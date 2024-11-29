@@ -1,6 +1,9 @@
 import { Button } from "@/components/ui/button"
 import { ChevronRight } from 'lucide-react'
 import Image from "next/image"
+import { Fraunces } from 'next/font/google'
+
+const fraunces = Fraunces({ subsets: ['latin'] })
 
 export function BenefitsSection() {
   return (
@@ -16,7 +19,7 @@ export function BenefitsSection() {
             />
           </div>
           <div className="flex flex-col gap-6">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800">
+            <h2 className={`${fraunces.className} text-3xl md:text-4xl text-gray-800`}>
               Beneficios de usar Recovery Care Solutions
             </h2>
             <p className="text-gray-600">

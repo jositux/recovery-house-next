@@ -1,6 +1,9 @@
 import { NewsCard } from "@/components/ui/news-card"
 import { ChevronRight } from 'lucide-react'
 import Link from "next/link"
+import { Fraunces } from 'next/font/google'
+
+const fraunces = Fraunces({ subsets: ['latin'] })
 
 const newsItems = [
   {
@@ -26,7 +29,7 @@ export function NewsSection() {
       <div className="container mx-auto">
         <div className="flex justify-between items-center mb-12">
           <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4 font-fraunces">
+            <h2 className={`${fraunces.className} text-3xl md:text-4xl font-normal text-gray-800 mb-4 font-fraunces`}>
               News & Trends
             </h2>
             <p className="text-gray-600 max-w-2xl">

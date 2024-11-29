@@ -4,6 +4,10 @@
   height: 100%;
 }
 
+.font-fraunces {
+  font-family: 'Fraunces, Fraunces Fallback';
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

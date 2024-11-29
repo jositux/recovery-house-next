@@ -43,10 +43,88 @@ export default async function PropertyPage({ params }: PageProps) {
       name: "Enfermería a Domicilio",
       service: "Cuidados de enfermería",
       phone: "300 123 4567",
-      email: "enfermeria@cuidados.com"
+      email: "enfermeria@cuidados.com",
+      treatment: "Enfermería"
     },
-    // ... otros proveedores
+    {
+      name: "FisioTerapia Express",
+      service: "Fisioterapia",
+      phone: "301 234 5678",
+      email: "info@fisioterapiaexpress.com",
+      treatment: "Fisioterapia"
+    },
+    {
+      name: "NutriSalud",
+      service: "Nutrición y dietética",
+      phone: "302 345 6789",
+      email: "contacto@nutrisalud.com",
+      treatment: "Nutrición"
+    },
+    {
+      name: "PsicoApoyo",
+      service: "Atención psicológica",
+      phone: "303 456 7890",
+      email: "citas@psicoapoyo.com",
+      treatment: "Psicología"
+    },
+    {
+      name: "FarmaCare 24/7",
+      service: "Farmacia a domicilio",
+      phone: "304 567 8901",
+      email: "pedidos@farmacare.com",
+      treatment: "Farmacia"
+    },
+    {
+      name: "MediTransporte",
+      service: "Transporte médico",
+      phone: "305 678 9012",
+      email: "reservas@meditransporte.com",
+      treatment: "Transporte"
+    },
+    {
+      name: "TerapiaOcupacional Plus",
+      service: "Terapia ocupacional",
+      phone: "306 789 0123",
+      email: "info@terapiaocupacionalplus.com",
+      treatment: "Terapia ocupacional"
+    },
+    {
+      name: "LabExpress",
+      service: "Laboratorio clínico móvil",
+      phone: "307 890 1234",
+      email: "resultados@labexpress.com",
+      treatment: "Laboratorio"
+    },
+    {
+      name: "FisioEquipos",
+      service: "Alquiler de equipos médicos",
+      phone: "308 901 2345",
+      email: "alquileres@fisioequipos.com",
+      treatment: "Equipos médicos"
+    },
+    {
+      name: "CuidadoPaliativo en Casa",
+      service: "Cuidados paliativos",
+      phone: "309 012 3456",
+      email: "atencion@cuidadopaliativo.com",
+      treatment: "Paliativos"
+    },
+    {
+      name: "RehabilitaHogar",
+      service: "Adecuación de espacios",
+      phone: "310 123 4567",
+      email: "proyectos@rehabilitahogar.com",
+      treatment: "Rehabilitación"
+    },
+    {
+      name: "MasajesTerapéuticos a Domicilio",
+      service: "Masajes terapéuticos",
+      phone: "311 234 5678",
+      email: "citas@masajesterapeuticos.com",
+      treatment: "Masajes"
+    }
   ];
+  
 
   return (
     <div className="min-h-screen bg-white">
@@ -118,6 +196,7 @@ export default async function PropertyPage({ params }: PageProps) {
                     key={index}
                     name={provider.name}
                     service={provider.service}
+                    treatment={provider.treatment}
                     phone={provider.phone}
                     email={provider.email}
                   />

@@ -2,6 +2,10 @@ import Link from "next/link"
 import Image from "next/image"
 import { LanguageSelector } from "@/components/ui/language-selector"
 
+import { Fraunces } from 'next/font/google'
+
+const fraunces = Fraunces({ subsets: ['latin'] })
+
 const assistanceLinks = [
   { title: "Centro de ayuda", href: "#" },
   { title: "Preguntas frecuentes", href: "#" },
@@ -81,7 +85,7 @@ export function Footer() {
 
           {/* Assistance Links */}
           <div className="lg:col-span-2">
-            <h3 className="font-fraunces font-semibold text-lg mb-4">Asistencia</h3>
+            <h3 className={`${fraunces.className} font-fraunces font-semibold text-lg mb-4`}>Asistencia</h3>
             <ul className="space-y-3">
               {assistanceLinks.map((link) => (
                 <li key={link.title}>
@@ -95,7 +99,7 @@ export function Footer() {
 
           {/* Host Links */}
           <div className="lg:col-span-2">
-            <h3 className="font-fraunces font-semibold text-lg mb-4">Anfitrión</h3>
+            <h3 className={`${fraunces.className} font-fraunces font-semibold text-lg mb-4`}>Anfitrión</h3>
             <ul className="space-y-3">
               {hostLinks.map((link) => (
                 <li key={link.title}>
@@ -109,7 +113,7 @@ export function Footer() {
 
           {/* Social Links */}
           <div className="lg:col-span-3">
-            <h3 className="font-fraunces font-semibold text-lg mb-4">Síguenos</h3>
+            <h3 className={`${fraunces.className} font-fraunces font-semibold text-lg mb-4`}>Síguenos</h3>
             <ul className="space-y-3">
               {socialLinks.map((link) => (
                 <li key={link.title}>

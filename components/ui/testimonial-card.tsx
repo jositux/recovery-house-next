@@ -1,6 +1,10 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
+import { Fraunces } from 'next/font/google'
+
+const fraunces = Fraunces({ subsets: ['latin'] })
+
 
 interface TestimonialCardProps extends React.HTMLAttributes<HTMLDivElement> {
   name: string
@@ -26,7 +30,7 @@ export function TestimonialCard({
             <AvatarFallback>{name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
           </Avatar>
           <div>
-            <h3 className="font-semibold text-base">{name}</h3>
+            <h3 className={`${fraunces.className} font-semibold text-base`}>{name}</h3>
             <p className="text-sm text-muted-foreground">{location}</p>
           </div>
         </div>

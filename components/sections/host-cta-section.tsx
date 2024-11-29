@@ -1,6 +1,10 @@
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 
+import { Fraunces } from 'next/font/google'
+
+const fraunces = Fraunces({ subsets: ['latin'] })
+
 export function HostCTASection() {
   return (
     <section className="relative h-[600px] w-full overflow-hidden">
@@ -16,7 +20,7 @@ export function HostCTASection() {
       {/* Content Container */}
       <div className="container relative h-full mx-auto">
         <div className="flex flex-col justify-center h-full max-w-lg">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 font-fraunces">
+          <h2 className={`${fraunces.className} text-4xl md:text-5xl text-white mb-4`}>
             Tu espacio vale la pena compartirlo
           </h2>
           <p className="text-lg text-white/90 mb-8">

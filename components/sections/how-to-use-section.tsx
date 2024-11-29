@@ -1,6 +1,11 @@
 import { Button } from "@/components/ui/button"
 import { ChevronRight } from 'lucide-react'
 
+import { Fraunces } from 'next/font/google'
+
+const fraunces = Fraunces({ subsets: ['latin'] })
+
+
 const steps = [
   {
     number: "1.",
@@ -26,7 +31,7 @@ export function HowToUseSection() {
         <div className="grid md:grid-cols-2 gap-12 items-start">
           {/* Left Column */}
           <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 font-fraunces mb-4">
+            <h2 className={`${fraunces.className} text-3xl md:text-4xl text-gray-800 mb-4`}>
               Cómo utilizar nuestra plataforma de recuperación
             </h2>
             <p className="text-gray-600">
@@ -38,7 +43,7 @@ export function HowToUseSection() {
           <div className="space-y-8">
             {steps.map((step, index) => (
               <div key={index} className="flex gap-4">
-                <span className="text-4xl font-bold text-[#4A7598] font-fraunces">
+                <span className={`${fraunces.className} text-7xl font-medium text-[#4A7598]`}>
                   {step.number}
                 </span>
                 <div>
