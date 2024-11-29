@@ -1,0 +1,35 @@
+.card {
+  flex-shrink: 0;
+  width: 280px;
+  overflow: hidden;
+  border-radius: 1rem;
+  background-color: #E5EEF6;
+}
+
+.imageContainer {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  width: 100%;
+}
+
+.content {
+  padding: 1.5rem;
+}
+
+.title {
+  font-family: var(--font-fraunces);
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.button {
+  width: 100%;
+  background-color: #4A7598;
+}
+
+.button:hover {
+  background-color: #3A5F7A;
+}
+

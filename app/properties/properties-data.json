@@ -1,0 +1,165 @@
+{
+  "properties": [
+    {
+      "id": "1",
+      "title": "Apartamento moderno en el centro",
+      "description": "Hermoso apartamento con todas las comodidades necesarias para tu recuperación postoperatoria.",
+      "price": 75000,
+      "image": "/placeholder.svg?height=300&width=400",
+      "coordinates": [40.7128, -74.006]
+    },
+    {
+      "id": "2",
+      "title": "Casa de reposo con jardín",
+      "description": "Espaciosa casa con un hermoso jardín, perfecta para una recuperación tranquila.",
+      "price": 95000,
+      "image": "/placeholder.svg?height=300&width=400",
+      "coordinates": [40.7282, -73.9942]
+    },
+    {
+      "id": "3",
+      "title": "Suite de lujo con servicio de enfermería",
+      "description": "Suite de lujo con servicio de enfermería las 24 horas para una recuperación cómoda y segura.",
+      "price": 150000,
+      "image": "/placeholder.svg?height=300&width=400",
+      "coordinates": [40.7589, -73.9851]
+    },
+    {
+      "id": "4",
+      "title": "Apartamento accesible cerca del hospital",
+      "description": "Apartamento totalmente accesible, ubicado a pocos minutos del hospital principal.",
+      "price": 65000,
+      "image": "/placeholder.svg?height=300&width=400",
+      "coordinates": [40.7489, -73.9680]
+    },
+    {
+      "id": "5",
+      "title": "Casa de campo para recuperación",
+      "description": "Tranquila casa de campo ideal para una recuperación relajada y en contacto con la naturaleza.",
+      "price": 85000,
+      "image": "/placeholder.svg?height=300&width=400",
+      "coordinates": [40.8075, -73.9626]
+    },
+    {
+      "id": "6",
+      "title": "Penthouse con vistas panorámicas",
+      "description": "Lujoso penthouse con vistas impresionantes de la ciudad, perfecto para una recuperación con estilo.",
+      "price": 200000,
+      "image": "/placeholder.svg?height=300&width=400",
+      "coordinates": [40.7516, -73.9776]
+    },
+    {
+      "id": "7",
+      "title": "Apartamento familiar con cocina equipada",
+      "description": "Amplio apartamento familiar con cocina totalmente equipada para una estancia cómoda durante la recuperación.",
+      "price": 90000,
+      "image": "/placeholder.svg?height=300&width=400",
+      "coordinates": [40.7606, -73.9935]
+    },
+    {
+      "id": "8",
+      "title": "Estudio acogedor en zona tranquila",
+      "description": "Pequeño pero acogedor estudio en una zona tranquila, ideal para una recuperación sin distracciones.",
+      "price": 55000,
+      "image": "/placeholder.svg?height=300&width=400",
+      "coordinates": [40.7829, -73.9654]
+    },
+    {
+      "id": "9",
+      "title": "Casa de playa para recuperación",
+      "description": "Hermosa casa de playa donde podrás recuperarte mientras disfrutas del sonido del mar.",
+      "price": 120000,
+      "image": "/placeholder.svg?height=300&width=400",
+      "coordinates": [40.5795, -73.9442]
+    },
+    {
+      "id": "10",
+      "title": "Apartamento adaptado para movilidad reducida",
+      "description": "Apartamento totalmente adaptado para personas con movilidad reducida, garantizando una recuperación cómoda y segura.",
+      "price": 80000,
+      "image": "/placeholder.svg?height=300&width=400",
+      "coordinates": [40.7605, -73.9932]
+    },
+    {
+      "id": "11",
+      "title": "Loft moderno con gimnasio privado",
+      "description": "Espacioso loft con gimnasio privado para ayudarte en tu proceso de recuperación física.",
+      "price": 110000,
+      "image": "/placeholder.svg?height=300&width=400",
+      "coordinates": [40.7185, -74.0152]
+    },
+    {
+      "id": "12",
+      "title": "Casa con piscina terapéutica",
+      "description": "Hermosa casa con piscina terapéutica, ideal para rehabilitación y ejercicios acuáticos.",
+      "price": 140000,
+      "image": "/placeholder.svg?height=300&width=400",
+      "coordinates": [40.7427, -73.9514]
+    },
+    {
+      "id": "13",
+      "title": "Apartamento zen con jardín japonés",
+      "description": "Tranquilo apartamento con un hermoso jardín japonés, perfecto para una recuperación relajante y meditativa.",
+      "price": 95000,
+      "image": "/placeholder.svg?height=300&width=400",
+      "coordinates": [40.7216, -73.9879]
+    },
+    {
+      "id": "14",
+      "title": "Suite hospitalaria de lujo",
+      "description": "Suite de lujo dentro del hospital, combinando la comodidad de un hotel con la atención médica inmediata.",
+      "price": 180000,
+      "image": "/placeholder.svg?height=300&width=400",
+      "coordinates": [40.7644, -73.9557]
+    },
+    {
+      "id": "15",
+      "title": "Cabaña en el bosque para recuperación",
+      "description": "Acogedora cabaña en medio del bosque, ideal para una recuperación en paz y tranquilidad.",
+      "price": 70000,
+      "image": "/placeholder.svg?height=300&width=400",
+      "coordinates": [41.1234, -74.0504]
+    },
+    {
+      "id": "16",
+      "title": "Apartamento con terraza y vista al parque",
+      "description": "Hermoso apartamento con una amplia terraza y vistas al parque, perfecto para relajarse durante la recuperación.",
+      "price": 105000,
+      "image": "/placeholder.svg?height=300&width=400",
+      "coordinates": [40.7712, -73.9739]
+    },
+    {
+      "id": "17",
+      "title": "Casa de reposo con servicio de chef",
+      "description": "Lujosa casa de reposo con servicio de chef personal, garantizando una alimentación deliciosa y saludable durante tu recuperación.",
+      "price": 160000,
+      "image": "/placeholder.svg?height=300&width=400",
+      "coordinates": [40.7352, -74.0058]
+    },
+    {
+      "id": "18",
+      "title": "Apartamento con sala de fisioterapia",
+      "description": "Moderno apartamento equipado con una sala de fisioterapia privada para tu rehabilitación.",
+      "price": 130000,
+      "image": "/placeholder.svg?height=300&width=400",
+      "coordinates": [40.7505, -73.9934]
+    },
+    {
+      "id": "19",
+      "title": "Bungalow con acceso directo a la playa",
+      "description": "Hermoso bungalow con acceso directo a la playa, ideal para una recuperación relajante junto al mar.",
+      "price": 115000,
+      "image": "/placeholder.svg?height=300&width=400",
+      "coordinates": [40.5760, -73.9515]
+    },
+    {
+      "id": "20",
+      "title": "Ático con jacuzzi terapéutico",
+      "description": "Lujoso ático con jacuzzi terapéutico y vistas panorámicas de la ciudad, perfecto para una recuperación con todos los lujos.",
+      "price": 190000,
+      "image": "/placeholder.svg?height=300&width=400",
+      "coordinates": [40.7587, -73.9787]
+    }
+  ]
+}
+
