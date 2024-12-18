@@ -1,16 +1,16 @@
+"use client"
+
+//import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { ChevronDown } from 'lucide-react'
+import { Home } from 'lucide-react'
 import Image from "next/image"
 import Link from "next/link"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-
+//import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+//import { LoginForm } from "@/components/forms/LoginForm"
 
 export function Header() {
+  //const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false)
+  
   return (
     <header className="bg-[#4A7598] p-4">
       <div className="container mx-auto flex items-center justify-between">
@@ -20,25 +20,46 @@ export function Header() {
             alt="Recovery Care Solutions"
             width={180}
             height={60}
+       
           />
+         
         </Link>
         
         <div className="flex items-center gap-4">
-          <span className="text-white">Hola, Juan</span>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="text-white hover:bg-white/10">
-                <span>Salir</span>
-                <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem>Mensajes</DropdownMenuItem>
-              <DropdownMenuItem>Mis estadías</DropdownMenuItem>
-              <DropdownMenuItem>Mi cuenta</DropdownMenuItem>
-              <DropdownMenuItem>Centro de ayuda</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button 
+            variant="secondary" 
+            className="bg-gray-800 text-white hover:bg-gray-700"
+            asChild
+          >
+            <Link href="/register">Registrarse</Link>
+          </Button>
+          <Button 
+            variant="secondary" 
+            className="bg-gray-800 text-white hover:bg-gray-700"
+            asChild
+            /*onClick={() => setIsLoginDialogOpen(true)}*/
+          >
+            <Link href="/login">Ingresar</Link>
+          </Button>
+          {/*
+          <Dialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Iniciar sesión</DialogTitle>
+              </DialogHeader>
+              <LoginForm /> 
+            </DialogContent>
+          </Dialog>*/}
+          <Button 
+            variant="secondary" 
+            className="bg-gray-800 text-white hover:bg-gray-700"
+            asChild
+          >
+            <Link href="/register-property" className="flex items-center gap-2">
+              Registra tu propiedad
+              <Home className="h-4 w-4" />
+            </Link>
+          </Button>
         </div>
       </div>
     </header>

@@ -1,0 +1,258 @@
+"use client"
+
+import { useState, useEffect } from 'react'
+import { useParams } from 'next/navigation'
+import axios from 'axios'
+import { /*Bed, Bath, Users,*/ Wifi, Car, AmbulanceIcon as FirstAid, Shirt, Waves, Tv, Clock, ChefHat, Hospital } from 'lucide-react'
+import { BookingWidget } from '@/components/ui/booking-widget'
+import { AmenityIcon } from '@/components/ui/amenity-icon'
+import { ServiceProviderCard } from '@/components/ui/service-provider-card'
+import { GoogleMap } from '@/components/ui/google-map'
+
+interface Room {
+  id: string
+  name: string
+  description: string
+  pricePerNigth: string
+  mainImage: string
+  cleaningFee: string
+  photos: {
+    directus_files_id: {
+      filename_download: string
+    }
+  }[]
+  extraTags: { ExtraTags_id: string }[]
+  servicesTags: { serviceTags_id: string }[]
+}
+
+interface Property {
+  id: string
+  name: string
+  country: string
+  region: string
+  state: string
+  city: string
+  place: {
+    type: string
+    coordinates: [number, number]
+  }
+  description: string | null
+  photos: {
+    directus_files_id: {
+      filename_download: string
+    }
+  }[]
+  Rooms: Room[]
+}
+
+interface Booking {
+  id: string
+  status: string
+  checkIn: string
+  checkOut: string
+  patient: string
+  room: string
+}
+
+export default function RoomPage() {
+  const { id } = useParams()
+  const [room, setRoom] = useState<Room | null>(null)
+  const [property, setProperty] = useState<Property | null>(null)
+  const [bookings, setBookings] = useState<Booking[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchRoomData = async () => {
+      setIsLoading(true)
+      setError(null)
+      try {
+        const [propertyResponse, bookingsResponse] = await Promise.all([
+          axios.get('/api/items/Property', {
+            params: {
+              'fields': '*,photos.directus_files_id.*, Rooms.*, Rooms.photos.directus_files_id.*, Rooms.extraTags.*, Rooms.servicesTags.*'
+            },
+            headers: {
+              'Access-Control-Allow-Origin': '*',
+            },
+          }),
+          axios.get(`/api/items/Booking`, {
+            params: {
+              'filter[room][_eq]': id
+            },
+            headers: {
+              'Access-Control-Allow-Origin': '*',
+            },
+          })
+        ])
+
+        const properties = propertyResponse.data.data
+        const foundProperty = properties.find((prop: Property) => 
+          prop.Rooms.some((room: Room) => room.id === id)
+        )
+        if (foundProperty) {
+          setProperty(foundProperty)
+          setRoom(foundProperty.Rooms.find((room: Room) => room.id === id) || null)
+        } else {
+          setError('Habitación no encontrada')
+        }
+
+        setBookings(bookingsResponse.data.data)
+      } catch (error) {
+        console.error('Error fetching room data:', error)
+        setError('Error al cargar los datos de la habitación. Por favor, intenta de nuevo más tarde.')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    if (id) {
+      fetchRoomData()
+    }
+  }, [id])
+
+
+  const decodeHtmlAndRemoveTags = (html: string): string => {
+    const textWithoutTags = html.replace(/<\/?[^>]+(>|$)/g, "");
+    const txt = document.createElement("textarea");
+    txt.innerHTML = textWithoutTags;
+    return txt.value;
+  };
+  
+
+  const amenities = [
+    { icon: Wifi, label: 'WiFi' },
+    { icon: Car, label: 'Traslados desde y hacia la clínica' },
+    { icon: FirstAid, label: 'Servicio de Enfermería' },
+    { icon: Shirt, label: 'Lavandería gratis' },
+    { icon: Waves, label: 'Piscina/spa' },
+    { icon: Tv, label: 'TV' },
+    { icon: Clock, label: 'Servicio 24/7' },
+    { icon: ChefHat, label: 'Chef' },
+    { icon: Hospital, label: 'Clínica Médica/hospitalaria' }
+  ]
+
+  const serviceProviders = [
+    {
+      name: "Enfermería a Domicilio",
+      service: "Cuidados de enfermería",
+      phone: "300 123 4567",
+      email: "enfermeria@cuidados.com",
+      treatment: "Enfermería"
+    },
+    {
+      name: "FisioTerapia Express",
+      service: "Fisioterapia",
+      phone: "301 234 5678",
+      email: "info@fisioterapiaexpress.com",
+      treatment: "Fisioterapia"
+    },
+    {
+      name: "NutriSalud",
+      service: "Nutrición y dietética",
+      phone: "302 345 6789",
+      email: "contacto@nutrisalud.com",
+      treatment: "Nutrición"
+    },
+  ]
+
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-screen">Cargando...</div>
+  }
+
+  if (error || !room || !property) {
+    return <div className="flex justify-center items-center h-screen text-red-500">{error || 'Habitación no encontrada'}</div>
+  }
+
+  return (
+    <div className="min-h-screen bg-white">
+
+ {/* Hero Image */}
+ <div className="relative h-[500px] w-full">
+        <img
+          src={`/api/assets/${room.mainImage}`}
+          alt={property.name}
+          className="w-full h-full object-cover"
+        />
+      </div>
+      {/* Content */}
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2">
+            {/* Title and Stats */}
+            <div className="mb-6">
+              <h1 className="text-3xl font-bold text-gray-900 mb-4">{room.name}</h1>
+              <p className="text-xl text-gray-600 mb-4">{property.name}</p>
+             {/* <div className="flex gap-4 text-gray-600">
+                <div className="flex items-center gap-1">
+                  <Bed className="h-5 w-5" />
+                  <span>{room.extraTags.find(tag => tag.ExtraTags_id === 'beds')?.ExtraTags_id || 'N/A'}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Bath className="h-5 w-5" />
+                  <span>{room.extraTags.find(tag => tag.ExtraTags_id === 'bathrooms')?.ExtraTags_id || 'N/A'}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Users className="h-5 w-5" />
+                  <span>{room.extraTags.find(tag => tag.ExtraTags_id === 'capacity')?.ExtraTags_id || 'N/A'}</span>
+                </div>
+  </div> */}
+            </div>
+
+            {/* Description */}
+            <div className="mb-8">
+              <p className="text-gray-600">{decodeHtmlAndRemoveTags(room.description)}</p>
+            </div>
+
+            {/* Amenities */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Amenidades / Servicios</h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {room.servicesTags.map((tag, index) => (
+                  <AmenityIcon key={index} icon={amenities.find(a => a.label === tag.serviceTags_id)?.icon || Wifi} label={tag.serviceTags_id} />
+                ))}
+              </div>
+            </div>
+
+            {/* Map */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">El vecindario</h2>
+              <div className="h-[300px] w-full relative rounded-lg overflow-hidden">
+                <GoogleMap lat={property.place.coordinates[1]} lng={property.place.coordinates[0]} />
+              </div>
+            </div>
+
+            {/* Service Providers */}
+            <div>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold text-gray-900">Proveedores de servicios</h2>
+                <button className="text-[#4A7598]">Filtrar</button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {serviceProviders.map((provider, index) => (
+                  <ServiceProviderCard
+                    key={index}
+                    name={provider.name}
+                    service={provider.service}
+                    treatment={provider.treatment}
+                    phone={provider.phone}
+                    email={provider.email}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Booking Widget */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-4">
+              <BookingWidget room={room.id} price={parseFloat(room.pricePerNigth)} cleaning={parseFloat(room.cleaningFee)} bookings={bookings} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+

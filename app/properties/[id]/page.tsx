@@ -1,5 +1,5 @@
 import { Bed, Bath, Users, Wifi, Car, AmbulanceIcon as FirstAid, Shirt, Waves, Tv, Clock, ChefHat, Hospital } from 'lucide-react'
-import { BookingWidget } from '@/components/ui/booking-widget'
+import { BookingWidget } from '@/components/ui/property-widget'
 import { AmenityIcon } from '@/components/ui/amenity-icon'
 import { ServiceProviderCard } from '@/components/ui/service-provider-card'
 import { GoogleMap } from '@/components/ui/google-map'
@@ -205,12 +205,12 @@ export default async function PropertyPage({ params }: PageProps) {
             </div>
           </div>
 
-          {/* Booking Widget */}
+          { //Booking Widget 
           <div className="lg:col-span-1">
             <div className="sticky top-4">
-              <BookingWidget price={property.price} />
+            <BookingWidget price={property.price} />
             </div>
-          </div>
+          </div>}
         </div>
       </div>
     </div>
