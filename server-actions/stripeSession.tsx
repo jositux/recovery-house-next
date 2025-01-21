@@ -11,41 +11,35 @@ const stripe = new Stripe(apiKey);
 interface NewSessionOptions {
   priceId: string;
   name: string;
-  description: string;
-  unit_amount: number;
 }
 
-export const postStripeSession = async ({
-  priceId,
-  name,
-  description,
-  unit_amount,
-}: NewSessionOptions) => {
+export const postStripeSession = async ({ priceId }: NewSessionOptions) => {
+
+  console.log(priceId)
   const returnUrl =
-    "http://localhost:3000/checkout-return?session_id={CHECKOUT_SESSION_ID}";
+    "https://recovery-house-next.vercel.app/checkout-return?session_id={CHECKOUT_SESSION_ID}";
 
   const session = await stripe.checkout.sessions.create({
     ui_mode: "embedded",
     line_items: [
-      {
-        price_data: {
-          currency: "cop",
-          product_data: {
-            name,
-            description,
+        {
+          price_data: {
+            currency: 'cop',
+            product_data: {
+              name: 'Meme "This is fine"',
+              description: "ghjksgahjgjs",
+            },
+            unit_amount: 20000000,
           },
-          unit_amount,
+          quantity: 1,
         },
-        quantity: 1,
-      },
-    ],
+      ],
     mode: "payment",
     return_url: returnUrl,
   });
 
-  if (!session.client_secret) {
+  if (!session.client_secret)
     throw new Error("Error initiating Stripe session");
-  }
 
   return {
     clientSecret: session.client_secret,
