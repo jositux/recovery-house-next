@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = '/api/users';
+const API_URL = '/webapi/users';
 
 export interface RegisterCredentials {
   first_name: string;

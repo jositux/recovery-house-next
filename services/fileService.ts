@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = '/api/files'; 
+const API_URL = '/webapi/files'; 
 
 interface FileUploadRequest {
   destination: string;
@@ -12,9 +12,10 @@ interface FileUploadRequest {
 }
 
 interface FileUploadResponse {
+  data: {
   id: string;
-  filename: string;
-  url: string;
+  filename_download: string;
+}
 }
 
 export const fileService = {

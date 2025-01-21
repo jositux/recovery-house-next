@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { Fraunces, DM_Sans } from 'next/font/google'
 import './globals.css'
+import { Toaster } from "@/components/ui/toaster"
+
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 
@@ -28,7 +30,8 @@ export default function RootLayout({
     <html lang="es" className={`${fraunces.variable} ${dmSans.variable}`}>
       <body className="font-dm-sans">
         <Header />
-        {children}
+        <main>{children}</main>
+        <Toaster />
         <Footer />
       </body>
     </html>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import axios from "axios";
+import { fetchCurrentUser } from "@/services/BookingService";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -14,6 +14,8 @@ import { Label } from "@/components/ui/label";
 import { format, addDays, parseISO, isWithinInterval } from "date-fns";
 import { es } from "date-fns/locale";
 import { CalendarIcon, Minus, Plus, Users } from "lucide-react";
+
+import { useRouter } from 'next/navigation'
 
 import styles from "./BookingWidget.module.css";
 
@@ -28,6 +30,8 @@ interface Booking {
 
 interface BookingWidgetProps {
   room: string;
+  name: string;
+  description: string;
   price: number;
   cleaning: number;
   bookings: Booking[];
@@ -35,6 +39,8 @@ interface BookingWidgetProps {
 
 export function BookingWidget({
   room,
+  name,
+  description,
   price,
   cleaning,
   bookings: initialBookings,
@@ -45,7 +51,7 @@ export function BookingWidget({
   const [nights, setNights] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [bookings, setBookings] = useState<Booking[]>(initialBookings);
+  const bookings = initialBookings;
 
   useEffect(() => {
     if (checkIn && checkOut) {
@@ -62,7 +68,7 @@ export function BookingWidget({
     const subtotal = price * nights * guests;
     const cleaningFee = cleaning;
     setTotalPrice(subtotal + cleaningFee);
-  }, [price, nights, guests]);
+  }, [price, nights, guests, cleaning]);
 
   const handleGuestsChange = (increment: number) => {
     setGuests((prevGuests) => Math.max(1, prevGuests + increment));
@@ -98,41 +104,39 @@ export function BookingWidget({
         return;
       }
 
-      const response = await axios.get("/api/users/me", {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const currentUser = await fetchCurrentUser(accessToken);
+      const patient_id = currentUser.id;
 
-      const patient_id = response.data.data.id;
-
-      const reservationResponse = await axios.post(
-        "/api/items/Booking/",
-        {
-          status: "pay-pending",
-          checkIn: checkIn,
-          checkOut: checkOut,
-          patient: patient_id,
-          room: room,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-
-      const newBooking: Booking = {
-        id: reservationResponse.data.id,
+      const newBookingData = {
         status: "pay-pending",
         checkIn: checkIn?.toISOString() || "",
         checkOut: checkOut?.toISOString() || "",
         patient: patient_id,
         room: room,
       };
+      
+      // Crear el nuevo array con los parámetros adicionales
+      const formattedBooking = {
+        ...newBookingData, // Incluye todos los datos originales
+        unit_amount: totalPrice, // Agrega el precio total calculado
+        guests: guests,
+        name: name,
+        description: description,    // Agrega la cantidad de huéspedes
+      };
 
-      setBookings((prevBookings) => [...prevBookings, newBooking]);
-      alert("Reservación creada con éxito.");
+      /*const newBooking = await createBooking(newBookingData, accessToken);
+
+      setBookings((prevBookings) => [
+        ...prevBookings,
+        { ...newBooking, ...newBookingData },
+      ]);*/
+
+      
+
+      localStorage.setItem("booking", JSON.stringify(formattedBooking));
+
+      router.push('/checkout')
+     
     } catch (error) {
       console.error("Error al realizar la reserva:", error);
       alert("Ocurrió un error al realizar la reserva.");
@@ -140,6 +144,8 @@ export function BookingWidget({
       setLoading(false);
     }
   };
+
+  const router = useRouter()
 
   return (
     <div className="border rounded-lg p-4 space-y-4">
@@ -244,22 +250,20 @@ export function BookingWidget({
           </div>
         </div>
         <div className="pt-4">
-        <div className="space-y-2 flex justify-between">
+          <div className="space-y-2 flex justify-between">
             <span className="flex text-gray-700">
-           {nights} noche(s) x {guests} huésped(es)
-          </span>
-          <span>${price * guests} COP</span>
+              {nights} noche(s) x {guests} huésped(es)
+            </span>
+            <span>${price * guests} COP</span>
           </div>
-          
-          
           <div className="flex justify-end">
             <p className="text-gray-700">+ Limpieza: {cleaning.toLocaleString("es-CO")} COP</p>
           </div>
           <div className="pt-4">
-          <div className="pt-4 space-y-2 border-t text-2xl flex justify-between font-bold">
-            <span>Total</span>
-            <span>${totalPrice.toLocaleString("es-CO")} COP</span>
-          </div>
+            <div className="pt-4 space-y-2 border-t text-2xl flex justify-between font-bold">
+              <span>Total</span>
+              <span>${totalPrice.toLocaleString("es-CO")} COP</span>
+            </div>
           </div>
         </div>
       </div>

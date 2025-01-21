@@ -48,11 +48,11 @@ export function LoginForm() {
     setAuthError(null) // Limpiar mensajes de error previos
     try {
       const response = await loginService.login(values as LoginCredentials)
-      console.log('respuesta en form: ', response)
     
       localStorage.setItem('expires', response.data.expires)
       localStorage.setItem('refresh_token', response.data.refresh_token)
       localStorage.setItem('access_token', response.data.access_token)
+
       router.push('/rooms')
     } catch (error) {
       if (axios.isAxiosError(error)) {

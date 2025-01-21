@@ -6,9 +6,9 @@ import { cn } from "@/lib/utils"
 import { fileService } from '@/services/fileService';
 
 interface ImageUploadProps {
-  onChange: (fileData: { id: string; filename: string; url: string; } | undefined) => void
+  onChange: (fileData: { id: string; filename_download: string;  } | undefined) => void
   onRemove: () => void
-  value?: { id: string; filename: string; url: string; } | undefined
+  value?: { id: string; filename_download: string; } | undefined
   className?: string
 }
 
@@ -32,8 +32,8 @@ export function ImageUpload({ onChange, onRemove, value, className }: ImageUploa
           description: 'PropertiesPhoto Desc',
           file: file,
         });
-        setUploadedImage(fileData)
-        onChange(fileData)
+        
+        onChange(fileData.data)
       } catch (error) {
         console.error('File upload failed:', error);
         // You might want to show an error message to the user here
@@ -74,7 +74,7 @@ export function ImageUpload({ onChange, onRemove, value, className }: ImageUploa
       ) : uploadedImage ? (
         <div className="absolute inset-0 w-full h-full">
           <img
-            src={uploadedImage.url}
+            src={uploadedImage.id}
             alt="Image preview"
             className="w-full h-full object-cover rounded-lg"
           />

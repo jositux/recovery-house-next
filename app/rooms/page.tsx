@@ -5,12 +5,13 @@ import { RoomCard } from "@/components/ui/room-card"
 import { RoomSearch } from "@/components/ui/room-search"
 import { MapRooms } from "@/components/ui/mapRooms"
 import axios from 'axios'
+import styles from './RoomsPage.module.css'  // Importa el archivo de CSS Modules
 
 interface Room {
   id: string
   name: string
   description: string
-  pricePerNigth: string
+  pricePerNight: string
   mainImage: string
   photos: {
     directus_files_id: {
@@ -54,7 +55,7 @@ export default function RoomsPage() {
       setIsLoading(true)
       setError(null)
       try {
-        const response = await axios.get('/api/items/Property', {
+        const response = await axios.get('/webapi/items/Property', {
           params: {
             'fields': '*,photos.directus_files_id.*, Rooms.*, Rooms.photos.directus_files_id.*, Rooms.extraTags.*, Rooms.servicesTags.*'
           },
@@ -87,13 +88,14 @@ export default function RoomsPage() {
 
   const filteredRooms = useMemo(() => {
     const lowercasedSearchTerm = searchTerm.toLowerCase()
-    return allRooms.filter(room => 
+    const filtered = allRooms.filter(room => 
       room.name.toLowerCase().includes(lowercasedSearchTerm) ||
       room.description.toLowerCase().includes(lowercasedSearchTerm) ||
       room.propertyName.toLowerCase().includes(lowercasedSearchTerm) ||
       room.propertyLocation.toLowerCase().includes(lowercasedSearchTerm) ||
-      room.pricePerNigth.includes(lowercasedSearchTerm)
+      room.pricePerNight.includes(lowercasedSearchTerm)
     )
+    return filtered.reverse()
   }, [allRooms, searchTerm])
 
   const totalPages = Math.ceil(filteredRooms.length / roomsPerPage)
@@ -139,13 +141,17 @@ export default function RoomsPage() {
           <div className="lg:w-2/3">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {currentRooms.map((room) => (
-                <div key={room.id} id={`room-${room.id}`}>
+                <div
+                  key={room.id}
+                  id={`room-${room.id}`}
+                  className={`${styles.fade} ${styles['fade-visible']}`}
+                >
                   <RoomCard
                     id={room.id}
                     name={room.name}
                     description={room.description}
-                    price={parseFloat(room.pricePerNigth)}
-                    image={`/api/assets/${room.mainImage}`}
+                    price={parseFloat(room.pricePerNight)}
+                    image={`/webapi/assets/${room.mainImage}`}
                     propertyName={room.propertyName}
                   />
                 </div>
@@ -180,4 +186,3 @@ export default function RoomsPage() {
     </main>
   )
 }
-

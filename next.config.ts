@@ -1,12 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-
+  reactStrictMode: true,
+  transpilePackages: ['react-leaflet'],
    
   async rewrites() {  
     return [  
       {  
-        source: '/api/:path*',  
+        source: '/webapi/:path*',  
         destination: 'https://us-east-1a.recoverycaresolutions.com/:path*', // Use environment variable  
       },  
     ];  

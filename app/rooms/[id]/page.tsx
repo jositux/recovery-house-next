@@ -13,7 +13,7 @@ interface Room {
   id: string
   name: string
   description: string
-  pricePerNigth: string
+  pricePerNight: string
   mainImage: string
   cleaningFee: string
   photos: {
@@ -68,15 +68,15 @@ export default function RoomPage() {
       setError(null)
       try {
         const [propertyResponse, bookingsResponse] = await Promise.all([
-          axios.get('/api/items/Property', {
+          axios.get('/webapi/items/Property', {
             params: {
-              'fields': '*,photos.directus_files_id.*, Rooms.*, Rooms.photos.directus_files_id.*, Rooms.extraTags.*, Rooms.servicesTags.*'
+              'fields': '*,photos.directus_files_id.*, Rooms.*, Rooms.photos.directus_files_id.*, Rooms.extraTags.*, Rooms.extraTags.*, Rooms.servicesTags.*'
             },
             headers: {
               'Access-Control-Allow-Origin': '*',
             },
           }),
-          axios.get(`/api/items/Booking`, {
+          axios.get(`/webapi/items/Booking`, {
             params: {
               'filter[room][_eq]': id
             },
@@ -87,6 +87,9 @@ export default function RoomPage() {
         ])
 
         const properties = propertyResponse.data.data
+
+        console.log(properties);
+        
         const foundProperty = properties.find((prop: Property) => 
           prop.Rooms.some((room: Room) => room.id === id)
         )
@@ -170,7 +173,7 @@ export default function RoomPage() {
  {/* Hero Image */}
  <div className="relative h-[500px] w-full">
         <img
-          src={`/api/assets/${room.mainImage}`}
+          src={`/webapi/assets/${room.mainImage}`}
           alt={property.name}
           className="w-full h-full object-cover"
         />
@@ -247,7 +250,7 @@ export default function RoomPage() {
           {/* Booking Widget */}
           <div className="lg:col-span-1">
             <div className="sticky top-4">
-              <BookingWidget room={room.id} price={parseFloat(room.pricePerNigth)} cleaning={parseFloat(room.cleaningFee)} bookings={bookings} />
+              <BookingWidget room={room.id} name={room.name} description={room.description} price={parseFloat(room.pricePerNight)} cleaning={parseFloat(room.cleaningFee)} bookings={bookings} />
             </div>
           </div>
         </div>

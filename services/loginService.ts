@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = '/api/auth';
+const API_URL = '/webapi/auth';
 
 export interface LoginCredentials {
   email: string;

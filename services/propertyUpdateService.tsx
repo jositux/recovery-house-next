@@ -3,37 +3,37 @@ import axios from 'axios';
 const API_URL = '/webapi/items/Property';
 
 export interface PropertyData {
-  "name": string;
-  "description": string;
-  "country": string;
-  "region": string;
-  "state": string;
-  "city": string;
-  "postalCode": string;
-  "street": string;
-  "number": string;
-  "fullAddress": string;
-  "latitude": number;
-  "longitude": number;
-  "type": string;
-  "taxIdEIN": string;
-  "mainImage": string;
-  "RNTFile": string;
-  "taxIdEINFile": string;
-  "Rooms": string[]
+  name: string;
+  description: string;
+  country: string;
+  region: string;
+  state: string;
+  city: string;
+  postalCode: string;
+  street: string;
+  number: string;
+  fullAddress: string;
+  latitude: number;
+  longitude: number;
+  type: string;
+  taxIdEIN: string;
+  mainImage: string;
+  RNTFile: string;
+  taxIdEINFile: string;
+  Rooms: string[];
 }
 
 export interface PropertyResponse {
-  // Define the response structure here
-  // This will depend on what the API returns after a successful property creation
   data: {
-  id: string;
-}
-  // ... other fields
+    id: string;
+  };
 }
 
-export const propertyService = {
-  createProperty: async (propertyData: PropertyData): Promise<PropertyResponse> => {
+export const propertyUpdateService = {
+  updateProperty: async (
+    propertyId: string, 
+    propertyData: PropertyData
+  ): Promise<PropertyResponse> => {
     try {
       const token = localStorage.getItem('access_token');
 
@@ -56,12 +56,9 @@ export const propertyService = {
         postalCode: propertyData.postalCode,
         street: propertyData.fullAddress,
         number: propertyData.number,
-        "place": {
-            "type": "Point",
-            "coordinates": [
-               propertyData.latitude,
-               propertyData.longitude
-            ]
+        place: {
+          type: "Point",
+          coordinates: [propertyData.latitude, propertyData.longitude],
         },
         type: propertyData.type,
         taxIdEIN: propertyData.taxIdEIN,
@@ -69,27 +66,29 @@ export const propertyService = {
         taxIdEINFile: propertyData.taxIdEINFile,
         taxIdApproved: false,
         mainImage: propertyData.mainImage,
-        photos: [],
-        Rooms: propertyData.Rooms
-    }
+        Rooms: propertyData.Rooms,
+      };
 
-      const response = await axios.post<PropertyResponse>(`${API_URL}`, formatedData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      localStorage.setItem('propertyId', response.data.data.id);
+      const response = await axios.patch<PropertyResponse>(
+        `${API_URL}/${propertyId}`, // Usar el ID de la propiedad en el endpoint
+        formatedData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       console.log('API Response:', response.data.data.id);
-
 
       return response.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        // Handle Axios errors
-        throw new Error(error.response?.data?.message || 'An error occurred while creating the property');
+        throw new Error(
+          error.response?.data?.message ||
+          'An error occurred while updating the property'
+        );
       }
-      // Handle other errors
       throw new Error('An unexpected error occurred');
     }
   },
