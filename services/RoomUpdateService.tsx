@@ -28,21 +28,15 @@ export const roomUpdateService = {
       }
 
       // Transformar servicesTags a [{ serviceTags_id: string }]
-      const formattedServiceTags = data.servicesTags.map(tag => ({
-        serviceTags_id: tag,
-      }));
+      const formattedServiceTags = data.servicesTags;
 
       // Transformar extraTags a [{ extratags_id: string }]
-      const formattedExtraTags = data.extraTags.map(tag => ({
-        ExtraTags_id: tag,
-      }));
+      const formattedExtraTags = data.extraTags;
 
       // Transformar photos, asignando mainImage si photos está vacío
       const formattedPhotos =
         data.photos.length > 0
-          ? data.photos.map(photo => ({
-              directus_files_id: photo,
-            }))
+          ? data.photos
           : [{ directus_files_id: data.mainImage }];
 
       // Transformar propertyId de string a { id: string }

@@ -118,19 +118,13 @@ export function BookingWidget({
       // Crear el nuevo array con los parámetros adicionales
       const formattedBooking = {
         ...newBookingData, // Incluye todos los datos originales
-        unit_amount: totalPrice, // Agrega el precio total calculado
+        unit_amount: totalPrice*100, // Agrega el precio total calculado VER X 100!!
         guests: guests,
         name: name,
         description: description,    // Agrega la cantidad de huéspedes
       };
 
-      /*const newBooking = await createBooking(newBookingData, accessToken);
-
-      setBookings((prevBookings) => [
-        ...prevBookings,
-        { ...newBooking, ...newBookingData },
-      ]);*/
-
+      //const newBooking = await createBooking(newBookingData, accessToken);
       
 
       localStorage.setItem("booking", JSON.stringify(formattedBooking));

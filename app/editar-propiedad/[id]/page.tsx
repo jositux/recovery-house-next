@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -20,80 +19,38 @@ import FileUpload from "@/components/FileUpload";
 import ImageUpload from "@/components/CoverPhotoUpload";
 import { LocationSelector } from "@/components/ui/location-selector";
 import { UserTypeCard } from "@/components/ui/user-type-card";
-import { useRouter } from 'next/navigation'
-
-
-
-import { propertyService, PropertyData } from "@/services/propertyService";
+import {
+  propertyUpdateService,
+  PropertyData,
+} from "@/services/propertyUpdateService";
 import { roomService, RoomData } from "@/services/RoomService";
-
-import { Building2, Home } from "lucide-react";
-
+import {
+  roomUpdateService,
+  RoomUpdateData,
+} from "@/services/RoomUpdateService";
+import { Building2, Home } from 'lucide-react';
 import RoomAccordion from "@/components/RoomAccordion";
+import { formSchema, FormValues, FileData, Room, Property } from "../types";
 
-const formSchema = z.object({
-  name: z.string().min(1, "El nombre es requerido."),
-  description: z.string().min(6, "El la descripcion es requerida."),
-  country: z.string().min(1, "Por favor selecciona un país."),
-  state: z.string().min(1, "Por favor selecciona un estado."),
-  city: z.string().min(1, "Por favor selecciona una ciudad."),
-  postalCode: z.string().min(1, "El código postal es requerido."),
-  street: z.string().min(1, "La calle es requerida."),
-  number: z.string().min(1, "El número es requerido."),
-  fullAddress: z
-    .string()
-    .min(5, "La dirección completa debe tener al menos 5 caracteres."),
-  latitude: z.number().min(-90).max(90).nullable(),
-  longitude: z.number().min(-180).max(180).nullable(),
-  type: z.enum(["Stay", "RecoveryHouse"]),
-  taxIdEIN: z.string().min(1, "El TAX ID es requerido."),
-  mainImage: z.string().min(1, "La foto de la propiedad es obligatoria."),
-  RNTFile: z.string().min(1, "El archivo RNT es obligatorio."),
-  taxIdEINFile: z.string().min(1, "El archivo TAX ID es obligatorio."),
-});
-
-interface Room {
-  id: string;
-  name: string;
-  roomNumber: string;
-  description: string;
-  beds: number;
-  capacity: number;
-  pricePerNight: string;
-  cleaningFee: string;
-  mainImage: string;
-  photos: string[];
-  extraTags: string[];
-  servicesTags: string[];
-  propertyId: string;
-}
-
-type FormValues = z.infer<typeof formSchema>;
-
-export default function RegisterPropertyBasePage() {
-  const [imageId, setImageId] = useState<string>(""); // Estado para guardar el ID de la imagen
-
-  const [RNTFileData, setRNTFileData] = useState<{
-    id: string;
-    filename_download: string;
-  }>({
-    id: "",
-    filename_download: "",
-  });
-
-  const [TaxFileData, setTaxFileData] = useState<{
-    id: string;
-    filename_download: string;
-  }>({
-    id: "",
-    filename_download: "",
-  });
-
+export default function EditPropertyPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const [property, setProperty] = useState<Property | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [paramId, setParamId] = useState<string | null>(null);
+  const [imageId, setImageId] = useState<string>("");
+  const [RNTFileData, setRNTFileData] = useState<FileData>({ id: "", filename_download: "" });
+  const [TaxFileData, setTaxFileData] = useState<FileData>({ id: "", filename_download: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [rooms, setRooms] = useState<Room[]>([]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      id: "",
       name: "",
       description: "",
       country: "",
@@ -113,38 +70,91 @@ export default function RegisterPropertyBasePage() {
     },
   });
 
-  const router = useRouter()
+  useEffect(() => {
+    const getParams = async () => {
+      const resolvedParams = await params;
+      setParamId(resolvedParams.id);
+    };
+    getParams();
+  }, [params]);
+
+  useEffect(() => {
+    if (paramId) {
+      const fetchProperty = () => {
+        try {
+          const storedProperties = localStorage.getItem("properties");
+          if (storedProperties) {
+            const properties: Property[] = JSON.parse(storedProperties);
+            const selectedProperty = properties.find((prop) => prop.id === paramId);
+            
+            console.log(selectedProperty)
+            
+            if (selectedProperty) {
+              setProperty(selectedProperty);
+            } else {
+              throw new Error("Propiedad no encontrada");
+            }
+          } else {
+            throw new Error("No se encontraron propiedades en localStorage");
+          }
+        } catch (err) {
+          setError(err instanceof Error ? err.message : "Error al cargar la propiedad");
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchProperty();
+    }
+  }, [paramId]);
+
+  useEffect(() => {
+    if (property) {
+      form.reset({
+        id: property.id,
+        name: property.name,
+        description: property.description,
+        country: property.country,
+        state: property.state,
+        city: property.city,
+        postalCode: property.postalCode,
+        street: property.street,
+        number: property.number,
+        fullAddress: property.fullAddress,
+        latitude: property.latitude,
+        longitude: property.longitude,
+        type: property.type,
+        taxIdEIN: property.taxIdEIN,
+        mainImage: property.mainImage,
+        RNTFile: property.RNTFile.id,
+        taxIdEINFile: property.taxIdEINFile.id,
+      });
+
+      setRNTFileData(property.RNTFile);
+      setTaxFileData(property.taxIdEINFile);
+      setRooms(property.Rooms);
+    }
+  }, [property, form]);
 
   const onSubmit = async (values: FormValues) => {
     setIsSubmitting(true);
     let propertyIdLocal = "";
 
     try {
-      const propertyData: PropertyData = {
-        name: values.name,
-        description: values.description,
-        country: values.country,
+      const propertyUpdateData: PropertyData = {
+        ...values,
         region: "default",
-        state: values.state,
-        city: values.city,
-        postalCode: values.postalCode,
-        street: values.street,
-        number: values.number,
-        fullAddress: values.fullAddress,
+        Rooms: [],
         latitude: values.latitude ?? 0,
         longitude: values.longitude ?? 0,
-        type: values.type,
-        taxIdEIN: values.taxIdEIN,
-        mainImage: values.mainImage,
-        RNTFile: values.RNTFile,
-        taxIdEINFile: values.taxIdEINFile,
-        Rooms: [], // Usamos `ids` aquí
       };
-      const response = await propertyService.createProperty(propertyData);
 
-      propertyIdLocal = response.data.id;
-      
-
+      if (property) {
+        const response = await propertyUpdateService.updateProperty(
+          property.id,
+          propertyUpdateData
+        );
+        propertyIdLocal = response.data.id;
+      }
     } catch (error) {
       console.error("Error al registrar la propiedad:", error);
     } finally {
@@ -152,11 +162,9 @@ export default function RegisterPropertyBasePage() {
     }
 
     try {
-      rooms.map(async (room) => {
-        // Verificar valores predeterminados para `room.mainImage` y `room.photos`
-        const roomMainImage = room.mainImage || values.mainImage; // Usa `values.mainImage` si `room.mainImage` está vacío
-        const roomPhotos =
-          room.photos.length > 0 ? room.photos : [roomMainImage]; // Usa `roomMainImage` si `photos` está vacío
+      await Promise.all(rooms.map(async (room) => {
+        const roomMainImage = room.mainImage || values.mainImage;
+        const roomPhotos = room.photos.length > 0 ? room.photos : [roomMainImage];
 
         const roomData: RoomData = {
           name: room.name,
@@ -164,54 +172,40 @@ export default function RegisterPropertyBasePage() {
           description: room.description,
           beds: room.beds,
           capacity: room.capacity,
-          pricePerNight: room.pricePerNight ?? "",
-          cleaningFee: room.cleaningFee ?? "",
+          pricePerNight: room.pricePerNight,
+          cleaningFee: room.cleaningFee,
           mainImage: roomMainImage,
           photos: roomPhotos,
           extraTags: room.extraTags,
           servicesTags: room.servicesTags,
-          propertyId: propertyIdLocal || "",
+          propertyId: propertyIdLocal,
         };
 
-        const response = await roomService.createRoom(roomData);
-
-    
-
-        return response.id; // Obtenemos el ID de la respuesta
-
-      });
-
-      router.push('/mispropiedades')
+        if (room.id.startsWith("room-")) {
+          await roomService.createRoom(roomData);
+        } else {
+          const roomUpdateData: RoomUpdateData = { id: room.id, ...roomData };
+          await roomUpdateService.updateRoom(roomUpdateData);
+        }
+      }));
     } catch (error) {
-      console.error("Error creando room:", error);
+      console.error("Error creando o actualizando habitaciones:", error);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const [rooms, setRooms] = useState<Room[]>([
-    {
-      id: "1",
-      name: "Habitación 1",
-      roomNumber: "",
-      description: "",
-      beds: 1,
-      capacity: 1,
-      pricePerNight: "",
-      cleaningFee: "",
-      mainImage: "",
-      photos: [],
-      extraTags: [],
-      servicesTags: [],
-      propertyId: "0",
-    },
-  ]);
+  if (loading) {
+    return <p className="text-center p-4">Cargando datos de la propiedad...</p>;
+  }
+
+  if (error) {
+    return <p className="text-center p-4 text-red-500">Error: {error}</p>;
+  }
 
   return (
     <div className="container mx-auto max-w-2xl py-10">
-      <h1 className="text-3xl font-bold mb-6">
-        Registra tu propiedad
-      </h1>
+      <h1 className="text-3xl font-bold mb-6">Edita tu propiedad</h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
@@ -230,13 +224,13 @@ export default function RegisterPropertyBasePage() {
 
           <FormField
             control={form.control}
-            name={"description"}
+            name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Descripción</FormLabel>
+                <FormLabel>Describe tu propiedad</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder="Describe las características de la habitación"
+                    placeholder="Describe las características de la propiedad"
                     {...field}
                   />
                 </FormControl>
@@ -245,80 +239,81 @@ export default function RegisterPropertyBasePage() {
             )}
           />
 
-          <LocationSelector
-            onChange={({ country, state, city }) => {
-              form.setValue("country", country);
-              form.setValue("state", state);
-              form.setValue("city", city);
-            }}
-            error={{
-              country: form.formState.errors.country?.message,
-              state: form.formState.errors.state?.message,
-              city: form.formState.errors.city?.message,
-            }}
+          {property && (
+            <LocationSelector
+              defaultCountry={property.country}
+              defaultState={property.state}
+              defaultCity={property.city}
+              onChange={({ country, state, city }) => {
+                form.setValue("country", country);
+                form.setValue("state", state);
+                form.setValue("city", city);
+              }}
+              error={{
+                country: form.formState.errors.country?.message,
+                state: form.formState.errors.state?.message,
+                city: form.formState.errors.city?.message,
+              }}
+            />
+          )}
+
+          <FormField
+            control={form.control}
+            name="postalCode"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Código Postal</FormLabel>
+                <FormControl>
+                  <Input placeholder="Código Postal" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="postalCode"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Código Postal</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Código Postal" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <FormField
+            control={form.control}
+            name="street"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Calle</FormLabel>
+                <FormControl>
+                  <Input placeholder="Nombre de la calle" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <FormField
-              control={form.control}
-              name="street"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Calle</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Nombre de la calle" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+          <FormField
+            control={form.control}
+            name="number"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Número</FormLabel>
+                <FormControl>
+                  <Input placeholder="Número de la propiedad" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="number"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Número</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Número de la propiedad" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <FormField
+            control={form.control}
+            name="fullAddress"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Dirección Completa</FormLabel>
+                <FormControl>
+                  <Input placeholder="Dirección completa" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <FormField
-              control={form.control}
-              name="fullAddress"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Dirección Completa</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Dirección completa" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
               name="latitude"
@@ -406,7 +401,7 @@ export default function RegisterPropertyBasePage() {
             name="taxIdEIN"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Identificador de Impuestos ID/EIN</FormLabel>
+                <FormLabel>Número de Impuestos Tax ID/EIN</FormLabel>
                 <FormControl>
                   <Input type="text" placeholder="Tax ID/EIN" {...field} />
                 </FormControl>
@@ -419,16 +414,15 @@ export default function RegisterPropertyBasePage() {
             <FormField
               control={form.control}
               name="RNTFile"
-              render={({}) => (
+              render={() => (
                 <FormItem>
-                  <FormLabel>Archivo de RNT</FormLabel>
+                  <FormLabel>Archivo RNT</FormLabel>
                   <FormControl>
                     <FileUpload
-                      id={RNTFileData.id} // Pasar el id
-                      filename_download={RNTFileData.filename_download} // Pasar el filename_download
+                      id={RNTFileData.id}
+                      filename_download={RNTFileData.filename_download}
                       onUploadSuccess={(response) => {
                         if (response.id !== RNTFileData.id) {
-                          // Solo actualiza si es diferente
                           setRNTFileData(response);
                           form.setValue("RNTFile", response.id);
                           form.clearErrors("RNTFile");
@@ -444,21 +438,20 @@ export default function RegisterPropertyBasePage() {
             <FormField
               control={form.control}
               name="taxIdEINFile"
-              render={({}) => (
+              render={() => (
                 <FormItem>
-                  <FormLabel>Archivo de Impuesto TAX</FormLabel>
+                  <FormLabel>Archivo de Impuestos TAX ID</FormLabel>
                   <FormControl>
                     <FileUpload
-                      id={TaxFileData.id} // Pasar el id
-                      filename_download={TaxFileData.filename_download} // Pasar el filename_download
+                      id={TaxFileData.id}
+                      filename_download={TaxFileData.filename_download}
                       onUploadSuccess={(response) => {
                         if (response.id !== TaxFileData.id) {
-                          // Solo actualiza si es diferente
                           setTaxFileData(response);
                           form.setValue("taxIdEINFile", response.id);
                           form.clearErrors("taxIdEINFile");
                         }
-                      }} // Maneja la respuesta del éxito
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -470,24 +463,22 @@ export default function RegisterPropertyBasePage() {
           <FormField
             control={form.control}
             name="mainImage"
-            render={({}) => (
+            render={() => (
               <FormItem>
                 <FormLabel>Foto de la Propiedad</FormLabel>
                 <FormControl>
                   <ImageUpload
-                    defaultImageId={imageId} // ID inicial, si existe
+                    defaultImageId={property?.mainImage}
                     onImageIdChange={(newImageId) => {
                       if (newImageId !== imageId) {
-                        // Solo actualiza si es diferente
                         setImageId(newImageId);
                         form.setValue("mainImage", newImageId);
                         form.clearErrors("mainImage");
                       }
-                    }} // Callback para manejar cambios
+                    }}
                   />
                 </FormControl>
                 <FormDescription>
-                  {/* Muestra el ID de la imagen seleccionada */}
                   <strong>ID de la Imagen Actual:</strong>{" "}
                   {imageId || "No hay imagen cargada."}
                 </FormDescription>
@@ -498,19 +489,11 @@ export default function RegisterPropertyBasePage() {
 
           <div className="container mx-auto py-12 px-4">
             <h1 className="text-3xl font-bold mb-8">Habitaciones</h1>
-
             <RoomAccordion rooms={rooms} setRooms={setRooms} />
-
-            {/*<div className="mt-8">
-              <h2 className="text-2xl font-bold mb-4">Habitación/es:</h2>
-              <pre className="bg-gray-100 p-4 rounded-md overflow-auto">
-                {JSON.stringify(rooms, null, 2)}
-              </pre>
-            </div>*/}
-                  </div>
+          </div>
 
           <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Registrando..." : "Registrar Propiedad"}
+            {isSubmitting ? "Registrando..." : "Registrar Información Base"}
           </Button>
         </form>
       </Form>
