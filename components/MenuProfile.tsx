@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Building, User, BedIcon } from "lucide-react";
+import { Building, User, BedIcon, LogOut } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { logoutUser } from "@/services/LogoutService";
@@ -46,6 +46,9 @@ export function MenuProfile({ name }: ProfileMenuProps) {
 
       // Limpia el localStorage y redirige al login
       localStorage.removeItem("access_token");
+
+      window.dispatchEvent(new Event("storage"));
+      
       router.push("/login");
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
@@ -85,12 +88,21 @@ export function MenuProfile({ name }: ProfileMenuProps) {
           </li>
           <li
             className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2"
-            onClick={handleLogout}
           >
              <Link href="/mis-reservas" className="flex items-center gap-2">
             <BedIcon className="w-4 h-4" />
             Mis reservas
             </Link>
+          </li>
+
+          <li
+            className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2"
+            onClick={handleLogout}
+          >
+             
+            <LogOut className="w-4 h-4" />
+            Salir
+            
           </li>
         </ul>
         <div className="px-4 py-2 bg-gray-50 border-t text-xs text-gray-500">

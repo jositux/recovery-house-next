@@ -153,8 +153,8 @@ export default function RoomPage() {
             <p className="text-xl text-gray-600 mb-2">{property.fullAddress}</p>
             <p className="text-lg text-gray-600">{decodeHtmlAndRemoveTags(property.description)}</p>
           </div>
-          <div className="h-64">
-            <GoogleMap lat={property.place.coordinates[1]} lng={property.place.coordinates[0]} />
+          <div className="h-64 rounded-lg">
+            <GoogleMap lat={property.place.coordinates[0]} lng={property.place.coordinates[1]} />
           </div>
         </div>
 
