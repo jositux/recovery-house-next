@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+//import { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE as string);
 
+/*
 interface Plan {
   id: string;
   name: string;
@@ -15,10 +16,10 @@ interface Plan {
   price: number;
   interval: string;
   price_id: string;
-}
+}*/
 
 export default function Subscriptions() {
-  const [plans, setPlans] = useState<Plan[]>([]);
+  /*const [plans, setPlans] = useState<Plan[]>([]);
 
   useEffect(() => {
     // Fetch subscription plans from your API
@@ -26,6 +27,8 @@ export default function Subscriptions() {
       .then(res => res.json())
       .then(data => setPlans(data));
   }, []);
+
+  console.log(plans)*/
 
   const handleSubscribe = async (priceId: string) => {
     const stripe = await stripePromise;
@@ -73,12 +76,12 @@ function BenefitItem({ children }: { children: React.ReactNode }) {
       <div className="grid grid-cols-2 gap-4 max-w-4xl mx-auto">
         <Card className="flex flex-col h-full transition-all duration-300 hover:shadow-lg">
           <CardHeader className="pb-4">
-            <CardTitle className="text-xl font-bold">Plan Premium</CardTitle>
+            <CardTitle className="text-xl font-bold">Plan Anual</CardTitle>
             <CardDescription className="text-xs">Máxima visibilidad y herramientas</CardDescription>
           </CardHeader>
           <CardContent className="flex-grow pb-4">
             <p className="text-2xl font-bold mb-2">
-              $199.99<span className="text-sm font-normal">/mes</span>
+              $199.99<span className="text-sm font-normal">/año</span>
             </p>
             <ul className="space-y-1 text-sm">
               <BenefitItem>Aparición prioritaria en búsquedas</BenefitItem>
@@ -91,13 +94,13 @@ function BenefitItem({ children }: { children: React.ReactNode }) {
             </ul>
           </CardContent>
           <CardFooter>
-            <Button onClick={() => handleSubscribe("price_1Qk9b2J7zGXf4A6t6SrPr0ba")} className="w-full text-sm">Comenzar Plan Premium</Button>
+            <Button onClick={() => handleSubscribe("price_1Qk9b2J7zGXf4A6t6SrPr0ba")} className="bg-[#4A7598] w-full text-sm">Comenzar Plan Premium</Button>
           </CardFooter>
         </Card>
 
         <Card className="flex flex-col h-full transition-all duration-300 hover:shadow-lg">
           <CardHeader className="pb-4">
-            <CardTitle className="text-xl font-bold">Plan Básico</CardTitle>
+            <CardTitle className="text-xl font-bold">Plan Mensual</CardTitle>
             <CardDescription className="text-xs">Ideal para comenzar</CardDescription>
           </CardHeader>
           <CardContent className="flex-grow pb-4">
@@ -115,12 +118,12 @@ function BenefitItem({ children }: { children: React.ReactNode }) {
             </ul>
           </CardContent>
           <CardFooter>
-            <Button className="w-full text-sm">Iniciar Plan Básico</Button>
+            <Button onClick={() => handleSubscribe("price_1Qk9b2J7zGXf4A6t6SrPr0ba")} className="w-full text-sm bg-[#4A7598]">Iniciar Plan Básico</Button>
           </CardFooter>
         </Card>
       </div>
     </div>
-      <h1>Choose a Subscription Plan</h1>
+      {/*<h1>Choose a Subscription Plan</h1>
       {plans.map(plan => (
         <div key={plan.id}>
           <h2>{plan.name}</h2>
@@ -129,7 +132,7 @@ function BenefitItem({ children }: { children: React.ReactNode }) {
           <p>Price: ${plan.price / 100} / {plan.interval}</p>
           <button onClick={() => handleSubscribe(plan.price_id)}>Subscribe</button>
         </div>
-      ))}
+      ))}*/}
     </div>
   );
 }

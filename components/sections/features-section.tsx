@@ -56,10 +56,12 @@ export function FeaturesSection() {
         </div>
 
         <div className="flex justify-center gap-4">
-          <Link href="/properties">
+          <Link href="/rooms">
             <Button className="bg-[#4A7598] hover:bg-[#3A5F7A]">Buscar</Button>
           </Link>
+          <Link href="/register">
           <Button variant="outline">Registrarse</Button>
+          </Link>
         </div>
       </div>
     </section>

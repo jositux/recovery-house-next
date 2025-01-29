@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
+import Link from "next/link";
 
 import { Fraunces } from 'next/font/google'
 
@@ -26,12 +27,14 @@ export function HostCTASection() {
           <p className="text-lg text-white/90 mb-8">
             Convierte tu casa en tu próxima oportunidad
           </p>
+          <Link href="/register">
           <Button 
             className="bg-white text-gray-900 hover:bg-white/90 w-fit"
             size="lg"
           >
             Conviértete en Host
           </Button>
+          </Link>
         </div>
       </div>
     </section>

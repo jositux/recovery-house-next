@@ -79,7 +79,7 @@ export function SuccessContent() {
               </CardDescription>
             </CardContent>
             <CardFooter className="flex flex-col sm:flex-row justify-center items-center gap-4">
-              <Link href="/register-provider" passHref>
+              <Link href="/registrar-servicio" passHref>
                 <Button className="w-full sm:w-auto">Agregar Servicio</Button>
               </Link>
               <Link href="/rooms" passHref>

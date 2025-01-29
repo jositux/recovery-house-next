@@ -81,7 +81,7 @@ const PropertiesPage: React.FC = () => {
             <Card key={property.id} className="flex flex-col">
               <CardHeader className="p-0">
                 <div className="relative h-48 w-full">
-                <Link href={`/rooms/${property.id}`}>
+                <Link href={`/propiedades/${property.id}`}>
                   <Image
                     src={`/webapi/assets/${
                       property.mainImage || "/placeholder.svg"
