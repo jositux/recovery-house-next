@@ -60,7 +60,7 @@ const socialLinks = [
 export function Footer() {
   return (
     <footer className="bg-[#E5EEF6] pt-16 pb-8">
-      <div className="container mx-auto">
+      <div className="container mx-auto  p-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 mb-12">
           {/* Company Info */}
           <div className="md:col-span-2 lg:col-span-5">

@@ -11,7 +11,7 @@ interface MapMarker {
   lat: number
   lng: number
   rooms: number
-  image?: string
+  image: string
 }
 
 interface MapProps {
@@ -58,7 +58,7 @@ export function MapRooms({ markers }: MapProps) {
     }
   }, [markers, map])
 
-  if (!isLoaded) return <div>Loading...</div>
+  if (!isLoaded) return <div>Cargando...</div>
 
   return (
     <GoogleMap
@@ -82,10 +82,10 @@ export function MapRooms({ markers }: MapProps) {
           onCloseClick={() => setSelectedMarker(null)}
         >
           <div className="max-w-xs">
-            <Link href={`/properties/${selectedMarker.id}`} className="block">
+            <Link href={`/propiedades/${selectedMarker.id}`} className="block">
               {selectedMarker.image && (
                 <Image
-                  src={selectedMarker.image}
+                  src={`/webapi/assets/${selectedMarker.image}`}
                   alt={selectedMarker.name}
                   width={200}
                   height={150}

@@ -179,7 +179,7 @@ const RoomAccordion = ({ rooms = [], setRooms }: RoomAccordionProps) => {
   ) => updateRoom(id, field, e.target.value);
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full">
       <div className="flex justify-end mb-4">
         <Button type="button" onClick={addRoom} size="sm">
           <PlusCircle className="mr-2 h-4 w-4" /> Agregar Habitación
@@ -246,7 +246,7 @@ const RoomAccordion = ({ rooms = [], setRooms }: RoomAccordionProps) => {
                       <div className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="block mb-1">Nombre</label>
+                            <label className="block mb-1 text-sm">Nombre</label>
                             <Input
                               placeholder="Ej. Habitación Azul"
                               value={room.name}
@@ -256,11 +256,11 @@ const RoomAccordion = ({ rooms = [], setRooms }: RoomAccordionProps) => {
                             />
                           </div>
                           <div>
-                            <label className="block mb-1">
-                              Número de habitación
+                            <label className="block mb-1 text-sm">
+                              Número
                             </label>
                             <Input
-                              placeholder=""
+                              placeholder="Ej. C4"
                               value={room.roomNumber}
                               onChange={(e) =>
                                 handleInputChange(e, room.id, "roomNumber")
@@ -269,9 +269,8 @@ const RoomAccordion = ({ rooms = [], setRooms }: RoomAccordionProps) => {
                           </div>
                         </div>
                         <div>
-                          <label className="block mb-1">Describa la habitación</label>
                           <Textarea
-                            placeholder="Room Description"
+                            placeholder="Describa la Habitación. Es muy importante que sea detallada."
                             value={room.description}
                             onChange={(e) =>
                               handleTextareaChange(e, room.id, "description")
@@ -280,7 +279,7 @@ const RoomAccordion = ({ rooms = [], setRooms }: RoomAccordionProps) => {
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="block mb-1">Camas</label>
+                          <label className="block mb-1 text-sm">Camas</label>
                             <select
                               value={room.beds}
                               onChange={(e) =>
@@ -296,7 +295,7 @@ const RoomAccordion = ({ rooms = [], setRooms }: RoomAccordionProps) => {
                             </select>
                           </div>
                           <div>
-                            <label className="block mb-1">Capacidad máxima</label>
+                            <label className="block mb-1 text-sm">Max. Huéspedes</label>
                             <select
                               value={room.capacity}
                               onChange={(e) =>
@@ -314,8 +313,8 @@ const RoomAccordion = ({ rooms = [], setRooms }: RoomAccordionProps) => {
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="block mb-1">
-                              Precio por Noche
+                            <label className="block mb-1 text-sm">
+                              Precio x Noche
                             </label>
                             <Input
                               type="number"
@@ -332,8 +331,8 @@ const RoomAccordion = ({ rooms = [], setRooms }: RoomAccordionProps) => {
                             />
                           </div>
                           <div>
-                            <label className="block mb-1">
-                              Precio por limpieza
+                            <label className="block mb-1 text-sm">
+                              Precio x limpieza
                             </label>
                             <Input
                               type="number"
@@ -350,13 +349,18 @@ const RoomAccordion = ({ rooms = [], setRooms }: RoomAccordionProps) => {
                             />
                           </div>
                         </div>
+                        <div className="py-12">
+                        <h3 className="block mb-1 text-sm">
+                              Subir Fotos de la Habitación
+                            </h3>
                         <GalleryUpload
                           initialIds={room.photos}
                           onGalleryChange={(newGallery) =>
                             updateRoom(room.id, "photos", newGallery)
                           }
                         />
-<label className="block mb-1">Servicios Generales</label>
+                        </div>
+<label className="block mb-1 text-sm">Servicios Generales</label>
 <CollectionServiceTags
                           onChange={(tags) =>
                             handleServiceTagsChange(tags, room.id)
@@ -364,13 +368,16 @@ const RoomAccordion = ({ rooms = [], setRooms }: RoomAccordionProps) => {
                           servicesTags={servicesTags}
                           initialSelectedTags={room.servicesTags}
                         />
-                        <label className="block mb-1">Servicios Extras</label>
+                        
+                        <div className="py-4">
+                        <label className="block mb-1 text-sm">Servicios Extras</label>
 
                         <CollectionExtraTags
                           onChange={(tags) => handleTagsChange(tags, room.id)}
                           extraTags={extraTags}
                           initialSelectedTags={room.extraTags}
                         />
+                        </div>
                        
 
 

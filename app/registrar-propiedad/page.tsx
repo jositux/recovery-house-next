@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -22,12 +21,20 @@ import { LocationSelector } from "@/components/ui/location-selector";
 import { UserTypeCard } from "@/components/ui/user-type-card";
 import { useRouter } from 'next/navigation'
 
+import type { LocationDetails } from "@/components/OSMSelector";
+import dynamic from 'next/dynamic';
+
+const OpenStreetMapSelector = dynamic(
+  () => import('@/components/OSMSelector').then((mod) => mod.default),
+  { ssr: false }
+);
+
 
 
 import { propertyService, PropertyData } from "@/services/propertyService";
 import { roomService, RoomData } from "@/services/RoomService";
 
-import { Building2, Home } from "lucide-react";
+import { Building2, Home, Save } from "lucide-react";
 
 import RoomAccordion from "@/components/RoomAccordion";
 
@@ -38,8 +45,8 @@ const formSchema = z.object({
   state: z.string().min(1, "Por favor selecciona un estado."),
   city: z.string().min(1, "Por favor selecciona una ciudad."),
   postalCode: z.string().min(1, "El código postal es requerido."),
-  street: z.string().min(1, "La calle es requerida."),
-  number: z.string().min(1, "El número es requerido."),
+  address: z
+  .string(),
   fullAddress: z
     .string()
     .min(5, "La dirección completa debe tener al menos 5 caracteres."),
@@ -71,6 +78,22 @@ interface Room {
 type FormValues = z.infer<typeof formSchema>;
 
 export default function RegisterPropertyBasePage() {
+
+  const handleLocationSelected = (details: LocationDetails) => {
+    console.log("Detalles de la ubicación seleccionada:", details);
+    form.setValue("address", details.address);
+    form.setValue("latitude", details.lat);
+    form.setValue("longitude", details.lng);
+    form.setValue("postalCode", details.postalCode);
+  };
+
+  const defaultLocation = {
+    address: "",
+    lat: 0,
+    lng: 0,
+    postalCode: "",
+  };
+
   const [imageId, setImageId] = useState<string>(""); // Estado para guardar el ID de la imagen
 
   const [RNTFileData, setRNTFileData] = useState<{
@@ -100,8 +123,7 @@ export default function RegisterPropertyBasePage() {
       state: "",
       city: "",
       postalCode: "",
-      street: "",
-      number: "",
+      address:"",
       fullAddress: "",
       latitude: null,
       longitude: null,
@@ -128,8 +150,7 @@ export default function RegisterPropertyBasePage() {
         state: values.state,
         city: values.city,
         postalCode: values.postalCode,
-        street: values.street,
-        number: values.number,
+        address: values.address,
         fullAddress: values.fullAddress,
         latitude: values.latitude ?? 0,
         longitude: values.longitude ?? 0,
@@ -159,6 +180,7 @@ export default function RegisterPropertyBasePage() {
           room.photos.length > 0 ? room.photos : [roomMainImage]; // Usa `roomMainImage` si `photos` está vacío
 
         const roomData: RoomData = {
+          id: room.id,
           name: room.name,
           roomNumber: room.roomNumber,
           description: room.description,
@@ -175,13 +197,12 @@ export default function RegisterPropertyBasePage() {
 
         const response = await roomService.createRoom(roomData);
 
-    
-
         return response.id; // Obtenemos el ID de la respuesta
 
       });
 
-      router.push('/mispropiedades')
+      router.push('/mis-propiedades')
+    
     } catch (error) {
       console.error("Error creando room:", error);
     } finally {
@@ -230,13 +251,36 @@ export default function RegisterPropertyBasePage() {
 
           <FormField
             control={form.control}
-            name={"description"}
+            name="mainImage"
+            render={() => (
+              <FormItem>
+                <FormLabel>Foto de la Propiedad</FormLabel>
+                <FormControl>
+                  <ImageUpload
+                    defaultImageId={""}
+                    onImageIdChange={(newImageId) => {
+                      if (newImageId !== imageId) {
+                        setImageId(newImageId);
+                        form.setValue("mainImage", newImageId);
+                        form.clearErrors("mainImage");
+                      }
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Descripción</FormLabel>
+                <FormLabel>Describe tu propiedad</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder="Describe las características de la habitación"
+                    placeholder="Describe las características de la propiedad"
                     {...field}
                   />
                 </FormControl>
@@ -245,20 +289,24 @@ export default function RegisterPropertyBasePage() {
             )}
           />
 
-          <LocationSelector
-            onChange={({ country, state, city }) => {
-              form.setValue("country", country);
-              form.setValue("state", state);
-              form.setValue("city", city);
-            }}
-            error={{
-              country: form.formState.errors.country?.message,
-              state: form.formState.errors.state?.message,
-              city: form.formState.errors.city?.message,
-            }}
-          />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+         
+            <LocationSelector
+              defaultCountry={""}
+              defaultState={""}
+              defaultCity={""}
+              onChange={({ country, state, city }) => {
+                form.setValue("country", country);
+                form.setValue("state", state);
+                form.setValue("city", city);
+              }}
+              error={{
+                country: form.formState.errors.country?.message,
+                state: form.formState.errors.state?.message,
+                city: form.formState.errors.city?.message,
+              }}
+            />
+          
+          <div className="hidden">
             <FormField
               control={form.control}
               name="postalCode"
@@ -272,43 +320,34 @@ export default function RegisterPropertyBasePage() {
                 </FormItem>
               )}
             />
-
-            <FormField
-              control={form.control}
-              name="street"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Calle</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Nombre de la calle" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="number"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Número</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Número de la propiedad" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <FormField
+            control={form.control}
+            name="fullAddress"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Dirección Legal</FormLabel>
+                <FormControl>
+                  <Input placeholder="Dirección completa" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
+          <OpenStreetMapSelector
+            onLocationSelected={handleLocationSelected}
+            defaultLocation={defaultLocation}
+          />
+
+          <div className="hidden">
             <FormField
               control={form.control}
-              name="fullAddress"
+              name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Dirección Completa</FormLabel>
+                  <FormLabel>Dirección</FormLabel>
                   <FormControl>
                     <Input placeholder="Dirección completa" {...field} />
                   </FormControl>
@@ -318,7 +357,7 @@ export default function RegisterPropertyBasePage() {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
               name="latitude"
@@ -333,7 +372,9 @@ export default function RegisterPropertyBasePage() {
                       {...field}
                       onChange={(e) =>
                         field.onChange(
-                          e.target.value ? parseFloat(e.target.value) : null
+                          e.target.value
+                            ? Number.parseFloat(e.target.value)
+                            : null
                         )
                       }
                       value={field.value ?? ""}
@@ -358,7 +399,9 @@ export default function RegisterPropertyBasePage() {
                       {...field}
                       onChange={(e) =>
                         field.onChange(
-                          e.target.value ? parseFloat(e.target.value) : null
+                          e.target.value
+                            ? Number.parseFloat(e.target.value)
+                            : null
                         )
                       }
                       value={field.value ?? ""}
@@ -406,7 +449,7 @@ export default function RegisterPropertyBasePage() {
             name="taxIdEIN"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Identificador de Impuestos ID/EIN</FormLabel>
+                <FormLabel>Número de Impuestos Tax ID/EIN</FormLabel>
                 <FormControl>
                   <Input type="text" placeholder="Tax ID/EIN" {...field} />
                 </FormControl>
@@ -419,16 +462,15 @@ export default function RegisterPropertyBasePage() {
             <FormField
               control={form.control}
               name="RNTFile"
-              render={({}) => (
+              render={() => (
                 <FormItem>
-                  <FormLabel>Archivo de RNT</FormLabel>
+                  <FormLabel>Archivo RNT</FormLabel>
                   <FormControl>
                     <FileUpload
-                      id={RNTFileData.id} // Pasar el id
-                      filename_download={RNTFileData.filename_download} // Pasar el filename_download
+                      id={RNTFileData.id}
+                      filename_download={RNTFileData.filename_download}
                       onUploadSuccess={(response) => {
                         if (response.id !== RNTFileData.id) {
-                          // Solo actualiza si es diferente
                           setRNTFileData(response);
                           form.setValue("RNTFile", response.id);
                           form.clearErrors("RNTFile");
@@ -444,21 +486,20 @@ export default function RegisterPropertyBasePage() {
             <FormField
               control={form.control}
               name="taxIdEINFile"
-              render={({}) => (
+              render={() => (
                 <FormItem>
-                  <FormLabel>Archivo de Impuesto TAX</FormLabel>
+                  <FormLabel>Archivo de Impuestos TAX ID</FormLabel>
                   <FormControl>
                     <FileUpload
-                      id={TaxFileData.id} // Pasar el id
-                      filename_download={TaxFileData.filename_download} // Pasar el filename_download
+                      id={TaxFileData.id}
+                      filename_download={TaxFileData.filename_download}
                       onUploadSuccess={(response) => {
                         if (response.id !== TaxFileData.id) {
-                          // Solo actualiza si es diferente
                           setTaxFileData(response);
                           form.setValue("taxIdEINFile", response.id);
                           form.clearErrors("taxIdEINFile");
                         }
-                      }} // Maneja la respuesta del éxito
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -467,50 +508,37 @@ export default function RegisterPropertyBasePage() {
             />
           </div>
 
-          <FormField
-            control={form.control}
-            name="mainImage"
-            render={({}) => (
-              <FormItem>
-                <FormLabel>Foto de la Propiedad</FormLabel>
-                <FormControl>
-                  <ImageUpload
-                    defaultImageId={imageId} // ID inicial, si existe
-                    onImageIdChange={(newImageId) => {
-                      if (newImageId !== imageId) {
-                        // Solo actualiza si es diferente
-                        setImageId(newImageId);
-                        form.setValue("mainImage", newImageId);
-                        form.clearErrors("mainImage");
-                      }
-                    }} // Callback para manejar cambios
-                  />
-                </FormControl>
-                <FormDescription>
-                  {/* Muestra el ID de la imagen seleccionada */}
-                  <strong>ID de la Imagen Actual:</strong>{" "}
-                  {imageId || "No hay imagen cargada."}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <div className="container mx-auto py-12 px-4">
-            <h1 className="text-3xl font-bold mb-8">Habitaciones</h1>
-
+          <div className="container mx-auto py-12">
+            <h1 className="text-2xl font-bold mb-8">
+              Datos de las habitaciones
+            </h1>
             <RoomAccordion rooms={rooms} setRooms={setRooms} />
+          </div>
 
-            {/*<div className="mt-8">
-              <h2 className="text-2xl font-bold mb-4">Habitación/es:</h2>
-              <pre className="bg-gray-100 p-4 rounded-md overflow-auto">
-                {JSON.stringify(rooms, null, 2)}
-              </pre>
-            </div>*/}
-                  </div>
+          {/*<div className="mt-8">
+            <h2 className="text-2xl font-bold mb-4">Habitación/es:</h2>
+            <pre className="bg-gray-100 p-4 rounded-md overflow-auto">
+              {JSON.stringify(rooms, null, 2)}
+            </pre>
+                  </div>*/}
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Registrando..." : "Registrar Propiedad"}
+          <Button
+            type="submit"
+            className="w-full mx-auto bg-[#4A7598] px-6 py-5 rounded-lg text-white font-medium hover:bg-[#3a5a77] transition-colors flex items-center justify-center gap-2"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <>
+                <Save className="animate-spin" />{" "}
+                {/* Icono de guardar con animación de giro */}
+                CARGANDO...
+              </>
+            ) : (
+              <>
+                <Save /> {/* Icono de guardar */}
+                REGISTRAR PROPIEDAD
+              </>
+            )}
           </Button>
         </form>
       </Form>

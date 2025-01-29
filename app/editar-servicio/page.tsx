@@ -111,6 +111,12 @@ export default function RegisterPropertyBasePage() {
 
   const { setValue } = form;
 
+
+  const { errors } = form.formState;
+useEffect(() => {
+  console.log("Errores del formulario:", errors);
+}, [errors]);
+
   useEffect(() => {
     const fetchMemberships = async () => {
       const data = await getMembershipTags();
@@ -132,6 +138,7 @@ export default function RegisterPropertyBasePage() {
 
           form.reset({
             id: provider.id,
+            userId: provider.userId,
             name: provider.name,
             email: provider.email,
             phone: provider.phone,
@@ -174,11 +181,6 @@ export default function RegisterPropertyBasePage() {
 
     fetchProviderData();
   }, [form]);
-
-  useEffect(() => {
-    console.log("defaultTags:", defaultTags);
-    console.log("defaultServiceTags:", defaultServiceTags);
-  }, [defaultTags, defaultServiceTags]);
 
   useEffect(() => {
     const loadTags = async () => {

@@ -1,44 +1,58 @@
-'use client'
-import React, { useCallback } from "react";
-import { loadStripe } from "@stripe/stripe-js";
-import {
-    EmbeddedCheckoutProvider,
-    EmbeddedCheckout,
-} from "@stripe/react-stripe-js";
+"use client"
 
-import { postStripeSession } from "@/server-actions/stripeSession";
+import React, { useCallback, useMemo } from "react"
+import { loadStripe } from "@stripe/stripe-js"
+import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js"
 
-const stripePromise = loadStripe(
-    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE as string,
-);
+import { postStripeSession } from "@/server-actions/stripeSession"
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE as string)
 
 interface CheckoutFormProps {
-    priceId: string;
-    bookingData: {
-        name?: string;
-        description?: string;
-        unit_amount?: number;
-    };
+  bookingData: {
+    name?: string
+    description?: string
+    unit_amount: number
+    guests?: number
+  }
 }
 
-export const CheckoutForm = ({ priceId, bookingData }: CheckoutFormProps) => {
-    const fetchClientSecret = useCallback(async () => {
-        const stripeResponse = await postStripeSession({
-            priceId,
-            name: bookingData.name || "", // Valor predeterminado: cadena vacía
-            description: bookingData.description || "", // Valor predeterminado: cadena vacía
-            unit_amount: bookingData.unit_amount || 0, // Valor predeterminado: 0
-        });
-        return stripeResponse.clientSecret;
-    }, [priceId, bookingData]);
+export const CheckoutForm = ({ bookingData }: CheckoutFormProps) => {
+  console.log("viene aca ", bookingData)
 
-    const options = { fetchClientSecret };
+  // Función para obtener el clientSecret
+  const fetchClientSecret = useCallback(async () => {
+    if (!bookingData || Object.keys(bookingData).length === 0) {
+      throw new Error("No se encontró información de la reserva.")
+    }
+    try {
+      const stripeResponse = await postStripeSession({
+        name: bookingData.name || "Sin nombre", // Valor predeterminado si no existe
+        description: bookingData.description || "Sin descripción", // Valor predeterminado si no existe
+        unit_amount: bookingData.unit_amount,
+      })
+      return stripeResponse.clientSecret
+    } catch (error) {
+      console.error("Error obteniendo clientSecret:", error)
+      throw new Error("No se pudo generar la sesión de Stripe.")
+    }
+  }, [bookingData])
 
-    return (
-        <div id="checkout">
-            <EmbeddedCheckoutProvider stripe={stripePromise} options={options}>
-                <EmbeddedCheckout />
-            </EmbeddedCheckoutProvider>
-        </div>
-    );
-};
+  // Opciones del EmbeddedCheckoutProvider
+  const options = useMemo(() => ({ fetchClientSecret }), [fetchClientSecret])
+
+  // Verifica que bookingData no esté vacío
+  if (!bookingData || Object.keys(bookingData).length === 0) {
+    return <p>No se encontró información de la reserva.</p>
+  }
+
+  // Ya que los hooks se han ejecutado, renderizamos el componente
+  return (
+    <div id="checkout">
+      <EmbeddedCheckoutProvider stripe={stripePromise} options={options}>
+        <EmbeddedCheckout />
+      </EmbeddedCheckoutProvider>
+    </div>
+  )
+}
+

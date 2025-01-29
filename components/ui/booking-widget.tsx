@@ -15,6 +15,8 @@ import { format, addDays, parseISO, isWithinInterval } from "date-fns";
 import { es } from "date-fns/locale";
 import { CalendarIcon, Minus, Plus, Users } from "lucide-react";
 
+import {createBooking} from "@/services/BookingService"
+
 import { useRouter } from 'next/navigation'
 
 import styles from "./BookingWidget.module.css";
@@ -25,6 +27,7 @@ interface Booking {
   checkIn: string;
   checkOut: string;
   patient: string;
+  guests: number;
   room: string;
 }
 
@@ -94,6 +97,8 @@ export function BookingWidget({
 
   const isReservationEnabled = checkIn && checkOut && nights > 0;
 
+  const router = useRouter()
+
   const handleReservation = async () => {
     try {
       setLoading(true);
@@ -112,6 +117,7 @@ export function BookingWidget({
         checkIn: checkIn?.toISOString() || "",
         checkOut: checkOut?.toISOString() || "",
         patient: patient_id,
+        guests: guests,
         room: room,
       };
       
@@ -124,7 +130,7 @@ export function BookingWidget({
         description: description,    // Agrega la cantidad de huéspedes
       };
 
-      //const newBooking = await createBooking(newBookingData, accessToken);
+      await createBooking(newBookingData, accessToken);
       
 
       localStorage.setItem("booking", JSON.stringify(formattedBooking));
@@ -139,7 +145,7 @@ export function BookingWidget({
     }
   };
 
-  const router = useRouter()
+  
 
   return (
     <div className="border rounded-lg p-4 space-y-4">

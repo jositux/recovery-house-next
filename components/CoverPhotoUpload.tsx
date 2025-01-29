@@ -1,47 +1,49 @@
-'use client';
+"use client"
 
-import React, { useState, useEffect } from 'react';
-import { uploadFile } from '@/services/fileUploadService'; // Servicio de subida
-import { Camera, Loader2, XCircle } from 'lucide-react'; // Iconos
+import type React from "react"
+import { useState, useEffect } from "react"
+import Image from "next/image"
+import { uploadFile } from "@/services/fileUploadService" // Servicio de subida
+import { Camera, Loader2, XCircle } from "lucide-react" // Iconos
 
 interface CoverPhotoUploadProps {
-  defaultImageId?: string; // ID de imagen predeterminada
-  onImageIdChange?: (id: string) => void; // Callback para emitir el id al componente padre
+  defaultImageId?: string // ID de imagen predeterminada
+  onImageIdChange?: (id: string) => void // Callback para emitir el id al componente padre
 }
 
 const CoverPhotoUpload: React.FC<CoverPhotoUploadProps> = ({ defaultImageId = "", onImageIdChange }) => {
-  const [loading, setLoading] = useState<boolean>(false);
-  const [imageId, setImageId] = useState<string>(defaultImageId);
+  const [loading, setLoading] = useState<boolean>(false)
+  const [imageId, setImageId] = useState<string>(defaultImageId)
 
   // Notifica al componente padre cuando el imageId cambia
   useEffect(() => {
     if (onImageIdChange) {
-      onImageIdChange(imageId);
+      onImageIdChange(imageId)
     }
-  }, [imageId, onImageIdChange]);
+  }, [imageId, onImageIdChange])
 
   // Maneja la subida de archivos
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const file = e.target.files?.[0]
+    if (!file) return
 
-    setLoading(true);
-    setImageId(""); // Reinicia el id previo
+    setLoading(true)
+    setImageId("") // Reinicia el id previo
 
     try {
-      const response = await uploadFile(file);
-      setImageId(response.id); // Guarda el id retornado
+      const response = await uploadFile(file)
+      setImageId(response.id) // Guarda el id retornado
     } catch (error) {
-      console.error('Error uploading file:', error);
+      console.error("Error uploading file:", error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   // Maneja el "clear" de la imagen
   const handleClearImage = (): void => {
-    setImageId("");
-  };
+    setImageId("")
+  }
 
   return (
     <div className="relative w-full max-w-4xl h-64 border-2 border-gray-300 rounded-md flex items-center justify-center bg-gray-50">
@@ -58,27 +60,28 @@ const CoverPhotoUpload: React.FC<CoverPhotoUploadProps> = ({ defaultImageId = ""
       {/* Imagen cargada o ícono de la cámara */}
       {imageId ? (
         <>
-          {/* Imagen cargada */}
-          <img
-            src={`https://us-east-1a.recoverycaresolutions.com/assets/${imageId}`}
-            alt="Cover Photo"
-            className="absolute inset-0 w-full h-full object-cover rounded-md"
-          />
+          {/* Imagen cargada usando Next.js Image */}
+          <div className="absolute inset-0 w-full h-full">
+            <Image
+              src={`https://us-east-1a.recoverycaresolutions.com/assets/${imageId}`}
+              alt="Cover Photo"
+              layout="fill"
+              objectFit="cover"
+              className="rounded-md"
+            />
+          </div>
 
           {/* Botón para limpiar imagen */}
           <button
             onClick={handleClearImage}
-            className="absolute top-2 right-2 bg-white rounded-full p-1 text-red-500 hover:text-red-600 shadow-md"
+            className="absolute top-2 right-2 bg-white rounded-full p-1 text-red-500 hover:text-red-600 shadow-md z-10"
             aria-label="Clear image"
           >
             <XCircle className="w-6 h-6" />
           </button>
         </>
       ) : (
-        <label
-          htmlFor="cover-photo-upload"
-          className="flex flex-col items-center gap-2 cursor-pointer"
-        >
+        <label htmlFor="cover-photo-upload" className="flex flex-col items-center gap-2 cursor-pointer">
           {loading ? (
             <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
           ) : (
@@ -88,7 +91,8 @@ const CoverPhotoUpload: React.FC<CoverPhotoUploadProps> = ({ defaultImageId = ""
         </label>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default CoverPhotoUpload;
+export default CoverPhotoUpload
+

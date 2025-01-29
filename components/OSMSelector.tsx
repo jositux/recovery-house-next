@@ -1,12 +1,17 @@
 'use client'
 
 import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet'
+import dynamic from 'next/dynamic'
 import L from 'leaflet'
+import { useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
+//import { Card, CardContent } from "@/components/ui/card"
 import debounce from 'lodash.debounce'
+
+const MapContainer = dynamic(() => import('react-leaflet').then(mod => mod.MapContainer), { ssr: false })
+const TileLayer = dynamic(() => import('react-leaflet').then(mod => mod.TileLayer), { ssr: false })
+const Marker = dynamic(() => import('react-leaflet').then(mod => mod.Marker), { ssr: false })
 
 const icon = L.icon({
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
@@ -18,6 +23,7 @@ const icon = L.icon({
   shadowSize: [41, 41],
 })
 
+
 export interface LocationDetails {
   address: string;
   lat: number;
@@ -27,6 +33,7 @@ export interface LocationDetails {
 
 interface OpenStreetMapSelectorProps {
   onLocationSelected: (details: LocationDetails) => void;
+  defaultLocation?: LocationDetails; // Nueva propiedad opcional
 }
 
 interface Suggestion {
@@ -57,15 +64,18 @@ function DraggableMarker({ position, setPosition }: { position: L.LatLng; setPos
   )
 }
 
-export default function OpenStreetMapSelector({ onLocationSelected }: OpenStreetMapSelectorProps) {
-  const [position, setPosition] = useState<L.LatLng>(new L.LatLng(40.416775, -3.703790))
-  const [locationDetails, setLocationDetails] = useState<LocationDetails>({
+export default function OpenStreetMapSelector({
+  onLocationSelected,
+  defaultLocation = {
     address: '',
     lat: 40.416775,
     lng: -3.703790,
     postalCode: ''
-  })
-  const [searchInput, setSearchInput] = useState('')
+  },
+}: OpenStreetMapSelectorProps) {
+  const [position, setPosition] = useState<L.LatLng>(new L.LatLng(defaultLocation.lat, defaultLocation.lng))
+  const [locationDetails, setLocationDetails] = useState<LocationDetails>(defaultLocation)
+  const [searchInput, setSearchInput] = useState(defaultLocation.address)
   const [suggestions, setSuggestions] = useState<Suggestion[]>([])
   const mapRef = useRef<L.Map | null>(null)
 
@@ -100,6 +110,7 @@ export default function OpenStreetMapSelector({ onLocationSelected }: OpenStreet
         postalCode: data.address?.postcode || ''
       }
       setLocationDetails(details)
+      console.log(locationDetails)
       onLocationSelected(details)
     } catch (error) {
       console.error('Error fetching location details:', error)
@@ -135,7 +146,7 @@ export default function OpenStreetMapSelector({ onLocationSelected }: OpenStreet
             setSearchInput(e.target.value)
             handleSearch(e.target.value)
           }}
-          placeholder="Busca una dirección"
+          placeholder="Busca una dirección y mueve el punto para ubicar con presición"
           className="w-full"
         />
         {suggestions.length > 0 && (
@@ -167,15 +178,15 @@ export default function OpenStreetMapSelector({ onLocationSelected }: OpenStreet
           <DraggableMarker position={position} setPosition={handleMarkerDrag} />
         </MapContainer>
       </div>
-      <Card>
+      {/*<Card>
         <CardContent className="pt-6">
           <h3 className="text-lg font-semibold mb-2">Detalles de la ubicación</h3>
           <p><strong>Dirección:</strong> {locationDetails.address}</p>
           <p><strong>Latitud:</strong> {locationDetails.lat.toFixed(6)}</p>
           <p><strong>Longitud:</strong> {locationDetails.lng.toFixed(6)}</p>
           <p><strong>Código Postal:</strong> {locationDetails.postalCode}</p>
-        </CardContent>
-      </Card>
+            </CardContent>
+      </Card>*/}
     </div>
   )
 }

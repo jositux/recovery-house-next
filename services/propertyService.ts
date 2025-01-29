@@ -10,8 +10,7 @@ export interface PropertyData {
   "state": string;
   "city": string;
   "postalCode": string;
-  "street": string;
-  "number": string;
+  "address": string;
   "fullAddress": string;
   "latitude": number;
   "longitude": number;
@@ -54,8 +53,8 @@ export const propertyService = {
         state: propertyData.state,
         city: propertyData.city,
         postalCode: propertyData.postalCode,
-        street: propertyData.fullAddress,
-        number: propertyData.number,
+        address: propertyData.address,
+        fullAddress: propertyData.fullAddress,
         "place": {
             "type": "Point",
             "coordinates": [

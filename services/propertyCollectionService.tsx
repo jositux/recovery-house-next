@@ -30,6 +30,8 @@ export const getPropertiesByUserId = async (userId: string, token: string): Prom
       },
     });
 
+    console.log("data", response.data.data)
+
     return response.data.data;
   } catch (error: any) {
     console.error("Error fetching properties:", error.response?.data || error.message);

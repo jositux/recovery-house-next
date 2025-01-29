@@ -1,48 +1,50 @@
-'use client'
+'use client';
 
 import { CheckoutForm } from "@/app/checkout/CheckoutForm";
 import React, { useState, useEffect } from "react";
 
 const CheckoutPage = () => {
-    // Aquí se establece el priceId de manera fija por simplicidad
-    const priceId = 'price_1PdILZFcneaRmfHyuWbuhpMB'
+  const [bookingData, setBookingData] = useState<{
+    name?: string;
+    description?: string;
+    unit_amount: number;  // Ahora es obligatorio
+    guests?: number;
+  }>();  // Valor predeterminado para `unit_amount`
 
-    const [bookingData, setBookingData] = useState<{
-      name?: string;
-      description?: string;
-      unit_amount?: number;
-  }>({});
-  
-    const [isLoading, setIsLoading] = useState(true);  // Estado para verificar si los datos están cargados
+  useEffect(() => {
+    const fetchBookingData = () => {
+      const storedBooking = localStorage.getItem("booking");
 
-    // Leer datos del localStorage al cargar el componente
-    useEffect(() => {
-        const storedBooking = localStorage.getItem("booking");
-        if (storedBooking) {
-            try {
-                const parsedBooking = JSON.parse(storedBooking);
-                setBookingData(parsedBooking);
-            } catch (error) {
-                console.error("Error parsing booking data from localStorage:", error);
-            }
+      console.log("stored", storedBooking)
+      if (storedBooking) {
+        try {
+          const parsedBooking = JSON.parse(storedBooking);
+          // Asignar `unit_amount` si no está definido
+          setBookingData({
+            ...parsedBooking,
+            unit_amount: parsedBooking.unit_amount || 0, // Asegura que siempre haya un `unit_amount`
+          });
+        } catch (error) {
+          console.error("Error parsing booking data from localStorage:", error);
         }
-        
-        // Aseguramos que el estado se ha actualizado antes de renderizar
-        setIsLoading(false);
-    }, []);  // Se ejecuta solo una vez al cargar el componente
+      }
+    };
 
-    // Mientras se cargan los datos, puedes mostrar un loading o un mensaje
-    if (isLoading) {
-        return <div>Loading...</div>;  // Puedes personalizar este mensaje o añadir un spinner
-    }
+    fetchBookingData();
+  }, []);
 
-    return (
-        <main>
-            <div className="max-w-screen-lg mx-auto my-8">
-                <CheckoutForm priceId={priceId} bookingData={bookingData} />
-            </div>
-        </main>
-    )
-}
+
+  return (
+    <main>
+      <div className="max-w-screen-lg mx-auto my-8">
+        {bookingData && Object.keys(bookingData).length > 0 ? (
+          <CheckoutForm bookingData={bookingData} />
+        ) : (
+          <p>Loading booking data...</p>
+        )}
+      </div>
+    </main>
+  );
+};
 
 export default CheckoutPage;

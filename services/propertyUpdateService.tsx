@@ -1,8 +1,10 @@
 import axios from 'axios';
+import { string } from 'zod';
 
 const API_URL = '/webapi/items/Property';
 
 export interface PropertyData {
+  id: string;
   name: string;
   description: string;
   country: string;
@@ -10,8 +12,7 @@ export interface PropertyData {
   state: string;
   city: string;
   postalCode: string;
-  street: string;
-  number: string;
+  address: string;
   fullAddress: string;
   latitude: number;
   longitude: number;
@@ -46,6 +47,7 @@ export const propertyUpdateService = {
       const patient_id = responseUser.data.data.id;
 
       const formatedData = {
+        id: propertyId,
         userId: patient_id,
         name: propertyData.name,
         description: propertyData.description,
@@ -54,8 +56,7 @@ export const propertyUpdateService = {
         state: propertyData.state,
         city: propertyData.city,
         postalCode: propertyData.postalCode,
-        street: propertyData.fullAddress,
-        number: propertyData.number,
+        address: propertyData.address,
         place: {
           type: "Point",
           coordinates: [propertyData.latitude, propertyData.longitude],
@@ -66,8 +67,10 @@ export const propertyUpdateService = {
         taxIdEINFile: propertyData.taxIdEINFile,
         taxIdApproved: false,
         mainImage: propertyData.mainImage,
-        Rooms: propertyData.Rooms,
+        Rooms: propertyData.Rooms
       };
+
+console.log("ID PIOLA: ", propertyId);
 
       const response = await axios.patch<PropertyResponse>(
         `${API_URL}/${propertyId}`, // Usar el ID de la propiedad en el endpoint

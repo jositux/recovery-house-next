@@ -29,6 +29,7 @@ interface Property {
   region: string
   state: string
   city: string
+  mainImage: string
   place: {
     type: string
     coordinates: [number, number]
@@ -118,7 +119,7 @@ export default function RoomsPage() {
         lat: property.place.coordinates[1],
         lng: property.place.coordinates[0],
         rooms: property.Rooms.length,
-        image: property.photos && property.photos[0] ? property.photos[0].directus_files_id.filename_download : undefined
+        image: property.mainImage,
       }))
   }, [properties])
 

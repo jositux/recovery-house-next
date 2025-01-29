@@ -3,6 +3,7 @@ import axios from "axios";
 const API_URL = '/webapi/items/Room';
 
 export interface RoomData {
+  id: string;
   name: string;
   roomNumber: string;
   beds: number;
@@ -52,8 +53,9 @@ export const roomService = {
       const formattedPropertyId = { id: data.propertyId };
 
       // Crear una copia de data con los campos transformados
+      const { id, ...restData } = data; // Excluir id
       const transformedData = {
-        ...data,
+        ...restData,
         pricePerNight: normalizedPricePerNight,
         cleaningFee: normalizedCleaningFee,
         propertyId: formattedPropertyId,
@@ -62,12 +64,15 @@ export const roomService = {
         photos: formattedPhotos,
       };
 
+
+      console.log("transformed: ", transformedData)
+
       const response = await axios.post(API_URL, transformedData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      return response.data; // Se espera que el endpoint retorne `{ id: string }`
+      return response.data.data; // Se espera que el endpoint retorne `{ id: string }`
     } else {
       throw new Error('localStorage no está disponible en el servidor');
     }
