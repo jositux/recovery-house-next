@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -11,9 +11,22 @@ export function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    // Verificar si el token de acceso existe en localStorage
-    const token = localStorage.getItem("access_token");
-    setIsLoggedIn(!!token); // Si el token existe, está logueado
+    // Función para verificar el token
+    const checkAuth = () => {
+      const token = localStorage.getItem("access_token");
+      setIsLoggedIn(!!token);
+    };
+
+    // Verificar en el montaje
+    checkAuth();
+
+    // Escuchar cambios en localStorage
+    window.addEventListener("storage", checkAuth);
+
+    // Cleanup del evento al desmontar
+    return () => {
+      window.removeEventListener("storage", checkAuth);
+    };
   }, []);
 
   return (
@@ -43,7 +56,6 @@ export function Header() {
 
         {/* Botones */}
         <div className="flex items-center gap-4">
-          {/* Botón de login, solo visible si no está logueado */}
           {!isLoggedIn && (
             <Button
               variant="secondary"
@@ -54,7 +66,6 @@ export function Header() {
             </Button>
           )}
 
-          {/* Menú de perfil y acciones, solo visible si está logueado */}
           {isLoggedIn && (
             <>
               <MenuProfile name="Carlos Jose Guaimas" />

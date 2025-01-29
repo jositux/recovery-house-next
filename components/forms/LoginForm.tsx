@@ -53,6 +53,8 @@ export function LoginForm() {
       localStorage.setItem('refresh_token', response.data.refresh_token)
       localStorage.setItem('access_token', response.data.access_token)
 
+      window.dispatchEvent(new Event("storage"));
+
       router.push('/rooms')
     } catch (error) {
       if (axios.isAxiosError(error)) {

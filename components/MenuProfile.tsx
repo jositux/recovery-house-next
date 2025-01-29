@@ -95,7 +95,7 @@ export function MenuProfile({ name }: ProfileMenuProps) {
         </ul>
         <div className="px-4 py-2 bg-gray-50 border-t text-xs text-gray-500">
           <p>{name}</p>
-          <p>Super Administrator</p>
+         
         </div>
       </div>
     </div>
