@@ -100,7 +100,7 @@ const GalleryUpload: React.FC<GalleryUploadProps> = ({ initialIds = [], onGaller
                 <label className="flex flex-col items-center cursor-pointer">
                   <input type="file" className="hidden" onChange={handleFileChange} accept="image/*" />
                   <Camera size={32} className="text-gray-500" />
-                  <p className="text-sm text-gray-500">Agregar Imagen</p>
+                  <p className="text-sm text-gray-500">Agregar Foto</p>
                 </label>
               )}
             </div>

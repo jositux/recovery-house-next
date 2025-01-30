@@ -1,9 +1,10 @@
 "use client"
 
-import { useCallback, useState, useRef, useEffect } from 'react'
-import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api'
-import Image from 'next/image'
-import Link from 'next/link'
+import { useCallback, useState, useRef, useEffect } from "react"
+import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from "@react-google-maps/api"
+import Image from "next/image"
+import Link from "next/link"
+import { X } from "lucide-react"
 
 interface MapMarker {
   id: string
@@ -19,28 +20,30 @@ interface MapProps {
 }
 
 const containerStyle = {
-  width: '100%',
-  height: '100%'
+  width: "100%",
+  height: "100%",
 }
 
 const colombiaCenter = {
   lat: 4.570868,
-  lng: -74.297333
+  lng: -74.297333,
 }
 
 export function MapRooms({ markers }: MapProps) {
   const { isLoaded } = useJsApiLoader({
-    id: 'google-map-script',
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""
+    id: "google-map-script",
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
   })
 
   const [map, setMap] = useState<google.maps.Map | null>(null)
+  console.log(map)
   const [selectedMarker, setSelectedMarker] = useState<MapMarker | null>(null)
   const mapRef = useRef<google.maps.Map | null>(null)
 
   const onLoad = useCallback(function callback(map: google.maps.Map) {
     mapRef.current = map
     setMap(map)
+    
   }, [])
 
   const onUnmount = useCallback(function callback() {
@@ -56,7 +59,7 @@ export function MapRooms({ markers }: MapProps) {
       })
       mapRef.current.fitBounds(bounds)
     }
-  }, [markers, map])
+  }, [markers, mapRef]) // Removed unnecessary dependency: map
 
   if (!isLoaded) return <div>Cargando...</div>
 
@@ -77,28 +80,45 @@ export function MapRooms({ markers }: MapProps) {
       ))}
 
       {selectedMarker && (
-        <InfoWindow
-          position={{ lat: selectedMarker.lat, lng: selectedMarker.lng }}
-          onCloseClick={() => setSelectedMarker(null)}
-        >
-          <div className="max-w-xs">
-            <Link href={`/propiedades/${selectedMarker.id}`} className="block">
-              {selectedMarker.image && (
-                <Image
-                  src={`/webapi/assets/${selectedMarker.image}`}
-                  alt={selectedMarker.name}
-                  width={200}
-                  height={150}
-                  className="w-full h-auto object-cover mb-2 rounded"
-                />
-              )}
-              <h3 className="font-bold text-lg mb-1 text-[#4A7598] hover:underline">{selectedMarker.name}</h3>
-            </Link>
-            <p className="font-bold text-gray-700">
-              {selectedMarker.rooms} <span className="font-normal">habitación(es) disponible(s)</span>
-            </p>
-          </div>
-        </InfoWindow>
+
+       <InfoWindow
+         position={{ lat: selectedMarker.lat, lng: selectedMarker.lng }}
+         onCloseClick={() => setSelectedMarker(null)}
+         options={{ disableAutoPan: false }}
+       >
+         <div className="relative max-w-xs bg-white rounded-lg shadow-lg overflow-hidden p-0">
+           {/* Botón de cerrar personalizado */}
+           <button
+             onClick={() => setSelectedMarker(null)}
+             className="absolute top-2 right-2 bg-gray-200 hover:bg-gray-300 rounded-full p-1 transition-colors duration-200"
+             aria-label="Cerrar"
+           >
+             <X size={16} />
+           </button>
+       
+           <Link href={`/propiedades/${selectedMarker.id}`} className="block">
+             {selectedMarker.image && (
+               <Image
+                 src={`/webapi/assets/${selectedMarker.image}`}
+                 alt={selectedMarker.name}
+                 width={200}
+                 height={150}
+                 className="w-full h-auto object-cover mb-3 rounded-lg"
+               />
+             )}
+             <div className="px-4">
+             <h3 className="font-bold text-lg text-[#4A7598] hover:underline transition-all duration-200">
+               {selectedMarker.name}
+             </h3>
+             <p className="text-gray-700 mt-2">
+             <span className="font-bold">{selectedMarker.rooms}</span> habitación(es) disponible(s)
+           </p>
+           </div>
+           </Link>
+           
+         </div>
+       </InfoWindow>
+       
       )}
     </GoogleMap>
   )

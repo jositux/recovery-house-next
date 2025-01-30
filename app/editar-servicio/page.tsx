@@ -358,7 +358,7 @@ useEffect(() => {
               <FormItem>
                 <FormLabel>Describe el servicio que ofreces</FormLabel>
                 <FormControl>
-                  <Textarea
+                  <Textarea className="h-full min-h-[100px]" 
                     placeholder="Describe las características"
                     {...field}
                   />

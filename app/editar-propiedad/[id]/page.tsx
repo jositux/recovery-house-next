@@ -342,7 +342,7 @@ export default function EditPropertyPage({
               <FormItem>
                 <FormLabel>Describe tu propiedad</FormLabel>
                 <FormControl>
-                  <Textarea
+                  <Textarea className="h-full min-h-[100px]"
                     placeholder="Describe las características de la propiedad"
                     {...field}
                   />

@@ -1,42 +1,35 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import FileUpload from "@/components/FileUpload";
-import ImageUpload from "@/components/CoverPhotoUpload";
-import { LocationSelector } from "@/components/ui/location-selector";
-import { UserTypeCard } from "@/components/ui/user-type-card";
-import { useRouter } from 'next/navigation'
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import { Button } from "@/components/ui/button"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import FileUpload from "@/components/FileUpload"
+import ImageUpload from "@/components/CoverPhotoUpload"
+import { LocationSelector } from "@/components/ui/location-selector"
+import { UserTypeCard } from "@/components/ui/user-type-card"
+import { useRouter } from "next/navigation"
 
-import type { LocationDetails } from "@/components/OSMSelector";
-import dynamic from 'next/dynamic';
+import type { LocationDetails } from "@/components/OSMSelector"
+import dynamic from "next/dynamic"
 
-const OpenStreetMapSelector = dynamic(
-  () => import('@/components/OSMSelector').then((mod) => mod.default),
-  { ssr: false }
-);
+const OpenStreetMapSelector = dynamic(() => import("@/components/OSMSelector").then((mod) => mod.default), {
+  ssr: false,
+})
+
+import { propertyService, type PropertyData } from "@/services/propertyService"
+import { roomService, type RoomData } from "@/services/RoomService"
+
+import { MultiSelectCase } from "@/components/MultiSelectCase"
 
 
+import { Building2, Home, Save } from "lucide-react"
 
-import { propertyService, PropertyData } from "@/services/propertyService";
-import { roomService, RoomData } from "@/services/RoomService";
-
-import { Building2, Home, Save } from "lucide-react";
-
-import RoomAccordion from "@/components/RoomAccordion";
+import RoomAccordion from "@/components/RoomAccordion"
 
 const formSchema = z.object({
   name: z.string().min(1, "El nombre es requerido."),
@@ -45,11 +38,8 @@ const formSchema = z.object({
   state: z.string().min(1, "Por favor selecciona un estado."),
   city: z.string().min(1, "Por favor selecciona una ciudad."),
   postalCode: z.string().min(1, "El código postal es requerido."),
-  address: z
-  .string(),
-  fullAddress: z
-    .string()
-    .min(5, "La dirección completa debe tener al menos 5 caracteres."),
+  address: z.string(),
+  fullAddress: z.string().min(5, "La dirección completa debe tener al menos 5 caracteres."),
   latitude: z.number().min(-90).max(90).nullable(),
   longitude: z.number().min(-180).max(180).nullable(),
   type: z.enum(["Stay", "RecoveryHouse"]),
@@ -57,62 +47,68 @@ const formSchema = z.object({
   mainImage: z.string().min(1, "La foto de la propiedad es obligatoria."),
   RNTFile: z.string().min(1, "El archivo RNT es obligatorio."),
   taxIdEINFile: z.string().min(1, "El archivo TAX ID es obligatorio."),
-});
+  hostName: z.string().min(1, "El nombre es obligatorio."),
+  guestComments: z.string().min(1, "El campo es obligatorio."),
+})
 
 interface Room {
-  id: string;
-  name: string;
-  roomNumber: string;
-  description: string;
-  beds: number;
-  capacity: number;
-  pricePerNight: string;
-  cleaningFee: string;
-  mainImage: string;
-  photos: string[];
-  extraTags: string[];
-  servicesTags: string[];
-  propertyId: string;
+  id: string
+  name: string
+  roomNumber: string
+  description: string
+  beds: number
+  capacity: number
+  pricePerNight: string
+  cleaningFee: string
+  mainImage: string
+  photos: string[]
+  extraTags: string[]
+  servicesTags: string[]
+  propertyId: string
 }
 
-type FormValues = z.infer<typeof formSchema>;
+type FormValues = z.infer<typeof formSchema>
+
 
 export default function RegisterPropertyBasePage() {
+  const handleSelectionChangeCase = (selectedIds: string[]) => {
+    console.log("Selected options:", selectedIds)
+  }
 
   const handleLocationSelected = (details: LocationDetails) => {
-    console.log("Detalles de la ubicación seleccionada:", details);
-    form.setValue("address", details.address);
-    form.setValue("latitude", details.lat);
-    form.setValue("longitude", details.lng);
-    form.setValue("postalCode", details.postalCode);
-  };
+    console.log("Detalles de la ubicación seleccionada:", details)
+    form.setValue("address", details.address)
+    form.setValue("latitude", details.lat)
+    form.setValue("longitude", details.lng)
+    form.setValue("postalCode", details.postalCode)
+  }
 
   const defaultLocation = {
     address: "",
     lat: 0,
     lng: 0,
     postalCode: "",
-  };
+  }
 
-  const [imageId, setImageId] = useState<string>(""); // Estado para guardar el ID de la imagen
+  const [imageId, setImageId] = useState<string>("") // Estado para guardar el ID de la imagen
 
   const [RNTFileData, setRNTFileData] = useState<{
-    id: string;
-    filename_download: string;
+    id: string
+    filename_download: string
   }>({
     id: "",
     filename_download: "",
-  });
+  })
 
   const [TaxFileData, setTaxFileData] = useState<{
-    id: string;
-    filename_download: string;
+    id: string
+    filename_download: string
   }>({
     id: "",
     filename_download: "",
-  });
+  })
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -123,7 +119,7 @@ export default function RegisterPropertyBasePage() {
       state: "",
       city: "",
       postalCode: "",
-      address:"",
+      address: "",
       fullAddress: "",
       latitude: null,
       longitude: null,
@@ -133,13 +129,13 @@ export default function RegisterPropertyBasePage() {
       RNTFile: "",
       taxIdEINFile: "",
     },
-  });
+  })
 
   const router = useRouter()
 
   const onSubmit = async (values: FormValues) => {
-    setIsSubmitting(true);
-    let propertyIdLocal = "";
+    setIsSubmitting(true)
+    let propertyIdLocal = ""
 
     try {
       const propertyData: PropertyData = {
@@ -159,25 +155,24 @@ export default function RegisterPropertyBasePage() {
         mainImage: values.mainImage,
         RNTFile: values.RNTFile,
         taxIdEINFile: values.taxIdEINFile,
+
         Rooms: [], // Usamos `ids` aquí
-      };
-      const response = await propertyService.createProperty(propertyData);
+       
+      }
+      const response = await propertyService.createProperty(propertyData)
 
-      propertyIdLocal = response.data.id;
-      
-
+      propertyIdLocal = response.data.id
     } catch (error) {
-      console.error("Error al registrar la propiedad:", error);
+      console.error("Error al registrar la propiedad:", error)
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
 
     try {
       rooms.map(async (room) => {
         // Verificar valores predeterminados para `room.mainImage` y `room.photos`
-        const roomMainImage = room.mainImage || values.mainImage; // Usa `values.mainImage` si `room.mainImage` está vacío
-        const roomPhotos =
-          room.photos.length > 0 ? room.photos : [roomMainImage]; // Usa `roomMainImage` si `photos` está vacío
+        const roomMainImage = room.mainImage || values.mainImage // Usa `values.mainImage` si `room.mainImage` está vacío
+        const roomPhotos = room.photos.length > 0 ? room.photos : [roomMainImage] // Usa `roomMainImage` si `photos` está vacío
 
         const roomData: RoomData = {
           id: room.id,
@@ -193,22 +188,20 @@ export default function RegisterPropertyBasePage() {
           extraTags: room.extraTags,
           servicesTags: room.servicesTags,
           propertyId: propertyIdLocal || "",
-        };
+        }
 
-        const response = await roomService.createRoom(roomData);
+        const response = await roomService.createRoom(roomData)
 
-        return response.id; // Obtenemos el ID de la respuesta
+        return response.id // Obtenemos el ID de la respuesta
+      })
 
-      });
-
-      router.push('/mis-propiedades')
-    
+      router.push("/mis-propiedades")
     } catch (error) {
-      console.error("Error creando room:", error);
+      console.error("Error creando room:", error)
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const [rooms, setRooms] = useState<Room[]>([
     {
@@ -226,13 +219,11 @@ export default function RegisterPropertyBasePage() {
       servicesTags: [],
       propertyId: "0",
     },
-  ]);
+  ])
 
   return (
     <div className="container mx-auto max-w-2xl py-10">
-      <h1 className="text-3xl font-bold mb-6">
-        Registra tu propiedad
-      </h1>
+      <h1 className="text-3xl font-bold mb-6">Registra tu propiedad</h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
@@ -260,9 +251,9 @@ export default function RegisterPropertyBasePage() {
                     defaultImageId={""}
                     onImageIdChange={(newImageId) => {
                       if (newImageId !== imageId) {
-                        setImageId(newImageId);
-                        form.setValue("mainImage", newImageId);
-                        form.clearErrors("mainImage");
+                        setImageId(newImageId)
+                        form.setValue("mainImage", newImageId)
+                        form.clearErrors("mainImage")
                       }
                     }}
                   />
@@ -279,33 +270,31 @@ export default function RegisterPropertyBasePage() {
               <FormItem>
                 <FormLabel>Describe tu propiedad</FormLabel>
                 <FormControl>
-                  <Textarea
-                    placeholder="Describe las características de la propiedad"
-                    {...field}
-                  />
+                  <Textarea className="h-full min-h-[100px]" placeholder="Describe las características de la propiedad" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-         
-            <LocationSelector
-              defaultCountry={""}
-              defaultState={""}
-              defaultCity={""}
-              onChange={({ country, state, city }) => {
-                form.setValue("country", country);
-                form.setValue("state", state);
-                form.setValue("city", city);
-              }}
-              error={{
-                country: form.formState.errors.country?.message,
-                state: form.formState.errors.state?.message,
-                city: form.formState.errors.city?.message,
-              }}
-            />
-          
+<MultiSelectCase onChange={handleSelectionChangeCase} />
+
+          <LocationSelector
+            defaultCountry={""}
+            defaultState={""}
+            defaultCity={""}
+            onChange={({ country, state, city }) => {
+              form.setValue("country", country)
+              form.setValue("state", state)
+              form.setValue("city", city)
+            }}
+            error={{
+              country: form.formState.errors.country?.message,
+              state: form.formState.errors.state?.message,
+              city: form.formState.errors.city?.message,
+            }}
+          />
+
           <div className="hidden">
             <FormField
               control={form.control}
@@ -336,10 +325,7 @@ export default function RegisterPropertyBasePage() {
             )}
           />
 
-          <OpenStreetMapSelector
-            onLocationSelected={handleLocationSelected}
-            defaultLocation={defaultLocation}
-          />
+          <OpenStreetMapSelector onLocationSelected={handleLocationSelected} defaultLocation={defaultLocation} />
 
           <div className="hidden">
             <FormField
@@ -370,13 +356,7 @@ export default function RegisterPropertyBasePage() {
                       step="any"
                       placeholder="Latitud"
                       {...field}
-                      onChange={(e) =>
-                        field.onChange(
-                          e.target.value
-                            ? Number.parseFloat(e.target.value)
-                            : null
-                        )
-                      }
+                      onChange={(e) => field.onChange(e.target.value ? Number.parseFloat(e.target.value) : null)}
                       value={field.value ?? ""}
                     />
                   </FormControl>
@@ -397,13 +377,7 @@ export default function RegisterPropertyBasePage() {
                       step="any"
                       placeholder="Longitud"
                       {...field}
-                      onChange={(e) =>
-                        field.onChange(
-                          e.target.value
-                            ? Number.parseFloat(e.target.value)
-                            : null
-                        )
-                      }
+                      onChange={(e) => field.onChange(e.target.value ? Number.parseFloat(e.target.value) : null)}
                       value={field.value ?? ""}
                     />
                   </FormControl>
@@ -471,9 +445,9 @@ export default function RegisterPropertyBasePage() {
                       filename_download={RNTFileData.filename_download}
                       onUploadSuccess={(response) => {
                         if (response.id !== RNTFileData.id) {
-                          setRNTFileData(response);
-                          form.setValue("RNTFile", response.id);
-                          form.clearErrors("RNTFile");
+                          setRNTFileData(response)
+                          form.setValue("RNTFile", response.id)
+                          form.clearErrors("RNTFile")
                         }
                       }}
                     />
@@ -495,9 +469,9 @@ export default function RegisterPropertyBasePage() {
                       filename_download={TaxFileData.filename_download}
                       onUploadSuccess={(response) => {
                         if (response.id !== TaxFileData.id) {
-                          setTaxFileData(response);
-                          form.setValue("taxIdEINFile", response.id);
-                          form.clearErrors("taxIdEINFile");
+                          setTaxFileData(response)
+                          form.setValue("taxIdEINFile", response.id)
+                          form.clearErrors("taxIdEINFile")
                         }
                       }}
                     />
@@ -509,18 +483,47 @@ export default function RegisterPropertyBasePage() {
           </div>
 
           <div className="container mx-auto py-12">
-            <h1 className="text-2xl font-bold mb-8">
-              Datos de las habitaciones
-            </h1>
+            <h1 className="text-2xl font-bold mb-8">Datos de las habitaciones</h1>
             <RoomAccordion rooms={rooms} setRooms={setRooms} />
           </div>
 
-          {/*<div className="mt-8">
-            <h2 className="text-2xl font-bold mb-4">Habitación/es:</h2>
-            <pre className="bg-gray-100 p-4 rounded-md overflow-auto">
-              {JSON.stringify(rooms, null, 2)}
-            </pre>
-                  </div>*/}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="hostName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nombre del anfitrión</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input placeholder="Nombre del anfitrión" {...field} />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="guestComments"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Comentarios para el huésped</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Textarea
+                        placeholder="Escribe un mensaje de bienvenida o instrucciones para tus huéspedes"
+                        {...field}
+                        className="h-full min-h-[100px]"
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
           <Button
             type="submit"
@@ -529,8 +532,7 @@ export default function RegisterPropertyBasePage() {
           >
             {isSubmitting ? (
               <>
-                <Save className="animate-spin" />{" "}
-                {/* Icono de guardar con animación de giro */}
+                <Save className="animate-spin" /> {/* Icono de guardar con animación de giro */}
                 CARGANDO...
               </>
             ) : (
@@ -543,5 +545,6 @@ export default function RegisterPropertyBasePage() {
         </form>
       </Form>
     </div>
-  );
+  )
 }
+

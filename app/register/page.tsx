@@ -53,7 +53,7 @@ export default function RegistrationPage() {
         email: registrationData.email,
         password: registrationData.password,
         initialRole: registrationData.initialRole,
-        verification_url: "http://localhost:3000/user/verify"
+        verification_url: "https://recovery-care.vercel.app/"
       };
       const response = await registerService.register(registerData);
       if (response.challenge) {

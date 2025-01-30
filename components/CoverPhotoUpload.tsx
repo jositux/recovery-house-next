@@ -87,7 +87,7 @@ const CoverPhotoUpload: React.FC<CoverPhotoUploadProps> = ({ defaultImageId = ""
           ) : (
             <Camera className="w-10 h-10 text-gray-500" />
           )}
-          <span className="text-sm font-medium text-gray-500">COVER PHOTO</span>
+          <span className="text-sm font-medium text-gray-500">SUBIR FOTO</span>
         </label>
       )}
     </div>
