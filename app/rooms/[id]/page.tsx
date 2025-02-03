@@ -52,6 +52,8 @@ interface Booking {
   checkOut: string
   patient: string
   guests: number
+  price: number
+  cleaning: number
   room: string
 }
 
