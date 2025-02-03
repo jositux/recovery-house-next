@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
+import Image from "next/image"
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -25,14 +26,12 @@ export default function ForgotPassword() {
         },
         body: JSON.stringify({
           email, 
-          reset_url: "https://recovery-care.vercel.app/user/reset-password/"
+          reset_url: "https://recovery-care.vercel.app/user/reset-password"
         }),
       });
 
       if (response.ok) {
-
-        
-        router.push('/login'); // Redirige al usuario a la página de inicio de sesión
+        router.push('/login?message=reset'); // Redirige al usuario a la página de inicio de sesión
       } else {
         
       }
@@ -44,26 +43,38 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="py-16 flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="py-16 flex flex-col items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+       <Image
+          src="/assets/logo2.svg"
+          alt="Recovery Care Solutions"
+          width={180}
+          height={80}
+        />
+      <div className="w-full max-w-md m-8 p-8 bg-white rounded-lg shadow-md">
         <div>
-          <h2 className="mt-6 text-center text-2xl font-bold text-gray-900">
+          <h2 className="text-center text-2xl font-bold text-gray-900">
             Restablecer contraseña
           </h2>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+       
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
+            
             <div>
               <Label htmlFor="email" className="sr-only">
                 Correo electrónico
               </Label>
+              <p className="mt-2 text-center text-sm text-gray-600 py-6">
+            Atención: Se enviará un correo electrónico a la dirección proporcionada con instrucciones para restablecer tu
+            contraseña.
+          </p>
               <Input
                 id="email"
                 name="email"
                 type="email"
                 autoComplete="email"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Correo electrónico"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}

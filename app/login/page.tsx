@@ -16,6 +16,23 @@ function MessageBanner() {
       </p>
     )
   }
+
+  if (message === "reset") {
+    return (
+      <p className="mb-2 text-green-600 font-medium py-4 text-center">
+        Revisa tu casilla de correo y sigue las instrucciones para resetear tu contraseña
+      </p>
+    )
+  }
+
+  if (message === "reset-ok") {
+    return (
+      <p className="mb-2 text-green-600 font-medium py-4 text-center">
+        ¡Felicitaciones! Puedes usar el sistema con tu nueva contraseña.
+      </p>
+    )
+  }
+
   return null
 }
 

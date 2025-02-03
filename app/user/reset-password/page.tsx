@@ -8,8 +8,10 @@ import * as z from "zod"
 import { Eye, EyeOff } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { useRouter } from 'next/navigation';
+import Image from "next/image"
 
 const passwordSchema = z
   .string()
@@ -31,6 +33,8 @@ type FormValues = z.infer<typeof formSchema>
 function ResetPasswordForm({ token }: { token: string }) {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
+  const router = useRouter();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -58,11 +62,12 @@ function ResetPasswordForm({ token }: { token: string }) {
       if (!response.ok) {
         throw new Error("No se pudo restablecer la contraseña")
       }
+      else {
+        router.push('/login?message=reset-ok'); 
+      }
 
-      alert("Contraseña actualizada exitosamente")
     } catch (error) {
       console.error(error)
-      alert("Hubo un error al restablecer la contraseña.")
     }
   }
 
@@ -93,10 +98,7 @@ function ResetPasswordForm({ token }: { token: string }) {
                   </Button>
                 </div>
               </FormControl>
-              <FormDescription>
-                La contraseña debe tener al menos 8 caracteres, incluyendo mayúsculas, minúsculas, números y caracteres
-                especiales.
-              </FormDescription>
+             
               <FormMessage />
             </FormItem>
           )}
@@ -148,8 +150,14 @@ function ResetPasswordContent() {
 
 export default function ResetPasswordPage() {
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
+    <div className="flex flex-col justify-center items-center p-16 bg-gray-100">
+     <Image
+          src="/assets/logo2.svg"
+          alt="Recovery Care Solutions"
+          width={180}
+          height={80}
+        />
+      <div className="w-full max-w-md m-8 p-8 bg-white rounded-lg shadow-md">
         <h1 className="text-2xl font-bold mb-6 text-center">Restablecer Contraseña</h1>
         <Suspense fallback={<div>Cargando...</div>}>
           <ResetPasswordContent />
