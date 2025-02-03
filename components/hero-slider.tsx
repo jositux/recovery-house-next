@@ -70,8 +70,8 @@ export function HeroSlider() {
   }
 
   return (
-    <div className={styles.sliderContainer}>
-      <motion.div 
+    <div className={` ${styles.sliderContainer} container mx-auto rounded-3xl`}>
+      <motion.div
         ref={sliderRef}
         className="w-full h-full"
         drag="x"

@@ -30,7 +30,7 @@ export default function RootLayout({
     <html lang="es" className={`${fraunces.variable} ${dmSans.variable}`}>
       <body className="font-dm-sans">
         <Header />
-        <main>{children}</main>
+        <main className='max-auto px-4'>{children}</main>
         <Toaster />
         <Footer />
       </body>

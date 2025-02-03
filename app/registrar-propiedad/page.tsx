@@ -277,7 +277,7 @@ export default function RegisterPropertyBasePage() {
             )}
           />
 
-<MultiSelectCase onChange={handleSelectionChangeCase} />
+          <MultiSelectCase onChange={handleSelectionChangeCase} />
 
           <LocationSelector
             defaultCountry={""}

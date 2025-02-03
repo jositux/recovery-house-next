@@ -8,7 +8,7 @@ const fraunces = Fraunces({ subsets: ['latin'] })
 
 export function HostCTASection() {
   return (
-    <section className="relative h-[600px] w-full overflow-hidden">
+    <section className="container mx-auto p-8 rounded-3xl relative h-[600px] w-full overflow-hidden">
       {/* Background Image */}
       <Image
         src="/assets/cta/0.jpg?height=1200&width=2000"

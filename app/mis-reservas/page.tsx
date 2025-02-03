@@ -208,7 +208,7 @@ const BookingList: React.FC = () => {
 function calculateTotal(booking: Booking, roomDetails?: Room): string {
   if (!roomDetails) return "N/A"
   const nights = (new Date(booking.checkOut).getTime() - new Date(booking.checkIn).getTime()) / (1000 * 3600 * 24)
-  const total = nights * Number.parseFloat(roomDetails.pricePerNight) + Number.parseFloat(roomDetails.cleaningFee)
+  const total = nights * booking.guests * Number.parseFloat(roomDetails.pricePerNight) + Number.parseFloat(roomDetails.cleaningFee)
   return total.toFixed(2)
 }
 
