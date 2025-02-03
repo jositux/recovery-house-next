@@ -15,6 +15,8 @@ export const GET = async (request: NextRequest) => {
   const session = await stripe.checkout.sessions.retrieve(stripeSessionId);
 
   if (session.status === "complete") {
+
+
     // Go to a success page!
     return redirect(`/checkout/success`);
   }
@@ -25,5 +27,5 @@ export const GET = async (request: NextRequest) => {
     return redirect(`/checkout`);
   }
 
-  return redirect("/shop");
+  return redirect("/rooms");
 };

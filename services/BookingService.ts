@@ -20,6 +20,8 @@ export const createBooking = async (
     checkOut: string;
     patient: string;
     guests: number;
+    price: string;
+    cleaning: string;
     room: string;
   },
   accessToken: string

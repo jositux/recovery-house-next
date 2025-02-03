@@ -28,6 +28,8 @@ interface Booking {
   checkOut: string;
   patient: string;
   guests: number;
+  price: number;
+  cleaning: number;
   room: string;
 }
 
@@ -118,6 +120,8 @@ export function BookingWidget({
         checkOut: checkOut?.toISOString() || "",
         patient: patient_id,
         guests: guests,
+        price: price,
+        cleaning: cleaning,
         room: room,
       };
       

@@ -18,8 +18,6 @@ interface CheckoutFormProps {
 }
 
 export const CheckoutForm = ({ bookingData }: CheckoutFormProps) => {
-  console.log("viene aca ", bookingData)
-
   // Función para obtener el clientSecret
   const fetchClientSecret = useCallback(async () => {
     if (!bookingData || Object.keys(bookingData).length === 0) {
