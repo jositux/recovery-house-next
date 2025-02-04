@@ -50,7 +50,7 @@ export function MenuActions() {
             </Link>
           </li>
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-            <Link href="/registrar-servicio" className="flex items-center gap-2">
+            <Link href="/subscriptions" className="flex items-center gap-2">
               <HandHeart className="w-4 h-4" />
               Agregar Servicio
             </Link>

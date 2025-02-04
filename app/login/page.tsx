@@ -4,6 +4,7 @@ import { Suspense } from "react"
 import Image from "next/image"
 import { LoginForm } from "@/components/forms/LoginForm"
 import { useSearchParams } from "next/navigation"
+import {LucideUserCheck, Mail } from 'lucide-react'
 
 function MessageBanner() {
   const searchParams = useSearchParams()
@@ -11,25 +12,34 @@ function MessageBanner() {
 
   if (message === "aceptado") {
     return (
-      <p className="mb-2 text-green-600 font-medium py-4 text-center">
-        ¡Felicitaciones! Puedes empezar a usar el sistema.
-      </p>
+
+      <div className="m-4 p-4 rounded-2xl text-center">
+      <LucideUserCheck className="w-8 h-8 mx-auto text-green-700" />
+      <p className="mt-2 text-gl text-green-700">
+      ¡Bienvenido! Puedes empezar a usar el sistema.   </p>
+    </div>
+    
     )
   }
 
   if (message === "reset") {
     return (
-      <p className="mb-2 text-green-600 font-medium py-4 text-center">
-        Revisa tu casilla de correo y sigue las instrucciones para resetear tu contraseña
-      </p>
+      <div className="m-4 p-4 rounded-2xl text-center">
+      <Mail className="w-8 h-8 mx-auto text-green-700" />
+      <p className="mt-2 text-gl text-green-700">
+      Atención: Revisa tu casilla de Email para recuperar tu contraseña.   </p>
+    </div>
     )
   }
 
   if (message === "reset-ok") {
     return (
-      <p className="mb-2 text-green-600 font-medium py-4 text-center">
-        ¡Felicitaciones! Puedes usar el sistema con tu nueva contraseña.
-      </p>
+      <div className="m-4 p-4 rounded-2xl text-center">
+      <LucideUserCheck className="w-8 h-8 mx-auto text-green-700" />
+      <p className="mt-2 text-gl text-green-700">
+      Puedes ingresar con tu nueva contraseña.   </p>
+    </div>
+      
     )
   }
 
