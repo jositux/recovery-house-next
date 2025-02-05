@@ -51,7 +51,7 @@ export function MembershipCard({
         <div
           className={cn(
             "text-sm",
-            isSelected ? "text-white/90" : "text-gray-600"
+            isSelected ? "text-white/90" : "text-[#162F40]"
           )}
           dangerouslySetInnerHTML={{ __html: description }}
         />

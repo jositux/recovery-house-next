@@ -247,7 +247,7 @@ export default function UpdateUserForm({ onSubmit, initialValues }: UpdateUserFo
 
         <Button 
           type="submit" 
-          className="w-full bg-[#4A7598] hover:bg-[#3A5F7A]"
+          className="w-full bg-[#39759E] hover:bg-[#39759E]"
           aria-label="Complete registration"
         >
           Guardar Cambios

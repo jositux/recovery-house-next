@@ -23,11 +23,17 @@ export function CollectionServiceTags({
   const [selectedTags, setSelectedTags] = useState<string[]>(initialSelectedTags);
 
   const handleTagClick = (idTag: string) => {
-    setSelectedTags((prevSelectedTags) =>
-      prevSelectedTags.includes(idTag)
-        ? prevSelectedTags.filter((id) => id !== idTag)
-        : [...prevSelectedTags, idTag]
-    );
+    setSelectedTags((prevSelectedTags) => {
+      if (idTag === "all-included") {
+        // Si se selecciona "all-included", seleccionamos solo este y deseleccionamos el resto
+        return prevSelectedTags.includes("all-included") ? [] : ["all-included"];
+      } else {
+        // Si se selecciona otro tag, deseleccionamos "all-included"
+        return prevSelectedTags.includes(idTag)
+          ? prevSelectedTags.filter((id) => id !== idTag)
+          : prevSelectedTags.filter((id) => id !== "all-included").concat(idTag);
+      }
+    });
   };
 
   useEffect(() => {
@@ -36,7 +42,7 @@ export function CollectionServiceTags({
 
   if (servicesTags.length === 0) {
     return (
-      <div className="text-gray-500 p-4 bg-gray-50 rounded-md">
+      <div className="text-[#162F40] p-4 bg-gray-50 rounded-md">
         No se encontraron etiquetas de servicios.
       </div>
     );

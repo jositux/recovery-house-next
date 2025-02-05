@@ -43,7 +43,7 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="py-16 flex flex-col items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="flex flex-col items-center justify-center bg-gray-50 py-16 px-4 sm:px-6 lg:px-8">
        <Image
           src="/assets/logo2.svg"
           alt="Recovery Care Solutions"
@@ -52,7 +52,7 @@ export default function ForgotPassword() {
         />
       <div className="w-full max-w-md m-8 p-8 bg-white rounded-lg shadow-md">
         <div>
-          <h2 className="text-center text-2xl font-bold text-gray-900">
+          <h2 className="text-center text-2xl font-bold text-[#162F40]">
             Restablecer contraseña
           </h2>
         </div>
@@ -64,7 +64,7 @@ export default function ForgotPassword() {
               <Label htmlFor="email" className="sr-only">
                 Correo electrónico
               </Label>
-              <p className="mt-2 text-center text-sm text-gray-600 py-6">
+              <p className="mt-2 text-center text-sm text-[#162F40] py-6">
             Atención: Se enviará un correo electrónico a la dirección proporcionada con instrucciones para restablecer tu
             contraseña.
           </p>
@@ -74,7 +74,7 @@ export default function ForgotPassword() {
                 type="email"
                 autoComplete="email"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-[#162F40] rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Correo electrónico"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -84,7 +84,7 @@ export default function ForgotPassword() {
           <div>
             <Button
               type="submit"
-              className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#4A7598] hover:bg-[#3A5F7A] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#39759E] hover:bg-[#39759E] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               disabled={isLoading}
             >
               {isLoading ? 'Enviando...' : 'Enviar'}

@@ -55,7 +55,7 @@ const EmailVerificationPage = () => {
         {verificationStatus === "verifying" && (
           <>
             <Loader2 className="w-10 h-10 text-blue-500 animate-spin mx-auto" />
-            <p className="mt-4 text-gray-600">Validando usuario...</p>
+            <p className="mt-4 text-[#162F40]">Validando usuario...</p>
           </>
         )}
 

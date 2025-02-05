@@ -21,10 +21,10 @@ export function NewsCard({ title, description, imageSrc }: NewsCardProps) {
           className="object-cover hover:scale-105 transition-transform duration-300"
         />
       </div>
-      <h3 className={`${fraunces.className} className="text-xl md:text-2xl font-medium text-gray-800 mb-2 font-fraunces`}>
+      <h3 className={`${fraunces.className} className="text-xl md:text-2xl font-medium text-[#162F40] mb-2 font-fraunces`}>
         {title}
       </h3>
-      <p className="text-gray-600 leading-relaxed">
+      <p className="text-[#162F40] leading-relaxed">
         {description}
       </p>
     </div>

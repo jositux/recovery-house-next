@@ -1,10 +1,11 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { ChevronRight } from "lucide-react"
-import { Fraunces } from "next/font/google"
+import { Button } from "@/components/ui/button";
+import { Fraunces } from "next/font/google";
+import Link from "next/link";
+import { Search } from "lucide-react";
 
-const fraunces = Fraunces({ subsets: ["latin"] })
+const fraunces = Fraunces({ subsets: ["latin"] });
 
 const steps = [
   {
@@ -22,23 +23,27 @@ const steps = [
   {
     number: "3.",
     title: "Explora las Opciones Disponibles",
-    description: "Navega por nuestra amplia selección de casas de recuperación y encuentra la opción perfecta para ti.",
+    description:
+      "Navega por nuestra amplia selección de casas de recuperación y encuentra la opción perfecta para ti.",
   },
-]
+];
 
 export function HowToUseSection() {
   return (
     <section className="py-16 bg-gray-50">
-      <div className="container mx-auto">
+      <div className="container mx-auto px-4 lg:px-0">
         <div className="grid md:grid-cols-2 gap-12 items-start">
           {/* Left Column */}
           <div>
-            <h2 className={`${fraunces.className} text-3xl md:text-4xl text-gray-800 mb-4`}>
+            <h2
+              className={`${fraunces.className} text-3xl md:text-4xl text-[#162F40] mb-4`}
+            >
               Cómo utilizar nuestra plataforma de recuperación
             </h2>
-            <p className="text-gray-600">
-              Nuestra plataforma de recuperación te permite encontrar una casa de recuperación de manera fácil y rápida.
-              Sigue estos pasos para utilizarla:
+            <p className="text-[#162F40]">
+              Nuestra plataforma de recuperación te permite encontrar una casa
+              de recuperación de manera fácil y rápida. Sigue estos pasos para
+              utilizarla:
             </p>
           </div>
 
@@ -47,28 +52,35 @@ export function HowToUseSection() {
             {steps.map((step, index) => (
               <div key={index} className="flex gap-4">
                 <div
-                  className={`${fraunces.className} flex items-center justify-center w-20 h-20 text-7xl font-medium text-[#4A7598] flex-shrink-0`}
+                  className={`${fraunces.className} flex items-center justify-center w-20 h-20 text-7xl font-medium text-[#162F40] flex-shrink-0`}
                 >
                   {step.number}
                 </div>
                 <div>
-                  <h3 className={`${fraunces.className} text-xl font-medium text-gray-800 mb-2`}>{step.title}</h3>
-                  <p className="text-gray-600">{step.description}</p>
+                  <h3
+                    className={`${fraunces.className} text-xl font-medium text-[#162F40] mb-2`}
+                  >
+                    {step.title}
+                  </h3>
+                  <p className="text-[#162F40]">{step.description}</p>
                 </div>
               </div>
             ))}
 
-            <div className="flex gap-4 pt-4">
-              <Button className="bg-[#4A7598] hover:bg-[#3A5F7A]">Buscar</Button>
-              <Button variant="outline" className="group">
-                Registrarse
-                <ChevronRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Button>
+            <div className="flex gap-4">
+              <Link href="/rooms">
+                <Button className="bg-[#3184B4] hover:bg-[#39759E] flex items-center gap-2">
+                  <Search size={16} />
+                  Buscar
+                </Button>
+              </Link>
+              <Link href="/register">
+                <Button variant="outline">Registrarse</Button>
+              </Link>
             </div>
           </div>
         </div>
       </div>
     </section>
-  )
+  );
 }
-

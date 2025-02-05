@@ -146,19 +146,19 @@ export default function RoomPage() {
       </div>
       {/* Content */}
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">{property.name}</h1>
+        <h1 className="text-3xl font-bold text-[#162F40] mb-4">{property.name}</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           <div>
-            <p className="text-xl text-gray-600 mb-2">{property.fullAddress}</p>
-            <p className="text-lg text-gray-600">{decodeHtmlAndRemoveTags(property.description)}</p>
+            <p className="text-xl text-[#162F40] mb-2">{property.fullAddress}</p>
+            <p className="text-lg text-[#162F40]">{decodeHtmlAndRemoveTags(property.description)}</p>
           </div>
           <div className="h-64 rounded-lg">
             <GoogleMap lat={property.place.coordinates[0]} lng={property.place.coordinates[1]} />
           </div>
         </div>
 
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Habitaciones disponibles</h2>
+        <h2 className="text-2xl font-bold text-[#162F40] mb-4">Habitaciones disponibles</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {property.Rooms.map((room: Room) => (
             <div key={room.id} className="border rounded-lg overflow-hidden">
@@ -181,9 +181,9 @@ export default function RoomPage() {
                     <span>Capacidad: {room.capacity}</span>
                   </div>
                 </div>
-                <p className="text-gray-600 mb-4">{decodeHtmlAndRemoveTags(room.description).substring(0, 100)}...</p>
+                <p className="text-[#162F40] mb-4">{decodeHtmlAndRemoveTags(room.description).substring(0, 100)}...</p>
                 <p className="text-lg font-bold mb-2">${room.pricePerNight} / noche</p>
-                <p className="text-sm text-gray-500">Tarifa de limpieza: ${room.cleaningFee}</p>
+                <p className="text-sm text-[#162F40]">Tarifa de limpieza: ${room.cleaningFee}</p>
               </div>
             </div>
           ))}
@@ -192,8 +192,8 @@ export default function RoomPage() {
         {/* Service Providers */}
         <div className="mt-12">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold text-gray-900">Proveedores de servicios</h2>
-            <button className="text-[#4A7598]">Filtrar</button>
+            <h2 className="text-2xl font-bold text-[#162F40]">Proveedores de servicios</h2>
+            <button className="text-[#39759E]">Filtrar</button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {serviceProviders.map((provider) => (

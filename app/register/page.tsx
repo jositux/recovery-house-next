@@ -53,7 +53,7 @@ export default function RegistrationPage() {
         email: registrationData.email,
         password: registrationData.password,
         initialRole: registrationData.initialRole,
-        verification_url: "https://recovery-care.vercel.app/user/verify"
+        verification_url: "https://recovery-care.vercel.app/user/verify/"
       };
       const response = await registerService.register(registerData);
       if (response.challenge) {
@@ -104,7 +104,7 @@ export default function RegistrationPage() {
 
   return (
     <div className="min-h-screen">
-      <div className="container mx-auto max-w-md py-10">
+      <div className="container mx-auto max-w-md py-10 px-4">
         <AnimatePresence mode="wait">
           {currentStep === 'details' && (
             <motion.div
@@ -128,20 +128,20 @@ export default function RegistrationPage() {
               transition={{ duration: 0.3 }}
             >
               <h1 className="text-2xl font-bold mb-6">Recovery Care Solutions es una plataforma a la que cualquiera puede pertenecer</h1>
-              <p className="mb-8 text-gray-600">
+              <p className="mb-8 text-[#162F40]">
                 Para garantizar esto, le pedimos que se comprometa a lo siguiente: Acepto tratar a todos los miembros de la comunidad independientemente de su raza, religión, origen nacional, etnia, color de piel, discapacidad, sexo, identidad de género, orientación sexual o edad, con respeto y sin juicios ni prejuicios.
               </p>
               <div className="flex gap-4">
                 <Button 
                   variant="ghost" 
                   onClick={handleBack}
-                  className="text-[#4A7598] hover:text-[#3A5F7A] hover:bg-[#4A7598]/10"
+                  className="text-[#39759E] hover:text-[#39759E] hover:bg-[#39759E]/10"
                 >
                   VOLVER
                 </Button>
                 <Button 
                   onClick={handleTermsAccept} 
-                  className="flex-1 bg-[#4A7598] hover:bg-[#3A5F7A]"
+                  className="flex-1 bg-[#39759E] hover:bg-[#39759E]"
                 >
                   DE ACUERDO Y CONTINÚO
                 </Button>

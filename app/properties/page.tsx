@@ -35,7 +35,7 @@ export default function PropertiesPage() {
     <main className="flex flex-col lg:flex-row min-h-screen">
       <div className="flex-1 p-6 overflow-auto">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold text-gray-800 mb-6">
+          <h1 className="text-3xl font-bold text-[#162F40] mb-6">
             Propiedades disponibles en Colombia
           </h1>
           <PropertySearch onSearch={handleSearch} />
@@ -56,7 +56,7 @@ export default function PropertiesPage() {
             ))}
           </div>
           {filteredProperties.length === 0 && (
-            <p className="text-center text-gray-500 mt-8">No se encontraron propiedades que coincidan con tu búsqueda.</p>
+            <p className="text-center text-[#162F40] mt-8">No se encontraron propiedades que coincidan con tu búsqueda.</p>
           )}
           {filteredProperties.length > 0 && (
             <div className="flex justify-center mt-8 gap-2">
@@ -65,7 +65,7 @@ export default function PropertiesPage() {
                   key={page}
                   onClick={() => setCurrentPage(page)}
                   className={`w-8 h-8 rounded-full ${
-                    page === currentPage ? 'bg-[#4A7598] text-white' : 'bg-gray-200 text-gray-600'
+                    page === currentPage ? 'bg-[#39759E] text-white' : 'bg-gray-200 text-[#162F40]'
                   } flex items-center justify-center`}
                   aria-label={`Página ${page}`}
                   aria-current={page === currentPage ? 'page' : undefined}

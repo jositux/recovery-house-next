@@ -25,24 +25,24 @@ const newsItems = [
 
 export function NewsSection() {
   return (
-    <section className="py-16 bg-white">
+    <section className="py-16 bg-white px-4 lg:px-0">
       <div className="container mx-auto">
         <div className="flex justify-between items-center mb-12">
           <div>
-            <h2 className={`${fraunces.className} text-3xl md:text-4xl font-normal text-gray-800 mb-4 font-fraunces`}>
+            <h2 className={`${fraunces.className} text-3xl md:text-4xl font-normal text-[#162F40] mb-4 font-fraunces`}>
               News & Trends
             </h2>
-            <p className="text-gray-600 max-w-2xl">
+            <p className="text-[#162F40] max-w-2xl">
               Descubre artículos informativos, consejos útiles y experiencias de otros pacientes que te guiarán en tu proceso postoperatorio
             </p>
           </div>
-          <Link 
+         {/* <Link 
             href="#" 
-            className="text-[#4A7598] hover:text-[#3A5F7A] flex items-center gap-1 font-medium"
+            className="text-[#39759E] hover:text-[#39759E] flex items-center gap-1 font-medium"
           >
             Ver todo
             <ChevronRight className="h-4 w-4" />
-          </Link>
+  </Link>*/}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

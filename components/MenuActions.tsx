@@ -42,7 +42,7 @@ export function MenuActions() {
             : "opacity-0 scale-95 invisible"
         }`}
       >
-        <ul className="text-sm text-gray-700">
+        <ul className="text-sm text-[#162F40]">
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
             <Link href="/registrar-propiedad" className="flex items-center gap-2">
               <Building className="w-4 h-4" />

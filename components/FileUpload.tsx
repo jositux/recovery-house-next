@@ -54,7 +54,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
         {loading ? (
           <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
         ) : (
-          <Upload className="w-5 h-5 text-gray-600" />
+          <Upload className="w-5 h-5 text-[#162F40]" />
         )}
       </label>
 

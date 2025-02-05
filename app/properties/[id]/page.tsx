@@ -144,8 +144,8 @@ export default async function PropertyPage({ params }: PageProps) {
           <div className="lg:col-span-2">
             {/* Title and Stats */}
             <div className="mb-6">
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">{property.title}</h1>
-              <div className="flex gap-4 text-gray-600">
+              <h1 className="text-3xl font-bold text-[#162F40] mb-4">{property.title}</h1>
+              <div className="flex gap-4 text-[#162F40]">
                 <div className="flex items-center gap-1">
                   <Bed className="h-5 w-5" />
                   <span>3</span>
@@ -163,12 +163,12 @@ export default async function PropertyPage({ params }: PageProps) {
 
             {/* Description */}
             <div className="mb-8">
-              <p className="text-gray-600">{property.description}</p>
+              <p className="text-[#162F40]">{property.description}</p>
             </div>
 
             {/* Amenities */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Amenidades / Servicios</h2>
+              <h2 className="text-2xl font-bold text-[#162F40] mb-4">Amenidades / Servicios</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {amenities.map((amenity, index) => (
                   <AmenityIcon key={index} icon={amenity.icon} label={amenity.label} />
@@ -178,7 +178,7 @@ export default async function PropertyPage({ params }: PageProps) {
 
             {/* Map */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">El vecindario</h2>
+              <h2 className="text-2xl font-bold text-[#162F40] mb-4">El vecindario</h2>
               <div className="h-[300px] w-full relative rounded-lg overflow-hidden">
                 <GoogleMap lat={property.latitude} lng={property.longitude} />
               </div>
@@ -187,8 +187,8 @@ export default async function PropertyPage({ params }: PageProps) {
             {/* Service Providers */}
             <div>
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold text-gray-900">Proveedores de servicios</h2>
-                <button className="text-[#4A7598]">Filtrar</button>
+                <h2 className="text-2xl font-bold text-[#162F40]">Proveedores de servicios</h2>
+                <button className="text-[#39759E]">Filtrar</button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {serviceProviders.map((provider, index) => (

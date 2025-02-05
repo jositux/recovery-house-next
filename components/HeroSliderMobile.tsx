@@ -56,7 +56,7 @@ export function HeroSliderMobile() {
         onClick={() => sliderRef.current && (sliderRef.current.scrollLeft -= sliderRef.current.offsetWidth)}
         aria-label="Previous slide"
       >
-        <ChevronLeft className="h-6 w-6 text-gray-800" />
+        <ChevronLeft className="h-6 w-6 text-[#162F40]" />
       </button>
 
       <div
@@ -84,7 +84,7 @@ export function HeroSliderMobile() {
         onClick={() => sliderRef.current && (sliderRef.current.scrollLeft += sliderRef.current.offsetWidth)}
         aria-label="Next slide"
       >
-        <ChevronRight className="h-6 w-6 text-gray-800" />
+        <ChevronRight className="h-6 w-6 text-[#162F40]" />
       </button>
     </div>
   )

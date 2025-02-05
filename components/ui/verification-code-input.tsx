@@ -94,7 +94,7 @@ export function VerificationCodeInput({
       {email && (
         <button
           onClick={onResend}
-          className="text-[#4A7598] hover:text-[#3A5F7A] text-sm font-medium mt-2"
+          className="text-[#39759E] hover:text-[#39759E] text-sm font-medium mt-2"
         >
           Reenviar código
         </button>
@@ -115,7 +115,7 @@ export function VerificationCodeInput({
             disabled={disabled}
             className={cn(
               "w-14 h-14 text-center text-lg font-medium",
-              "focus:ring-2 focus:ring-[#4A7598] focus:border-[#4A7598]",
+              "focus:ring-2 focus:ring-[#39759E] focus:border-[#39759E]",
               "disabled:opacity-50 disabled:cursor-not-allowed"
             )}
             aria-label={`Digit ${index + 1} of verification code`}
@@ -124,7 +124,7 @@ export function VerificationCodeInput({
       </div>
 
       <Button 
-        className="w-full bg-[#4A7598] hover:bg-[#3A5F7A]"
+        className="w-full bg-[#39759E] hover:bg-[#39759E]"
         disabled={!isCodeComplete || disabled}
         onClick={() => isCodeComplete && onComplete && onComplete(code.join(""))}
       >

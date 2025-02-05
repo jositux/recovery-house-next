@@ -67,7 +67,7 @@ function BenefitItem({ children }: { children: React.ReactNode }) {
        <div className="container mx-auto px-4 py-8">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold mb-2">Planes para Profesionales de la Salud</h2>
-        <p className="text-sm text-gray-600 max-w-2xl mx-auto">
+        <p className="text-sm text-[#162F40] max-w-2xl mx-auto">
           Ofrezca sus servicios de recuperación a más pacientes. Nuestras suscripciones le brindan visibilidad y las
           herramientas necesarias para conectar con pacientes y expandir su alcance profesional.
         </p>
@@ -94,7 +94,7 @@ function BenefitItem({ children }: { children: React.ReactNode }) {
             </ul>
           </CardContent>
           <CardFooter>
-            <Button onClick={() => handleSubscribe("price_1Qk9b2J7zGXf4A6t6SrPr0ba")} className="bg-[#4A7598] w-full text-sm">Comenzar Plan Premium</Button>
+            <Button onClick={() => handleSubscribe("price_1Qk9b2J7zGXf4A6t6SrPr0ba")} className="bg-[#39759E] w-full text-sm">Comenzar Plan Premium</Button>
           </CardFooter>
         </Card>
 
@@ -118,7 +118,7 @@ function BenefitItem({ children }: { children: React.ReactNode }) {
             </ul>
           </CardContent>
           <CardFooter>
-            <Button onClick={() => handleSubscribe("price_1Qk9b2J7zGXf4A6t6SrPr0ba")} className="w-full text-sm bg-[#4A7598]">Iniciar Plan Básico</Button>
+            <Button onClick={() => handleSubscribe("price_1Qk9b2J7zGXf4A6t6SrPr0ba")} className="w-full text-sm bg-[#39759E]">Iniciar Plan Básico</Button>
           </CardFooter>
         </Card>
       </div>

@@ -30,10 +30,10 @@ export function ServiceButton({ icon, label, selected, onClick, className }: Ser
       variant="outline"
       className={cn(
         "flex items-center justify-start space-x-2 w-full",
-        selected ? "bg-[#4A7598] text-white" : "bg-gray-100 text-[#4A7598]",
-        "border-[#4A7598] border",
-        selected ? "hover:bg-[#4A7598] hover:border-[#4A7598] hover:text-white" : "hover:border-[#4A7598]",
-        "active:bg-[#4A7598] active:text-white",
+        selected ? "bg-[#39759E] text-white" : "bg-gray-100 text-[#39759E]",
+        "border-[#39759E] border",
+        selected ? "hover:bg-[#39759E] hover:border-[#39759E] hover:text-white" : "hover:border-[#39759E]",
+        "active:bg-[#39759E] active:text-white",
         className
       )}
       onClick={onClick}

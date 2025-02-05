@@ -597,7 +597,7 @@ export default function EditPropertyPage({
 
           <Button
             type="submit"
-            className="w-full mx-auto bg-[#4A7598] px-6 py-5 rounded-lg text-white font-medium hover:bg-[#3a5a77] transition-colors flex items-center justify-center gap-2"
+            className="w-full mx-auto bg-[#39759E] px-6 py-5 rounded-lg text-white font-medium hover:bg-[#3a5a77] transition-colors flex items-center justify-center gap-2"
             disabled={isSubmitting}
           >
             {isSubmitting ? (

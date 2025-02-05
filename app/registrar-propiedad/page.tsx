@@ -222,7 +222,7 @@ export default function RegisterPropertyBasePage() {
   ])
 
   return (
-    <div className="container mx-auto max-w-2xl py-10">
+    <div className="container mx-auto max-w-2xl py-10 px-4">
       <h1 className="text-3xl font-bold mb-6">Registra tu propiedad</h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -527,7 +527,7 @@ export default function RegisterPropertyBasePage() {
 
           <Button
             type="submit"
-            className="w-full mx-auto bg-[#4A7598] px-6 py-5 rounded-lg text-white font-medium hover:bg-[#3a5a77] transition-colors flex items-center justify-center gap-2"
+            className="w-full mx-auto bg-[#39759E] px-6 py-5 rounded-lg text-white font-medium hover:bg-[#3a5a77] transition-colors flex items-center justify-center gap-2"
             disabled={isSubmitting}
           >
             {isSubmitting ? (

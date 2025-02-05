@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo, useCallback, useEffect } from 'react'
+import  SelectionSearch  from "@/components/selection-search"
 import { RoomCard } from "@/components/ui/room-card"
 import { RoomSearch } from "@/components/ui/room-search"
 import { MapRooms } from "@/components/ui/mapRooms"
@@ -50,6 +51,14 @@ export default function RoomsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const roomsPerPage = 9
+
+  const [selectedOptions, setSelectedOptions] = useState<string[]>(["all"])
+
+  const handleSelectionChange = (newSelection: string[]) => {
+    setSelectedOptions(newSelection)
+    console.log("New selection:", newSelection)
+    // Aquí puedes realizar cualquier acción adicional con la nueva selección
+  }
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -116,8 +125,8 @@ export default function RoomsPage() {
       .map(property => ({
         id: property.id,
         name: property.name,
-        lat: property.place.coordinates[1],
-        lng: property.place.coordinates[0],
+        lat: property.place.coordinates[0],
+        lng: property.place.coordinates[1],
         rooms: property.Rooms.length,
         image: property.mainImage,
       }))
@@ -131,13 +140,19 @@ export default function RoomsPage() {
     return <div className="flex justify-center items-center h-screen text-red-500">{error}</div>
   }
 
+
+
+
   return (
     <main className="flex flex-col min-h-screen p-6">
       <div className="max-w-7xl mx-auto w-full">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">
+        <h1 className="text-3xl font-bold text-[#162F40] mb-6">
           Habitaciones disponibles
         </h1>
         <RoomSearch onSearch={handleSearch} />
+        <div className="flex">
+        <SelectionSearch initialSelected={selectedOptions} onChange={handleSelectionChange} />
+        </div>
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="lg:w-2/3">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -152,14 +167,14 @@ export default function RoomsPage() {
                     name={room.name}
                     description={room.description}
                     price={parseFloat(room.pricePerNight)}
-                    image={`/webapi/assets/${room.mainImage}`}
+                    image={`/webapi/assets/${room.mainImage}?key=medium`}
                     propertyName={room.propertyName}
                   />
                 </div>
               ))}
             </div>
             {filteredRooms.length === 0 && (
-              <p className="text-center text-gray-500 mt-8">No se encontraron habitaciones que coincidan con tu búsqueda.</p>
+              <p className="text-center text-[#162F40] mt-8">No se encontraron habitaciones que coincidan con tu búsqueda.</p>
             )}
             {filteredRooms.length > 0 && (
               <div className="flex justify-center mt-8 gap-2">
@@ -168,7 +183,7 @@ export default function RoomsPage() {
                     key={page}
                     onClick={() => setCurrentPage(page)}
                     className={`w-8 h-8 rounded-full ${
-                      page === currentPage ? 'bg-[#4A7598] text-white' : 'bg-gray-200 text-gray-600'
+                      page === currentPage ? 'bg-[#39759E] text-white' : 'bg-gray-200 text-[#162F40]'
                     } flex items-center justify-center`}
                     aria-label={`Página ${page}`}
                     aria-current={page === currentPage ? 'page' : undefined}

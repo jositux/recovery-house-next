@@ -90,9 +90,9 @@ export function Map({ properties }: MapProps) {
                 height={150}
                 className="w-full h-auto object-cover mb-2 rounded"
               />
-              <h3 className="font-bold text-lg mb-1 text-[#4A7598] hover:underline">{selectedProperty.title}</h3>
+              <h3 className="font-bold text-lg mb-1 text-[#39759E] hover:underline">{selectedProperty.title}</h3>
             </Link>
-            <p className="font-bold text-gray-700">
+            <p className="font-bold text-[#162F40]">
               ${selectedProperty.price.toLocaleString('es-CO')} <span className="font-normal">COP por noche</span>
             </p>
           </div>

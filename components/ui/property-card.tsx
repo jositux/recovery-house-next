@@ -21,10 +21,10 @@ export function PropertyCard({ title, description, price, image, id }: PropertyC
         />
       </div>
       <div className="space-y-2">
-        <h3 className="font-bold text-lg text-gray-800">{title}</h3>
-        <p className="text-gray-600 text-sm line-clamp-2">{description}</p>
-        <p className="font-bold text-[#4A7598]">
-          ${price.toLocaleString('en-US')} <span className="text-gray-600 font-normal">por noche</span>
+        <h3 className="font-bold text-lg text-[#162F40]">{title}</h3>
+        <p className="text-[#162F40] text-sm line-clamp-2">{description}</p>
+        <p className="font-bold text-[#39759E]">
+          ${price.toLocaleString('en-US')} <span className="text-[#162F40] font-normal">por noche</span>
         </p>
       </div>
     </Link>

@@ -63,7 +63,7 @@ const CoverPhotoUpload: React.FC<CoverPhotoUploadProps> = ({ defaultImageId = ""
           {/* Imagen cargada usando Next.js Image */}
           <div className="absolute inset-0 w-full h-full">
             <Image
-              src={`https://us-east-1a.recoverycaresolutions.com/assets/${imageId}`}
+              src={`webapi/assets/${imageId}?key=medium`}
               alt="Cover Photo"
               layout="fill"
               objectFit="cover"
@@ -85,9 +85,9 @@ const CoverPhotoUpload: React.FC<CoverPhotoUploadProps> = ({ defaultImageId = ""
           {loading ? (
             <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
           ) : (
-            <Camera className="w-10 h-10 text-gray-500" />
+            <Camera className="w-10 h-10 text-[#162F40]" />
           )}
-          <span className="text-sm font-medium text-gray-500">SUBIR FOTO</span>
+          <span className="text-sm font-medium text-[#162F40]">SUBIR FOTO</span>
         </label>
       )}
     </div>

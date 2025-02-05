@@ -27,12 +27,12 @@ const testimonials = [
 export function TestimonialsSection() {
   return (
     <section className="py-16 bg-gray-50">
-      <div className="container mx-auto">
+      <div className="container mx-auto px-4 lg:px-0">
         <div className="text-center mb-12">
-          <h2 className={`${fraunces.className} md:text-4xl text-gray-800 mb-4`}>
+          <h2 className={`${fraunces.className} md:text-4xl text-[#162F40] mb-4`}>
             Testimonios
           </h2>
-          <p className="text-gray-600">
+          <p className="text-[#162F40]">
             Nuestros usuarios hablan
           </p>
         </div>

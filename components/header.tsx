@@ -39,7 +39,7 @@ export function Header() {
 
   return (
     <>
-      <header className="bg-[#4A7598] p-4">
+      <header className="bg-[#39759E] p-4">
         <div className="container mx-auto flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
@@ -72,7 +72,7 @@ export function Header() {
               className="md:hidden h-10 w-10 rounded-full bg-white hover:bg-gray-100"
               onClick={toggleSearch}
             >
-              <Search className="h-5 w-5 text-[#4A7598]" />
+              <Search className="h-5 w-5 text-[#39759E]" />
             </Button>
 
             {!isLoggedIn && (

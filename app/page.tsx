@@ -12,10 +12,10 @@ import { NewsSection } from "@/components/sections/news-section"
 export default function Home() {
   return (
     <main>
-      <div className="hidden md:block">
+      <div className="hidden md:block px-4">
         <HeroSlider />
       </div>
-      <div className="md:hidden">
+      <div className="md:hidden px-4">
         <HeroSliderMobile/>
       </div>
       <WelcomeSection />

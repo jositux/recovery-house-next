@@ -158,7 +158,7 @@ export function BookingWidget({
           <span className="text-3xl font-bold">
             ${price.toLocaleString("es-CO")} COP
           </span>
-          <span className="text-gray-600">/noche</span>
+          <span className="text-[#162F40]">/noche</span>
         </div>
       </div>
 
@@ -255,13 +255,13 @@ export function BookingWidget({
         </div>
         <div className="pt-4">
           <div className="space-y-2 flex justify-between">
-            <span className="flex text-gray-700">
+            <span className="flex text-[#162F40]">
               {nights} noche(s) x {guests} huésped(es)
             </span>
             <span>${price * guests} COP</span>
           </div>
           <div className="flex justify-end">
-            <p className="text-gray-700">+ Limpieza: {cleaning.toLocaleString("es-CO")} COP</p>
+            <p className="text-[#162F40]">+ Limpieza: {cleaning.toLocaleString("es-CO")} COP</p>
           </div>
           <div className="pt-4">
             <div className="pt-4 space-y-2 border-t text-2xl flex justify-between font-bold">
@@ -273,7 +273,7 @@ export function BookingWidget({
       </div>
 
       <Button
-        className="w-full bg-[#4A7598] hover:bg-[#3A5F7A]"
+        className="w-full bg-[#39759E] hover:bg-[#39759E]"
         disabled={!isReservationEnabled || loading}
         onClick={handleReservation}
       >

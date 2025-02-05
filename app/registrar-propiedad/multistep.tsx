@@ -454,7 +454,7 @@ export default function RegisterPropertyBasePage() {
 
             <Button
               type="submit"
-              className="w-full mx-auto bg-[#4A7598] px-6 py-5 rounded-lg text-white font-medium hover:bg-[#3a5a77] transition-colors flex items-center justify-center gap-2"
+              className="w-full mx-auto bg-[#39759E] px-6 py-5 rounded-lg text-white font-medium hover:bg-[#3a5a77] transition-colors flex items-center justify-center gap-2"
               disabled={isSubmitting}
             >
               {isSubmitting ? (
@@ -481,7 +481,7 @@ export default function RegisterPropertyBasePage() {
           <div className="flex justify-between">
             <Button
               onClick={handleBack}
-              className="bg-gray-300 text-gray-800 px-6 py-5 rounded-lg font-medium hover:bg-gray-400 transition-colors flex items-center justify-center gap-2"
+              className="bg-gray-300 text-[#162F40] px-6 py-5 rounded-lg font-medium hover:bg-gray-400 transition-colors flex items-center justify-center gap-2"
             >
               <ArrowLeft />
               VOLVER
@@ -489,7 +489,7 @@ export default function RegisterPropertyBasePage() {
 
             <Button
               onClick={handleRoomSubmit}
-              className="bg-[#4A7598] px-6 py-5 rounded-lg text-white font-medium hover:bg-[#3a5a77] transition-colors flex items-center justify-center gap-2"
+              className="bg-[#39759E] px-6 py-5 rounded-lg text-white font-medium hover:bg-[#3a5a77] transition-colors flex items-center justify-center gap-2"
               disabled={isSubmitting}
             >
               {isSubmitting ? (

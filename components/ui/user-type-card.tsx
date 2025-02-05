@@ -26,8 +26,8 @@ export function UserTypeCard({
       className={cn(
         "relative flex gap-4 p-6 cursor-pointer rounded-lg border transition-all",
         selected 
-          ? "border-[#4A7598] bg-[#4A7598] text-white" 
-          : "hover:border-[#4A7598]/50 hover:shadow-sm"
+          ? "border-[#39759E] bg-[#39759E] text-white" 
+          : "hover:border-[#39759E]/50 hover:shadow-sm"
       )}
       role="radio"
       aria-checked={selected}
@@ -42,16 +42,16 @@ export function UserTypeCard({
     >
       <Icon className={cn(
         "h-6 w-6 shrink-0 mt-1",
-        selected ? "text-white" : "text-[#4A7598]"
+        selected ? "text-white" : "text-[#39759E]"
       )} aria-hidden="true" />
       <div className="space-y-1">
         <h3 className={cn(
-          selected ? "text-white" : "text-gray-900",
+          selected ? "text-white" : "text-[#162F40]",
           textSize === "small" ? "text-sm" : "text-xl"
         )}>{title}</h3>
         <p className={cn(
           "text-sm",
-          selected ? "text-white/90" : "text-gray-600",
+          selected ? "text-white/90" : "text-[#162F40]",
           textSize === "small" && "text-xs"
         )}>{description}</p>
       </div>

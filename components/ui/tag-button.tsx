@@ -35,9 +35,9 @@ export function TagButton({ icon, label, selected, onClick, className }: TagButt
       className={cn(
         "flex items-center p-4 cursor-pointer border rounded-lg shadow-sm transition-all",
         selected
-          ? "bg-[#4A7598] text-white shadow-lg"
-          : "bg-white text-[#4A7598] hover:bg-gray-100",
-        "border-[#4A7598] hover:shadow-md",
+          ? "bg-[#39759E] text-white shadow-lg"
+          : "bg-white text-[#39759E] hover:bg-gray-100",
+        "border-[#39759E] hover:shadow-md",
         className
       )}
     >

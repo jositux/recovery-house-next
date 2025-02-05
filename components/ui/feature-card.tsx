@@ -21,8 +21,8 @@ export function FeatureCard({ title, description, imageSrc }: FeatureCardProps) 
           className="object-cover"
         />
       </div>
-      <h3 className={`${fraunces.className} text-2xl text-gray-800`}>{title}</h3>
-      <p className="text-gray-600">{description}</p>
+      <h3 className={`${fraunces.className} text-2xl text-[#162F40]`}>{title}</h3>
+      <p className="text-[#162F40]">{description}</p>
     </div>
   )
 }

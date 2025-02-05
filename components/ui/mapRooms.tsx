@@ -99,7 +99,7 @@ export function MapRooms({ markers }: MapProps) {
            <Link href={`/propiedades/${selectedMarker.id}`} className="block">
              {selectedMarker.image && (
                <Image
-                 src={`/webapi/assets/${selectedMarker.image}`}
+                 src={`/webapi/assets/${selectedMarker.image}?key=small`}
                  alt={selectedMarker.name}
                  width={200}
                  height={150}
@@ -107,10 +107,10 @@ export function MapRooms({ markers }: MapProps) {
                />
              )}
              <div className="px-4">
-             <h3 className="font-bold text-lg text-[#4A7598] hover:underline transition-all duration-200">
+             <h3 className="font-bold text-lg text-[#39759E] hover:underline transition-all duration-200">
                {selectedMarker.name}
              </h3>
-             <p className="text-gray-700 mt-2">
+             <p className="text-[#162F40] mt-2">
              <span className="font-bold">{selectedMarker.rooms}</span> habitación(es) disponible(s)
            </p>
            </div>

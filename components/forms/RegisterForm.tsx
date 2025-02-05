@@ -352,7 +352,7 @@ export default function RegisterForm({ onSubmit, initialValues }: RegisterFormPr
 
         <Button 
           type="submit" 
-          className="w-full bg-[#4A7598] hover:bg-[#3A5F7A]"
+          className="w-full bg-[#39759E] hover:bg-[#39759E]"
           aria-label="Complete registration"
         >
           Continuar

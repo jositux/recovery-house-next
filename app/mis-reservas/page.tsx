@@ -62,8 +62,6 @@ const BookingList: React.FC = () => {
 
         const user = await getCurrentUser(token);
 
-        console.log(user);
-
         // Fetch bookings
         const bookingsResponse = await fetch(
           `/webapi/items/Booking?filter[patient][_eq]=${user.id}&fields=*`
@@ -159,7 +157,7 @@ const BookingList: React.FC = () => {
     <div className="container mx-auto py-10">
       <h1 className="text-3xl font-bold mb-6">Mis Reservas</h1>
       {bookings.length === 0 ? (
-        <p className="text-center text-gray-500">
+        <p className="text-center text-[#162F40]">
           No tienes reservas actualmente.
         </p>
       ) : (
@@ -187,40 +185,40 @@ const BookingList: React.FC = () => {
     </div>
 
     <CardContent className="flex-1 p-6 md:w-2/3">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-3">
+      <h2 className="text-2xl font-semibold text-[#162F40] mb-3">
         {roomDetails?.name || "Habitación"} (
         {property?.name || "Propiedad desconocida"})
       </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         <div>
-          <p className="text-sm text-gray-500">Ingreso</p>
+          <p className="text-sm text-[#162F40]">Ingreso</p>
           <p className="font-medium">{format(new Date(booking.checkIn), "PPP", { locale: es })}</p>
         </div>
         <div>
-          <p className="text-sm text-gray-500">Salida</p>
+          <p className="text-sm text-[#162F40]">Salida</p>
           <p className="font-medium">{format(new Date(booking.checkOut), "PPP", { locale: es })}</p>
         </div>
         <div>
-          <p className="text-sm text-gray-500">Huéspedes</p>
+          <p className="text-sm text-[#162F40]">Huéspedes</p>
           <p className="font-medium">{booking.guests}</p>
         </div>
         <div>
-          <p className="text-sm text-gray-500">Precio por noche</p>
+          <p className="text-sm text-[#162F40]">Precio por noche</p>
           <p className="font-medium">${booking.price}</p>
         </div>
         <div>
-          <p className="text-sm text-gray-500">Limpieza</p>
+          <p className="text-sm text-[#162F40]">Limpieza</p>
           <p className="font-medium">${booking.cleaning}</p>
         </div>
       </div>
 
       {roomDetails && (
-        <p className="text-sm text-gray-600 mb-4">{roomDetails.description}</p>
+        <p className="text-sm text-[#162F40] mb-4">{roomDetails.description}</p>
       )}
 
       <div className="flex justify-between items-center">
-        <p className="text-lg font-semibold text-gray-800">
+        <p className="text-lg font-semibold text-[#162F40]">
           Total: ${calculateTotal(booking)}
         </p>
         <Button

@@ -34,7 +34,7 @@ export function NumberInput({ min = 1, max = 50, defaultValue = 1, onChange }: N
         size="icon"
         onClick={handleDecrement}
         disabled={value <= min}
-        className="w-6 h-6 rounded-full border-gray-400 text-gray-600 hover:bg-gray-200"
+        className="w-6 h-6 rounded-full border-gray-400 text-[#162F40] hover:bg-gray-200"
       >
         <Minus className="h-5 w-5" />
       </Button>
@@ -50,7 +50,7 @@ export function NumberInput({ min = 1, max = 50, defaultValue = 1, onChange }: N
         size="icon"
         onClick={handleIncrement}
         disabled={value >= max}
-        className="w-6 h-6 rounded-full border-gray-400 text-gray-600 hover:bg-gray-200"
+        className="w-6 h-6 rounded-full border-gray-400 text-[#162F40] hover:bg-gray-200"
       >
         <Plus className="h-5 w-5" />
       </Button>

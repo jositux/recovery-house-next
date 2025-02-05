@@ -150,7 +150,7 @@ function ResetPasswordContent() {
 
 export default function ResetPasswordPage() {
   return (
-    <div className="flex flex-col justify-center items-center p-16 bg-gray-100">
+    <div className="flex flex-col justify-center items-center py-16 px-4 sm:px-6 lg:px-8 bg-gray-100">
      <Image
           src="/assets/logo2.svg"
           alt="Recovery Care Solutions"

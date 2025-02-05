@@ -3,6 +3,7 @@
 import { useState, useRef } from "react"
 import { motion, AnimatePresence, useAnimation, PanInfo } from "framer-motion"
 import Image from "next/image"
+import Link from "next/link"
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import styles from "./hero-slider.module.css"
@@ -15,16 +16,19 @@ const slides = [
     title: "¡Conectamos pacientes con casas de recuperación en todo el mundo!",
     image: "/assets/hero/2.png?height=600&width=600",
     backgroundImage: "/assets/hero/background.jpg?height=1080&width=1920",
+    url: "/rooms",
   },
   {
     title: "Los facilitadores de experiencia se encargarán de tu cuidado",
     image: "/assets/hero/1.png?height=600&width=600",
     backgroundImage: "/assets/hero/background.jpg?height=1080&width=1920",
+    url: "/rooms",
   },
   {
     title: "Proveedores de todo el mundo en áreas de salud esperan para atenderte",
     image: "/assets/hero/2.png?height=600&width=600",
     backgroundImage: "/assets/hero/background.jpg?height=1080&width=1920",
+    url: "/rooms",
   },
 ]
 
@@ -104,12 +108,14 @@ export function HeroSlider() {
             </div>
             <div className={styles.contentContainer}>
               <div className={styles.textContent}>
-                <h1 className={`${fraunces.className} ${styles.hContent} text-3xl text-gray-800 md:text-4xl lg:text-5xl mb-6"`}>
+                <h1 className={`${fraunces.className} ${styles.hContent} text-3xl text-[#162F40] md:text-4xl lg:text-5xl mb-6`}>
                   {slides[slideIndex].title}
                 </h1>
-                <Button className="bg-[#4A7598] hover:bg-[#3A5F7A] w-fit">
-                  Ver más
-                </Button>
+                <Link href={slides[slideIndex].url}>
+                  <Button className="bg-[#39759E] hover:bg-[#39759E] w-fit">
+                    Ver más
+                  </Button>
+                </Link>
               </div>
               <div className={styles.imageContainer}>
                 <Image
@@ -142,4 +148,3 @@ export function HeroSlider() {
     </div>
   )
 }
-

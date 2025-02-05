@@ -85,7 +85,7 @@ const PropertiesPage: React.FC = () => {
                   <Image
                     src={`/webapi/assets/${
                       property.mainImage || "/placeholder.svg"
-                    }`}
+                    }?key=small`}
                     alt={property.name}
                     layout="fill"
                     objectFit="cover"
@@ -96,7 +96,7 @@ const PropertiesPage: React.FC = () => {
               </CardHeader>
               <CardContent className="flex-grow p-4">
                 <CardTitle className="mb-2">{property.name}</CardTitle>
-                <p className="text-sm text-gray-600 mb-2">
+                <p className="text-sm text-[#162F40] mb-2">
                   País: {property.country}
                 </p>
                 <p className="text-sm">

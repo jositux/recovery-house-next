@@ -72,14 +72,14 @@ export function Footer() {
                 height={40}
               />
             </Link>
-            <p className="text-gray-600 mb-6">
+            <p className="text-[#162F40] mb-6">
               Encuentra y reserva casas de recuperación postoperatoria en todo el mundo. 
               Ofrecemos una red de alojamientos especializados con servicios profesionales 
               de enfermería, nutrición personalizada, y transporte seguro, garantizando un 
               entorno ideal para una recuperación cómoda y efectiva.
             </p>
-            <p className="text-gray-600">
-              Contáctenos: <Link href="mailto:info@marca.com" className="hover:text-[#4A7598]">info@marca.com</Link>
+            <p className="text-[#162F40]">
+              Contáctenos: <Link href="mailto:info@marca.com" className="hover:text-[#39759E]">info@marca.com</Link>
             </p>
           </div>
 
@@ -89,7 +89,7 @@ export function Footer() {
             <ul className="space-y-3">
               {assistanceLinks.map((link) => (
                 <li key={link.title}>
-                  <Link href={link.href} className="text-gray-600 hover:text-[#4A7598]">
+                  <Link href={link.href} className="text-[#162F40] hover:text-[#39759E]">
                     {link.title}
                   </Link>
                 </li>
@@ -103,7 +103,7 @@ export function Footer() {
             <ul className="space-y-3">
               {hostLinks.map((link) => (
                 <li key={link.title}>
-                  <Link href={link.href} className="text-gray-600 hover:text-[#4A7598]">
+                  <Link href={link.href} className="text-[#162F40] hover:text-[#39759E]">
                     {link.title}
                   </Link>
                 </li>
@@ -119,7 +119,7 @@ export function Footer() {
                 <li key={link.title}>
                   <Link 
                     href={link.href} 
-                    className="flex items-center gap-2 text-gray-600 hover:text-[#4A7598]"
+                    className="flex items-center gap-2 text-[#162F40] hover:text-[#39759E]"
                   >
                     {link.icon}
                     {link.title}
@@ -133,17 +133,17 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-gray-300 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-600 text-sm">
+            <p className="text-[#162F40] text-sm">
               © 2024 Recovery Care Solutions. Todos los derechos reservados.
             </p>
             <div className="flex flex-wrap justify-center gap-4 text-sm items-center">
-              <Link href="#" className="text-gray-600 hover:text-[#4A7598]">
+              <Link href="#" className="text-[#162F40] hover:text-[#39759E]">
                 Política de Privacidad
               </Link>
-              <Link href="#" className="text-gray-600 hover:text-[#4A7598]">
+              <Link href="#" className="text-[#162F40] hover:text-[#39759E]">
                 Términos de Servicio
               </Link>
-              <Link href="#" className="text-gray-600 hover:text-[#4A7598]">
+              <Link href="#" className="text-[#162F40] hover:text-[#39759E]">
                 Configuración de Cookies
               </Link>
               <LanguageSelector />

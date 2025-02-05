@@ -48,7 +48,7 @@ export function MenuProfile({ name }: ProfileMenuProps) {
       localStorage.removeItem("access_token");
 
       window.dispatchEvent(new Event("storage"));
-      
+
       router.push("/login");
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
@@ -73,7 +73,7 @@ export function MenuProfile({ name }: ProfileMenuProps) {
             : "opacity-0 scale-95 invisible"
         }`}
       >
-        <ul className="text-sm text-gray-700">
+        <ul className="text-sm text-[#162F40]">
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
             <Link href="/mi-perfil" className="flex items-center gap-2">
               <User className="w-4 h-4" />
@@ -105,7 +105,7 @@ export function MenuProfile({ name }: ProfileMenuProps) {
             
           </li>
         </ul>
-        <div className="px-4 py-2 bg-gray-50 border-t text-xs text-gray-500">
+        <div className="px-4 py-2 bg-gray-50 border-t text-xs text-[#162F40]">
           <p>{name}</p>
          
         </div>

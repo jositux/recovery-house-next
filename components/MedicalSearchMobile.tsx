@@ -67,7 +67,7 @@ const MedicalSearchMobile = () => {
   }
 
   return (
-    <div className="md:hidden w-full max-w-[850px] mx-auto p-4 space-y-3 bg-[#4A7598] rounded-b-xl">
+    <div className="md:hidden w-full max-w-[850px] mx-auto p-4 space-y-3 bg-[#39759E] rounded-b-xl">
       <div className="w-full">
         <label className="block text-sm mb-1 text-white">Motivo médico</label>
         <DropdownMenu>
@@ -76,7 +76,7 @@ const MedicalSearchMobile = () => {
               variant="outline"
               className="w-full justify-between bg-white hover:bg-white"
             >
-              <span className="text-gray-500">
+              <span className="text-[#162F40]">
                 {selectedProcedures.length > 0
                   ? `${selectedProcedures.length} seleccionados`
                   : "Tipo de intervención"}

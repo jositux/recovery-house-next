@@ -73,7 +73,7 @@ const GalleryUpload: React.FC<GalleryUploadProps> = ({ initialIds = [], onGaller
             <div className="absolute inset-0 overflow-hidden rounded-md shadow-sm">
               <div className="relative w-full h-full">
                 <Image
-                  src={`https://us-east-1a.recoverycaresolutions.com/assets/${image.id}`}
+                  src={`webapi/assets/${image.id}`}
                   alt={image.filename_download}
                   layout="fill"
                   objectFit="cover"
@@ -99,8 +99,8 @@ const GalleryUpload: React.FC<GalleryUploadProps> = ({ initialIds = [], onGaller
               ) : (
                 <label className="flex flex-col items-center cursor-pointer">
                   <input type="file" className="hidden" onChange={handleFileChange} accept="image/*" />
-                  <Camera size={32} className="text-gray-500" />
-                  <p className="text-sm text-gray-500">Agregar Foto</p>
+                  <Camera size={32} className="text-[#162F40]" />
+                  <p className="text-sm text-[#162F40]">Agregar Foto</p>
                 </label>
               )}
             </div>

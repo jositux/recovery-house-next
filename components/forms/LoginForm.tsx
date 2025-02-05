@@ -117,15 +117,15 @@ export function LoginForm() {
           </p>
         )}
         <div className="text-sm">
-          <Link href="/user/request-password" className="text-[#4A7598] hover:underline">
+          <Link href="/user/request-password" className="text-[#39759E] hover:underline">
             ¿Has olvidado la contraseña?
           </Link>
         </div>
-        <Button type="submit" className="w-full bg-[#4A7598] hover:bg-[#3A5F7A]" disabled={isLoading}>
+        <Button type="submit" className="w-full bg-[#39759E] hover:bg-[#39759E]" disabled={isLoading}>
           {isLoading ? "Iniciando sesión..." : "Iniciar sesión"}
         </Button>
         <div className="text-sm text-center">
-          <Link href="/register" className="text-[#4A7598] hover:underline">
+          <Link href="/register" className="text-[#39759E] hover:underline">
             ¿Aún no tienes cuenta? Regístrate
           </Link>
         </div>

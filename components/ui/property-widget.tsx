@@ -61,7 +61,7 @@ export function BookingWidget({ price }: BookingWidgetProps) {
       <div className="flex justify-between items-center">
         <div>
           <span className="text-2xl font-bold">${price.toLocaleString('es-CO')} COP</span>
-          <span className="text-gray-600">/noche</span>
+          <span className="text-[#162F40]">/noche</span>
         </div>
       </div>
 
@@ -160,7 +160,7 @@ export function BookingWidget({ price }: BookingWidgetProps) {
         )}
       </div>
 
-      <Button className="w-full bg-[#4A7598] hover:bg-[#3A5F7A]" disabled={!isReservationEnabled}>
+      <Button className="w-full bg-[#39759E] hover:bg-[#39759E]" disabled={!isReservationEnabled}>
         Reservar
       </Button>
     </div>

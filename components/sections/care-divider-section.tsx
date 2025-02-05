@@ -8,7 +8,7 @@ export function CareDividerSection() {
     <section className={`${styles.Care} relative overflow-hidden`}>
      
       {/* Images */}
-      <div className="container mx-auto relative">
+      <div className="container mx-auto relative px-4">
         {/* Hands image */}
         <div className="absolute left-[5%] top-0 w-20 h-20 md:w-24 md:h-24">
           <div className="relative w-full h-full">

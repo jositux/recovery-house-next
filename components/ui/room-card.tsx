@@ -24,11 +24,11 @@ export function RoomCard({ id, name, description, price, image, propertyName }: 
         />
       </div>
       <div className="space-y-2">
-        <h3 className="font-bold text-lg text-gray-800">{name || 'Habitación sin nombre'}</h3>
-        <p className="text-sm text-gray-600">{propertyName || 'Propiedad desconocida'}</p>
-        <p className="text-gray-600 text-sm line-clamp-2">{description || 'Sin descripción'}</p>
-        <p className="font-bold text-[#4A7598]">
-          ${(price || 0).toLocaleString('es-CO')} <span className="text-gray-600 font-normal">COP por noche</span>
+        <h3 className="font-bold text-lg text-[#162F40]">{name || 'Habitación sin nombre'}</h3>
+        <p className="text-sm text-[#162F40]">{propertyName || 'Propiedad desconocida'}</p>
+        <p className="text-[#162F40] text-sm line-clamp-2">{description || 'Sin descripción'}</p>
+        <p className="font-bold text-[#39759E]">
+          ${(price || 0).toLocaleString('es-CO')} <span className="text-[#162F40] font-normal">COP por noche</span>
         </p>
       </div>
     </Link>

@@ -36,7 +36,7 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmit, bo
             {[1, 2, 3, 4, 5].map((star) => (
               <Star
                 key={star}
-                className={`cursor-pointer ${star <= rating ? "text-yellow-400 fill-yellow-400" : "text-gray-300"}`}
+                className={`cursor-pointer ${star <= rating ? "text-yellow-400 fill-yellow-400" : "text-[#162F40]"}`}
                 onClick={() => setRating(star)}
               />
             ))}

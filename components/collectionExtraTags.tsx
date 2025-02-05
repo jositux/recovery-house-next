@@ -37,7 +37,7 @@ export function CollectionExtraTags({
 
   if (extraTags.length === 0) {
     return (
-      <div className="text-gray-500 p-4 bg-gray-50 rounded-md">
+      <div className="text-[#162F40] p-4 bg-gray-50 rounded-md">
         No se encontraron etiquetas adicionales.
       </div>
     );
