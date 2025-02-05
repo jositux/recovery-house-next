@@ -11,17 +11,27 @@ interface SelectionSearchProps {
 
 type SelectionKey = "all" | "nurse" | "coordinator" | "food" | "transportation";
 
-export default function SelectionSearch({ initialSelected = ["all"], onChange }: SelectionSearchProps) {
-  const [selections, setSelections] = useState<{ [key in SelectionKey]: boolean }>({
-    all: false,
-    nurse: false,
-    coordinator: false,
-    food: false,
-    transportation: false,
-  });
+export default function SelectionSearch({ initialSelected = [], onChange }: SelectionSearchProps) {
+  const [selections, setSelections] = useState<{ [key in SelectionKey]: boolean }>(() => {
+    const initialState: { [key in SelectionKey]: boolean } = {
+      all: false,
+      nurse: false,
+      coordinator: false,
+      food: false,
+      transportation: false,
+    }
+
+    initialSelected.forEach((key) => {
+      if (key in initialState) {
+        initialState[key as SelectionKey] = true
+      }
+    })
+
+    return initialState
+  })
 
   const handleSelection = (key: SelectionKey) => {
-    let newSelections: { [key in SelectionKey]: boolean };
+    let newSelections: { [key in SelectionKey]: boolean }
 
     if (key === "all") {
       newSelections = {
@@ -34,7 +44,7 @@ export default function SelectionSearch({ initialSelected = ["all"], onChange }:
     } else {
       newSelections = {
         ...selections,
-        all: false,
+        all: false, // Desactiva "Todo incluido" si se selecciona otra opción
         [key]: !selections[key],
       }
     }
@@ -44,12 +54,12 @@ export default function SelectionSearch({ initialSelected = ["all"], onChange }:
 
   useEffect(() => {
     const newSelectedIds = Object.entries(selections)
-      .filter(([key, value]) => value)
+      .filter(([key, value]) => value) // Usamos 'key' en vez de '_'
       .map(([key]) => key)
-
-    console.log("Selected IDs:", newSelectedIds)
+  
     onChange?.(newSelectedIds)
   }, [selections, onChange])
+  
 
   return (
     <div className="flex flex-wrap gap-4">
@@ -70,22 +80,22 @@ export default function SelectionSearch({ initialSelected = ["all"], onChange }:
         </div>
       </Button>
 
-      {["nurse", "coordinator", "food", "transportation"].map((item) => (
+      {(["nurse", "coordinator", "food", "transportation"] as SelectionKey[]).map((item) => (
         <Button
           key={item}
           variant="outline"
           className={`flex items-center justify-between gap-2 rounded-full pl-4 pr-2 h-10 ${
-            selections[item as keyof typeof selections] ? "border-[#3b82f6] text-[#3b82f6]" : "border-[#e2e8f0]"
+            selections[item] ? "border-[#3b82f6] text-[#3b82f6]" : "border-[#e2e8f0]"
           } hover:bg-transparent hover:text-inherit`}
-          onClick={() => handleSelection(item as SelectionKey)} // Hacemos un 'cast' a 'SelectionKey'
+          onClick={() => handleSelection(item)}
         >
           {item.charAt(0).toUpperCase() + item.slice(1)}
           <div
             className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${
-              selections[item as keyof typeof selections] ? "bg-[#162F40]" : "bg-[#D2EFFF]"
+              selections[item] ? "bg-[#162F40]" : "bg-[#D2EFFF]"
             }`}
           >
-            <Check className={`h-4 w-4 ${selections[item as keyof typeof selections] ? "text-white" : "text-white"}`} />
+            <Check className={`h-4 w-4 ${selections[item] ? "text-white" : "text-white"}`} />
           </div>
         </Button>
       ))}

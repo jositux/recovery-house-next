@@ -1,6 +1,5 @@
 import { NewsCard } from "@/components/ui/news-card"
-import { ChevronRight } from 'lucide-react'
-import Link from "next/link"
+
 import { Fraunces } from 'next/font/google'
 
 const fraunces = Fraunces({ subsets: ['latin'] })
