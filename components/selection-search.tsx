@@ -53,12 +53,11 @@ export default function SelectionSearch({ initialSelected = [], onChange }: Sele
   }
 
   useEffect(() => {
-    const newSelectedIds = Object.entries(selections)
-      .filter(([key, value]) => value) // Usamos 'key' en vez de '_'
-      .map(([key]) => key)
+    const newSelectedIds = Object.keys(selections).filter((key) => selections[key as SelectionKey]);
   
-    onChange?.(newSelectedIds)
-  }, [selections, onChange])
+    onChange?.(newSelectedIds);
+  }, [selections, onChange]);
+  
   
 
   return (
