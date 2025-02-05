@@ -48,7 +48,7 @@ function MessageBanner() {
 
 export default function LoginPage() {
   return (
-    <div className="bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="bg-gray-100 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="sm:mx-auto flex flex-col items-center sm:w-full sm:max-w-md">
         <Suspense fallback={null}>
           <MessageBanner />

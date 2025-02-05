@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import SelectionSearch from "@/components/selection-search"
 import { RoomCard } from "@/components/ui/room-card"
 import { RoomSearch } from "@/components/ui/room-search"
@@ -53,8 +53,6 @@ export default function RoomsPage() {
   const roomsPerPage = 9
   const [selectedOptions, setSelectedOptions] = useState<string[]>(["all"])
 
-  const prevPropertiesRef = useRef<Property[]>([]); // Ref para almacenar el estado anterior de properties
-
   const handleSelectionChange = (newSelection: string[]) => {
     setSelectedOptions(newSelection)
   }
@@ -71,13 +69,8 @@ export default function RoomsPage() {
           },
         });
 
-        // Solo actualizamos el estado si los datos han cambiado
-        if (JSON.stringify(response.data.data) !== JSON.stringify(prevPropertiesRef.current)) {
-          setProperties(response.data.data);
-          prevPropertiesRef.current = response.data.data; // Guardamos los datos anteriores
-        }
-
-        setIsLoading(false);
+        setProperties(response.data.data);
+        setIsLoading(false); // Se marca como no cargando después de obtener datos
       } catch (error) {
         console.error('Error fetching rooms:', error);
         setError('Error al cargar las habitaciones. Por favor, intenta de nuevo más tarde.');
@@ -85,8 +78,10 @@ export default function RoomsPage() {
       }
     };
 
-    fetchRooms();
-  }, []); // Dependencia vacía para ejecutar solo una vez al montar
+    if (isLoading) {
+      fetchRooms();
+    }
+  }, [isLoading]); // Solo se ejecuta una vez cuando `isLoading` es verdadero
 
   const allRooms = useMemo(() => {
     return properties.flatMap(property => 

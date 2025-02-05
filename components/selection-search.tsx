@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -30,6 +30,8 @@ export default function SelectionSearch({ initialSelected = [], onChange }: Sele
     return initialState
   })
 
+  const prevSelectionsRef = useRef<{ [key in SelectionKey]: boolean }>(selections);
+
   const handleSelection = (key: SelectionKey) => {
     let newSelections: { [key in SelectionKey]: boolean }
 
@@ -53,12 +55,13 @@ export default function SelectionSearch({ initialSelected = [], onChange }: Sele
   }
 
   useEffect(() => {
-    const newSelectedIds = Object.keys(selections).filter((key) => selections[key as SelectionKey]);
-  
-    onChange?.(newSelectedIds);
+    // Solo se ejecuta si ha habido un cambio en las selecciones
+    if (JSON.stringify(selections) !== JSON.stringify(prevSelectionsRef.current)) {
+      const newSelectedIds = Object.keys(selections).filter((key) => selections[key as SelectionKey]);
+      onChange?.(newSelectedIds);
+      prevSelectionsRef.current = selections;  // Actualiza la referencia
+    }
   }, [selections, onChange]);
-  
-  
 
   return (
     <div className="flex flex-wrap gap-4">
