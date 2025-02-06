@@ -63,12 +63,12 @@ useEffect(() => {
         email: registrationData.email,
         password: registrationData.password,
         initialRole: registrationData.initialRole,
-        verification_url: "http://localhost:3000/user/verify"
+        verification_url: "https://recoverycaresolutions.com/user/verify"
       };
       const response = await registerService.register(registerData);
 
       localStorage.setItem('initialRole', registerData.initialRole)
-      
+
       if (response.challenge) {
         localStorage.setItem('initialRole', registerData.initialRole)
         localStorage.setItem('verificationChallenge', response.challenge);
