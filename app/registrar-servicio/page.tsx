@@ -18,11 +18,11 @@ import { Textarea } from "@/components/ui/textarea";
 import FileUpload from "@/components/FileUpload";
 import { LocationSelector } from "@/components/ui/location-selector";
 import { providerService, ProviderData } from "@/services/providerService";
-import { MembershipSelector } from "@/components/ui/membership-selector";
-import {
+//import { MembershipSelector } from "@/components/ui/membership-selector";
+/*import {
   getMembershipTags,
   type MembershipTag,
-} from "@/services/membership-service";
+} from "@/services/membership-service";*/
 import { CollectionExtraTags } from "@/components/collectionExtraTags";
 import { CollectionServiceTags } from "@/components/collectionServiceTags";
 import { getExtraTags } from "@/services/extraTagsService";
@@ -57,23 +57,23 @@ export default function RegisterPropertyBasePage() {
   const [servicesTags, setServicesTags] = useState<
     { id: string; name: string; icon: string }[]
   >([]);
-  const [selectedMembership, setSelectedMembership] = useState<string | null>(
+  /*const [selectedMembership, setSelectedMembership] = useState<string | null>(
     null
-  );
-  const [memberships, setMemberships] = useState<MembershipTag[]>([]);
+  );*/
+  //const [memberships, setMemberships] = useState<MembershipTag[]>([]);
 
-  useEffect(() => {
+ /* useEffect(() => {
     const fetchMemberships = async () => {
       const data = await getMembershipTags();
       setMemberships(data);
     };
     fetchMemberships();
-  }, []);
+  }, []);*/
 
-  const handleSelectionChange = (selectedId: string | null) => {
+ /*const handleSelectionChange = (selectedId: string | null) => {
     setSelectedMembership(selectedId);
     console.log("Selected membership ID:", selectedId);
-  };
+  };*/
 
   useEffect(() => {
     const loadTags = async () => {
@@ -159,7 +159,7 @@ export default function RegisterPropertyBasePage() {
         state: values.state,
         city: values.city,
         description: values.description,
-        membership: selectedMembership || values.membership,
+        membership: "bronze",
         taxIdEIN: values.taxIdEIN,
         RNTFile: values.RNTFile,
         taxIdEINFile: values.taxIdEINFile,
@@ -205,7 +205,7 @@ export default function RegisterPropertyBasePage() {
   };
 
   return (
-    <div className="container mx-auto max-w-2xl py-10">
+    <div className="container mx-auto max-w-2xl py-16 px-4">
       <h1 className="text-3xl font-bold mb-6">
         Registra tu servicio
       </h1>
@@ -278,7 +278,7 @@ export default function RegisterPropertyBasePage() {
               city: form.formState.errors.city?.message,
             }}
           />
-
+{/*
           <FormField
             control={form.control}
             name="membership"
@@ -295,7 +295,7 @@ export default function RegisterPropertyBasePage() {
                 <FormMessage />
               </FormItem>
             )}
-          />
+            />*/}
           <FormField
             control={form.control}
             name="taxIdEIN"

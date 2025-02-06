@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import axios from "axios"
 import { useRouter } from "next/navigation"
 import { loginService, type LoginCredentials } from "@/services/loginService"
+import { getCurrentUser, type User } from "@/services/userService"
 import Link from "next/link"
 
 export function LoginForm() {
@@ -47,22 +48,36 @@ export function LoginForm() {
       localStorage.setItem("refresh_token", response.data.refresh_token)
       localStorage.setItem("access_token", response.data.access_token)
 
+      const currentUser: User = await getCurrentUser(response.data.access_token)
+      localStorage.setItem("nombre", currentUser.first_name + " " + currentUser.last_name)
+
       window.dispatchEvent(new Event("storage"))
 
-      router.push("/rooms")
+      // Verificar el initialRole y redirigir
+      const initialRole = localStorage.getItem("initialRole")
+      switch (initialRole) {
+        case "Patient":
+          router.push("/w-visitante")
+          break
+        case "PropertyOwner":
+          router.push("/w-host")
+          break
+        case "ServiceProvider":
+          router.push("/w-proveedor")
+          break
+        default:
+          router.push("/rooms")
+      }
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 401) {
-          // Mostrar el mensaje de error específico
           setAuthError("Verifica usuario y/o contraseña")
         } else {
-          // Manejar otros códigos de error
           setAuthError(
             `Error: ${error.response?.status || "Sin código"} - ${error.response?.statusText || "Sin mensaje"}`,
           )
         }
       } else {
-        // Manejar errores que no son de Axios
         setAuthError("Verifica usuario y/o contraseña")
       }
     } finally {

@@ -222,7 +222,7 @@ export default function RegisterPropertyBasePage() {
   ])
 
   return (
-    <div className="container mx-auto max-w-2xl py-10 px-4">
+    <div className="container mx-auto max-w-3xl py-10 px-4">
       <h1 className="text-3xl font-bold mb-6">Registra tu propiedad</h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">

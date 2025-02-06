@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -6,19 +6,22 @@ import Image from "next/image";
 import Link from "next/link";
 import { MenuProfile } from "@/components/MenuProfile";
 import { MenuActions } from "@/components/MenuActions";
-import { Search } from 'lucide-react';
+import { Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import MedicalSearchMobile from '@/components/MedicalSearchMobile';
+import MedicalSearchMobile from "@/components/MedicalSearchMobile";
 
 export function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [userName, setUserName] = useState("");
 
   useEffect(() => {
-    // Función para verificar el token
+    // Función para verificar autenticación y obtener nombre
     const checkAuth = () => {
       const token = localStorage.getItem("access_token");
+      const name = localStorage.getItem("nombre") || "Usuario";
       setIsLoggedIn(!!token);
+      setUserName(name);
     };
 
     // Verificar en el montaje
@@ -75,7 +78,7 @@ export function Header() {
               <Search className="h-5 w-5 text-[#39759E]" />
             </Button>
 
-            {!isLoggedIn && (
+            {!isLoggedIn ? (
               <Button
                 variant="secondary"
                 className="bg-gray-800 text-white hover:bg-gray-700"
@@ -83,11 +86,9 @@ export function Header() {
               >
                 <Link href="/login">Ingresar</Link>
               </Button>
-            )}
-
-            {isLoggedIn && (
+            ) : (
               <>
-                <MenuProfile name="Carlos Jose Guaimas" />
+                <MenuProfile name={userName} />
                 <MenuActions />
               </>
             )}

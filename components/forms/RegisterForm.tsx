@@ -6,6 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { Eye, EyeOff, User, Building2, Stethoscope } from 'lucide-react'
 import { Button } from "@/components/ui/button"
+import { SimpleTermsCheckbox } from "@/components/ui/simple-terms-checkbox"
+
 import {
   Form,
   FormControl,
@@ -61,6 +63,11 @@ export default function RegisterForm({ onSubmit, initialValues }: RegisterFormPr
   //const [formattedDate, setFormattedDate] = useState("") //Removed
   const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set())
 
+  const [termsAccepted, setTermsAccepted] = useState(false)
+  const handleTermsAccept = (accepted: boolean) => {
+    setTermsAccepted(accepted)
+  }
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -102,8 +109,6 @@ export default function RegisterForm({ onSubmit, initialValues }: RegisterFormPr
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleRegisterSubmit)} className="space-y-8">
         <div className="space-y-4">
-
-          
         
           <div className="grid grid-cols-2 gap-4">
             <FormField
@@ -226,19 +231,18 @@ export default function RegisterForm({ onSubmit, initialValues }: RegisterFormPr
                     onChange={field.onChange}
                     initialValue={field.value}
                   />
+                
                 </FormControl>
                 <FormMessage />
               </FormItem>
+              
             )}
           />
+          
           <p className="text-sm text-muted-foreground">
             Debes tener al menos 18 años para registrarte.
           </p>
-          {/* {formattedDate && ( //Removed
-            <p className="text-sm font-medium mt-2">
-              Fecha de nacimiento: {formattedDate}
-            </p>
-          )} */}
+        
         </div>
 
         <div className="space-y-4">
@@ -350,10 +354,13 @@ export default function RegisterForm({ onSubmit, initialValues }: RegisterFormPr
           />
         </div>
 
+        <SimpleTermsCheckbox onAccept={handleTermsAccept} />
+
         <Button 
           type="submit" 
           className="w-full bg-[#39759E] hover:bg-[#39759E]"
           aria-label="Complete registration"
+          disabled={!termsAccepted}
         >
           Continuar
         </Button>

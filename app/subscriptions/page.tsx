@@ -64,7 +64,7 @@ function BenefitItem({ children }: { children: React.ReactNode }) {
 
   return (
     <div>
-       <div className="container mx-auto px-4 py-8">
+       <div className="container mx-auto px-4 py-16">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold mb-2">Planes para Profesionales de la Salud</h2>
         <p className="text-sm text-[#162F40] max-w-2xl mx-auto">
@@ -73,7 +73,7 @@ function BenefitItem({ children }: { children: React.ReactNode }) {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 max-w-4xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
         <Card className="flex flex-col h-full transition-all duration-300 hover:shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="text-xl font-bold">Plan Anual</CardTitle>
@@ -81,13 +81,12 @@ function BenefitItem({ children }: { children: React.ReactNode }) {
           </CardHeader>
           <CardContent className="flex-grow pb-4">
             <p className="text-2xl font-bold mb-2">
-              $199.99<span className="text-sm font-normal">/año</span>
+              $100.00<span className="text-sm font-normal">/año</span>
             </p>
             <ul className="space-y-1 text-sm">
               <BenefitItem>Aparición prioritaria en búsquedas</BenefitItem>
               <BenefitItem>Visible en todas las habitaciones relacionadas</BenefitItem>
               <BenefitItem>Pacientes ilimitados</BenefitItem>
-              <BenefitItem>Videoconferencias HD sin límite</BenefitItem>
               <BenefitItem>Herramientas avanzadas de seguimiento</BenefitItem>
               <BenefitItem>Integración con sistemas de salud</BenefitItem>
               <BenefitItem>Soporte prioritario 24/7</BenefitItem>
@@ -100,21 +99,20 @@ function BenefitItem({ children }: { children: React.ReactNode }) {
 
         <Card className="flex flex-col h-full transition-all duration-300 hover:shadow-lg">
           <CardHeader className="pb-4">
-            <CardTitle className="text-xl font-bold">Plan Mensual</CardTitle>
+            <CardTitle className="text-xl font-bold">Plan Trimestral</CardTitle>
             <CardDescription className="text-xs">Ideal para comenzar</CardDescription>
           </CardHeader>
           <CardContent className="flex-grow pb-4">
             <p className="text-2xl font-bold mb-2">
-              $99.99<span className="text-sm font-normal">/mes</span>
+              $30.00<span className="text-sm font-normal">/cada 3 meses</span>
             </p>
             <ul className="space-y-1 text-sm">
-              <BenefitItem>Aparición estándar en búsquedas</BenefitItem>
-              <BenefitItem>Visible en 5 habitaciones relacionadas</BenefitItem>
-              <BenefitItem>Hasta 50 pacientes activos</BenefitItem>
-              <BenefitItem>100 horas de videoconferencia/mes</BenefitItem>
-              <BenefitItem>Herramientas básicas de seguimiento</BenefitItem>
-              <BenefitItem>Portal de pacientes personalizable</BenefitItem>
-              <BenefitItem>Soporte por email y chat</BenefitItem>
+              <BenefitItem>Aparición prioritaria en búsquedas</BenefitItem>
+              <BenefitItem>Visible en todas las habitaciones relacionadas</BenefitItem>
+              <BenefitItem>Pacientes ilimitados</BenefitItem>
+              <BenefitItem>Herramientas avanzadas de seguimiento</BenefitItem>
+              <BenefitItem>Integración con sistemas de salud</BenefitItem>
+              <BenefitItem>Soporte prioritario 24/7</BenefitItem>
             </ul>
           </CardContent>
           <CardFooter>

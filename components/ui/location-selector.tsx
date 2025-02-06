@@ -63,7 +63,7 @@ export function LocationSelector({
   // }, [country, state, city, onChange])
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-3 md:grid-cols-3 gap-4">
       <div>
         <Label htmlFor="country">País</Label>
         <Select onValueChange={(value) => { setCountry(value); onChange({ country: value, state, city }); }} value={country}>

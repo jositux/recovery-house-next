@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import RegisterForm, { formSchema } from "@/components/forms/RegisterForm"
 import { LoginForm } from "@/components/forms/LoginForm"
+
+
 //import { VerificationCodeInput } from "@/components/ui/verification-code-input"
 import { z } from "zod"
 
@@ -31,14 +33,22 @@ export default function RegistrationPage() {
     }
   }, [currentStep]);
 
-  const handleRegisterSubmit = (values: z.infer<typeof formSchema>) => {
-    setRegistrationData(values)
-    setCurrentStep('terms')
+  
+const handleRegisterSubmit = (values: z.infer<typeof formSchema>) => {
+  setRegistrationData(values); // Actualizar datos de registro
+};
+
+useEffect(() => {
+  // Verificar si registrationData ha sido actualizado
+  if (registrationData) {
+    // Solo ejecutar handleTermsAccept si registrationData ya está disponible
+    handleTermsAccept();
   }
+}, [registrationData]); // Este useEffect se ejecuta cuando registrationData cambia
 
   const handleTermsAccept = async () => {
     if (!registrationData) {
-     
+     console.log('why')
       return
     }
 
@@ -53,10 +63,14 @@ export default function RegistrationPage() {
         email: registrationData.email,
         password: registrationData.password,
         initialRole: registrationData.initialRole,
-        verification_url: "https://recoverycaresolutions.com/user/verify"
+        verification_url: "http://localhost:3000/user/verify"
       };
       const response = await registerService.register(registerData);
+
+      localStorage.setItem('initialRole', registerData.initialRole)
+      
       if (response.challenge) {
+        localStorage.setItem('initialRole', registerData.initialRole)
         localStorage.setItem('verificationChallenge', response.challenge);
       }
    
