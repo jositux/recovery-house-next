@@ -51,6 +51,8 @@ export function LoginForm() {
       const currentUser: User = await getCurrentUser(response.data.access_token)
       localStorage.setItem("nombre", currentUser.first_name + " " + currentUser.last_name)
 
+      console.log("tengo el id", currentUser.id)
+
       window.dispatchEvent(new Event("storage"))
 
       // Verificar el initialRole y redirigir

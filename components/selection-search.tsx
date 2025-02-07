@@ -67,7 +67,7 @@ export default function SelectionSearch({ initialSelected = [], onChange }: Sele
     <div className="flex flex-wrap gap-4">
       <Button
         variant="outline"
-        className={`flex items-center justify-between gap-2 rounded-full pl-4 pr-2 h-10 min-w-[140px] ${
+        className={`flex text-sm items-center justify-between gap-2 rounded-full pl-4 pr-2 h-10 min-w-[140px] ${
           selections.all ? "bg-[white] text-[#162F40] hover:bg-[white] border-[#162F40]" : "hover:bg-white"
         }`}
         onClick={() => handleSelection("all")}

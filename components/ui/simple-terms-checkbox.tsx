@@ -18,10 +18,10 @@ export function SimpleTermsCheckbox({ onAccept }: SimpleTermsCheckboxProps) {
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardContent className="p-4 space-y-3">
+    <Card className="w-full max-w-md mx-auto shadow-none border-0 p-0">
+      <CardContent className="space-y-3 p-0">
       
-        <p className="text-xs text-muted-foreground leading-tight">
+        <p className="text-xs text-muted-foreground">
           Acepto tratar a todos los miembros de la comunidad independientemente de su raza, religión, origen nacional,
           etnia, color de piel, discapacidad, sexo, identidad de género, orientación sexual o edad, con respeto y sin
           juicios ni prejuicios.

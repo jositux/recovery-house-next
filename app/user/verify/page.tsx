@@ -10,7 +10,7 @@ const EmailVerificationPage = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const token = searchParams.get("token")
-  const verificationUrl = token ? `/webapi/users/registro/verify-email?token=${token}` : ""
+  const verificationUrl = token ? `/webapi/users/register/verify-email?token=${token}` : ""
 
   const [verificationStatus, setVerificationStatus] = useState<"verifying" | "success" | "error">("verifying")
 

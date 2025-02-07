@@ -144,24 +144,25 @@ export default function RoomsPage() {
   }
 
   return (
-    <main className="flex flex-col min-h-screen p-6">
-      <div className="max-w-7xl mx-auto w-full">
-        <h1 className="text-3xl font-bold text-[#162F40] mb-6">
+    <main className="flex flex-col min-h-screen pl-8">
+      <div className="mx-auto w-full">
+        {/*<h1 className="text-3xl font-bold text-[#162F40] mb-6">
           Habitaciones disponibles
         </h1>
-        <RoomSearch onSearch={handleSearch} />
-        <div className="flex">
+  <RoomSearch onSearch={handleSearch} />*/}
+        <div className="flex py-8">
           <SelectionSearch initialSelected={selectedOptions} onChange={handleSelectionChange} />
         </div>
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="lg:w-2/3">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {currentRooms.map((room) => (
                 <div
                   key={room.id}
                   id={`room-${room.id}`}
                   className={`${styles.fade} ${styles['fade-visible']}`}
                 >
+                 
                   <RoomCard
                     id={room.id}
                     name={room.name}
@@ -177,6 +178,7 @@ export default function RoomsPage() {
               <p className="text-center text-[#162F40] mt-8">No se encontraron habitaciones que coincidan con tu búsqueda.</p>
             )}
             {filteredRooms.length > 0 && (
+           
               <div className="flex justify-center mt-8 gap-2">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <button
@@ -194,7 +196,7 @@ export default function RoomsPage() {
               </div>
             )}
           </div>
-          <div className="lg:w-1/3 h-[calc(100vh-200px)] sticky top-6">
+          <div className="lg:w-1/3 h-[calc(100vh-200px)] rounded-full sticky top-6">
             <MapRooms markers={mapMarkers} />
           </div>
         </div>

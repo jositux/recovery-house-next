@@ -25,7 +25,7 @@ export const registerService = {
     try {
       // Filtramos eliminando initialRole
       const { initialRole, birthDate, phone, emergencyPhone, address, ...filteredData } = credentials;
-      const response = await axios.post<RegisterResponse>(`${API_URL}/registro`, filteredData);
+      const response = await axios.post<RegisterResponse>(`${API_URL}/register`, filteredData);
       console.log(response.data)
       return response.data;
     } catch (error) {

@@ -8,6 +8,7 @@ import { Eye, EyeOff, User, Building2, Stethoscope } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { SimpleTermsCheckbox } from "@/components/ui/simple-terms-checkbox"
 
+
 import {
   Form,
   FormControl,
