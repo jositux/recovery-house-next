@@ -140,7 +140,7 @@ export function LoginForm() {
           {isLoading ? "Iniciando sesión..." : "Iniciar sesión"}
         </Button>
         <div className="text-sm text-center">
-          <Link href="/register" className="text-[#39759E] hover:underline">
+          <Link href="/registro" className="text-[#39759E] hover:underline">
             ¿Aún no tienes cuenta? Regístrate
           </Link>
         </div>

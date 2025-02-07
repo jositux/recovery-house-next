@@ -74,7 +74,7 @@ export function HowToUseSection() {
                   Buscar
                 </Button>
               </Link>
-              <Link href="/register">
+              <Link href="/registro">
                 <Button variant="outline">Registrarse</Button>
               </Link>
             </div>

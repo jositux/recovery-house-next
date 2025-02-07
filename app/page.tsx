@@ -8,11 +8,15 @@ import { BenefitsSection } from "@/components/sections/benefits-section"
 //import { CareDividerSection } from "@/components/sections/care-divider-section"
 import { HostCTASection } from "@/components/sections/host-cta-section"
 import { NewsSection } from "@/components/sections/news-section"
+import styles from "./page.module.css"
+
 
 export default function Home() {
   return (
+    
     <main>
-      <div className="hidden md:block px-4">
+     
+      <div className={`${styles.Container} hidden mt-[-124px] pt-[50px] md:block px-4`}>
         <HeroSlider />
       </div>
       <div className="md:hidden px-4">

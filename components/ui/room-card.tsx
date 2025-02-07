@@ -1,3 +1,6 @@
+import Image from "next/image"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import Link from "next/link"
 
 interface RoomCardProps {
@@ -10,27 +13,29 @@ interface RoomCardProps {
 }
 
 export function RoomCard({ id, name, description, price, image, propertyName }: RoomCardProps) {
-  
-  console.log(image)
-  const imageSrc = image || "/placeholder.svg?height=300&width=400";
-
   return (
-    <Link href={`/rooms/${id}`} className="group block">
-      <div className="relative aspect-[4/3] overflow-hidden rounded-lg mb-3">
-        <img
-          src={imageSrc}
-          alt={name}
-          className="object-cover transition-transform duration-300 group-hover:scale-105 w-full h-full"
-        />
+    <Card className="overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+      <Link href={`/rooms/${id}`}>
+      <div className="relative h-48 w-full">
+        <Image src={image || "/placeholder.svg"} alt={name} layout="fill" objectFit="cover" className="rounded-t-xl" />
       </div>
-      <div className="space-y-2">
-        <h3 className="font-bold text-lg text-[#162F40]">{name || 'Habitación sin nombre'}</h3>
-        <p className="text-sm text-[#162F40]">{propertyName || 'Propiedad desconocida'}</p>
-        <p className="text-[#162F40] text-sm line-clamp-2">{description || 'Sin descripción'}</p>
-        <p className="font-bold text-[#39759E]">
-          ${(price || 0).toLocaleString('es-CO')} <span className="text-[#162F40] font-normal">COP por noche</span>
-        </p>
-      </div>
-    </Link>
+      </Link>
+      <CardContent className="p-4">
+        <h3 className="text-lg font-semibold text-gray-800 mb-1">{name}</h3>
+        <p className="text-sm text-gray-600 mb-2">{propertyName}</p>
+        <p className="text-sm text-gray-500 line-clamp-2">{description}</p>
+      </CardContent>
+      <CardFooter className="flex justify-between items-center p-4 bg-gray-50">
+        <span className="text-lg font-bold text-gray-800">
+          ${price} <span className="text-sm font-normal">/ noche</span>
+        </span>
+        <Link href={`/rooms/${id}`}>
+        <Button variant="outline" className="rounded-full">
+          Ver detalles
+        </Button>
+        </Link>
+      </CardFooter>
+    </Card>
   )
 }
+

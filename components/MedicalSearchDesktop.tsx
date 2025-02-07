@@ -10,7 +10,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { format, addDays } from "date-fns"
 import { es } from 'date-fns/locale'
 import { cn } from "@/lib/utils"
-import { NumberInput } from "./number-input"
+import { NumberInput } from "./number-input-desktop"
+import styles from "./MedicalSearch.module.css"
+
 
 interface Procedure {
   name: string;
@@ -62,7 +64,7 @@ const MedicalSearchDesktop = () => {
   }
 
   return (
-    <div className="hidden md:block w-full max-w-[850px] mx-auto bg-[#1B2B3A] rounded-3xl">
+    <div className={`${styles.Content} hidden relative z-100 lg:mt-[-50px] lg:block w-full max-w-[850px] mx-auto bg-[#1B2B3A] rounded-3xl`}>
       <div className="p-4">
         <div className="flex flex-col md:flex-row md:items-center gap-6">
           <h2 className="text-white leading-[1.3rem] font-medium text-1xl whitespace-nowrap">

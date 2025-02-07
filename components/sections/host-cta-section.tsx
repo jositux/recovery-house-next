@@ -37,7 +37,7 @@ export function HostCTASection() {
           <p className="text-lg text-white/90 mb-8">
             Convierte tu casa en tu próxima oportunidad
           </p>
-          <Link href="/register">
+          <Link href="/registro">
             <Button
               className="bg-white text-[#162F40] hover:bg-white/90 w-fit"
               size="lg"

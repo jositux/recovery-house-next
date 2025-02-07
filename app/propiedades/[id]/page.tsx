@@ -11,6 +11,7 @@ import {
 
 import { ServiceProviderCard } from "@/components/ui/service-provider-card"
 import { GoogleMap } from "@/components/ui/google-map"
+import { PropertyBlockForm } from "@/components/property-block-form"
 
 interface Room {
   id: string
@@ -162,13 +163,16 @@ export default function RoomPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {property.Rooms.map((room: Room) => (
             <div key={room.id} className="border rounded-lg overflow-hidden">
-              <Image
-                src={`/webapi/assets/${room.mainImage}`}
-                alt={room.name}
-                width={400}
-                height={200}
-                objectFit="cover"
-              />
+              <div className="w-[400px] h-[225px] overflow-hidden">
+  <Image
+    src={`/webapi/assets/${room.mainImage}`}
+    alt={room.name}
+    width={400}
+    height={225}
+    objectFit="cover"
+  />
+</div>
+
               <div className="p-4">
                 <h3 className="text-xl font-bold mb-2">{room.name}</h3>
                 <div className="grid grid-cols-2 gap-2 mb-2">
@@ -185,6 +189,7 @@ export default function RoomPage() {
                 <p className="text-lg font-bold mb-2">${room.pricePerNight} / noche</p>
                 <p className="text-sm text-[#162F40]">Tarifa de limpieza: ${room.cleaningFee}</p>
               </div>
+              <PropertyBlockForm />
             </div>
           ))}
         </div>

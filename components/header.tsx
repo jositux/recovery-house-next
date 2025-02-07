@@ -1,68 +1,64 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import Link from "next/link";
-import { MenuProfile } from "@/components/MenuProfile";
-import { MenuActions } from "@/components/MenuActions";
-import { Search } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import MedicalSearchMobile from "@/components/MedicalSearchMobile";
+import { useState, useEffect } from "react"
+import { usePathname } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import Image from "next/image"
+import Link from "next/link"
+import { MenuProfile } from "@/components/MenuProfile"
+import { MenuActions } from "@/components/MenuActions"
+import { Search } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import { SearchBar } from "@/components/search-bar"
+import MedicalSearchMobile from "@/components/MedicalSearchMobile"
+import styles from "./header.module.css"
 
 export function Header() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [userName, setUserName] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [userName, setUserName] = useState("")
+  const pathname = usePathname()
+
+  const showSearchBar = pathname === "/" || pathname === "/rooms"
 
   useEffect(() => {
     // Función para verificar autenticación y obtener nombre
     const checkAuth = () => {
-      const token = localStorage.getItem("access_token");
-      const name = localStorage.getItem("nombre") || "Usuario";
-      setIsLoggedIn(!!token);
-      setUserName(name);
-    };
+      const token = localStorage.getItem("access_token")
+      const name = localStorage.getItem("nombre") || "Usuario"
+      setIsLoggedIn(!!token)
+      setUserName(name)
+    }
 
     // Verificar en el montaje
-    checkAuth();
+    checkAuth()
 
     // Escuchar cambios en localStorage
-    window.addEventListener("storage", checkAuth);
+    window.addEventListener("storage", checkAuth)
 
     // Cleanup del evento al desmontar
     return () => {
-      window.removeEventListener("storage", checkAuth);
-    };
-  }, []);
+      window.removeEventListener("storage", checkAuth)
+    }
+  }, [])
 
   const toggleSearch = () => {
-    setIsSearchOpen(!isSearchOpen);
-  };
+    setIsSearchOpen(!isSearchOpen)
+  }
 
   return (
     <>
-      <header className="bg-[#39759E] p-4">
+      <header className={`${styles.Container} bg-[#39759E] p-4 relative z-1`}>
         <div className="container mx-auto flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             {/* Logo grande visible en pantallas medianas y grandes */}
             <div className="hidden sm:block">
-              <Image
-                src="/assets/logo.svg"
-                alt="Recovery Care Solutions"
-                width={140}
-                height={50}
-              />
+              <Image src="/assets/logo.svg" alt="Recovery Care Solutions" width={140} height={50} />
             </div>
             {/* Logo mini visible en pantallas pequeñas */}
             <div className="block sm:hidden">
-              <Image
-                src="/assets/logo-mini.svg"
-                alt="Recovery Care Solutions"
-                width={40}
-                height={40}
-              />
+              <Image src="/assets/logo-mini.svg" alt="Recovery Care Solutions" width={40} height={40} />
             </div>
           </Link>
 
@@ -79,11 +75,7 @@ export function Header() {
             </Button>
 
             {!isLoggedIn ? (
-              <Button
-                variant="secondary"
-                className="bg-gray-800 text-white hover:bg-gray-700"
-                asChild
-              >
+              <Button variant="secondary" className="bg-gray-800 text-white hover:bg-gray-700" asChild>
                 <Link href="/login">Ingresar</Link>
               </Button>
             ) : (
@@ -110,6 +102,9 @@ export function Header() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {showSearchBar && <SearchBar />}
     </>
-  );
+  )
 }
+
