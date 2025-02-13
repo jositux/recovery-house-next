@@ -81,10 +81,11 @@ export default function RoomPage() {
   console.log("valores iniciales", initialValues);
 
   return (
-    <div className="container mx-auto p-4 py-16">
-      <h1 className="text-2xl font-bold mb-6">Room Information Form</h1>
+    <div className="min-h-screen bg-[#F8F8F7]">
+      <div className="container mx-auto max-w-2xl py-10 px-4">
+      <h1 className="text-2xl font-bold mb-6">Editar Habitación</h1>
       <div className="grid gap-6 mx-auto">
-        <div>
+        <div className="container m-4 my-16">
           <RoomForm onSubmit={handleFormSubmit} initialValues={initialValues} />
         </div>
         {/*
@@ -137,6 +138,7 @@ export default function RoomPage() {
             </Card>
           </div>
         )}*/}
+      </div>
       </div>
     </div>
   );

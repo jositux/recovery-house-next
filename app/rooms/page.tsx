@@ -151,7 +151,7 @@ export default function RoomsPage() {
           <SelectionSearch initialSelected={selectedOptions} onChange={handleSelectionChange} />
         </div>
         <div className={`flex transition-all duration-300 ease-in-out ${isMapVisible ? "gap-6" : "gap-0"}`}>
-          <div className={`transition-all duration-300 ease-in-out ${isMapVisible ? "w-2/3" : "w-full"}`}>
+          <div className={`transition-all duration-300 ease-in-out ${isMapVisible ? "w-2/3" : "w-full pr-8"}`}>
             <div
               className={`grid grid-cols-1 md:grid-cols-2 ${isMapVisible ? "lg:grid-cols-3" : "lg:grid-cols-4"} gap-6 auto-rows-fr`}
             >

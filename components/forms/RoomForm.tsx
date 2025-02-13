@@ -32,6 +32,9 @@ import { getExtraTags } from "@/services/extraTagsService";
 import { getServiceTags } from "@/services/serviceTagsService";
 import useTags from "@/hooks/useTags";
 
+import Link from "next/link";
+//import { getRandomValues } from "crypto";
+
 const formSchema = z.object({
   id: z.string(),
   propertyId: z.string(),
@@ -102,8 +105,8 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
     try {
       await onSubmit(values);
       toast({
-        title: "Success",
-        description: "Room information has been saved successfully.",
+        title: "Enhorabuena!",
+        description: "Se ha guardado la habitación",
         variant: "default",
       });
       //form.reset()
@@ -120,8 +123,8 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
-        <div className="grid grid-cols-10 gap-4">
-          <div className="col-span-7">
+        <div className="grid grid-cols-1 md:grid-cols-[65%_30%] gap-4 p-4 bg-white rounded-xl">
+          <div>
             <FormField
               control={form.control}
               name="name"
@@ -136,7 +139,7 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
               )}
             />
           </div>
-          <div className="col-span-3">
+          <div>
             <FormField
               control={form.control}
               name="roomNumber"
@@ -152,21 +155,22 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
             />
           </div>
         </div>
-
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea placeholder="Enter room description" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-4 p-4 bg-white rounded-xl">
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Textarea placeholder="Enter room description" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-white rounded-xl">
           <FormField
             control={form.control}
             name="beds"
@@ -224,52 +228,59 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
             )}
           />
         </div>
-        <FormField
-          control={form.control}
-          name="pricePerNight"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Price per Night</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  step="1"
-                  value={field.value || ""}
-                  onChange={(e) => field.onChange(Number(e.target.value) || 0)}
-                  onFocus={() => {
-                    if (field.value === 0) {
-                      field.onChange("");
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-white rounded-xl">
+          <FormField
+            control={form.control}
+            name="pricePerNight"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Price per Night</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    step="1"
+                    value={field.value || ""}
+                    onChange={(e) =>
+                      field.onChange(Number(e.target.value) || 0)
                     }
-                  }}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="cleaningFee"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Cleaning Fee</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  step="1"
-                  value={field.value || ""}
-                  onChange={(e) => field.onChange(Number(e.target.value) || 0)}
-                  onFocus={() => {
-                    if (field.value === 0) {
-                      field.onChange("");
+                    onFocus={() => {
+                      if (field.value === 0) {
+                        field.onChange("");
+                      }
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="cleaningFee"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Cleaning Fee</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    step="1"
+                    value={field.value || ""}
+                    onChange={(e) =>
+                      field.onChange(Number(e.target.value) || 0)
                     }
-                  }}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                    onFocus={() => {
+                      if (field.value === 0) {
+                        field.onChange("");
+                      }
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        {/*
         <FormField
           control={form.control}
           name="mainImage"
@@ -282,83 +293,104 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
               <FormMessage />
             </FormItem>
           )}
-        />
-        <FormField
-          control={form.control}
-          name="photos"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Additional Photos URLs</FormLabel>
-              <FormControl>
-                <GalleryUpload
-                  initialIds={field.value} // Inicializa con las fotos actuales
-                  onGalleryChange={(newGallery: string[]) => {
-                    console.log(newGallery);
-                    field.onChange(newGallery); // Actualiza el valor del campo photos
-                  }}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="extraTags"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Extra Tags</FormLabel>
-              <FormControl>
-                <CollectionExtraTags
-                  onChange={(newTags: string[]) => {
-                    if (
-                      JSON.stringify(newTags) !== JSON.stringify(field.value)
-                    ) {
-                      field.onChange(newTags); // Solo actualiza si hay un cambio
-                    }
-                  }}
-                  extraTags={extraTags || []}
-                  initialSelectedTags={field.value}
-                  enable="property"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="servicesTags"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Services Tags</FormLabel>
-              <FormControl>
-                <CollectionServiceTags
-                  onChange={(newTags: string[]) => {
-                    if (
-                      JSON.stringify(newTags) !== JSON.stringify(field.value)
-                    ) {
-                      field.onChange(newTags); // Solo actualiza si hay un cambio
-                    }
-                  }}
-                  servicesTags={serviceTags || []}
-                  initialSelectedTags={field.value}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit" disabled={form.formState.isSubmitting}>
-          {form.formState.isSubmitting ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Saving...
-            </>
-          ) : (
-            "Save"
-          )}
-        </Button>
+          />*/}
+        <div className="grid grid-cols-1 gap-6 p-4 bg-white rounded-xl">
+          <FormField
+            control={form.control}
+            name="photos"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Additional Photos URLs</FormLabel>
+                <FormControl>
+                  <GalleryUpload
+                    initialIds={field.value} // Inicializa con las fotos actuales
+                    onGalleryChange={(newGallery: string[]) => {
+                      console.log(newGallery);
+                      field.onChange(newGallery); // Actualiza el valor del campo photos
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="grid grid-cols-1 gap-6 p-4 bg-white rounded-xl">
+          <FormField
+            control={form.control}
+            name="extraTags"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Extra Tags</FormLabel>
+                <FormControl>
+                  <CollectionExtraTags
+                    onChange={(newTags: string[]) => {
+                      if (
+                        JSON.stringify(newTags) !== JSON.stringify(field.value)
+                      ) {
+                        field.onChange(newTags); // Solo actualiza si hay un cambio
+                      }
+                    }}
+                    extraTags={extraTags || []}
+                    initialSelectedTags={field.value}
+                    enable="property"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="grid grid-cols-1 gap-6 p-4 bg-white rounded-xl">
+          <FormField
+            control={form.control}
+            name="servicesTags"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Services Tags</FormLabel>
+                <FormControl>
+                  <CollectionServiceTags
+                    onChange={(newTags: string[]) => {
+                      if (
+                        JSON.stringify(newTags) !== JSON.stringify(field.value)
+                      ) {
+                        field.onChange(newTags); // Solo actualiza si hay un cambio
+                      }
+                    }}
+                    servicesTags={serviceTags || []}
+                    initialSelectedTags={field.value}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="flex gap-4 mt-4">
+          <Link href={`/propiedades/${initialValues?.propertyId}/`} className="flex-1">
+            <Button
+              variant="outline"
+              type="button"
+              className="w-full text-lg px-6 py-3"
+            >
+              Cancelar
+            </Button>
+          </Link>
+          <Button
+            type="submit"
+            disabled={form.formState.isSubmitting}
+            className="flex-1 text-lg px-6 py-3"
+          >
+            {form.formState.isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Guardando...
+              </>
+            ) : (
+              "Guardar"
+            )}
+          </Button>
+        </div>
       </form>
     </Form>
   );

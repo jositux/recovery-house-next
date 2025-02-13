@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import RoomForm from "./RoomForm";
+import RoomForm from "@/components/forms/RoomForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { roomService, type RoomData } from "@/services/AddRoomService";
 
@@ -47,8 +47,9 @@ export default function RoomPage() {
   };
 
   return (
-    <div className="container mx-auto p-4 py-16">
-      <h1 className="text-2xl font-bold mb-6">Room Information Form</h1>
+    <div className="min-h-screen bg-[#F8F8F7]">
+      <div className="container mx-auto max-w-2xl py-10 px-4">
+      <h1 className="text-2xl font-bold mb-6">Agregar Habitación</h1>
       <div className="grid gap-6 md:grid-cols-2">
         <div>
           <RoomForm onSubmit={handleFormSubmit} initialValues={initialValues} />
@@ -103,6 +104,7 @@ export default function RoomPage() {
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 }
