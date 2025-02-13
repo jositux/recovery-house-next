@@ -24,9 +24,9 @@ import { providerService, ProviderData } from "@/services/providerService";
   type MembershipTag,
 } from "@/services/membership-service";*/
 import { CollectionExtraTags } from "@/components/collectionExtraTags";
-import { CollectionServiceTags } from "@/components/collectionServiceTags";
+//import { CollectionServiceTags } from "@/components/collectionServiceTags";
 import { getExtraTags } from "@/services/extraTagsService";
-import { getServiceTags } from "@/services/serviceTagsService";
+//import { getServiceTags } from "@/services/serviceTagsService";
 
 const formSchema = z.object({
   name: z.string().min(1, "El nombre es requerido."),
@@ -52,12 +52,12 @@ type FormValues = z.infer<typeof formSchema>;
 
 export default function RegisterPropertyBasePage() {
   const [extraTags, setExtraTags] = useState<
-    { id: string; name: string; icon: string }[]
+    { id: string; name: string; icon: string; enable_property: boolean; enable_services: boolean; }[]
   >([]);
-  const [servicesTags, setServicesTags] = useState<
-    { id: string; name: string; icon: string }[]
+  /*const [servicesTags, setServicesTags] = useState<
+    { id: string; name: string; icon: string; }[]
   >([]);
-  /*const [selectedMembership, setSelectedMembership] = useState<string | null>(
+  const [selectedMembership, setSelectedMembership] = useState<string | null>(
     null
   );*/
   //const [memberships, setMemberships] = useState<MembershipTag[]>([]);
@@ -81,8 +81,8 @@ export default function RegisterPropertyBasePage() {
         const extraTagsData = await getExtraTags();
         setExtraTags(extraTagsData);
 
-        const servicesTagsData = await getServiceTags();
-        setServicesTags(servicesTagsData);
+        //const servicesTagsData = await getServiceTags();
+       // setServicesTags(servicesTagsData);
       } catch (error) {
         console.error(error);
       }
@@ -126,21 +126,22 @@ export default function RegisterPropertyBasePage() {
     }
   };
 
+  /*
   const handleServiceTagsChange = (tags: string[]) => {
     if (JSON.stringify(tags) !== JSON.stringify(selectedServiceTags)) {
       setValue("serviceTags", tags, { shouldDirty: true });
     }
-  };
+  };*/
 
   const selectedExtraTags = useWatch({
     control: form.control,
     name: "extraTags",
   });
 
-  const selectedServiceTags = useWatch({
+ /* const selectedServiceTags = useWatch({
     control: form.control,
     name: "serviceTags",
-  });
+  });*/
 
   const onSubmit = async (values: FormValues) => {
     if (!values.RNTFile || !values.taxIdEINFile) {
@@ -216,9 +217,9 @@ export default function RegisterPropertyBasePage() {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Nombre del proveedor</FormLabel>
+                <FormLabel>Nombre del Servicio</FormLabel>
                 <FormControl>
-                  <Input placeholder="Nombre" {...field} />
+                  <Input placeholder="Ej. Peluquería Pedrito" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -252,12 +253,35 @@ export default function RegisterPropertyBasePage() {
               )}
             />
           </div>
+          <hr className="h-px my-8 bg-gray-100 border-0 dark:bg-gray-700" />
+          <FormField
+            control={form.control}
+            name="extraTags"
+            render={() => (
+              <FormItem>
+                <FormLabel className="text-lg">Servicios Ofrecidos</FormLabel>
+                <Controller
+                  control={form.control}
+                  name="extraTags"
+                  render={() => (
+                    <CollectionExtraTags
+                      onChange={handleTagsChange}
+                      extraTags={extraTags}
+                      initialSelectedTags={selectedExtraTags}
+                      enable="services"
+                    />
+                  )}
+                />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <FormField
             control={form.control}
             name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Descripción</FormLabel>
                 <FormControl>
                   <Textarea placeholder="Describe las características" {...field} />
                 </FormControl>
@@ -265,7 +289,8 @@ export default function RegisterPropertyBasePage() {
               </FormItem>
             )}
           />
-
+<hr className="h-px my-8 bg-gray-100 border-0 dark:bg-gray-700"></hr>
+<h2 className="text-lg">Dónde ofrece su servicio?</h2>
 <LocationSelector
             onChange={({ country, state, city }) => {
               form.setValue("country", country);
@@ -296,6 +321,8 @@ export default function RegisterPropertyBasePage() {
               </FormItem>
             )}
             />*/}
+            <hr className="h-px my-8 bg-gray-100 border-0 dark:bg-gray-700"></hr>
+            <h2 className="text-lg">Información Legal</h2>
           <FormField
             control={form.control}
             name="taxIdEIN"
@@ -309,7 +336,10 @@ export default function RegisterPropertyBasePage() {
               </FormItem>
             )}
           />
+
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+         
             <FormField
               control={form.control}
               name="RNTFile"
@@ -345,28 +375,8 @@ export default function RegisterPropertyBasePage() {
               )}
             />
           </div>
-          <FormField
-            control={form.control}
-            name="extraTags"
-            render={() => (
-              <FormItem>
-                <FormLabel>Etiquetas Extra</FormLabel>
-                <Controller
-                  control={form.control}
-                  name="extraTags"
-                  render={() => (
-                    <CollectionExtraTags
-                      onChange={handleTagsChange}
-                      extraTags={extraTags}
-                      initialSelectedTags={selectedExtraTags}
-                    />
-                  )}
-                />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
+         
+          {/*<FormField
             control={form.control}
             name="serviceTags"
             render={() => (
@@ -386,7 +396,7 @@ export default function RegisterPropertyBasePage() {
                 <FormMessage />
               </FormItem>
             )}
-          />
+                  />*/}
           <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? "Registrando..." : "Registrar Proveedor"}
           </Button>

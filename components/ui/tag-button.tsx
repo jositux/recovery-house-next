@@ -1,6 +1,6 @@
 import React from "react";
 import { cn } from "@/lib/utils";
-import { DynamicIcon } from "lucide-react/dynamic"; // Importamos DynamicIcon
+import { DynamicIcon } from "lucide-react/dynamic";
 
 // Lista de íconos válidos de lucide-react
 const validIcons = [
@@ -11,14 +11,14 @@ const validIcons = [
   "bell",
   "star",
   "ghost",
-  "wifi", // Añade más íconos si es necesario
+  "wifi",
 ] as const;
 
-type IconName = typeof validIcons[number]; // Tipo estricto basado en la lista de íconos válidos
+type IconName = typeof validIcons[number];
 
 interface TagButtonProps {
   id: string;
-  icon: string; // icon es un string genérico
+  icon: string;
   label: string;
   selected: boolean;
   onClick: () => void;
@@ -26,14 +26,13 @@ interface TagButtonProps {
 }
 
 export function TagButton({ icon, label, selected, onClick, className }: TagButtonProps) {
-  // Si el icono no es válido o está vacío, usamos "home" por defecto
   const iconToUse: IconName = validIcons.includes(icon as IconName) ? (icon as IconName) : "home";
 
   return (
     <div
       onClick={onClick}
       className={cn(
-        "flex items-center p-4 cursor-pointer border rounded-lg shadow-sm transition-all",
+        "flex items-center p-2 md:p-4 cursor-pointer border rounded-lg shadow-sm transition-all sm:flex-row flex-col sm:items-center",
         selected
           ? "bg-[#39759E] text-white shadow-lg"
           : "bg-white text-[#39759E] hover:bg-gray-100",
@@ -41,25 +40,18 @@ export function TagButton({ icon, label, selected, onClick, className }: TagButt
         className
       )}
     >
-      {/* Contenedor del ícono con tamaño fijo */}
+      {/* Ícono en la parte superior en mobile y a la izquierda en pantallas grandes */}
       <div
-        className="flex items-center justify-center mr-3"
-        style={{
-          width: "24px", // Tamaño fijo del contenedor
-          height: "24px",
-        }}
+        className="flex items-center justify-center sm:mr-3 mb-2 sm:mb-0"
+        style={{ width: "24px", height: "24px" }}
       >
-        {/* Ícono con tamaño fijo */}
         <DynamicIcon
           name={iconToUse}
-          style={{
-            width: "24px",
-            height: "24px",
-          }}
+          style={{ width: "24px", height: "24px" }}
         />
       </div>
-      {/* Etiqueta */}
-      <span className="text-sm font-medium">{label}</span>
+      {/* Etiqueta con fuente más fina */}
+      <span className="text-sm">{label}</span>
     </div>
   );
 }

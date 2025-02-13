@@ -21,7 +21,7 @@ const MAX_IMAGES = 6
 
 const GalleryUpload: React.FC<GalleryUploadProps> = ({ initialIds = [], onGalleryChange }) => {
   const [gallery, setGallery] = useState<UploadedImage[]>(
-    initialIds.map((id) => ({ id, filename_download: `image-${id}` })),
+    initialIds.every((id) => id.trim() === "") ? [] : initialIds.map((id) => ({ id, filename_download: `image-${id}` })),
   )
   const [loading, setLoading] = useState(false)
   const prevIdsRef = useRef<string[]>([])
@@ -67,13 +67,13 @@ const GalleryUpload: React.FC<GalleryUploadProps> = ({ initialIds = [], onGaller
 
   return (
     <div className="max-w-6xl mx-auto">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 grid-cols-2 lg:grid-cols-3 gap-4">
         {gallery.map((image) => (
           <div key={image.id} id={`image-${image.id}`} className={`relative w-full h-0 pb-[56.25%] ${styles.fadeIn}`}>
             <div className="absolute inset-0 overflow-hidden rounded-md shadow-sm">
               <div className="relative w-full h-full">
                 <Image
-                  src={`webapi/assets/${image.id}`}
+                  src={`/webapi/assets/${image.id}?key=small`}
                   alt={image.filename_download}
                   layout="fill"
                   objectFit="cover"

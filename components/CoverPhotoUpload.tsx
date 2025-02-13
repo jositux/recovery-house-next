@@ -1,38 +1,40 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import Image from "next/image"
-import { uploadFile } from "@/services/fileUploadService" // Servicio de subida
-import { Camera, Loader2, XCircle } from "lucide-react" // Iconos
+import { uploadFile } from "@/services/fileUploadService"
+import { Camera, Loader2, XCircle } from "lucide-react"
 
 interface CoverPhotoUploadProps {
-  defaultImageId?: string // ID de imagen predeterminada
-  onImageIdChange?: (id: string) => void // Callback para emitir el id al componente padre
+  defaultImageId?: string
+  onImageIdChange?: (id: string) => void
 }
 
 const CoverPhotoUpload: React.FC<CoverPhotoUploadProps> = ({ defaultImageId = "", onImageIdChange }) => {
   const [loading, setLoading] = useState<boolean>(false)
   const [imageId, setImageId] = useState<string>(defaultImageId)
 
-  // Notifica al componente padre cuando el imageId cambia
-  useEffect(() => {
+  const notifyParent = useCallback(() => {
     if (onImageIdChange) {
       onImageIdChange(imageId)
     }
   }, [imageId, onImageIdChange])
 
-  // Maneja la subida de archivos
+  useEffect(() => {
+    notifyParent()
+  }, [notifyParent])
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
     const file = e.target.files?.[0]
     if (!file) return
 
     setLoading(true)
-    setImageId("") // Reinicia el id previo
+    setImageId("")
 
     try {
       const response = await uploadFile(file)
-      setImageId(response.id) // Guarda el id retornado
+      setImageId(response.id)
     } catch (error) {
       console.error("Error uploading file:", error)
     } finally {
@@ -40,14 +42,12 @@ const CoverPhotoUpload: React.FC<CoverPhotoUploadProps> = ({ defaultImageId = ""
     }
   }
 
-  // Maneja el "clear" de la imagen
   const handleClearImage = (): void => {
     setImageId("")
   }
 
   return (
     <div className="relative w-full max-w-4xl h-64 border-2 border-gray-300 rounded-md flex items-center justify-center bg-gray-50">
-      {/* Input de archivo oculto */}
       <input
         type="file"
         id="cover-photo-upload"
@@ -57,13 +57,11 @@ const CoverPhotoUpload: React.FC<CoverPhotoUploadProps> = ({ defaultImageId = ""
         disabled={loading}
       />
 
-      {/* Imagen cargada o ícono de la cámara */}
       {imageId ? (
         <>
-          {/* Imagen cargada usando Next.js Image */}
           <div className="absolute inset-0 w-full h-full">
             <Image
-              src={`webapi/assets/${imageId}?key=medium`}
+              src={`/webapi/assets/${imageId}?key=medium`}
               alt="Cover Photo"
               layout="fill"
               objectFit="cover"
@@ -71,7 +69,6 @@ const CoverPhotoUpload: React.FC<CoverPhotoUploadProps> = ({ defaultImageId = ""
             />
           </div>
 
-          {/* Botón para limpiar imagen */}
           <button
             onClick={handleClearImage}
             className="absolute top-2 right-2 bg-white rounded-full p-1 text-red-500 hover:text-red-600 shadow-md z-10"

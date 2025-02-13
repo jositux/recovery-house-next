@@ -142,7 +142,7 @@ export default function RegisterPropertyBasePage() {
         name: values.name,
         description: values.description,
         country: values.country,
-        region: "default",
+
         state: values.state,
         city: values.city,
         postalCode: values.postalCode,
@@ -156,8 +156,7 @@ export default function RegisterPropertyBasePage() {
         RNTFile: values.RNTFile,
         taxIdEINFile: values.taxIdEINFile,
 
-        Rooms: [], // Usamos `ids` aquí
-       
+
       }
       const response = await propertyService.createProperty(propertyData)
 

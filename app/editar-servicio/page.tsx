@@ -59,7 +59,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 export default function RegisterPropertyBasePage() {
   const [extraTags, setExtraTags] = useState<
-    { id: string; name: string; icon: string }[]
+    { id: string; name: string; icon: string; enable_property:boolean; enable_services: boolean; }[]
   >([]);
   const [servicesTags, setServicesTags] = useState<
     { id: string; name: string; icon: string }[]
@@ -498,6 +498,7 @@ useEffect(() => {
                         onChange={handleTagsChange}
                         extraTags={extraTags}
                         initialSelectedTags={defaultTags}
+                        enable="services"
                       />
                     )}
                   />

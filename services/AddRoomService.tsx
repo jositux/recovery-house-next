@@ -4,15 +4,15 @@ const API_URL = '/webapi/items/Room';
 
 export interface RoomData {
   id: string;
+  propertyId: string;
   name: string;
   roomNumber: string;
   beds: number;
   capacity: number;
   description: string;
-  pricePerNight: string;
+  pricePerNight: number;
   mainImage: string;
-  propertyId: string;
-  cleaningFee: string;
+  cleaningFee: number;
   photos: string[];
   extraTags: string[]; // Recibido como array de strings
   servicesTags: string[]; // Recibido como array de strings
@@ -50,16 +50,16 @@ export const roomService = {
           : [{ directus_files_id: data.mainImage }];
 
       // Crear una copia de data con los campos transformados
-      //const { id, ...resData } = data; // Excluir id
+      const { id, ...resData } = data; // Excluir id
       const transformedData = {
-        //...resData,
+        ...resData,
+        mainImage: formattedPhotos[0].directus_files_id,
         pricePerNight: normalizedPricePerNight,
         cleaningFee: normalizedCleaningFee,
         servicesTags: formattedServiceTags,
         extraTags: formattedExtraTags,
         photos: formattedPhotos,
       };
-
 
       console.log("transformed: ", transformedData)
 

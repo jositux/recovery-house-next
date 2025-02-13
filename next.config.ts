@@ -3,8 +3,15 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   transpilePackages: ['react-leaflet'],
+
   images: {
-    domains: ['us-east-1a.recoverycaresolutions.com'],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "us-east-1a.recoverycaresolutions.com", // Cambia esto por el dominio real de tus imágenes
+        pathname: "/**",
+      },
+    ],
   },
    
   async rewrites() {  

@@ -6,7 +6,6 @@ export interface PropertyData {
   "name": string;
   "description": string;
   "country": string;
-  "region": string;
   "state": string;
   "city": string;
   "postalCode": string;
@@ -19,7 +18,6 @@ export interface PropertyData {
   "mainImage": string;
   "RNTFile": string;
   "taxIdEINFile": string;
-  "Rooms": string[]
 }
 
 export interface PropertyResponse {
@@ -49,7 +47,7 @@ export const propertyService = {
         name: propertyData.name,
         description: propertyData.description,
         country: propertyData.country,
-        region: propertyData.region,
+        region: "",
         state: propertyData.state,
         city: propertyData.city,
         postalCode: propertyData.postalCode,
@@ -69,7 +67,7 @@ export const propertyService = {
         taxIdApproved: false,
         mainImage: propertyData.mainImage,
         photos: [],
-        Rooms: propertyData.Rooms
+        Rooms: []
     }
 
       const response = await axios.post<PropertyResponse>(`${API_URL}`, formatedData, {

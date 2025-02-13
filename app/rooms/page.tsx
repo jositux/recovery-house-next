@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
+import { useState, useMemo, /*useCallback, */useEffect, useRef } from 'react'
 import SelectionSearch from "@/components/selection-search"
 import { RoomCard } from "@/components/ui/room-card"
-import { RoomSearch } from "@/components/ui/room-search"
+//import { RoomSearch } from "@/components/ui/room-search"
 import { MapRooms } from "@/components/ui/mapRooms"
 import axios from 'axios'
 import styles from './RoomsPage.module.css'
@@ -47,7 +47,7 @@ interface Property {
 export default function RoomsPage() {
   const [properties, setProperties] = useState<Property[]>([])
   const [currentPage, setCurrentPage] = useState(1)
-  const [searchTerm, setSearchTerm] = useState('')
+  const searchTerm = ''
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const roomsPerPage = 9
@@ -113,10 +113,10 @@ export default function RoomsPage() {
 
   const totalPages = Math.ceil(filteredRooms.length / roomsPerPage);
 
-  const handleSearch = useCallback((term: string) => {
+  /*const handleSearch = useCallback((term: string) => {
     setSearchTerm(term);
     setCurrentPage(1);
-  }, []);
+  }, []);*/
 
   const indexOfLastRoom = currentPage * roomsPerPage;
   const indexOfFirstRoom = indexOfLastRoom - roomsPerPage;
@@ -179,7 +179,7 @@ export default function RoomsPage() {
             )}
             {filteredRooms.length > 0 && (
            
-              <div className="flex justify-center mt-8 gap-2">
+              <div className="flex justify-center mt-8 mb-8 gap-2">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <button
                     key={page}
@@ -196,7 +196,7 @@ export default function RoomsPage() {
               </div>
             )}
           </div>
-          <div className="lg:w-1/3 h-[calc(100vh-200px)] rounded-full sticky top-6">
+          <div className="lg:w-1/3 h-[calc(100vh-0px)] rounded-full sticky top-0">
             <MapRooms markers={mapMarkers} />
           </div>
         </div>

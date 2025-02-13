@@ -33,7 +33,7 @@ interface RoomAccordionProps {
 }
 
 const RoomAccordion = ({ rooms = [], setRooms }: RoomAccordionProps) => {
-  const [extraTags, setExtraTags] = useState<{ id: string; name: string; icon: string }[]>([])
+  const [extraTags, setExtraTags] = useState<{ id: string; name: string; icon: string, enable_property: boolean; enable_services: boolean; }[]>([])
   const [servicesTags, setServicesTags] = useState<{ id: string; name: string; icon: string }[]>([])
   const [expandedRoom, setExpandedRoom] = useState<string | null>(null)
 
@@ -239,7 +239,7 @@ const RoomAccordion = ({ rooms = [], setRooms }: RoomAccordionProps) => {
                               onChange={(e) => handleSelectChange(e, room.id, "beds")}
                               className="w-full p-2 border rounded"
                             >
-                              {[1, 2, 3, 4, 5].map((bed) => (
+                              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((bed) => (
                                 <option key={bed} value={bed}>
                                   {bed}
                                 </option>
@@ -253,7 +253,7 @@ const RoomAccordion = ({ rooms = [], setRooms }: RoomAccordionProps) => {
                               onChange={(e) => handleSelectChange(e, room.id, "capacity")}
                               className="w-full p-2 border rounded"
                             >
-                              {[1, 2, 3, 4, 5].map((cap) => (
+                              {[1, 2, 4, 6, 8, 10, 20].map((cap) => (
                                 <option key={cap} value={cap}>
                                   {cap}
                                 </option>
@@ -304,6 +304,7 @@ const RoomAccordion = ({ rooms = [], setRooms }: RoomAccordionProps) => {
                             onChange={(tags) => handleTagsChange(tags, room.id)}
                             extraTags={extraTags}
                             initialSelectedTags={room.extraTags}
+                            enable="property"
                           />
                         </div>
                       </div>

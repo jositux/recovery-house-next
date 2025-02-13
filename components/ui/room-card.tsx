@@ -12,7 +12,7 @@ interface RoomCardProps {
   propertyName: string
 }
 
-export function RoomCard({ id, name, description, price, image, propertyName }: RoomCardProps) {
+export function RoomCard({ id, name, price, image, propertyName }: RoomCardProps) {
   return (
     <Card className="overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
       <Link href={`/rooms/${id}`}>
@@ -23,7 +23,7 @@ export function RoomCard({ id, name, description, price, image, propertyName }: 
       <CardContent className="p-4">
         <h3 className="text-lg font-semibold text-gray-800 mb-1">{name}</h3>
         <p className="text-sm text-gray-600 mb-2">{propertyName}</p>
-        <p className="text-sm text-gray-500 line-clamp-2">{description}</p>
+       {/* <p className="text-sm text-gray-500 line-clamp-2">{description}</p>  */}
       </CardContent>
       <CardFooter className="flex justify-between items-center p-4 bg-gray-50">
         <span className="text-lg font-bold text-gray-800">
@@ -31,7 +31,7 @@ export function RoomCard({ id, name, description, price, image, propertyName }: 
         </span>
         <Link href={`/rooms/${id}`}>
         <Button variant="outline" className="rounded-full">
-          Ver detalles
+          Ver
         </Button>
         </Link>
       </CardFooter>
