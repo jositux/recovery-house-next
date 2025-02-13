@@ -6,6 +6,9 @@ import { CheckCircle, XCircle, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
+import { Fraunces } from "next/font/google";
+
+const fraunces = Fraunces({ subsets: ["latin"] });
 
 export function SuccessContent() {
   const [status, setStatus] = useState("loading")
@@ -38,6 +41,8 @@ export function SuccessContent() {
 
     setStatus(session.status)
     setCustomerEmail(session.customer_email)
+
+    console.log(customerEmail)
   }
 
   const renderContent = () => {
@@ -70,12 +75,12 @@ export function SuccessContent() {
         return (
           <Card className="w-full max-w-md mx-auto">
             <CardHeader>
-              <CardTitle className="text-center text-green-600">¡Suscripción Exitosa!</CardTitle>
+              <CardTitle className={`${fraunces.className} text-2xl text-center font-medium mb-6`}>¡Suscripción Exitosa!</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center">
               <CheckCircle className="h-16 w-16 text-green-500 mb-4" />
               <CardDescription className="text-center">
-                Gracias por su suscripción. Se ha enviado un correo de confirmación a {customerEmail}.
+                Gracias por su suscripción. Se ha enviado un correo con los detalles.
               </CardDescription>
             </CardContent>
             <CardFooter className="flex flex-col sm:flex-row justify-center items-center gap-4">

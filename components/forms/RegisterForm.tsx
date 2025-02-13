@@ -1,13 +1,12 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { Eye, EyeOff, User, Building2, Stethoscope } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import { SimpleTermsCheckbox } from "@/components/ui/simple-terms-checkbox"
-
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Eye, EyeOff, User, Building2, Stethoscope } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { SimpleTermsCheckbox } from "@/components/ui/simple-terms-checkbox";
 
 import {
   Form,
@@ -16,11 +15,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { CalendarBirth } from "@/components/CalendarBirth"
-import { UserTypeCard } from "@/components/ui/user-type-card"
-import { cn } from "@/lib/utils"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { CalendarBirth } from "@/components/CalendarBirth";
+import { UserTypeCard } from "@/components/ui/user-type-card";
+import { cn } from "@/lib/utils";
 
 export const formSchema = z.object({
   first_name: z.string().min(2, {
@@ -44,30 +43,36 @@ export const formSchema = z.object({
   address: z.string().min(2, {
     message: "El domicilio debe tener al menos 2 caracteres.",
   }),
-  password: z.string().min(8, {
-    message: "La contraseña debe tener al menos 8 caracteres.",
-  }).refine((val) => val.trim().length >= 8, {
-    message: "La contraseña debe tener al menos 8 caracteres no vacíos.",
-  }),
+  password: z
+    .string()
+    .min(8, {
+      message: "La contraseña debe tener al menos 8 caracteres.",
+    })
+    .refine((val) => val.trim().length >= 8, {
+      message: "La contraseña debe tener al menos 8 caracteres no vacíos.",
+    }),
   initialRole: z.enum(["Patient", "PropertyOwner", "ServiceProvider"], {
     required_error: "Por favor selecciona un tipo de usuario.",
-  })
-})
+  }),
+});
 
 type RegisterFormProps = {
-  onSubmit: (values: z.infer<typeof formSchema>) => void
-  initialValues?: Partial<z.infer<typeof formSchema>>
-}
+  onSubmit: (values: z.infer<typeof formSchema>) => void;
+  initialValues?: Partial<z.infer<typeof formSchema>>;
+};
 
-export default function RegisterForm({ onSubmit, initialValues }: RegisterFormProps) {
-  const [showPassword, setShowPassword] = useState(false)
+export default function RegisterForm({
+  onSubmit,
+  initialValues,
+}: RegisterFormProps) {
+  const [showPassword, setShowPassword] = useState(false);
   //const [formattedDate, setFormattedDate] = useState("") //Removed
-  const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set())
+  const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
 
-  const [termsAccepted, setTermsAccepted] = useState(false)
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const handleTermsAccept = (accepted: boolean) => {
-    setTermsAccepted(accepted)
-  }
+    setTermsAccepted(accepted);
+  };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -82,25 +87,30 @@ export default function RegisterForm({ onSubmit, initialValues }: RegisterFormPr
       password: initialValues?.password || "",
       initialRole: initialValues?.initialRole || "Patient",
     },
-  })
+  });
 
-  const { watch, formState: { errors } } = form
+  const {
+    watch,
+    formState: { errors },
+  } = form;
 
   useEffect(() => {
     const subscription = watch((value, { name, type }) => {
       if (type === "change") {
-        setTouchedFields(prev => new Set(prev).add(name as string))
+        setTouchedFields((prev) => new Set(prev).add(name as string));
       }
-    })
-    return () => subscription.unsubscribe()
-  }, [watch])
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
 
   const isFieldInvalid = (fieldName: string) => {
     if (fieldName === "email") {
-      return touchedFields.has("email") && !!errors.email
+      return touchedFields.has("email") && !!errors.email;
     }
-    return touchedFields.has(fieldName) && !!errors[fieldName as keyof typeof errors]
-  }
+    return (
+      touchedFields.has(fieldName) && !!errors[fieldName as keyof typeof errors]
+    );
+  };
 
   const handleRegisterSubmit = (values: z.infer<typeof formSchema>) => {
     onSubmit(values);
@@ -108,23 +118,28 @@ export default function RegisterForm({ onSubmit, initialValues }: RegisterFormPr
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleRegisterSubmit)} className="space-y-8">
-        <div className="space-y-4">
-        
+      <form
+        onSubmit={form.handleSubmit(handleRegisterSubmit)}
+        className="space-y-8"
+      >
+        <div className="space-y-4 p-4 bg-white rounded-xl">
           <div className="grid grid-cols-2 gap-4">
             <FormField
               control={form.control}
               name="first_name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nombre <span className="text-red-500">*</span></FormLabel>
+                  <FormLabel>
+                    Nombre <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
-                    <Input 
-                      placeholder="Nombre" 
-                      {...field} 
+                    <Input
+                      placeholder="Nombre"
+                      {...field}
                       required
                       className={cn(
-                        isFieldInvalid("first_name") && "border-red-500 focus-visible:ring-red-500"
+                        isFieldInvalid("first_name") &&
+                          "border-red-500 focus-visible:ring-red-500"
                       )}
                     />
                   </FormControl>
@@ -137,14 +152,17 @@ export default function RegisterForm({ onSubmit, initialValues }: RegisterFormPr
               name="last_name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Apellido <span className="text-red-500">*</span></FormLabel>
+                  <FormLabel>
+                    Apellido <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
-                    <Input 
-                      placeholder="Apellido" 
-                      {...field} 
+                    <Input
+                      placeholder="Apellido"
+                      {...field}
                       required
                       className={cn(
-                        isFieldInvalid("last_name") && "border-red-500 focus-visible:ring-red-500"
+                        isFieldInvalid("last_name") &&
+                          "border-red-500 focus-visible:ring-red-500"
                       )}
                     />
                   </FormControl>
@@ -155,42 +173,48 @@ export default function RegisterForm({ onSubmit, initialValues }: RegisterFormPr
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 p-4 bg-white rounded-xl">
           <h2 className="text-lg font-medium">Informacion de contacto</h2>
           <FormField
-              control={form.control}
-              name="address"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Domicilio <span className="text-red-500">*</span></FormLabel>
-                  <FormControl>
-                    <Input 
-                      placeholder="Dirección, Calle #" 
-                      {...field} 
-                      required
-                      className={cn(
-                        isFieldInvalid("firstName") && "border-red-500 focus-visible:ring-red-500"
-                      )}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            control={form.control}
+            name="address"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Domicilio <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Dirección, Calle #"
+                    {...field}
+                    required
+                    className={cn(
+                      isFieldInvalid("firstName") &&
+                        "border-red-500 focus-visible:ring-red-500"
+                    )}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <div className="grid grid-cols-2 gap-4">
             <FormField
               control={form.control}
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Telefono<span className="text-red-500">*</span></FormLabel>
+                  <FormLabel>
+                    Telefono<span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
-                    <Input 
-                      placeholder="Telefono" 
-                      {...field} 
+                    <Input
+                      placeholder="Telefono"
+                      {...field}
                       required
                       className={cn(
-                        isFieldInvalid("firstName") && "border-red-500 focus-visible:ring-red-500"
+                        isFieldInvalid("firstName") &&
+                          "border-red-500 focus-visible:ring-red-500"
                       )}
                     />
                   </FormControl>
@@ -203,13 +227,16 @@ export default function RegisterForm({ onSubmit, initialValues }: RegisterFormPr
               name="emergencyPhone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tel. de emergencia <span className="text-red-500"></span></FormLabel>
+                  <FormLabel>
+                    Tel. de emergencia <span className="text-red-500"></span>
+                  </FormLabel>
                   <FormControl>
-                    <Input 
-                      placeholder="Tel. de emergencia" 
-                      {...field} 
+                    <Input
+                      placeholder="Tel. de emergencia"
+                      {...field}
                       className={cn(
-                        isFieldInvalid("lastName") && "border-red-500 focus-visible:ring-red-500"
+                        isFieldInvalid("lastName") &&
+                          "border-red-500 focus-visible:ring-red-500"
                       )}
                     />
                   </FormControl>
@@ -220,8 +247,10 @@ export default function RegisterForm({ onSubmit, initialValues }: RegisterFormPr
           </div>
         </div>
 
-        <div className="space-y-4">
-          <h2 className="text-lg font-medium">Fecha de nacimiento <span className="text-red-500">*</span></h2>
+        <div className="space-y-4 p-4 bg-white rounded-xl">
+          <h2 className="text-lg font-medium">
+            Fecha de nacimiento <span className="text-red-500">*</span>
+          </h2>
           <FormField
             control={form.control}
             name="birthDate"
@@ -232,21 +261,18 @@ export default function RegisterForm({ onSubmit, initialValues }: RegisterFormPr
                     onChange={field.onChange}
                     initialValue={field.value}
                   />
-                
                 </FormControl>
                 <FormMessage />
               </FormItem>
-              
             )}
           />
-          
+
           <p className="text-sm text-muted-foreground">
             Debes tener al menos 18 años para registrarte.
           </p>
-        
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 p-4 bg-white rounded-xl">
           <h2 className="text-lg font-medium">Seguridad</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
@@ -254,17 +280,20 @@ export default function RegisterForm({ onSubmit, initialValues }: RegisterFormPr
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel htmlFor="email">Email <span className="text-red-500">*</span></FormLabel>
+                  <FormLabel htmlFor="email">
+                    Email <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
-                    <Input 
+                    <Input
                       id="email"
-                      type="email" 
-                      placeholder="Email" 
-                      {...field} 
+                      type="email"
+                      placeholder="Email"
+                      {...field}
                       required
                       aria-describedby="email-error"
                       className={cn(
-                        isFieldInvalid("email") && "border-red-500 focus-visible:ring-red-500"
+                        isFieldInvalid("email") &&
+                          "border-red-500 focus-visible:ring-red-500"
                       )}
                     />
                   </FormControl>
@@ -277,7 +306,9 @@ export default function RegisterForm({ onSubmit, initialValues }: RegisterFormPr
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel htmlFor="password">Password <span className="text-red-500">*</span></FormLabel>
+                  <FormLabel htmlFor="password">
+                    Password <span className="text-red-500">*</span>
+                  </FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input
@@ -288,7 +319,8 @@ export default function RegisterForm({ onSubmit, initialValues }: RegisterFormPr
                         required
                         aria-describedby="password-strength"
                         className={cn(
-                          isFieldInvalid("newPassword") && "border-red-500 focus-visible:ring-red-500"
+                          isFieldInvalid("newPassword") &&
+                            "border-red-500 focus-visible:ring-red-500"
                         )}
                       />
                       <Button
@@ -297,7 +329,9 @@ export default function RegisterForm({ onSubmit, initialValues }: RegisterFormPr
                         size="icon"
                         className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                         onClick={() => setShowPassword(!showPassword)}
-                        aria-label={showPassword ? "Hide password" : "Show password"}
+                        aria-label={
+                          showPassword ? "Hide password" : "Show password"
+                        }
                       >
                         {showPassword ? (
                           <EyeOff className="h-4 w-4" />
@@ -314,7 +348,7 @@ export default function RegisterForm({ onSubmit, initialValues }: RegisterFormPr
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 p-4 bg-white rounded-xl">
           <h2 className="text-lg font-medium">Tipo de usuario</h2>
           <FormField
             control={form.control}
@@ -355,10 +389,12 @@ export default function RegisterForm({ onSubmit, initialValues }: RegisterFormPr
           />
         </div>
 
+        <div className="space-y-4 p-4 bg-white rounded-xl">
         <SimpleTermsCheckbox onAccept={handleTermsAccept} />
+        </div>
 
-        <Button 
-          type="submit" 
+        <Button
+          type="submit"
           className="w-full bg-[#39759E] hover:bg-[#39759E]"
           aria-label="Complete registration"
           disabled={!termsAccepted}
@@ -367,6 +403,5 @@ export default function RegisterForm({ onSubmit, initialValues }: RegisterFormPr
         </Button>
       </form>
     </Form>
-  )
+  );
 }
-

@@ -1,7 +1,7 @@
 "use client";
 
 //import { useState } from "react";
-import RoomForm from "./RoomForm";
+import RoomForm from "@/components/forms/RoomForm";
 //import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   roomUpdateService,

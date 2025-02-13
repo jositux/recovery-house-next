@@ -7,6 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
 import Image from "next/image"
+import { Fraunces } from "next/font/google";
+
+const fraunces = Fraunces({ subsets: ["latin"] });
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -52,7 +55,9 @@ export default function ForgotPassword() {
         />
       <div className="w-full max-w-md m-8 p-8 bg-white rounded-lg shadow-md">
         <div>
-          <h2 className="text-center text-2xl font-bold text-[#162F40]">
+        <h2
+                  className={`${fraunces.className} text-2xl text-center font-medium mb-6`}
+                >
             Restablecer contraseña
           </h2>
         </div>
