@@ -31,6 +31,10 @@ import { Building2, Home, Save } from "lucide-react";
 import { MultiSelectCase } from "@/components/MultiSelectCase";
 
 
+import { useRouter } from "next/navigation"
+
+
+
 import {
   formSchema,
   type FormValues,
@@ -187,6 +191,8 @@ export default function EditPropertyPage({
     }
   }, [paramId, fetchProperty]); 
 
+  const router = useRouter()
+
   const onSubmit = async (values: FormValues) => {
    
     setIsSubmitting(true);
@@ -208,6 +214,8 @@ export default function EditPropertyPage({
        // propertyIdLocal = property.id;
 
         localStorage.removeItem("selected_property");
+
+        router.push(`/propiedades/${property.id}`)
 
         toast("¡Los cambios se han guardado con éxito!");
       }
