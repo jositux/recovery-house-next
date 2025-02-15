@@ -72,6 +72,8 @@ export default function RegistrationPage() {
       };
       const response = await registerService.register(registerData);
 
+      
+
       localStorage.setItem("initialRole", registerData.initialRole);
 
       if (response.challenge) {

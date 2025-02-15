@@ -20,12 +20,12 @@ import {
   providerService,
   ProviderData,
 } from "@/services/providerUpdateService";
-import { MembershipSelector } from "@/components/ui/membership-selector";
+//import { MembershipSelector } from "@/components/ui/membership-selector";
 import { LocationSelector } from "@/components/ui/location-selector";
-import {
+/*import {
   getMembershipTags,
   type MembershipTag,
-} from "@/services/membership-service";
+} from "@/services/membership-service";*/
 import { CollectionExtraTags } from "@/components/collectionExtraTags";
 import { CollectionServiceTags } from "@/components/collectionServiceTags";
 import { getProvidersByUserId } from "@/services/providerCollectionService";
@@ -53,6 +53,10 @@ const formSchema = z.object({
   }),
   extraTags: z.array(z.string()).default([]),
   serviceTags: z.array(z.string()).default([]),
+  // Nuevos campos de suscripción
+  subscriptionPrice: z.string().default(""),
+  subscriptionType: z.string().default(""),
+  price: z.string().default(""),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -65,7 +69,7 @@ export default function RegisterPropertyBasePage() {
     { id: string; name: string; icon: string }[]
   >([]);
   const [selectedMembership, setSelectedMembership] = useState<string>("");
-  const [memberships, setMemberships] = useState<MembershipTag[]>([]);
+  //const [memberships, setMemberships] = useState<MembershipTag[]>([]);
   const [defaultTags, setDefaultTags] = useState<string[]>([]);
   const [defaultServiceTags, setDefaultServiceTags] = useState<string[]>([]);
 
@@ -117,13 +121,13 @@ useEffect(() => {
   console.log("Errores del formulario:", errors);
 }, [errors]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     const fetchMemberships = async () => {
       const data = await getMembershipTags();
       setMemberships(data);
     };
     fetchMemberships();
-  }, []);
+  }, []);*/
 
   useEffect(() => {
     const fetchProviderData = async () => {
@@ -197,9 +201,6 @@ useEffect(() => {
     loadTags();
   }, []);
 
-  const handleSelectionChange = (selectedId: string) => {
-    setSelectedMembership(selectedId);
-  };
 
   const handleTagsChange = (tags: string[]) => {
     if (JSON.stringify(tags) !== JSON.stringify(selectedExtraTags)) {
@@ -248,6 +249,9 @@ useEffect(() => {
         taxIdEINFile: values.taxIdEINFile,
         extraTags: values.extraTags,
         serviceTags: values.serviceTags,
+        subscriptionPrice: values.subscriptionPrice || "",
+        subscriptionType: values.subscriptionType || "",
+        price: values.price || "",
       };
 
       const response = await providerService.updateProvider(
@@ -384,7 +388,7 @@ useEffect(() => {
               }}
             />
           )}
-          <FormField
+          {/*<FormField
             control={form.control}
             name="membership"
             render={() => (
@@ -400,7 +404,7 @@ useEffect(() => {
                 <FormMessage />
               </FormItem>
             )}
-          />
+            />*/}
           <FormField
             control={form.control}
             name="taxIdEIN"
@@ -456,6 +460,7 @@ useEffect(() => {
               />
             )}
           </div>
+         
          
           {defaultServiceTags && (
             <FormField

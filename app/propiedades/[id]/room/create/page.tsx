@@ -1,15 +1,15 @@
 "use client";
 
-import { useState } from "react";
+//import { useState } from "react";
 import RoomForm from "@/components/forms/RoomForm";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+//import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { roomService, type RoomData } from "@/services/AddRoomService";
 
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 
 export default function RoomPage() {
-  const [submittedData, setSubmittedData] = useState<RoomData | null>(null);
+  //const [submittedData, setSubmittedData] = useState<RoomData | null>(null);
 
   const pathname = usePathname(); // Obtiene la ruta actual
   const pathSegments = pathname.split("/"); // Divide la URL en segmentos
@@ -19,7 +19,7 @@ export default function RoomPage() {
 
 
   const handleFormSubmit = async (data: RoomData) => {
-    setSubmittedData(data);
+    //setSubmittedData(data);
     const response = await roomService.createRoom(data);
   
     if (response.id) {
@@ -50,59 +50,11 @@ export default function RoomPage() {
     <div className="min-h-screen bg-[#F8F8F7]">
       <div className="container mx-auto max-w-2xl py-10 px-4">
       <h1 className="text-2xl font-bold mb-6">Agregar Habitación</h1>
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-1">
         <div>
           <RoomForm onSubmit={handleFormSubmit} initialValues={initialValues} />
         </div>
-        {submittedData && (
-          <div>
-            <Card>
-              <CardHeader>
-                <CardTitle>Submitted Room Data</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>
-                  <strong>Name:</strong> {submittedData.name}
-                </p>
-                <p>
-                  <strong>Room Number:</strong> {submittedData.roomNumber}
-                </p>
-                <p>
-                  <strong>Description:</strong> {submittedData.description}
-                </p>
-                <p>
-                  <strong>Beds:</strong> {submittedData.beds}
-                </p>
-                <p>
-                  <strong>Capacity:</strong> {submittedData.capacity}
-                </p>
-                <p>
-                  <strong>Price per Night:</strong> $
-                  {submittedData.pricePerNight.toFixed(2)}
-                </p>
-                <p>
-                  <strong>Cleaning Fee:</strong> $
-                  {submittedData.cleaningFee.toFixed(2)}
-                </p>
-                <p>
-                  <strong>Main Image:</strong> {submittedData.mainImage}
-                </p>
-                <p>
-                  <strong>Additional Photos:</strong>{" "}
-                  {submittedData.photos.join(", ")}
-                </p>
-                <p>
-                  <strong>Extra Tags:</strong>{" "}
-                  {submittedData.extraTags.join(", ")}
-                </p>
-                <p>
-                  <strong>Services Tags:</strong>{" "}
-                  {submittedData.servicesTags.join(", ")}
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+       
       </div>
     </div>
     </div>

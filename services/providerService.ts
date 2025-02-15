@@ -17,6 +17,10 @@ export interface ProviderData {
   taxIdEINFile: string;
   extraTags: string[];
   serviceTags: string[];
+  // Nuevos campos de suscripción
+  subscriptionPrice: string;
+  subscriptionType: string;
+  price: string;
 }
 
 export interface ProviderResponse {
@@ -30,7 +34,7 @@ export const providerService = {
     providerData: ProviderData
   ): Promise<ProviderResponse> => {
     try {
-      // Check if window is defined to ensure code runs only on the client side
+      // Asegurarse de que se ejecute solo en el cliente
       if (typeof window !== "undefined") {
         const token = localStorage.getItem("access_token");
 
@@ -50,12 +54,13 @@ export const providerService = {
           serviceTags_id: tag, // Caso general
         }));
 
-        // Transformar extraTags a [{ extratags_id: string }]
+        // Transformar extraTags a [{ ExtraTags_id: string }]
         const formattedExtraTags = providerData.extraTags.map((tag) => ({
           ExtraTags_id: tag,
         }));
 
-        // Crear una copia de data con servicesTags, extraTags y photos transformados
+        // Crear una copia de los datos, sobreescribiendo userId, serviceTags y extraTags.
+        // Los campos de suscripción se mantienen desde providerData.
         const transformedData = {
           ...providerData,
           userId: user_id,
@@ -73,7 +78,7 @@ export const providerService = {
           }
         );
 
-        // Store propertyId in localStorage
+        // Almacenar el providerId en localStorage
         localStorage.setItem("providerId", response.data.data.id);
 
         return response.data;

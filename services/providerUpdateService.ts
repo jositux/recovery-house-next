@@ -18,6 +18,9 @@ export interface ProviderData {
   taxIdEINFile: string;
   extraTags: string[];
   serviceTags: string[];
+  subscriptionPrice: string;
+  subscriptionType: string;
+  price: string;
 }
 
 export interface ProviderResponse {

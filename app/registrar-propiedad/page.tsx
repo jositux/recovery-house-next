@@ -481,7 +481,7 @@ export default function RegisterPropertyBasePage() {
             />
           </div>
 
-          <div className="container mx-auto py-12">
+          <div className="container mx-auto py-12 hidden">
             <h1 className="text-2xl font-bold mb-8">Datos de las habitaciones</h1>
             <RoomAccordion rooms={rooms} setRooms={setRooms} />
           </div>

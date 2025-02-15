@@ -172,18 +172,18 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
             name="beds"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Number of Beds</FormLabel>
+                <FormLabel>Camas</FormLabel>
                 <Select
                   onValueChange={(value) => field.onChange(Number(value))} // CONVIERTE EL STRING A NÚMERO
                   value={String(field.value)}
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select number of beds" />
+                      <SelectValue placeholder="Elegir Cantidad" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {[1, 2, 3, 4, 5].map((num) => (
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
                       <SelectItem key={num} value={num.toString()}>
                         {num}
                       </SelectItem>
@@ -199,7 +199,7 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
             name="capacity"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Capacity</FormLabel>
+                <FormLabel>Máximo de personas</FormLabel>
                 <FormControl>
                   <Select
                     onValueChange={(value) => field.onChange(Number(value))} // CONVIERTE EL STRING A NÚMERO
@@ -207,11 +207,11 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select number of beds" />
+                        <SelectValue placeholder="Elegir cantidad" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {[1, 2, 3, 4, 5].map((num) => (
+                      {[1, 2, 4, 6, 8, 10,20].map((num) => (
                         <SelectItem key={num} value={num.toString()}>
                           {num}
                         </SelectItem>
@@ -229,7 +229,7 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
           name="pricePerNight"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Price per Night</FormLabel>
+              <FormLabel>Precio x Noche</FormLabel>
               <FormControl>
                 <Input
                   type="number"
@@ -252,7 +252,7 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
           name="cleaningFee"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Cleaning Fee</FormLabel>
+              <FormLabel>Costo por Limpieza</FormLabel>
               <FormControl>
                 <Input
                   type="number"

@@ -38,9 +38,9 @@ import Link from "next/link";
 const formSchema = z.object({
   id: z.string(),
   propertyId: z.string(),
-  name: z.string().min(1, { message: "Name is required" }),
-  roomNumber: z.string().min(1, { message: "Room number is required" }),
-  description: z.string().min(1, { message: "Description is required" }),
+  name: z.string().min(1, { message: "El nombre es obligatorio" }),
+  roomNumber: z.string().min(1, { message: "Campo requerido" }),
+  description: z.string().min(1, { message: "Campo Obligatorio" }),
   beds: z.number().int().positive().max(99, { message: "Maximum 99 beds" }),
   capacity: z
     .number()
@@ -49,20 +49,20 @@ const formSchema = z.object({
     .max(99, { message: "Maximum capacity 99" }),
   pricePerNight: z
     .number()
-    .positive({ message: "Price per night must be a positive number" }),
+    .positive({ message: "El precio debe ser mayor a 0" }),
   cleaningFee: z
     .number()
-    .positive({ message: "Cleaning fee must be a positive number" }),
+    .positive({ message: "El precio debe ser mayor a 0" }),
   mainImage: z.string(),
   photos: z
     .array(z.string())
-    .min(1, { message: "At least one photo is required" }),
+    .min(1, { message: "Cargar al menos 1 Foto" }),
   extraTags: z
     .array(z.string())
-    .min(1, { message: "At least one extratag is required" }),
+    .min(1, { message: "Elegir por lo menos un servicio extra" }),
   servicesTags: z
     .array(z.string())
-    .min(1, { message: "At least one service is required" }),
+    .min(1, { message: "Elegir por lo menos un servicio base" }),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -114,7 +114,7 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
       console.log(error);
       toast({
         title: "Error",
-        description: "Please check the information and try again.",
+        description: "Por favor chequea bien todos los datos",
         variant: "destructive",
       });
     }
@@ -163,7 +163,7 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="Enter room description" {...field} />
+                  <Textarea placeholder="Ingresa una descripción" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -176,14 +176,14 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
             name="beds"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Number of Beds</FormLabel>
+                <FormLabel>Camas</FormLabel>
                 <Select
                   onValueChange={(value) => field.onChange(Number(value))} // CONVIERTE EL STRING A NÚMERO
                   value={String(field.value)}
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select number of beds" />
+                      <SelectValue placeholder="Seelecciona la cantidad" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -203,7 +203,7 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
             name="capacity"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Capacity</FormLabel>
+                <FormLabel>Capacidad Máxima</FormLabel>
                 <FormControl>
                   <Select
                     onValueChange={(value) => field.onChange(Number(value))} // CONVIERTE EL STRING A NÚMERO
@@ -211,7 +211,7 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select number of beds" />
+                        <SelectValue placeholder="Elige el máximo de personas" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -234,7 +234,7 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
             name="pricePerNight"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Price per Night</FormLabel>
+                <FormLabel>Precio x Noche</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
@@ -259,7 +259,7 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
             name="cleaningFee"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Cleaning Fee</FormLabel>
+                <FormLabel>Costo de Limpieza</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
@@ -300,7 +300,7 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
             name="photos"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Additional Photos URLs</FormLabel>
+                <FormLabel>Fotos de la habitación</FormLabel>
                 <FormControl>
                   <GalleryUpload
                     initialIds={field.value} // Inicializa con las fotos actuales
@@ -318,10 +318,35 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
         <div className="grid grid-cols-1 gap-6 p-4 bg-white rounded-xl">
           <FormField
             control={form.control}
+            name="servicesTags"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Servicios Básicos</FormLabel>
+                <FormControl>
+                  <CollectionServiceTags
+                    onChange={(newTags: string[]) => {
+                      if (
+                        JSON.stringify(newTags) !== JSON.stringify(field.value)
+                      ) {
+                        field.onChange(newTags); // Solo actualiza si hay un cambio
+                      }
+                    }}
+                    servicesTags={serviceTags || []}
+                    initialSelectedTags={field.value}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <div className="grid grid-cols-1 gap-6 p-4 bg-white rounded-xl">
+          <FormField
+            control={form.control}
             name="extraTags"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Extra Tags</FormLabel>
+                <FormLabel>Servicios Extra</FormLabel>
                 <FormControl>
                   <CollectionExtraTags
                     onChange={(newTags: string[]) => {
@@ -341,37 +366,13 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
             )}
           />
         </div>
-        <div className="grid grid-cols-1 gap-6 p-4 bg-white rounded-xl">
-          <FormField
-            control={form.control}
-            name="servicesTags"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Services Tags</FormLabel>
-                <FormControl>
-                  <CollectionServiceTags
-                    onChange={(newTags: string[]) => {
-                      if (
-                        JSON.stringify(newTags) !== JSON.stringify(field.value)
-                      ) {
-                        field.onChange(newTags); // Solo actualiza si hay un cambio
-                      }
-                    }}
-                    servicesTags={serviceTags || []}
-                    initialSelectedTags={field.value}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-        <div className="flex gap-4 mt-4">
+       
+        <div className="flex gap-4 mt-4 p-4 md:p-0">
           <Link href={`/propiedades/${initialValues?.propertyId}/`} className="flex-1">
             <Button
               variant="outline"
               type="button"
-              className="w-full text-lg px-6 py-3"
+              className="w-full text-sm px-6 py-3"
             >
               Cancelar
             </Button>
@@ -379,7 +380,7 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
           <Button
             type="submit"
             disabled={form.formState.isSubmitting}
-            className="flex-1 text-lg px-6 py-3"
+            className="flex-1 text-sm px-6 py-3 bg-[#39759E]"
           >
             {form.formState.isSubmitting ? (
               <>

@@ -46,6 +46,10 @@ const formSchema = z.object({
   }),
   extraTags: z.array(z.string()).default([]),
   serviceTags: z.array(z.string()).default([]),
+  // Nuevos campos de suscripción
+  subscriptionPrice: z.string().default(""),
+  subscriptionType: z.string().default(""),
+  price: z.string().default(""),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -126,12 +130,15 @@ export default function RegisterPropertyBasePage() {
     }
   };
 
-  /*
-  const handleServiceTagsChange = (tags: string[]) => {
-    if (JSON.stringify(tags) !== JSON.stringify(selectedServiceTags)) {
-      setValue("serviceTags", tags, { shouldDirty: true });
+  useEffect(() => {
+    const subscriptionData = localStorage.getItem("subscription")
+    if (subscriptionData) {
+      const { subscriptionPrice, subscriptionType, price } = JSON.parse(subscriptionData)
+      form.setValue("subscriptionPrice", subscriptionPrice)
+      form.setValue("subscriptionType", subscriptionType)
+      form.setValue("price", price)
     }
-  };*/
+  }, [])
 
   const selectedExtraTags = useWatch({
     control: form.control,
@@ -166,12 +173,15 @@ export default function RegisterPropertyBasePage() {
         taxIdEINFile: values.taxIdEINFile,
         extraTags: values.extraTags,
         serviceTags: values.serviceTags,
+        subscriptionPrice: values.subscriptionPrice || "",
+        subscriptionType: values.subscriptionType || "",
+        price: values.price || "",
       };
       const response = await providerService.createProperty(providerData);
 
       console.log("Property created:", response);
     } catch (error) {
-      console.error("Error al registrar la propiedad:", error);
+      console.error("Error al registrar el servicio:", error);
     } finally {
       setIsSubmitting(false);
     }

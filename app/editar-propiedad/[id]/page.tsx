@@ -26,18 +26,14 @@ import {
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-
-import { roomService, type RoomData } from "@/services/RoomService";
-import { roomDeleteService } from "@/services/RoomDeleteService";
-
 import { Building2, Home, Save } from "lucide-react";
-import RoomAccordion from "@/components/RoomAccordion";
+
 import {
   formSchema,
   type FormValues,
   type FileData,
-  type RoomSkeleton,
-  type Room,
+  //type RoomSkeleton,
+  //type Room,
   type Property,
 } from "../types";
 
@@ -73,7 +69,7 @@ export default function EditPropertyPage({
     filename_download: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [rooms, setRooms] = useState<Room[]>([]);
+
 
   const [defaultLocation, setDefaultLocation] = useState<LocationDetails>({
     address: "",
@@ -82,7 +78,6 @@ export default function EditPropertyPage({
     postalCode: "",
   });
 
-  const [roomsToDelete, setRoomsDelete] = useState<string[]>([]); // Added state for rooms to delete
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -114,24 +109,7 @@ export default function EditPropertyPage({
     getParams();
   }, [params]);
 
-  // Función para convertir de RoomSkeleton a Room
-  function convertRoomSkeletonToRoom(roomSkeleton: RoomSkeleton): Room {
-    return {
-      ...roomSkeleton, // Copiar todas las propiedades
-      photos: roomSkeleton.photos.map((photo) => photo.directus_files_id.id), // Extraer solo el `id` de cada foto
-      extraTags: roomSkeleton.extraTags.map((tag) => tag.ExtraTags_id), // Extraer solo el `ExtraTags_id`
-      servicesTags: roomSkeleton.servicesTags.map((tag) => tag.serviceTags_id), // Extraer solo el `serviceTags_id`
-    };
-  }
-
-  // Función para convertir un array de RoomSkeleton a un array de Room
-  function convertRoomSkeletonArrayToRoomArray(
-    roomSkeletonArray: RoomSkeleton[]
-  ): Room[] {
-    return roomSkeletonArray.map((roomSkeleton) =>
-      convertRoomSkeletonToRoom(roomSkeleton)
-    );
-  }
+  
 
   const fetchProperty = useCallback(async () => {
     if (!paramId) return;
@@ -177,13 +155,7 @@ export default function EditPropertyPage({
           setRNTFileData(selectedProperty.RNTFile);
           setTaxFileData(selectedProperty.taxIdEINFile);
   
-          const roomArray: Room[] = convertRoomSkeletonArrayToRoomArray(
-            selectedProperty.Rooms
-          );
-          setRooms(roomArray);
-  
-          const roomIds = roomArray.map((room) => room.id);
-          setRoomsDelete(roomIds);
+         
         } else {
           throw new Error("Propiedad no encontrada");
         }
@@ -206,57 +178,12 @@ export default function EditPropertyPage({
   }, [paramId, fetchProperty]); 
 
   const onSubmit = async (values: FormValues) => {
-    await Promise.all(
-      roomsToDelete.map(async (room) => {
-        await roomDeleteService.deleteRoom(room);
-      })
-    );
-
+   
     setIsSubmitting(true);
     let propertyIdLocal = property?.id || "";
     const createdRoomIds: string[] = [];
 
-    try {
-      await Promise.all(
-        rooms.map(async (room) => {
-          const roomMainImage = room.mainImage || values.mainImage;
-          const roomPhotos =
-            room.photos.length > 0 ? room.photos : [roomMainImage];
 
-          const roomData: RoomData = {
-            id: room.id || "",
-            name: room.name || "Habitación sin nombre",
-            roomNumber: room.roomNumber || "",
-            description: room.description || "",
-            beds: room.beds,
-            capacity: room.capacity,
-            pricePerNight: room.pricePerNight,
-            cleaningFee: room.cleaningFee,
-            mainImage: roomMainImage,
-            photos: roomPhotos,
-            extraTags: room.extraTags,
-            servicesTags: room.servicesTags,
-            propertyId: propertyIdLocal || "",
-          };
-
-          const response = await roomService.createRoom(roomData);
-
-          if (response?.id) {
-            createdRoomIds.push(response.id);
-          } else {
-            console.warn("La respuesta no contiene un ID válido:", response);
-          }
-
-          return response.id;
-        })
-      );
-    } catch (error) {
-      console.error("Error creando o actualizando habitaciones:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
-
-    setRoomsDelete(createdRoomIds);
 
     try {
       const propertyUpdateData: PropertyData = {
@@ -571,19 +498,6 @@ export default function EditPropertyPage({
             />
           </div>
 
-          <div className="container mx-auto py-12">
-            <h1 className="text-2xl font-bold mb-8">
-              Datos de las habitaciones
-            </h1>
-            <RoomAccordion rooms={rooms} setRooms={setRooms} />
-          </div>
-
-          {/*<div className="mt-8">
-            <h2 className="text-2xl font-bold mb-4">Habitación/es:</h2>
-            <pre className="bg-gray-100 p-4 rounded-md overflow-auto">
-              {JSON.stringify(rooms, null, 2)}
-            </pre>
-                  </div>*/}
 
 <ToastContainer
         position="top-right" // Posición del toast
