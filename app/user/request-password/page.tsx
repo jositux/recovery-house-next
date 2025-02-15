@@ -29,7 +29,7 @@ export default function ForgotPassword() {
         },
         body: JSON.stringify({
           email, 
-          reset_url: "https://recovery-care.vercel.app/user/reset-password"
+          reset_url: "https://recoverycaresolutions.com/user/reset-password"
         }),
       });
 
