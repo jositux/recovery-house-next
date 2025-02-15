@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-const API_URL = '/webapi/users/register';
+//const API_URL = '/webapi/users/register';
 
-//const API_URL = '/webapi/flows/trigger/c620e196-b720-44d5-8c71-5408e9a9f234'
+const API_URL = '/webapi/flows/trigger/c620e196-b720-44d5-8c71-5408e9a9f234'
 
 
 export interface RegisterCredentials {
