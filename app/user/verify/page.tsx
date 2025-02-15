@@ -50,7 +50,7 @@ const EmailVerificationPage = () => {
   }, [router, token, verificationUrl])
 
   return (
-    <div className="flex flex-col items-center justify-center py-40 min-h-fit bg-gray-100">
+    <div className="flex flex-col items-center justify-center py-40 min-h-screen bg-gray-100">
       <div className="p-8 bg-white rounded-lg shadow-md text-center">
         {verificationStatus === "verifying" && (
           <>

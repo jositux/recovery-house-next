@@ -74,12 +74,12 @@ export function MenuProfile({ name }: ProfileMenuProps) {
         }`}
       >
         <ul className="text-sm text-[#162F40]">
-          <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+          {/*<li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
             <Link href="/mi-perfil" className="flex items-center gap-2">
               <User className="w-4 h-4" />
               Mi Perfil
             </Link>
-          </li>
+      </li>*/}
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
             <Link href="/mis-propiedades" className="flex items-center gap-2">
               <Building className="w-4 h-4" />
