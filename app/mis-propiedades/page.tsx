@@ -6,7 +6,7 @@ import { getPropertiesByUserId, type Property } from "@/services/propertyCollect
 import { getCurrentUser, type User } from "@/services/userService"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { MapPin, Plus, Star, Loader2, BedDouble } from "lucide-react"
+import { MapPin, Plus, Star, Loader2, BedDouble, Home, ArrowRight } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -57,20 +57,43 @@ const PropertiesPage: React.FC = () => {
   }
 
   return (
-    <div className="container min-h-screen mx-auto py-16 px-4 md:px-0 lg:px-0">
+    <div className="container min-h-screen mx-auto py-16 px-4 md:px-6 lg:px-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Mis Propiedades</h1>
         <Link href="/registrar-propiedad">
-          <Button className="bg-[#39759E] text-white hover:bg-primary/90">
+          <Button className="bg-[#39759E] text-white hover:bg-[#2c5a7a] transition-colors duration-300">
             <Plus className="mr-2 h-5 w-5" /> Nueva Propiedad
           </Button>
         </Link>
       </div>
 
       {properties.length === 0 ? (
-        <p className="text-center text-gray-500 text-lg">No hay propiedades disponibles.</p>
+        <Card className="p-8 text-center bg-gradient-to-br from-blue-50 to-indigo-100 border-none shadow-lg">
+          <CardContent className="flex flex-col items-center">
+            <Home className="h-24 w-24 text-[#39759E] mb-6" />
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">¡Comienza tu viaje como anfitrión!</h2>
+            <p className="text-lg text-gray-600 mb-8 max-w-2xl">
+              Aún no tienes propiedades registradas. Dar el primer paso para convertirte en anfitrión puede ser el
+              comienzo de una experiencia increíble.
+            </p>
+            <div className="grid gap-6 md:grid-cols-1 max-w-2xl w-full">
+              <Card className="p-6 bg-white shadow-md hover:shadow-lg transition-shadow duration-300">
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">Registra tu primera propiedad</h3>
+                <p className="text-gray-600 mb-4">
+                  Comienza compartiendo los detalles de tu espacio único con potenciales huéspedes.
+                </p>
+                <Link href="/registrar-propiedad">
+                  <Button className="w-full bg-[#39759E] text-white hover:bg-[#2c5a7a] transition-colors duration-300">
+                    Empezar ahora <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </Card>
+             
+            </div>
+          </CardContent>
+        </Card>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {properties.map((property) => (
             <Card key={property.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
               <div className="flex flex-col sm:flex-row">
