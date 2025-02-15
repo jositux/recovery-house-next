@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { Fraunces, DM_Sans } from 'next/font/google'
 import './globals.css'
 import { Toaster } from "@/components/ui/toaster"
-
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 
@@ -19,6 +18,9 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: 'Recovery Care Solutions',
   description: 'Conectamos pacientes con casas de recuperación en todo el mundo',
+  icons: {
+    icon: '/favicon.svg', // Ruta del favicon SVG
+  },
 }
 
 export default function RootLayout({
@@ -28,6 +30,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className={`${fraunces.variable} ${dmSans.variable}`}>
+      <head>
+        <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" /> {/* Actualizado a SVG */}
+      </head>
       <body className="font-dm-sans">
         <Header />
         <main className='max-auto relative z-0'>{children}</main>
@@ -37,4 +42,3 @@ export default function RootLayout({
     </html>
   )
 }
-
