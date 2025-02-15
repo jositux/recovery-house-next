@@ -82,6 +82,7 @@ export default function RegistrationPage() {
       }
       else {
       localStorage.setItem("initialRole", registerData.initialRole);
+      setSuccessMessage(null)
 
       if (response.challenge) {
         localStorage.setItem("initialRole", registerData.initialRole);
