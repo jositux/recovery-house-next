@@ -2,6 +2,7 @@
 
 import { CheckoutForm } from "@/app/checkout/CheckoutForm";
 import React, { useState, useEffect } from "react";
+import { Loader2 } from "lucide-react";
 
 const CheckoutPage = () => {
   const [bookingData, setBookingData] = useState<{
@@ -40,7 +41,12 @@ const CheckoutPage = () => {
         {bookingData && Object.keys(bookingData).length > 0 ? (
           <CheckoutForm bookingData={bookingData} />
         ) : (
-          <p>Loading booking data...</p>
+          <div className="flex justify-center items-center h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <span className="ml-2 text-lg text-gray-700">
+          Cargando...
+        </span>
+      </div>
         )}
       </div>
     </main>

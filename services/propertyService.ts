@@ -18,6 +18,9 @@ export interface PropertyData {
   "mainImage": string;
   "RNTFile": string;
   "taxIdEINFile": string;
+  "hostName": string,
+  "guestComments": string,
+  "patology": string[]
 }
 
 export interface PropertyResponse {
@@ -56,8 +59,8 @@ export const propertyService = {
         "place": {
             "type": "Point",
             "coordinates": [
-               propertyData.latitude,
-               propertyData.longitude
+               propertyData?.latitude || 4.7110,
+               propertyData?.longitude || 74.0721
             ]
         },
         type: propertyData.type,
@@ -66,6 +69,9 @@ export const propertyService = {
         taxIdEINFile: propertyData.taxIdEINFile,
         taxIdApproved: false,
         mainImage: propertyData.mainImage,
+        hostName: propertyData.hostName,
+        guestComments: propertyData.guestComments,
+        patology: JSON.stringify(propertyData.patology),
         photos: [],
         Rooms: []
     }

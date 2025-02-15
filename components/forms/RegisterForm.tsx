@@ -65,6 +65,7 @@ export default function RegisterForm({
   onSubmit,
   initialValues,
 }: RegisterFormProps) {
+
   const [showPassword, setShowPassword] = useState(false);
   //const [formattedDate, setFormattedDate] = useState("") //Removed
   const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
@@ -392,6 +393,9 @@ export default function RegisterForm({
         <div className="space-y-4 p-4 bg-white rounded-xl">
         <SimpleTermsCheckbox onAccept={handleTermsAccept} />
         </div>
+
+         
+       
 
         <Button
           type="submit"

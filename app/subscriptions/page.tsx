@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
-import { Check } from "lucide-react";
+import { Check, Edit, X } from "lucide-react"
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { 
@@ -24,6 +24,8 @@ interface ProviderData {
   name?: string
   email?: string
 }
+
+
 function SubscriptionPlans() {
   const [providerData, setProviderData] = useState<ProviderData[]>([])
 
@@ -35,6 +37,7 @@ function SubscriptionPlans() {
       try {
         const currentUser = await getCurrentUser(token);
         const data = await getProvidersByUserId(currentUser.id, token);
+        console.log(currentUser)
         setProviderData(data);
       } catch (error) {
         console.error("Error al cargar los datos del proveedor:", error);
@@ -84,19 +87,53 @@ function SubscriptionPlans() {
     <div>
       <div className="container mx-auto px-4 py-16">
         {providerData.length > 0 ? (
-          <Card className="bg-white rounded-xl p-8 shadow-md text-center max-w-md mx-auto">
-            <CardHeader>
-              <CardTitle className="text-2xl font-bold">Servicio Cargado</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="mb-4">Parece que ya cargaste tu servicio.</p>
-            </CardContent>
-            <CardFooter>
-              <Link href="/editar-servicio">
-                <Button variant="outline" className="w-full">Editar</Button>
-              </Link>
-            </CardFooter>
-          </Card>
+        <Card className="bg-white rounded-xl shadow-lg max-w-md mx-auto overflow-hidden">
+        <CardHeader className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white p-6">
+          <CardTitle className="text-2xl font-bold flex items-center justify-center">
+            <Check className="mr-2" size={24} />
+            Servicio Cargado
+          </CardTitle>
+          <CardDescription className="text-blue-100"></CardDescription>
+        </CardHeader>
+        <CardContent className="p-6">
+          <p className="text-gray-600 mb-4">
+            Has completado exitosamente el registro de tu servicio. Ahora puedes editarlo según tus
+            necesidades.
+          </p>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h3 className="font-semibold text-blue-700 mb-2">Próximos pasos:</h3>
+            <ul className="text-sm text-gray-600 space-y-2">
+              <li className="flex items-start">
+                <Check className="text-green-500 mr-2 mt-1 flex-shrink-0" size={16} />
+                Revisa la información de tu servicio
+              </li>
+              <li className="flex items-start">
+                <Check className="text-green-500 mr-2 mt-1 flex-shrink-0" size={16} />
+                Actualiza tus detalles si es necesario
+              </li>
+              <li className="flex items-start">
+                <Check className="text-green-500 mr-2 mt-1 flex-shrink-0" size={16} />
+                Mantén tu perfil actualizado para atraer más clientes
+              </li>
+            </ul>
+          </div>
+        </CardContent>
+        <CardFooter className="bg-gray-50 p-6">
+          <div className="grid grid-cols-2 gap-4 w-full">
+            
+            <Button variant="outline" className="w-full">
+              <X className="mr-2" size={16} />
+              Salir
+            </Button>
+            <Link href="/editar-servicio" passHref className="w-full">
+              <Button variant="default" className="w-full">
+                <Edit className="mr-2" size={16} />
+                Editar Servicio
+              </Button>
+            </Link>
+          </div>
+        </CardFooter>
+      </Card>
         ) : (
           <>
             <div className="text-center mb-8">

@@ -29,6 +29,9 @@ export default function RegistrationPage() {
     useState<RegistrationData | null>(null);
   //const [verificationError, setVerificationError] = useState<string | null>(null); // Added verification error state
 
+
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
   useEffect(() => {
     if (currentStep === "terms") {
       setTimeout(() => {
@@ -72,8 +75,12 @@ export default function RegistrationPage() {
       };
       const response = await registerService.register(registerData);
 
-      
+      console.log("respuesta ", response.code)
 
+      if(response.code == "409") {
+        setSuccessMessage("El email ya está siendo utilizado por otro usuario, por favor use otro");
+      }
+      else {
       localStorage.setItem("initialRole", registerData.initialRole);
 
       if (response.challenge) {
@@ -82,6 +89,7 @@ export default function RegistrationPage() {
       }
 
       setCurrentStep("verification");
+    }
     } catch (error) {
       if (error instanceof Error) {
       }
@@ -95,12 +103,23 @@ export default function RegistrationPage() {
 
   return (
     <div className="min-h-screen bg-[#F8F8F7]">
-      <div className="container mx-auto max-w-2xl py-10 px-4">
+      <div className="container mx-auto max-w-2xl py-16 px-4">
+        
+       
+
+        <AnimatePresence mode="wait">
+        <motion.div
+              key="title"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
         <h1 className={`${fraunces.className} text-2xl font-medium mb-6`}>
           Registrar Usuario
         </h1>
+        </motion.div>
 
-        <AnimatePresence mode="wait">
           {currentStep === "details" && (
             <motion.div
               key="details"
@@ -162,7 +181,7 @@ export default function RegistrationPage() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="space-y-4 p-8 bg-white rounded-xl">
+              <div className="space-y-4 p-4 bg-white rounded-xl">
                 <h1
                   className={`${fraunces.className} text-2xl text-center font-medium mb-6`}
                 >
@@ -200,6 +219,13 @@ export default function RegistrationPage() {
               <p className="mb-4">Por favor, inicia sesión para continuar.</p>
               <LoginForm />
             </motion.div>
+          )}
+
+{successMessage && (
+            <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mt-4 mb-4 rounded" role="alert">
+              <p className="font-bold">¡Atención!</p>
+              <p>{successMessage}</p>
+            </div>
           )}
         </AnimatePresence>
       </div>

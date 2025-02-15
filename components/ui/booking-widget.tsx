@@ -1,45 +1,41 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { fetchCurrentUser } from "@/services/BookingService";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { format, addDays, parseISO, isWithinInterval } from "date-fns";
-import { es } from "date-fns/locale";
-import { CalendarIcon, Minus, Plus, Users } from "lucide-react";
+import { useState, useEffect } from "react"
+import { fetchCurrentUser } from "@/services/BookingService"
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { format, addDays, parseISO, isWithinInterval } from "date-fns"
+import { es } from "date-fns/locale"
+import { CalendarIcon, Minus, Plus, Users } from "lucide-react"
 
-import {createBooking} from "@/services/BookingService"
+import { createBooking } from "@/services/BookingService"
 
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation"
 
-import styles from "./BookingWidget.module.css";
+import styles from "./BookingWidget.module.css"
 
 interface Booking {
-  id: string;
-  status: string;
-  checkIn: string;
-  checkOut: string;
-  patient: string;
-  guests: number;
-  price: number;
-  cleaning: number;
-  room: string;
+  id: string
+  status: string
+  checkIn: string
+  checkOut: string
+  patient: string
+  guests: number
+  price: number
+  cleaning: number
+  room: string
 }
 
 interface BookingWidgetProps {
-  room: string;
-  name: string;
-  description: string;
-  price: number;
-  cleaning: number;
-  bookings: Booking[];
+  room: string
+  name: string
+  description: string
+  price: number
+  cleaning: number
+  bookings: Booking[]
 }
 
 export function BookingWidget({
@@ -50,69 +46,91 @@ export function BookingWidget({
   cleaning,
   bookings: initialBookings,
 }: BookingWidgetProps) {
-  const [checkIn, setCheckIn] = useState<Date>();
-  const [checkOut, setCheckOut] = useState<Date>();
-  const [guests, setGuests] = useState(1);
-  const [nights, setNights] = useState(0);
-  const [totalPrice, setTotalPrice] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const bookings = initialBookings;
+  const [checkIn, setCheckIn] = useState<Date>()
+  const [checkOut, setCheckOut] = useState<Date>()
+  const [guests, setGuests] = useState(1)
+  const [nights, setNights] = useState(0)
+  const [totalPrice, setTotalPrice] = useState(0)
+  const [loading, setLoading] = useState(false)
+  const bookings = initialBookings
 
   useEffect(() => {
     if (checkIn && checkOut) {
-      const nightsCount = Math.ceil(
-        (checkOut.getTime() - checkIn.getTime()) / (1000 * 3600 * 24)
-      );
-      setNights(nightsCount);
+      const nightsCount = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 3600 * 24))
+      setNights(nightsCount)
     } else {
-      setNights(0);
+      setNights(0)
     }
-  }, [checkIn, checkOut]);
+  }, [checkIn, checkOut])
 
   useEffect(() => {
-    const subtotal = price * nights * guests;
-    const cleaningFee = cleaning;
-    setTotalPrice(subtotal + cleaningFee);
-  }, [price, nights, guests, cleaning]);
+    const subtotal = price * nights * guests
+    const cleaningFee = cleaning
+    setTotalPrice(subtotal + cleaningFee)
+  }, [price, nights, guests, cleaning])
 
   const handleGuestsChange = (increment: number) => {
-    setGuests((prevGuests) => Math.max(1, prevGuests + increment));
-  };
+    setGuests((prevGuests) => Math.max(1, prevGuests + increment))
+  }
 
   const isDateReserved = (date: Date) => {
     return bookings.some((booking) => {
-      const startDate = parseISO(booking.checkIn);
-      const endDate = parseISO(booking.checkOut);
-      return isWithinInterval(date, { start: startDate, end: endDate });
-    });
-  };
+      const startDate = parseISO(booking.checkIn)
+      const endDate = parseISO(booking.checkOut)
+      return isWithinInterval(date, { start: startDate, end: endDate })
+    })
+  }
 
   const handleCheckInSelect = (date: Date | undefined) => {
-    setCheckIn(date);
-    if (date && checkOut && date >= checkOut) {
-      setCheckOut(addDays(date, 1));
+    if (date) {
+      const nextAvailableDate = findNextAvailableDate(date)
+      setCheckIn(nextAvailableDate)
+      if (checkOut && nextAvailableDate >= checkOut) {
+        setCheckOut(addDays(nextAvailableDate, 1))
+      }
+    } else {
+      setCheckIn(undefined)
     }
-  };
+  }
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const findNextAvailableDate = (startDate: Date): Date => {
+    let currentDate = startDate
+    while (isDateReserved(currentDate)) {
+      currentDate = addDays(currentDate, 1)
+    }
+    return currentDate
+  }
 
-  const isReservationEnabled = checkIn && checkOut && nights > 0;
+  const hasReservedDateBetween = (start: Date, end: Date): boolean => {
+    let currentDate = addDays(start, 1)
+    while (currentDate < end) {
+      if (isDateReserved(currentDate)) {
+        return true
+      }
+      currentDate = addDays(currentDate, 1)
+    }
+    return false
+  }
+
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const isReservationEnabled = checkIn && checkOut && nights > 0
 
   const router = useRouter()
 
   const handleReservation = async () => {
     try {
-      setLoading(true);
+      setLoading(true)
 
-      const accessToken = localStorage.getItem("access_token");
+      const accessToken = localStorage.getItem("access_token")
       if (!accessToken) {
-        alert("No se encontró el token de acceso.");
-        return;
+        alert("No se encontró el token de acceso.")
+        return
       }
 
-      const currentUser = await fetchCurrentUser(accessToken);
-      const patient_id = currentUser.id;
+      const currentUser = await fetchCurrentUser(accessToken)
+      const patient_id = currentUser.id
 
       const newBookingData = {
         status: "pay-pending",
@@ -123,58 +141,47 @@ export function BookingWidget({
         price: price,
         cleaning: cleaning,
         room: room,
-      };
-      
-      // Crear el nuevo array con los parámetros adicionales
+      }
+
       const formattedBooking = {
-        ...newBookingData, // Incluye todos los datos originales
-        unit_amount: totalPrice*100, // Agrega el precio total calculado VER X 100!!
+        ...newBookingData,
+        unit_amount: totalPrice * 100,
         guests: guests,
         name: name,
-        description: description,    // Agrega la cantidad de huéspedes
-      };
+        description: description,
+      }
 
-      await createBooking(newBookingData, accessToken);
-      
+      await createBooking(newBookingData, accessToken)
 
-      localStorage.setItem("booking", JSON.stringify(formattedBooking));
+      localStorage.setItem("booking", JSON.stringify(formattedBooking))
 
-      router.push('/checkout')
-     
+      router.push("/checkout")
     } catch (error) {
-      console.error("Error al realizar la reserva:", error);
-      alert("Ocurrió un error al realizar la reserva.");
+      console.error("Error al realizar la reserva:", error)
+      alert("Ocurrió un error al realizar la reserva.")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
-
-  
+  }
 
   return (
-    <div className="border rounded-lg p-4 space-y-4">
+    <div className="border rounded-lg p-6 space-y-6 shadow-md bg-white">
       <div className="flex justify-between items-center">
         <div>
-          <span className="text-3xl font-bold">
-            ${price.toLocaleString("es-CO")} COP
-          </span>
-          <span className="text-[#162F40]">/noche</span>
+          <span className="text-3xl font-bold text-[#39759E]">${price.toLocaleString("es-CO")} COP</span>
+          <span className="text-[#162F40] ml-2">/noche</span>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-4">
         <Popover>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              className={`w-full justify-start text-left font-normal ${
-                !checkIn && "text-muted-foreground"
-              }`}
+              className={`w-full justify-start text-left font-normal ${!checkIn && "text-muted-foreground"}`}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
-              {checkIn
-                ? format(checkIn, "PP", { locale: es })
-                : "Check-in"}
+              {checkIn ? format(checkIn, "PP", { locale: es }) : "Llegada"}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
@@ -182,7 +189,11 @@ export function BookingWidget({
               mode="single"
               selected={checkIn}
               onSelect={handleCheckInSelect}
-              disabled={(date) => date < today || isDateReserved(date)}
+              disabled={(date) => {
+                const isBeforeToday = date < today
+                const isReserved = isDateReserved(date)
+                return isBeforeToday || isReserved
+              }}
               modifiers={{
                 reserved: isDateReserved,
               }}
@@ -196,14 +207,10 @@ export function BookingWidget({
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              className={`w-full justify-start text-left font-normal ${
-                !checkOut && "text-muted-foreground"
-              }`}
+              className={`w-full justify-start text-left font-normal ${!checkOut && "text-muted-foreground"}`}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
-              {checkOut
-                ? format(checkOut, "PP", { locale: es })
-                : "Check-out"}
+              {checkOut ? format(checkOut, "PP", { locale: es }) : "Salida"}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
@@ -211,7 +218,12 @@ export function BookingWidget({
               mode="single"
               selected={checkOut}
               onSelect={setCheckOut}
-              disabled={(date) => date <= (checkIn || today) || isDateReserved(date)}
+              disabled={(date) => {
+                const isBeforeOrEqualCheckIn = date <= (checkIn || today)
+                const isReserved = isDateReserved(date)
+                const hasBetweenReservation = checkIn ? hasReservedDateBetween(checkIn, date) : false
+                return isBeforeOrEqualCheckIn || isReserved || hasBetweenReservation
+              }}
               modifiers={{
                 reserved: isDateReserved,
               }}
@@ -223,62 +235,50 @@ export function BookingWidget({
         </Popover>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <Label className="flex items-center gap-2">
-            <Users className="h-4 w-4" />
+          <Label className="flex items-center gap-2 text-[#162F40]">
+            <Users className="h-5 w-5" />
             Huéspedes
           </Label>
-          <div className="flex items-center">
-            <Button
-              type="button"
-              variant="outline"
-              className="p-2"
-              onClick={() => handleGuestsChange(-1)}
-            >
-              <Minus />
+          <div className="flex items-center border rounded-md">
+            <Button type="button" variant="ghost" className="p-2" onClick={() => handleGuestsChange(-1)}>
+              <Minus className="h-4 w-4" />
             </Button>
-            <Input
-              value={guests}
-              readOnly
-              className="w-12 text-center border-none"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              className="p-2"
-              onClick={() => handleGuestsChange(1)}
-            >
-              <Plus />
+            <Input value={guests} readOnly className="w-12 text-center border-none" />
+            <Button type="button" variant="ghost" className="p-2" onClick={() => handleGuestsChange(1)}>
+              <Plus className="h-4 w-4" />
             </Button>
           </div>
         </div>
-        <div className="pt-4">
-          <div className="space-y-2 flex justify-between">
-            <span className="flex text-[#162F40]">
-              {nights} noche(s) x {guests} huésped(es)
-            </span>
-            <span>${price * guests} COP</span>
-          </div>
-          <div className="flex justify-end">
-            <p className="text-[#162F40]">+ Limpieza: {cleaning.toLocaleString("es-CO")} COP</p>
-          </div>
-          <div className="pt-4">
-            <div className="pt-4 space-y-2 border-t text-2xl flex justify-between font-bold">
-              <span>Total</span>
-              <span>${totalPrice.toLocaleString("es-CO")} COP</span>
+        {nights > 0 && (
+          <div className="space-y-2 bg-gray-50 p-4 rounded-md">
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-[#162F40]">
+                ${price.toLocaleString("es-CO")} x {nights} noche(s)
+              </span>
+              <span className="font-semibold">${(price * nights).toLocaleString("es-CO")} COP</span>
+            </div>
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-[#162F40]">Tarifa de limpieza</span>
+              <span className="font-semibold">${cleaning.toLocaleString("es-CO")} COP</span>
+            </div>
+            <div className="flex justify-between items-center text-sm pt-2 border-t">
+              <span className="text-[#162F40] font-semibold">Total</span>
+              <span className="font-bold text-lg">${totalPrice.toLocaleString("es-CO")} COP</span>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       <Button
-        className="w-full bg-[#39759E] hover:bg-[#39759E]"
+        className="w-full bg-[#39759E] hover:bg-[#2c5a7a] text-white font-semibold py-3 rounded-md transition-colors duration-300"
         disabled={!isReservationEnabled || loading}
         onClick={handleReservation}
       >
         {loading ? "Reservando..." : "Reservar"}
       </Button>
     </div>
-  );
+  )
 }
+

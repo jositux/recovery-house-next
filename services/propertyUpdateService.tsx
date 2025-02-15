@@ -21,7 +21,9 @@ export interface PropertyData {
   mainImage: string;
   RNTFile: string;
   taxIdEINFile: string;
-  Rooms: string[];
+  hostName: string,
+  guestComments: string,
+  patology: string[],
 }
 
 export interface PropertyResponse {
@@ -67,10 +69,11 @@ export const propertyUpdateService = {
         taxIdEINFile: propertyData.taxIdEINFile,
         taxIdApproved: false,
         mainImage: propertyData.mainImage,
-        Rooms: propertyData.Rooms
+        hostName: propertyData.hostName,
+  guestComments: propertyData.guestComments,
+  patology: JSON.stringify(propertyData.patology),
       };
 
-console.log("ID PIOLA: ", propertyId);
 
       const response = await axios.patch<PropertyResponse>(
         `${API_URL}/${propertyId}`, // Usar el ID de la propiedad en el endpoint

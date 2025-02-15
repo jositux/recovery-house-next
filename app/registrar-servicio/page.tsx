@@ -179,7 +179,7 @@ export default function RegisterPropertyBasePage() {
       };
       const response = await providerService.createProperty(providerData);
 
-      console.log("Property created:", response);
+      console.log("Servicio creado:", response);
     } catch (error) {
       console.error("Error al registrar el servicio:", error);
     } finally {
@@ -216,12 +216,14 @@ export default function RegisterPropertyBasePage() {
   };
 
   return (
-    <div className="container mx-auto max-w-2xl py-16 px-4">
+    <div className="min-h-screen bg-[#F8F8F7]">
+      <div className="container mx-auto max-w-2xl py-16 px-4">
       <h1 className="text-3xl font-bold mb-6">
         Registra tu servicio
       </h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <div className="space-y-4 p-4 bg-white rounded-xl">
           <FormField
             control={form.control}
             name="name"
@@ -263,7 +265,21 @@ export default function RegisterPropertyBasePage() {
               )}
             />
           </div>
-          <hr className="h-px my-8 bg-gray-100 border-0 dark:bg-gray-700" />
+
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Textarea placeholder="Describe las características" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          </div>
+          <div className="space-y-4 p-4 bg-white rounded-xl">
           <FormField
             control={form.control}
             name="extraTags"
@@ -287,19 +303,8 @@ export default function RegisterPropertyBasePage() {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Textarea placeholder="Describe las características" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-<hr className="h-px my-8 bg-gray-100 border-0 dark:bg-gray-700"></hr>
+          </div>
+          <div className="space-y-4 p-4 bg-white rounded-xl">
 <h2 className="text-lg">Dónde ofrece su servicio?</h2>
 <LocationSelector
             onChange={({ country, state, city }) => {
@@ -331,7 +336,8 @@ export default function RegisterPropertyBasePage() {
               </FormItem>
             )}
             />*/}
-            <hr className="h-px my-8 bg-gray-100 border-0 dark:bg-gray-700"></hr>
+            </div>
+            <div className="space-y-4 p-4 bg-white rounded-xl">
             <h2 className="text-lg">Información Legal</h2>
           <FormField
             control={form.control}
@@ -384,6 +390,7 @@ export default function RegisterPropertyBasePage() {
                 </FormItem>
               )}
             />
+            </div>
           </div>
          
           {/*<FormField
@@ -407,11 +414,12 @@ export default function RegisterPropertyBasePage() {
               </FormItem>
             )}
                   />*/}
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
+          <Button type="submit" className="w-full bg-[#39759E]" disabled={isSubmitting}>
             {isSubmitting ? "Registrando..." : "Registrar Proveedor"}
           </Button>
         </form>
       </Form>
+    </div>
     </div>
   );
 }

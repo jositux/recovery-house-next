@@ -27,10 +27,10 @@ import { LocationSelector } from "@/components/ui/location-selector";
   type MembershipTag,
 } from "@/services/membership-service";*/
 import { CollectionExtraTags } from "@/components/collectionExtraTags";
-import { CollectionServiceTags } from "@/components/collectionServiceTags";
+//import { CollectionServiceTags } from "@/components/collectionServiceTags";
 import { getProvidersByUserId } from "@/services/providerCollectionService";
 import { getExtraTags } from "@/services/extraTagsService";
-import { getServiceTags } from "@/services/serviceTagsService";
+//import { getServiceTags } from "@/services/serviceTagsService";
 import { getCurrentUser } from "@/services/userService";
 
 const formSchema = z.object({
@@ -65,13 +65,13 @@ export default function RegisterPropertyBasePage() {
   const [extraTags, setExtraTags] = useState<
     { id: string; name: string; icon: string; enable_property:boolean; enable_services: boolean; }[]
   >([]);
-  const [servicesTags, setServicesTags] = useState<
+  /*const [servicesTags, setServicesTags] = useState<
     { id: string; name: string; icon: string }[]
-  >([]);
+  >([]);*/
   const [selectedMembership, setSelectedMembership] = useState<string>("");
   //const [memberships, setMemberships] = useState<MembershipTag[]>([]);
   const [defaultTags, setDefaultTags] = useState<string[]>([]);
-  const [defaultServiceTags, setDefaultServiceTags] = useState<string[]>([]);
+  //const [defaultServiceTags, setDefaultServiceTags] = useState<string[]>([]);
 
   const [defaultLocation, setDefaultLocation] = useState<{
     country: string;
@@ -176,7 +176,7 @@ useEffect(() => {
 
           setSelectedMembership(provider.membership);
           setDefaultTags(provider.extraTags || []);
-          setDefaultServiceTags(provider.serviceTags || []);
+          //setDefaultServiceTags(provider.serviceTags || []);
         }
       } catch (error) {
         console.error("Error al cargar los datos del proveedor:", error);
@@ -192,8 +192,8 @@ useEffect(() => {
         const extraTagsData = await getExtraTags();
         setExtraTags(extraTagsData);
 
-        const servicesTagsData = await getServiceTags();
-        setServicesTags(servicesTagsData);
+        //const servicesTagsData = await getServiceTags();
+        //setServicesTags(servicesTagsData);
       } catch (error) {
         console.error(error);
       }
@@ -208,21 +208,22 @@ useEffect(() => {
     }
   };
 
+  /*
   const handleServiceTagsChange = (tags: string[]) => {
     if (JSON.stringify(tags) !== JSON.stringify(selectedServiceTags)) {
       setValue("serviceTags", tags, { shouldDirty: true });
     }
-  };
+  };*/
 
   const selectedExtraTags = useWatch({
     control: form.control,
     name: "extraTags",
   });
 
-  const selectedServiceTags = useWatch({
+  /*const selectedServiceTags = useWatch({
     control: form.control,
     name: "serviceTags",
-  });
+  });*/
 
   const onSubmit = async (values: FormValues) => {
     console.log("Form values before submission:", values);
@@ -254,12 +255,11 @@ useEffect(() => {
         price: values.price || "",
       };
 
-      const response = await providerService.updateProvider(
+      await providerService.updateProvider(
         providerData.id,
         providerData
       );
 
-      console.log("Provider updated:", response);
       setSuccessMessage("¡Proveedor actualizado con éxito!");
     } catch (error) {
       console.error("Error al actualizar el proveedor:", error);
@@ -300,18 +300,20 @@ useEffect(() => {
   };
 
   return (
-    <div className="container mx-auto max-w-2xl py-10">
+    <div className="min-h-screen bg-[#F8F8F7]">
+      <div className="container mx-auto max-w-2xl py-16 px-4">
       <h1 className="text-3xl font-bold mb-6">
-        Actualizar información del proveedor
+        Actualizar Servicio
       </h1>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <div className="space-y-4 p-4 bg-white rounded-xl">
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Nombre del proveedor</FormLabel>
+                <FormLabel>Nombre del Servicio</FormLabel>
                 <FormControl>
                   <Input placeholder="Nombre" {...field} />
                 </FormControl>
@@ -371,6 +373,39 @@ useEffect(() => {
               </FormItem>
             )}
           />
+          </div>
+          <div className="space-y-4 p-4 bg-white rounded-xl">
+          {defaultTags && (
+            <FormField
+              control={form.control}
+              name="extraTags"
+              render={() => (
+                <FormItem>
+                  <FormLabel className="text-lg">
+                      Servicios Ofrecidos
+                    </FormLabel>
+                  <Controller
+                    control={form.control}
+                    name="extraTags"
+                    render={() => (
+                      <CollectionExtraTags
+                        key={defaultTags.join(',')}
+                        onChange={handleTagsChange}
+                        extraTags={extraTags}
+                        initialSelectedTags={defaultTags}
+                        enable="services"
+                      />
+                    )}
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
+          </div>
+
+          <div className="space-y-4 p-4 bg-white rounded-xl">
+          <h2 className="text-lg">Dónde ofrece su servicio?</h2>
           {defaultLocation && (
             <LocationSelector
               defaultCountry={defaultLocation.country}
@@ -388,6 +423,7 @@ useEffect(() => {
               }}
             />
           )}
+          </div>
           {/*<FormField
             control={form.control}
             name="membership"
@@ -405,6 +441,8 @@ useEffect(() => {
               </FormItem>
             )}
             />*/}
+            <div className="space-y-4 p-4 bg-white rounded-xl">
+            <h2 className="text-lg">Información Legal</h2>
           <FormField
             control={form.control}
             name="taxIdEIN"
@@ -419,6 +457,7 @@ useEffect(() => {
             )}
           />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          
             {RNTFileData !== null && (
               <FormField
                 control={form.control}
@@ -460,8 +499,9 @@ useEffect(() => {
               />
             )}
           </div>
-         
-         
+          </div>
+
+    {/*     
           {defaultServiceTags && (
             <FormField
               control={form.control}
@@ -485,33 +525,9 @@ useEffect(() => {
                 </FormItem>
               )}
             />
-          )}
+                    )}*/}
 
-{defaultTags && (
-            <FormField
-              control={form.control}
-              name="extraTags"
-              render={() => (
-                <FormItem>
-                  <FormLabel>Etiquetas Extra</FormLabel>
-                  <Controller
-                    control={form.control}
-                    name="extraTags"
-                    render={() => (
-                      <CollectionExtraTags
-                        key={defaultTags.join(',')}
-                        onChange={handleTagsChange}
-                        extraTags={extraTags}
-                        initialSelectedTags={defaultTags}
-                        enable="services"
-                      />
-                    )}
-                  />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
+
           
           {successMessage && (
             <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded" role="alert">
@@ -524,6 +540,7 @@ useEffect(() => {
           </Button>
         </form>
       </Form>
+    </div>
     </div>
   );
 }

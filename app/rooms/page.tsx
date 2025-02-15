@@ -47,7 +47,6 @@ interface Property {
 export default function RoomsPage() {
   const [properties, setProperties] = useState<Property[]>([])
   const [currentPage, setCurrentPage] = useState(1)
-  //const searchTerm = ""
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const roomsPerPage = 12
@@ -77,10 +76,9 @@ export default function RoomsPage() {
           },
         })
 
-        // Solo actualizamos el estado si los datos han cambiado
         if (JSON.stringify(response.data.data) !== JSON.stringify(prevPropertiesRef.current)) {
           setProperties(response.data.data)
-          prevPropertiesRef.current = response.data.data // Guardamos los datos anteriores
+          prevPropertiesRef.current = response.data.data
         }
 
         setIsLoading(false)
@@ -156,11 +154,7 @@ export default function RoomsPage() {
               className={`grid grid-cols-1 md:grid-cols-2 ${isMapVisible ? "lg:grid-cols-3" : "lg:grid-cols-4"} gap-6 auto-rows-fr`}
             >
               {currentRooms.map((room) => (
-                <div
-                  key={room.id}
-                  id={`room-${room.id}`}
-                  className={`${styles.fade} ${styles["fade-visible"]}`}
-                >
+                <div key={room.id} id={`room-${room.id}`} className={`${styles.fade} ${styles["fade-visible"]}`}>
                   <RoomCard
                     id={room.id}
                     name={room.name}

@@ -55,18 +55,15 @@ export function LocationSelector({
     }
   }, [country, state, defaultCity])
 
-  // Removed useEffect hook
-  // useEffect(() => {
-  //   if (country && state && city) {
-  //     onChange({ country, state, city })
-  //   }
-  // }, [country, state, city, onChange])
-
   return (
     <div className="grid grid-cols-3 md:grid-cols-3 gap-4">
       <div>
         <Label htmlFor="country">País</Label>
-        <Select onValueChange={(value) => { setCountry(value); onChange({ country: value, state, city }); }} value={country}>
+        <Select onValueChange={(value) => { 
+          setCountry(value)
+          const countryName = countriesData[value as keyof typeof countriesData]?.name || ""
+          onChange({ country: countryName, state, city })
+        }} value={country}>
           <SelectTrigger id="country" className={error?.country ? "border-red-500" : ""}>
             <SelectValue placeholder="Selecciona un país" />
           </SelectTrigger>
@@ -81,7 +78,11 @@ export function LocationSelector({
 
       <div>
         <Label htmlFor="state">Estado</Label>
-        <Select onValueChange={(value) => { setState(value); onChange({ country, state: value, city }); }} value={state}>
+        <Select onValueChange={(value) => { 
+          setState(value)
+          const stateName = states[value] || ""
+          onChange({ country, state: stateName, city })
+        }} value={state}>
           <SelectTrigger id="state" className={error?.state ? "border-red-500" : ""}>
             <SelectValue placeholder="Selecciona un estado" />
           </SelectTrigger>
@@ -96,7 +97,10 @@ export function LocationSelector({
 
       <div>
         <Label htmlFor="city">Ciudad</Label>
-        <Select onValueChange={(value) => { setCity(value); onChange({ country, state, city: value }); }} value={city}>
+        <Select onValueChange={(value) => { 
+          setCity(value)
+          onChange({ country, state, city: value })
+        }} value={city}>
           <SelectTrigger id="city" className={error?.city ? "border-red-500" : ""}>
             <SelectValue placeholder="Selecciona una ciudad" />
           </SelectTrigger>
@@ -111,4 +115,3 @@ export function LocationSelector({
     </div>
   )
 }
-
