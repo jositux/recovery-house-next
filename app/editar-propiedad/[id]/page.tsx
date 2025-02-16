@@ -160,7 +160,7 @@ export default function EditPropertyPage({
           setRNTFileData(selectedProperty.RNTFile);
           setTaxFileData(selectedProperty.taxIdEINFile);
 
-          setSelectedPatology(selectedProperty.patology);
+         
           form.setValue("patology", selectedProperty.patology)
         } else {
           throw new Error("Propiedad no encontrada");
