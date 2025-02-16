@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useCallback } from "react"
 import { Check } from "lucide-react"
 
 interface Procedure {
@@ -9,8 +9,8 @@ interface Procedure {
 }
 
 interface MultiSelectButtonsProps {
+  value: string[]
   onChange: (selectedNames: string[]) => void
-  initialSelection?: string[]
 }
 
 const procedures: Procedure[] = [
@@ -22,29 +22,13 @@ const procedures: Procedure[] = [
   { name: "Otro", icon: "/assets/icons/05.svg" },
 ]
 
-export function MultiSelectCase({ onChange, initialSelection = [] }: MultiSelectButtonsProps) {
-  const [selectedProcedures, setSelectedProcedures] = useState<string[]>(initialSelection)
-
-  const handleChange = useCallback(
-    (newSelection: string[]) => {
-      onChange(newSelection)
-    },
-    [onChange],
-  )
-
-  useEffect(() => {
-    setSelectedProcedures(initialSelection)
-  }, [initialSelection])
-
+export function MultiSelectCase({ value = [], onChange }: MultiSelectButtonsProps) {
   const toggleProcedure = useCallback(
     (name: string) => {
-      setSelectedProcedures((prev) => {
-        const newSelection = prev.includes(name) ? prev.filter((item) => item !== name) : [...prev, name]
-        handleChange(newSelection)
-        return newSelection
-      })
+      const newSelection = value.includes(name) ? value.filter((item) => item !== name) : [...value, name]
+      onChange(newSelection)
     },
-    [handleChange],
+    [value, onChange],
   )
 
   return (
@@ -55,9 +39,7 @@ export function MultiSelectCase({ onChange, initialSelection = [] }: MultiSelect
           key={procedure.name}
           onClick={() => toggleProcedure(procedure.name)}
           className={`p-2 rounded-lg border-[1px] transition-all duration-200 ease-in-out text-left ${
-            selectedProcedures.includes(procedure.name)
-              ? "border-[#39759E] bg-blue-50"
-              : "border-gray-200 hover:border-blue-300"
+            value.includes(procedure.name) ? "border-[#39759E] bg-blue-50" : "border-gray-200 hover:border-blue-300"
           }`}
         >
           <div className="flex items-start">
@@ -71,10 +53,10 @@ export function MultiSelectCase({ onChange, initialSelection = [] }: MultiSelect
             </div>
             <div
               className={`flex-shrink-0 w-5 h-5 rounded-full border-[1px] flex items-center mt-2 justify-center ${
-                selectedProcedures.includes(procedure.name) ? "border-[#39759E] bg-[#39759E]" : "border-gray-300"
+                value.includes(procedure.name) ? "border-[#39759E] bg-[#39759E]" : "border-gray-300"
               }`}
             >
-              {selectedProcedures.includes(procedure.name) && <Check className="w-3 h-3 text-white" />}
+              {value.includes(procedure.name) && <Check className="w-3 h-3 text-white" />}
             </div>
           </div>
         </button>

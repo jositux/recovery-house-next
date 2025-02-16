@@ -72,7 +72,6 @@ type FormValues = z.infer<typeof formSchema>
 
 export default function RegisterPropertyBasePage() {
 
-  const [selectedPatology, setSelectedPatology] = useState<string[]>([])
 
   const handleLocationSelected = (details: LocationDetails) => {
     console.log("Detalles de la ubicación seleccionada:", details)
@@ -127,7 +126,7 @@ export default function RegisterPropertyBasePage() {
       mainImage: "",
       RNTFile: "",
       taxIdEINFile: "",
-      patology: selectedPatology,
+      patology: [],
       hostName: "",
       guestComments: "",
     },
@@ -265,13 +264,8 @@ export default function RegisterPropertyBasePage() {
                   <FormItem>
                     <FormLabel>Tratamientos en que se especializa</FormLabel>
                     <FormControl>
-                      <MultiSelectCase
-                         onChange={(selected) => {
-                          field.onChange(selected)
-                          setSelectedPatology(selected)
-                        }}
-                        initialSelection={selectedPatology}
-                      />
+                    <MultiSelectCase value={field.value} onChange={field.onChange} />
+     
                     </FormControl>
                     <FormMessage />
                   </FormItem>
