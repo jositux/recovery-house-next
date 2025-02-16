@@ -61,6 +61,7 @@ export const roomUpdateService = {
 
       console.log("ID EN SERVICE", data);
 
+  
       // Crear una copia de data con servicesTags, extraTags, photos, y propertyId transformados
       const transformedData = {
         ...data,

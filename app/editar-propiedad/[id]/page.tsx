@@ -62,7 +62,7 @@ export default function EditPropertyPage({
     form.setValue("longitude", details.lng);
     form.setValue("postalCode", details.postalCode);
   };
-
+  const [selectedPatology, setSelectedPatology] = useState<string[]>([])
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -106,7 +106,7 @@ export default function EditPropertyPage({
       RNTFile: "",
       taxIdEINFile: "",
       address: "", // Added address field
-      patology: [],
+      patology: selectedPatology,
       hostName: "",
   guestComments:"",
     },
@@ -134,7 +134,7 @@ export default function EditPropertyPage({
         if (selectedProperty) {
           setProperty(selectedProperty);
 
-          console.log(property)
+          console.log(selectedProperty.patology)
   
           // Actualizar el formulario con los datos de la propiedad
           form.reset({
@@ -169,6 +169,8 @@ export default function EditPropertyPage({
   
           setRNTFileData(selectedProperty.RNTFile);
           setTaxFileData(selectedProperty.taxIdEINFile);
+
+          setSelectedPatology(selectedProperty.patology)
   
          
         } else {
@@ -304,12 +306,12 @@ export default function EditPropertyPage({
                   <FormItem>
                     <FormLabel>Tratamientos en que se especializa</FormLabel>
                     <FormControl>
-                      <MultiSelectCase
-                        onChange={(selectedIds) => {
-                          field.onChange(selectedIds)
-                          console.log("Selected options:", selectedIds)
+                    <MultiSelectCase
+                         onChange={(selected) => {
+                          field.onChange(selected)
+                          setSelectedPatology(selected)
                         }}
-                        
+                        initialSelection={selectedPatology}
                       />
                     </FormControl>
                     <FormMessage />

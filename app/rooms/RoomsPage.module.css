@@ -1,0 +1,9 @@
+/* RoomsPage.module.css */
+.fade {
+  opacity: 0;
+  transition: opacity 500ms ease-in-out;
+}
+
+.fade-visible {
+  opacity: 1;
+}

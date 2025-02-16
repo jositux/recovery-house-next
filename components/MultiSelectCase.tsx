@@ -1,6 +1,7 @@
-import { useState } from "react"
+"use client"
+
+import { useState, useEffect, useCallback } from "react"
 import { Check } from "lucide-react"
-import type React from "react" // Added import for React
 
 interface Procedure {
   name: string
@@ -9,6 +10,7 @@ interface Procedure {
 
 interface MultiSelectButtonsProps {
   onChange: (selectedNames: string[]) => void
+  initialSelection?: string[]
 }
 
 const procedures: Procedure[] = [
@@ -20,16 +22,30 @@ const procedures: Procedure[] = [
   { name: "Otro", icon: "/assets/icons/05.svg" },
 ]
 
-export function MultiSelectCase({ onChange }: MultiSelectButtonsProps) {
-  const [selectedProcedures, setSelectedProcedures] = useState<string[]>([])
+export function MultiSelectCase({ onChange, initialSelection = [] }: MultiSelectButtonsProps) {
+  const [selectedProcedures, setSelectedProcedures] = useState<string[]>(initialSelection)
 
-  const toggleProcedure = (name: string) => {
-    setSelectedProcedures((prev) => {
-      const newSelection = prev.includes(name) ? prev.filter((item) => item !== name) : [...prev, name]
+  const handleChange = useCallback(
+    (newSelection: string[]) => {
       onChange(newSelection)
-      return newSelection
-    })
-  }
+    },
+    [onChange],
+  )
+
+  useEffect(() => {
+    setSelectedProcedures(initialSelection)
+  }, [initialSelection])
+
+  const toggleProcedure = useCallback(
+    (name: string) => {
+      setSelectedProcedures((prev) => {
+        const newSelection = prev.includes(name) ? prev.filter((item) => item !== name) : [...prev, name]
+        handleChange(newSelection)
+        return newSelection
+      })
+    },
+    [handleChange],
+  )
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
@@ -39,11 +55,17 @@ export function MultiSelectCase({ onChange }: MultiSelectButtonsProps) {
           key={procedure.name}
           onClick={() => toggleProcedure(procedure.name)}
           className={`p-2 rounded-lg border-[1px] transition-all duration-200 ease-in-out text-left ${
-            selectedProcedures.includes(procedure.name) ? "border-[#39759E] bg-blue-50" : "border-gray-200 hover:border-blue-300"
+            selectedProcedures.includes(procedure.name)
+              ? "border-[#39759E] bg-blue-50"
+              : "border-gray-200 hover:border-blue-300"
           }`}
         >
           <div className="flex items-start">
-            <img src={procedure.icon} alt={procedure.name} className="w-6 h-6 mr-3 mt-1 flex-shrink-0" />
+            <img
+              src={procedure.icon || "/placeholder.svg?height=24&width=24"}
+              alt={procedure.name}
+              className="w-6 h-6 mr-3 mt-1 flex-shrink-0"
+            />
             <div className="flex-grow">
               <h3 className="font-normal text-sm py-2">{procedure.name}</h3>
             </div>
@@ -60,3 +82,4 @@ export function MultiSelectCase({ onChange }: MultiSelectButtonsProps) {
     </div>
   )
 }
+

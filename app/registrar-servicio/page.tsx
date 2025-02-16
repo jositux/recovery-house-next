@@ -56,7 +56,13 @@ type FormValues = z.infer<typeof formSchema>;
 
 export default function RegisterPropertyBasePage() {
   const [extraTags, setExtraTags] = useState<
-    { id: string; name: string; icon: string; enable_property: boolean; enable_services: boolean; }[]
+    {
+      id: string;
+      name: string;
+      icon: string;
+      enable_property: boolean;
+      enable_services: boolean;
+    }[]
   >([]);
   /*const [servicesTags, setServicesTags] = useState<
     { id: string; name: string; icon: string; }[]
@@ -66,7 +72,7 @@ export default function RegisterPropertyBasePage() {
   );*/
   //const [memberships, setMemberships] = useState<MembershipTag[]>([]);
 
- /* useEffect(() => {
+  /* useEffect(() => {
     const fetchMemberships = async () => {
       const data = await getMembershipTags();
       setMemberships(data);
@@ -74,7 +80,7 @@ export default function RegisterPropertyBasePage() {
     fetchMemberships();
   }, []);*/
 
- /*const handleSelectionChange = (selectedId: string | null) => {
+  /*const handleSelectionChange = (selectedId: string | null) => {
     setSelectedMembership(selectedId);
     console.log("Selected membership ID:", selectedId);
   };*/
@@ -86,7 +92,7 @@ export default function RegisterPropertyBasePage() {
         setExtraTags(extraTagsData);
 
         //const servicesTagsData = await getServiceTags();
-       // setServicesTags(servicesTagsData);
+        // setServicesTags(servicesTagsData);
       } catch (error) {
         console.error(error);
       }
@@ -131,21 +137,22 @@ export default function RegisterPropertyBasePage() {
   };
 
   useEffect(() => {
-    const subscriptionData = localStorage.getItem("subscription")
+    const subscriptionData = localStorage.getItem("subscription");
     if (subscriptionData) {
-      const { subscriptionPrice, subscriptionType, price } = JSON.parse(subscriptionData)
-      form.setValue("subscriptionPrice", subscriptionPrice)
-      form.setValue("subscriptionType", subscriptionType)
-      form.setValue("price", price)
+      const { subscriptionPrice, subscriptionType, price } =
+        JSON.parse(subscriptionData);
+      form.setValue("subscriptionPrice", subscriptionPrice);
+      form.setValue("subscriptionType", subscriptionType);
+      form.setValue("price", price);
     }
-  }, [])
+  }, []);
 
   const selectedExtraTags = useWatch({
     control: form.control,
     name: "extraTags",
   });
 
- /* const selectedServiceTags = useWatch({
+  /* const selectedServiceTags = useWatch({
     control: form.control,
     name: "serviceTags",
   });*/
@@ -218,107 +225,117 @@ export default function RegisterPropertyBasePage() {
   return (
     <div className="min-h-screen bg-[#F8F8F7]">
       <div className="container mx-auto max-w-2xl py-16 px-4">
-      <h1 className="text-3xl font-bold mb-6">
-        Registra tu servicio
-      </h1>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <div className="space-y-4 p-4 bg-white rounded-xl">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nombre del Servicio</FormLabel>
-                <FormControl>
-                  <Input placeholder="Ej. Peluquería Pedrito" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input type="email" placeholder="Correo electrónico" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Teléfono</FormLabel>
-                  <FormControl>
-                    <Input type="text" placeholder="Número de teléfono" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Textarea placeholder="Describe las características" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          </div>
-          <div className="space-y-4 p-4 bg-white rounded-xl">
-          <FormField
-            control={form.control}
-            name="extraTags"
-            render={() => (
-              <FormItem>
-                <FormLabel className="text-lg">Servicios Ofrecidos</FormLabel>
-                <Controller
+        <h1 className="text-3xl font-bold mb-6">Registra tu servicio</h1>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <div className="space-y-4 p-4 bg-white rounded-xl">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nombre del Servicio</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ej. Peluquería Pedrito" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
                   control={form.control}
-                  name="extraTags"
-                  render={() => (
-                    <CollectionExtraTags
-                      onChange={handleTagsChange}
-                      extraTags={extraTags}
-                      initialSelectedTags={selectedExtraTags}
-                      enable="services"
-                    />
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="Correo electrónico"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
                 />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Teléfono</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Número de teléfono"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-          </div>
-          <div className="space-y-4 p-4 bg-white rounded-xl">
-<h2 className="text-lg">Dónde ofrece su servicio?</h2>
-<LocationSelector
-            onChange={({ country, state, city }) => {
-              form.setValue("country", country);
-              form.setValue("state", state);
-              form.setValue("city", city);
-            }}
-            error={{
-              country: form.formState.errors.country?.message,
-              state: form.formState.errors.state?.message,
-              city: form.formState.errors.city?.message,
-            }}
-          />
-{/*
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Describe las características"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="space-y-4 p-4 bg-white rounded-xl">
+              <FormField
+                control={form.control}
+                name="extraTags"
+                render={() => (
+                  <FormItem>
+                    <FormLabel className="text-lg">
+                      Servicios Ofrecidos
+                    </FormLabel>
+                    <Controller
+                      control={form.control}
+                      name="extraTags"
+                      render={() => (
+                        <CollectionExtraTags
+                          onChange={handleTagsChange}
+                          extraTags={extraTags}
+                          initialSelectedTags={selectedExtraTags}
+                          enable="services"
+                        />
+                      )}
+                    />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="space-y-4 p-4 bg-white rounded-xl">
+              <h2 className="text-lg">Dónde ofrece su servicio?</h2>
+              <LocationSelector
+                onChange={({ country, state, city }) => {
+                  form.setValue("country", country);
+                  form.setValue("state", state);
+                  form.setValue("city", city);
+                }}
+                error={{
+                  country: form.formState.errors.country?.message,
+                  state: form.formState.errors.state?.message,
+                  city: form.formState.errors.city?.message,
+                }}
+              />
+              {/*
           <FormField
             control={form.control}
             name="membership"
@@ -338,62 +355,60 @@ export default function RegisterPropertyBasePage() {
             />*/}
             </div>
             <div className="space-y-4 p-4 bg-white rounded-xl">
-            <h2 className="text-lg">Información Legal</h2>
-          <FormField
-            control={form.control}
-            name="taxIdEIN"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Tax ID/EIN</FormLabel>
-                <FormControl>
-                  <Input placeholder="Tax ID/EIN" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+              <h2 className="text-lg">Información Legal</h2>
+              <FormField
+                control={form.control}
+                name="taxIdEIN"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tax ID/EIN</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Tax ID/EIN" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-         
-            <FormField
-              control={form.control}
-              name="RNTFile"
-              render={() => (
-                <FormItem>
-                  <FormLabel>RNT File</FormLabel>
-                  <FormControl>
-                    <FileUpload
-                      id={RNTFileData.id}
-                      filename_download={RNTFileData.filename_download}
-                      onUploadSuccess={handleRNTFileUpload}
-                      onClearFile={handleRNTFileClear}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="taxIdEINFile"
-              render={() => (
-                <FormItem>
-                  <FormLabel>TAX ID File</FormLabel>
-                  <FormControl>
-                    <FileUpload
-                      id={TaxFileData.id}
-                      filename_download={TaxFileData.filename_download}
-                      onUploadSuccess={handleTaxFileUpload}
-                      onClearFile={handleTaxFileClear}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="RNTFile"
+                  render={() => (
+                    <FormItem>
+                      <FormLabel>RNT File</FormLabel>
+                      <FormControl>
+                        <FileUpload
+                          id={RNTFileData.id}
+                          filename_download={RNTFileData.filename_download}
+                          onUploadSuccess={handleRNTFileUpload}
+                          onClearFile={handleRNTFileClear}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="taxIdEINFile"
+                  render={() => (
+                    <FormItem>
+                      <FormLabel>TAX ID File</FormLabel>
+                      <FormControl>
+                        <FileUpload
+                          id={TaxFileData.id}
+                          filename_download={TaxFileData.filename_download}
+                          onUploadSuccess={handleTaxFileUpload}
+                          onClearFile={handleTaxFileClear}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
-          </div>
-         
-          {/*<FormField
+
+            {/*<FormField
             control={form.control}
             name="serviceTags"
             render={() => (
@@ -414,12 +429,16 @@ export default function RegisterPropertyBasePage() {
               </FormItem>
             )}
                   />*/}
-          <Button type="submit" className="w-full bg-[#39759E]" disabled={isSubmitting}>
-            {isSubmitting ? "Registrando..." : "Registrar Proveedor"}
-          </Button>
-        </form>
-      </Form>
-    </div>
+            <Button
+              type="submit"
+              className="w-full bg-[#39759E]"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Registrando..." : "Registrar Proveedor"}
+            </Button>
+          </form>
+        </Form>
+      </div>
     </div>
   );
 }
