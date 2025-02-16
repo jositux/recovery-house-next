@@ -57,7 +57,6 @@ export default function EditPropertyPage({
     form.setValue("longitude", details.lng);
     form.setValue("postalCode", details.postalCode);
   };
-  const [selectedPatology, setSelectedPatology] = useState<string[]>([]);
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
