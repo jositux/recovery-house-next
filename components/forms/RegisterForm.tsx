@@ -175,7 +175,7 @@ export default function RegisterForm({
         </div>
 
         <div className="space-y-4 p-4 bg-white rounded-xl">
-          <h2 className="text-lg font-medium">Informacion de contacto</h2>
+          <h2 className="text-lg font-medium">Información de contacto</h2>
           <FormField
             control={form.control}
             name="address"
@@ -206,7 +206,7 @@ export default function RegisterForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    Telefono<span className="text-red-500">*</span>
+                    Teléfono<span className="text-red-500">*</span>
                   </FormLabel>
                   <FormControl>
                     <Input

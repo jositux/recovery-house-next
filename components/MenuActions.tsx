@@ -43,7 +43,7 @@ export function MenuActions() {
         }`}
       >
         <ul className="text-sm text-[#162F40]">
-          <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+          <li className="px-4 py-2 hover:bg-gray-100 rounded-lg cursor-pointer">
             <Link href="/registrar-propiedad" className="flex items-center gap-2">
               <Building className="w-4 h-4" />
               Agregar Propiedad

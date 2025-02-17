@@ -67,7 +67,7 @@ export function MenuProfile({ name }: ProfileMenuProps) {
 
       {/* Menú desplegable */}
       <div
-        className={`absolute right-0 mt-2 w-48 bg-white shadow-md rounded-lg z-10 transition-all duration-300 ${
+        className={`absolute right-0 mt-2 w-48 bg-white shadow-md rounded-lg z-999 transition-all duration-300 ${
           isMenuOpen
             ? "opacity-100 scale-100 visible"
             : "opacity-0 scale-95 invisible"
@@ -80,7 +80,7 @@ export function MenuProfile({ name }: ProfileMenuProps) {
               Mi Perfil
             </Link>
       </li>*/}
-          <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+          <li className="px-4 py-2 hover:bg-gray-100 rounded-lg cursor-pointer">
             <Link href="/mis-propiedades" className="flex items-center gap-2">
               <Building className="w-4 h-4" />
               Mis propiedades

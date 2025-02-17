@@ -32,7 +32,7 @@ import { Building2, Home, Save } from "lucide-react"
 
 const formSchema = z.object({
   name: z.string().min(1, "El nombre es requerido."),
-  description: z.string().min(6, "El la descripcion es requerida."),
+  description: z.string().min(6, "El la descripción es requerida."),
   country: z.string().min(1, "Por favor selecciona un país."),
   state: z.string().min(1, "Por favor selecciona un estado."),
   city: z.string().min(1, "Por favor selecciona una ciudad."),
@@ -513,7 +513,7 @@ export default function RegisterPropertyBasePage() {
                   name="guestComments"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Información Util</FormLabel>
+                      <FormLabel>Información útil</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Textarea
