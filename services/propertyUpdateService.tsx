@@ -48,6 +48,8 @@ export const propertyUpdateService = {
 
       const patient_id = responseUser.data.data.id;
 
+
+console.log("lo qye recibo", propertyData.patology);
       const formatedData = {
         id: propertyId,
         userId: patient_id,

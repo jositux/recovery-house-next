@@ -23,13 +23,25 @@ const procedures: Procedure[] = [
 ]
 
 export function MultiSelectCase({ value = [], onChange }: MultiSelectButtonsProps) {
+
+  const safeValue = Array.isArray(value) ? value : (() => {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  })();
+
   const toggleProcedure = useCallback(
     (name: string) => {
-      const newSelection = value.includes(name) ? value.filter((item) => item !== name) : [...value, name]
-      onChange(newSelection)
+      const newSelection = safeValue.includes(name)
+        ? safeValue.filter((item) => item !== name)
+        : [...safeValue, name];
+      onChange(newSelection);
     },
-    [value, onChange],
-  )
+    [safeValue, onChange]
+  );
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-4xl mx-auto">

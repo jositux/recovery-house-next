@@ -32,6 +32,7 @@ import { MultiSelectCase } from "@/components/MultiSelectCase";
 
 import { useRouter } from "next/navigation";
 
+
 import {
   formSchema,
   type FormValues,
@@ -112,6 +113,13 @@ export default function EditPropertyPage({
     getParams();
   }, [params]);
 
+  const decodeHtmlAndRemoveTags = (html: string): string => {
+    const textWithoutTags = html.replace(/<\/?[^>]+(>|$)/g, "")
+    const txt = document.createElement("textarea")
+    txt.innerHTML = textWithoutTags
+    return txt.value
+  }
+
   const fetchProperty = useCallback(async () => {
     if (!paramId) return;
 
@@ -146,7 +154,7 @@ export default function EditPropertyPage({
             address: selectedProperty.address,
             patology: selectedProperty.patology,
             hostName: selectedProperty.hostName,
-            guestComments: selectedProperty.guestComments,
+            guestComments: decodeHtmlAndRemoveTags(selectedProperty.guestComments),
           });
 
           // Actualizar defaultLocation con los datos de la propiedad
