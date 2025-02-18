@@ -116,9 +116,7 @@ export default function RegistrationPage() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-        <h1 className={`${fraunces.className} text-2xl font-medium mb-6`}>
-          Registrar Usuario
-        </h1>
+        
         </motion.div>
 
           {currentStep === "details" && (
@@ -129,6 +127,9 @@ export default function RegistrationPage() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
+              <h1 className={`${fraunces.className} text-2xl font-medium mb-6`}>
+          Registrar Usuario
+        </h1>
               <RegisterForm
                 onSubmit={handleRegisterSubmit}
                 initialValues={registrationData || undefined}
@@ -182,7 +183,7 @@ export default function RegistrationPage() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="space-y-4 p-4 bg-white rounded-xl">
+              <div className="space-y-4 p-8 bg-white rounded-xl">
                 <h1
                   className={`${fraunces.className} text-2xl text-center font-medium mb-6`}
                 >
