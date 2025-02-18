@@ -9,7 +9,8 @@ import { format, differenceInDays } from "date-fns"
 import { es } from "date-fns/locale"
 import Image from "next/image"
 import ReviewModal from "@/components/ReviewModal"
-import { Calendar, Users, DollarSign, Home, Star, Loader2 } from "lucide-react"
+import { Calendar, Users, DollarSign, Home, Star, Loader2,  Search  } from "lucide-react"
+import Link from 'next/link'
 
 interface Booking {
   id: string
@@ -146,7 +147,26 @@ const BookingList: React.FC = () => {
     <div className="container mx-auto py-16 px-4 sm:px-4 lg:px-0">
       <h1 className="text-3xl font-bold mb-6 text-gray-900">Mis Reservas</h1>
       {bookings.length === 0 ? (
-        <p className="text-center text-gray-600 text-lg">No tienes reservas actualmente.</p>
+        <main className="flex-grow flex items-center justify-center px-4">
+        <div className="text-center max-w-2xl">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            ¡Encuentra tu espacio ideal para una recuperación tranquila!
+          </h2>
+          <p className="text-lg text-gray-600 mb-8">
+            Aún no tienes reservas, pero estamos aquí para ayudarte a encontrar la casa de recuperación perfecta para tu
+            proceso de sanación y bienestar.
+          </p>
+          <Button
+            className="inline-flex items-center px-6 py-3 text-white bg-[#4A90E2] hover:bg-[#3A7BC8] transition-colors duration-300"
+            asChild
+          >
+            <Link href="/rooms">
+              <Search className="mr-2 h-5 w-5" />
+              Buscar casa de recuperación
+            </Link>
+          </Button>
+        </div>
+      </main>
       ) : (
         <ul className="space-y-8">
           {bookings.map((booking) => {
