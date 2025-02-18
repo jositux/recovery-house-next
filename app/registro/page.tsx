@@ -77,6 +77,8 @@ export default function RegistrationPage() {
 
       console.log("respuesta ", response.code)
 
+      setSuccessMessage(null)
+
       if(response.code == "409") {
         setSuccessMessage("El email ya está siendo utilizado por otro usuario, por favor use otro");
       }
@@ -85,7 +87,6 @@ export default function RegistrationPage() {
       setSuccessMessage(null)
 
       if (response.challenge) {
-        localStorage.setItem("initialRole", registerData.initialRole);
         localStorage.setItem("verificationChallenge", response.challenge);
       }
 
@@ -222,8 +223,8 @@ export default function RegistrationPage() {
               <LoginForm />
             </motion.div>
           )}
-
-{successMessage && (
+          
+          {successMessage && (
             <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mt-4 mb-4 rounded" role="alert">
               <p className="font-bold">¡Atención!</p>
               <p>{successMessage}</p>
