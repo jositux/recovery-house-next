@@ -162,6 +162,8 @@ export default function RoomsPage() {
                     price={Number.parseFloat(room.pricePerNight)}
                     image={`/webapi/assets/${room.mainImage}?key=medium`}
                     propertyName={room.propertyName}
+                    country={room.propertyLocation.split(", ")[2]}
+                    state={room.propertyLocation.split(", ")[1]}
                   />
                 </div>
               ))}

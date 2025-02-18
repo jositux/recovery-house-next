@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-const API_URL = '/webapi/users/register';
+//const API_URL = '/webapi/users/register';
 
-//const API_URL = '/webapi/flows/trigger/c620e196-b720-44d5-8c71-5408e9a9f234'
+const API_URL = '/webapi/flows/trigger/c620e196-b720-44d5-8c71-5408e9a9f234'
 
 
 export interface RegisterCredentials {
@@ -27,10 +27,13 @@ export interface RegisterResponse {
 export const registerService = {
   register: async (credentials: RegisterCredentials): Promise<RegisterResponse> => {
     try {
-      // Filtramos eliminando initialRole
+      // Chequeamos que exista el email
       const { initialRole, birthDate, phone, emergencyPhone, address, ...filteredData } = credentials;
       const response = await axios.post<RegisterResponse>(`${API_URL}`, filteredData);
       
+      if(response.data.code == "200") {
+        await axios.post<RegisterResponse>(`/webapi/users/register`, filteredData);
+      }
       return response.data;
     } catch (error) {
       if (axios.isAxiosError(error)) {
