@@ -1,7 +1,7 @@
 "use client"
 
-import * as React from "react"
-import { useState, Suspense } from "react"
+import type * as React from "react"
+import { useState, useEffect, Suspense } from "react"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import { Search, Check, X } from "lucide-react"
@@ -13,8 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import Image from "next/image"
 import styles from "./MedicalSearch.module.css"
-import { useRouter } from "next/navigation"
-import { useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 
 interface Procedure {
   name: string
@@ -40,7 +39,7 @@ interface SearchParamsHandlerProps {
 function SearchParamsHandler({ setSelectedProcedures, setLocation, setDate, setTravelers }: SearchParamsHandlerProps) {
   const searchParams = useSearchParams()
 
-  React.useEffect(() => {
+  useEffect(() => {
     const proceduresParam = searchParams.get("procedures")
     const locationParam = searchParams.get("location")
     const checkInParam = searchParams.get("checkIn")
@@ -56,12 +55,16 @@ function SearchParamsHandler({ setSelectedProcedures, setLocation, setDate, setT
     }
 
     if (checkInParam) {
-      const fromDate = new Date(checkInParam)
+      const fromDate = new Date(checkInParam + "T00:00:00")
+      console.log("Check-in param:", checkInParam)
+      console.log("Created fromDate:", fromDate)
       setDate((prev) => ({ ...prev, from: fromDate }))
     }
 
     if (checkOutParam) {
-      const toDate = new Date(checkOutParam)
+      const toDate = new Date(checkOutParam + "T00:00:00")
+      console.log("Check-out param:", checkOutParam)
+      console.log("Created toDate:", toDate)
       setDate((prev) => ({
         from: prev?.from ?? undefined,
         to: toDate,
@@ -81,14 +84,12 @@ function SearchParamsHandler({ setSelectedProcedures, setLocation, setDate, setT
 
 export function SearchBar() {
   const [selectedProcedures, setSelectedProcedures] = useState<string[]>([])
-
-  const [date, setDate] = React.useState<DateRange | undefined>({
+  const [date, setDate] = useState<DateRange | undefined>({
     from: undefined,
     to: undefined,
   })
-
-  const [travelers, setTravelers] = React.useState(1)
-  const [location, setLocation] = React.useState("")
+  const [travelers, setTravelers] = useState(1)
+  const [location, setLocation] = useState("")
 
   const toggleProcedure = (procedureName: string) => {
     setSelectedProcedures((prev) =>
@@ -111,10 +112,14 @@ export function SearchBar() {
       searchParams.append("location", location)
     }
     if (date?.from) {
-      searchParams.append("checkIn", date.from.toISOString().split("T")[0])
+      const checkIn = format(date.from, "yyyy-MM-dd")
+      console.log("Setting checkIn:", checkIn)
+      searchParams.append("checkIn", checkIn)
     }
     if (date?.to) {
-      searchParams.append("checkOut", date.to.toISOString().split("T")[0])
+      const checkOut = format(date.to, "yyyy-MM-dd")
+      console.log("Setting checkOut:", checkOut)
+      searchParams.append("checkOut", checkOut)
     }
     if (travelers > 1) {
       searchParams.append("travelers", travelers.toString())
@@ -126,7 +131,7 @@ export function SearchBar() {
 
   return (
     <>
-      <Suspense fallback={null}>
+      <Suspense fallback={<div>Loading search parameters...</div>}>
         <SearchParamsHandler
           setSelectedProcedures={setSelectedProcedures}
           setLocation={setLocation}

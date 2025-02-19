@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { Check } from "lucide-react"
+import { Check } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 
 interface SelectionSearchProps {
@@ -10,6 +10,14 @@ interface SelectionSearchProps {
 }
 
 type SelectionKey = "all" | "nurse" | "coordinator" | "food" | "transportation";
+
+const spanishLabels: { [key in SelectionKey]: string } = {
+  all: "Todo incluido",
+  nurse: "Enfermera",
+  coordinator: "Coordinador",
+  food: "Comida",
+  transportation: "Transporte"
+}
 
 export default function SelectionSearch({ initialSelected = [], onChange }: SelectionSearchProps) {
   const [selections, setSelections] = useState<{ [key in SelectionKey]: boolean }>(() => {
@@ -46,7 +54,7 @@ export default function SelectionSearch({ initialSelected = [], onChange }: Sele
     } else {
       newSelections = {
         ...selections,
-        all: false, // Desactiva "Todo incluido" si se selecciona otra opción
+        all: false,
         [key]: !selections[key],
       }
     }
@@ -55,11 +63,10 @@ export default function SelectionSearch({ initialSelected = [], onChange }: Sele
   }
 
   useEffect(() => {
-    // Solo se ejecuta si ha habido un cambio en las selecciones
     if (JSON.stringify(selections) !== JSON.stringify(prevSelectionsRef.current)) {
       const newSelectedIds = Object.keys(selections).filter((key) => selections[key as SelectionKey]);
       onChange?.(newSelectedIds);
-      prevSelectionsRef.current = selections;  // Actualiza la referencia
+      prevSelectionsRef.current = selections;
     }
   }, [selections, onChange]);
 
@@ -72,7 +79,7 @@ export default function SelectionSearch({ initialSelected = [], onChange }: Sele
         }`}
         onClick={() => handleSelection("all")}
       >
-        <span>Todo incluido</span>
+        <span>{spanishLabels.all}</span>
         <div
           className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${
             selections.all ? "bg-[#162F40]" : "bg-[#e2e8f0]"
@@ -91,7 +98,7 @@ export default function SelectionSearch({ initialSelected = [], onChange }: Sele
           } hover:bg-transparent hover:text-inherit`}
           onClick={() => handleSelection(item)}
         >
-          {item.charAt(0).toUpperCase() + item.slice(1)}
+          {spanishLabels[item]}
           <div
             className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${
               selections[item] ? "bg-[#162F40]" : "bg-[#D2EFFF]"
