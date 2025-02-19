@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { PageTracker } from "react-page-tracker";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -36,7 +37,10 @@ export default function RootLayout({
       </head>
       <body className="font-dm-sans">
         <Header />
-        <main className="max-auto relative z-0">{children}</main>
+        <main className="max-auto relative z-0">
+          <PageTracker />
+          {children}
+        </main>
         <Toaster />
         <Footer />
       </body>

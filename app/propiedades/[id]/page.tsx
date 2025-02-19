@@ -10,6 +10,7 @@ import { PropertyBlockForm } from "@/components/property-block-form"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { MagicBackButton } from "@/components/ui/magic-back-button"
 
 interface Room {
   id: string
@@ -74,7 +75,7 @@ export default function RoomPage() {
       try {
         const accessToken = localStorage.getItem("access_token")
 
-        let propertyResponse;
+        let propertyResponse
 
         if (accessToken) {
           propertyResponse = await axios.get(`/webapi/items/Property/${id}`, {
@@ -85,15 +86,14 @@ export default function RoomPage() {
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },
-          });
+          })
         } else {
           propertyResponse = await axios.get(`/webapi/items/Property/${id}`, {
             params: {
               fields: "*, Rooms.*",
             },
-          });
+          })
         }
-              
 
         const propertyData: Property = propertyResponse.data.data
         setProperty(propertyData)
@@ -149,12 +149,16 @@ export default function RoomPage() {
       {/* Property Image */}
       <div className="relative h-[70vh] w-full">
         <Image src={`/webapi/assets/${property.mainImage}`} alt={property.name} layout="fill" objectFit="cover" />
+
         <div className="absolute inset-0 bg-black bg-opacity-30" />
-        <div className="absolute bottom-8 left-8 text-white">
-          <h1 className="text-5xl font-bold mb-2">{property.name}</h1>
-          <p className="text-2xl">
-            {property.city}, {property.state}, {property.country}
-          </p>
+
+        <div className="absolute bottom-8 left-0 right-0 text-white">
+          <div className="container mx-auto px-4 lg:px-20">
+            <h1 className="text-5xl font-bold mb-2">{property.name}</h1>
+            <p className="text-2xl">
+              {property.city}, {property.state}, {property.country}
+            </p>
+          </div>
         </div>
         {accessToken && (
           <div className="absolute top-4 right-4">
@@ -170,8 +174,14 @@ export default function RoomPage() {
         )}
       </div>
 
+      <div className="absolute top-8 left-0 right-0 z-10">
+        <div className="container mx-auto px-4 lg:px-20">
+          <MagicBackButton />
+        </div>
+      </div>
+
       {/* Content */}
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 lg:px-20 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
           <div className="md:col-span-2">
             <h2 className="text-2xl font-semibold mb-4">Acerca de esta propiedad</h2>
@@ -213,16 +223,16 @@ export default function RoomPage() {
                   className="bg-white border rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
                 >
                   <div className="relative w-full h-48">
-                  <Link href={`/rooms/${room.id}`} passHref>
-  <div className="relative w-full h-full">
-    <Image
-      src={`/webapi/assets/${room.mainImage}`}
-      alt={room.name}
-      layout="fill"
-      objectFit="cover"
-    />
-  </div>
-</Link>
+                    <Link href={`/rooms/${room.id}`} passHref>
+                      <div className="relative w-full h-full">
+                        <Image
+                          src={`/webapi/assets/${room.mainImage}`}
+                          alt={room.name}
+                          layout="fill"
+                          objectFit="cover"
+                        />
+                      </div>
+                    </Link>
 
                     {accessToken && (
                       <div className="absolute top-2 right-2">

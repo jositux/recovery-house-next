@@ -36,6 +36,7 @@ interface BookingWidgetProps {
   price: number
   cleaning: number
   bookings: Booking[]
+  maxGuests: number
 }
 
 export function BookingWidget({
@@ -45,6 +46,7 @@ export function BookingWidget({
   price,
   cleaning,
   bookings: initialBookings,
+  maxGuests,
 }: BookingWidgetProps) {
   const [checkIn, setCheckIn] = useState<Date>()
   const [checkOut, setCheckOut] = useState<Date>()
@@ -70,7 +72,7 @@ export function BookingWidget({
   }, [price, nights, guests, cleaning])
 
   const handleGuestsChange = (increment: number) => {
-    setGuests((prevGuests) => Math.max(1, prevGuests + increment))
+    setGuests((prevGuests) => Math.max(1, Math.min(prevGuests + increment, maxGuests)))
   }
 
   const isDateReserved = (date: Date) => {
@@ -246,7 +248,13 @@ export function BookingWidget({
               <Minus className="h-4 w-4" />
             </Button>
             <Input value={guests} readOnly className="w-12 text-center border-none" />
-            <Button type="button" variant="ghost" className="p-2" onClick={() => handleGuestsChange(1)}>
+            <Button
+              type="button"
+              variant="ghost"
+              className="p-2"
+              onClick={() => handleGuestsChange(1)}
+              disabled={guests >= maxGuests}
+            >
               <Plus className="h-4 w-4" />
             </Button>
           </div>
