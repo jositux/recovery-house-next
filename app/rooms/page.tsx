@@ -201,17 +201,31 @@ function RoomsPageContent() {
   const currentRooms = filteredRooms.slice(indexOfFirstRoom, indexOfLastRoom)
 
   const mapMarkers = useMemo(() => {
-    return properties
-      .filter((property) => property.place && property.place.coordinates)
-      .map((property) => ({
-        id: property.id,
-        name: property.name,
-        lat: property.place.coordinates[0],
-        lng: property.place.coordinates[1],
-        rooms: property.Rooms.length,
-        image: property.mainImage,
-      }))
-  }, [properties])
+    const markerMap = new Map()
+
+    filteredRooms.forEach((room) => {
+      if (room.coordinates) {
+        const [lat, lng] = room.coordinates
+        const key = `${lat},${lng}`
+
+        if (!markerMap.has(key)) {
+          markerMap.set(key, {
+            id: room.id,
+            name: room.propertyName,
+            lat,
+            lng,
+            rooms: 1,
+            image: room.mainImage,
+          })
+        } else {
+          const marker = markerMap.get(key)
+          marker.rooms += 1
+        }
+      }
+    })
+
+    return Array.from(markerMap.values())
+  }, [filteredRooms])
 
   if (isLoading) {
     return <div className="flex justify-center items-center h-screen">Cargando...</div>
