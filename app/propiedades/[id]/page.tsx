@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { MagicBackButton } from "@/components/ui/magic-back-button"
+import { getCurrentUser } from "@/services/userService"
 
 interface Room {
   id: string
@@ -65,6 +66,7 @@ export default function RoomPage() {
   const [property, setProperty] = useState<Property | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isOwner, setIsOwner] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -78,6 +80,7 @@ export default function RoomPage() {
         let propertyResponse
 
         if (accessToken) {
+          const currentUser = await getCurrentUser(accessToken)
           propertyResponse = await axios.get(`/webapi/items/Property/${id}`, {
             params: {
               fields:
@@ -87,6 +90,16 @@ export default function RoomPage() {
               Authorization: `Bearer ${accessToken}`,
             },
           })
+
+          setIsOwner(currentUser.id === propertyResponse.data.data.userId)
+
+          if (!isOwner) {
+            propertyResponse = await axios.get(`/webapi/items/Property/${id}`, {
+              params: {
+                fields: "*, Rooms.*",
+              },
+            })
+          }
         } else {
           propertyResponse = await axios.get(`/webapi/items/Property/${id}`, {
             params: {
@@ -142,8 +155,6 @@ export default function RoomPage() {
     )
   }
 
-  const accessToken = localStorage.getItem("access_token")
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Property Image */}
@@ -160,7 +171,7 @@ export default function RoomPage() {
             </p>
           </div>
         </div>
-        {accessToken && (
+        {isOwner && (
           <div className="absolute top-4 right-4">
             <Button
               variant="secondary"
@@ -203,7 +214,7 @@ export default function RoomPage() {
         <div className="mb-12">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold">Habitaciones disponibles</h2>
-            {accessToken && (
+            {isOwner && (
               <Button asChild>
                 <Link
                   href={`/propiedades/${property.id}/room/create`}
@@ -234,7 +245,7 @@ export default function RoomPage() {
                       </div>
                     </Link>
 
-                    {accessToken && (
+                    {isOwner && (
                       <div className="absolute top-2 right-2">
                         <Button
                           variant="secondary"
@@ -270,7 +281,7 @@ export default function RoomPage() {
                       </div>
                     </div>
                     <p className="text-sm text-gray-600 mb-4">Tarifa de limpieza: ${room.cleaningFee}</p>
-                    {accessToken && <PropertyBlockForm />}
+                    {isOwner && <PropertyBlockForm />}
                   </div>
                 </div>
               ))}
@@ -291,7 +302,7 @@ export default function RoomPage() {
                 Agregar habitaciones es el primer paso para convertir tu espacio en una fuente de ingresos. Muestra tus
                 espacios únicos y comienza a recibir reservas hoy mismo.
               </p>
-              {accessToken && (
+              {isOwner && (
                 <div className="flex flex-col items-center space-y-4">
                   <Button
                     asChild

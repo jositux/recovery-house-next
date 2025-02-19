@@ -9,6 +9,7 @@ import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { es } from "date-fns/locale";
 import {
   Form,
   FormControl,
@@ -82,8 +83,8 @@ export function PropertyBlockForm() {
               <div className="space-y-0.5">
                 <FormLabel className="text-base">Bloquear Habitación</FormLabel>
                 <FormDescription className="mr-4">
-                  Activa la opción y Elige un rango de fechas. La habitación
-                  se ocultará en ese período.
+                  Activa la opción y Elige un rango de fechas. La habitación se
+                  ocultará en ese período.
                 </FormDescription>
               </div>
               <FormControl>
@@ -111,12 +112,12 @@ export function PropertyBlockForm() {
                         <Button
                           variant={"outline"}
                           className={cn(
-                            "w-full pl-3 text-left font-normal",
+                            "w-full pl-3 text-left font-normal text-[13px]",
                             !field.value && "text-muted-foreground"
                           )}
                         >
                           {field.value ? (
-                            format(field.value, "PPP")
+                            format(field.value, "d MMM, yyyy", { locale: es })
                           ) : (
                             <span>Desde</span>
                           )}
@@ -155,12 +156,12 @@ export function PropertyBlockForm() {
                         <Button
                           variant={"outline"}
                           className={cn(
-                            "w-full pl-3 text-left font-normal",
+                            "w-full pl-3 text-left font-normal text-[13px]",
                             !field.value && "text-muted-foreground"
                           )}
                         >
                           {field.value ? (
-                            format(field.value, "PPP")
+                            format(field.value, "d MMM, yyyy", { locale: es })
                           ) : (
                             <span>Hasta</span>
                           )}
