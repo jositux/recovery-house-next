@@ -24,15 +24,20 @@ export function CollectionServiceTags({
 
   const handleTagClick = (idTag: string) => {
     setSelectedTags((prevSelectedTags) => {
+      let updatedTags: string[];
+  
       if (idTag === "all-included") {
         // Si se selecciona "all-included", seleccionamos solo este y deseleccionamos el resto
-        return prevSelectedTags.includes("all-included") ? [] : ["all-included"];
+        updatedTags = prevSelectedTags.includes("all-included") ? [] : ["all-included"];
       } else {
         // Si se selecciona otro tag, deseleccionamos "all-included"
-        return prevSelectedTags.includes(idTag)
+        updatedTags = prevSelectedTags.includes(idTag)
           ? prevSelectedTags.filter((id) => id !== idTag)
           : prevSelectedTags.filter((id) => id !== "all-included").concat(idTag);
       }
+  
+      // Filtrar para evitar campos vacíos
+      return updatedTags.filter((tag) => tag.trim() !== "");
     });
   };
 

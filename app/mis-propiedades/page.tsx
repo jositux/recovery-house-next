@@ -56,6 +56,14 @@ const PropertiesPage: React.FC = () => {
     return <p className="text-center p-4 text-red-500">Error: {error}</p>
   }
 
+  const decodeHtmlAndRemoveTags = (html: string): string => {
+    const textWithoutTags = html.replace(/<\/?[^>]+(>|$)/g, "")
+    const txt = document.createElement("textarea")
+    txt.innerHTML = textWithoutTags
+    return txt.value
+  }
+
+
   return (
     <div className="container min-h-screen mx-auto py-16 px-4 md:px-6 lg:px-8">
       <div className="flex justify-between items-center mb-8">
@@ -121,7 +129,7 @@ const PropertiesPage: React.FC = () => {
                       <MapPin className="h-4 w-4 mr-1" />
                       {property.country}
                     </p>
-                    <p className="text-sm text-gray-600 line-clamp-2">{property.description || "Sin descripción"}</p>
+                    <p className="text-sm text-gray-600 line-clamp-2">{decodeHtmlAndRemoveTags(property.description)|| "Sin descripción"}</p>
                     <p className="text-sm text-gray-500 mt-2 flex items-center">
                       <BedDouble className="h-4 w-4 mr-1" />
                       {property.Rooms?.length || 0} habitación{property.Rooms?.length !== 1 ? "es" : ""}

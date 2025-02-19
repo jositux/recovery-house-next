@@ -36,15 +36,15 @@ export const roomUpdateService = {
       const normalizedCleaningFee =
         String(data.cleaningFee).trim() === "" ? "0" : String(data.cleaningFee);
 
-      // Transformar servicesTags a [{ serviceTags_id: string }]
-      const formattedServiceTags = data.servicesTags.map((tag) => ({
-        serviceTags_id: tag,
-      }));
-
-      // Transformar extraTags a [{ extratags_id: string }]
-      const formattedExtraTags = data.extraTags.map((tag) => ({
-        ExtraTags_id: tag,
-      }));
+       // Transformar servicesTags a [{ serviceTags_id: string }]
+       const formattedServiceTags = data.servicesTags
+       .filter(tag => tag.trim() !== "") // Filtra valores vacíos o con solo espacios
+       .map(tag => ({ serviceTags_id: tag }));
+ 
+       // Transformar extraTags a [{ extratags_id: string }]
+       const formattedExtraTags = data.extraTags
+         .filter((tag) => tag.trim() !== "") // Filtra valores vacíos o con solo espacios
+         .map((tag) => ({ ExtraTags_id: tag }));
 
       // Transformar photos, asignando mainImage si photos está vacío
       const formattedPhotos =

@@ -73,15 +73,27 @@ export default function RoomPage() {
 
       try {
         const accessToken = localStorage.getItem("access_token")
-        const propertyResponse = await axios.get(`/webapi/items/Property/${id}`, {
-          params: {
-            fields:
-              "*, RNTFile.filename_download,RNTFile.id,taxIdEINFile.filename_download,taxIdEINFile.id, Rooms.*,Rooms.photos.*,Rooms.extraTags.*,Rooms.servicesTags.*",
-          },
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        })
+
+        let propertyResponse;
+
+        if (accessToken) {
+          propertyResponse = await axios.get(`/webapi/items/Property/${id}`, {
+            params: {
+              fields:
+                "*, RNTFile.filename_download,RNTFile.id,taxIdEINFile.filename_download,taxIdEINFile.id, Rooms.*,Rooms.photos.*,Rooms.extraTags.*,Rooms.servicesTags.*",
+            },
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          });
+        } else {
+          propertyResponse = await axios.get(`/webapi/items/Property/${id}`, {
+            params: {
+              fields: "*, Rooms.*",
+            },
+          });
+        }
+              
 
         const propertyData: Property = propertyResponse.data.data
         setProperty(propertyData)
@@ -130,6 +142,8 @@ export default function RoomPage() {
     )
   }
 
+  const accessToken = localStorage.getItem("access_token")
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Property Image */}
@@ -142,16 +156,18 @@ export default function RoomPage() {
             {property.city}, {property.state}, {property.country}
           </p>
         </div>
-        <div className="absolute top-4 right-4">
-          <Button
-            variant="secondary"
-            onClick={() => handleEditBanner(property)}
-            className="rounded-full bg-white hover:bg-gray-100 text-gray-800 px-4 py-2"
-          >
-            <Pencil className="h-4 w-4 mr-2" />
-            Editar
-          </Button>
-        </div>
+        {accessToken && (
+          <div className="absolute top-4 right-4">
+            <Button
+              variant="secondary"
+              onClick={() => handleEditBanner(property)}
+              className="rounded-full bg-white hover:bg-gray-100 text-gray-800 px-4 py-2"
+            >
+              <Pencil className="h-4 w-4 mr-2" />
+              Editar
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Content */}
@@ -177,15 +193,17 @@ export default function RoomPage() {
         <div className="mb-12">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold">Habitaciones disponibles</h2>
-            <Button asChild>
-              <Link
-                href={`/propiedades/${property.id}/room/create`}
-                className="flex items-center gap-2 bg-primary text-white hover:bg-primary-dark"
-              >
-                <Plus className="h-5 w-5" />
-                Agregar Habitación
-              </Link>
-            </Button>
+            {accessToken && (
+              <Button asChild>
+                <Link
+                  href={`/propiedades/${property.id}/room/create`}
+                  className="flex items-center gap-2 bg-primary text-white hover:bg-primary-dark"
+                >
+                  <Plus className="h-5 w-5" />
+                  Agregar Habitación
+                </Link>
+              </Button>
+            )}
           </div>
           {property.Rooms && property.Rooms.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -195,17 +213,29 @@ export default function RoomPage() {
                   className="bg-white border rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
                 >
                   <div className="relative w-full h-48">
-                    <Image src={`/webapi/assets/${room.mainImage}`} alt={room.name} layout="fill" objectFit="cover" />
-                    <div className="absolute top-2 right-2">
-                      <Button
-                        variant="secondary"
-                        onClick={() => handleEditRoom(room)}
-                        className="rounded-full bg-white hover:bg-gray-100 text-gray-800 px-4 py-2"
-                      >
-                        <Pencil className="h-4 w-4 mr-2" />
-                        Editar
-                      </Button>
-                    </div>
+                  <Link href={`/rooms/${room.id}`} passHref>
+  <div className="relative w-full h-full">
+    <Image
+      src={`/webapi/assets/${room.mainImage}`}
+      alt={room.name}
+      layout="fill"
+      objectFit="cover"
+    />
+  </div>
+</Link>
+
+                    {accessToken && (
+                      <div className="absolute top-2 right-2">
+                        <Button
+                          variant="secondary"
+                          onClick={() => handleEditRoom(room)}
+                          className="rounded-full bg-white hover:bg-gray-100 text-gray-800 px-4 py-2"
+                        >
+                          <Pencil className="h-4 w-4 mr-2" />
+                          Editar
+                        </Button>
+                      </div>
+                    )}
                   </div>
 
                   <div className="p-6">
@@ -230,40 +260,41 @@ export default function RoomPage() {
                       </div>
                     </div>
                     <p className="text-sm text-gray-600 mb-4">Tarifa de limpieza: ${room.cleaningFee}</p>
-                    <PropertyBlockForm />
+                    {accessToken && <PropertyBlockForm />}
                   </div>
                 </div>
               ))}
             </div>
           ) : (
             <div className="bg-white border rounded-lg shadow-lg p-8 text-center">
-            <div className="mb-6 relative">
-              <Image
-                src="/assets/welcome/host.jpg?height=200&width=200"
-                alt="No rooms"
-                width={200}
-                height={200}
-                className="mx-auto"
-              />
+              <div className="mb-6 relative">
+                <Image
+                  src="/assets/welcome/host.jpg?height=200&width=200"
+                  alt="No rooms"
+                  width={200}
+                  height={200}
+                  className="mx-auto"
+                />
+              </div>
+              <h3 className="text-3xl font-semibold mb-4 text-gray-800">¡Desbloquea el potencial de tu propiedad!</h3>
+              <p className="text-lg text-gray-600 mb-6 max-w-2xl mx-auto">
+                Agregar habitaciones es el primer paso para convertir tu espacio en una fuente de ingresos. Muestra tus
+                espacios únicos y comienza a recibir reservas hoy mismo.
+              </p>
+              {accessToken && (
+                <div className="flex flex-col items-center space-y-4">
+                  <Button
+                    asChild
+                    className="bg-primary text-white hover:bg-primary-dark transition-colors duration-300 rounded-full px-8 py-4 text-lg shadow-lg hover:shadow-xl"
+                  >
+                    <Link href={`/propiedades/${property.id}/room/create`}>
+                      <Plus className="h-6 w-6 mr-2 inline-block" />
+                      Agregar tu primera habitación
+                    </Link>
+                  </Button>
+                </div>
+              )}
             </div>
-            <h3 className="text-3xl font-semibold mb-4 text-gray-800">¡Desbloquea el potencial de tu propiedad!</h3>
-            <p className="text-lg text-gray-600 mb-6 max-w-2xl mx-auto">
-              Agregar habitaciones es el primer paso para convertir tu espacio en una fuente de ingresos. Muestra tus
-              espacios únicos y comienza a recibir reservas hoy mismo.
-            </p>
-            <div className="flex flex-col items-center space-y-4">
-              <Button
-                asChild
-                className="bg-primary text-white hover:bg-primary-dark transition-colors duration-300 rounded-full px-8 py-4 text-lg shadow-lg hover:shadow-xl"
-              >
-                <Link href={`/propiedades/${property.id}/room/create`}>
-                  <Plus className="h-6 w-6 mr-2 inline-block" />
-                  Agregar tu primera habitación
-                </Link>
-              </Button>
-              
-            </div>
-          </div>
           )}
         </div>
       </div>
