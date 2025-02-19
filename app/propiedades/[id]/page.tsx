@@ -91,9 +91,12 @@ export default function RoomPage() {
             },
           })
 
-          setIsOwner(currentUser.id === propertyResponse.data.data.userId)
+          console.log("current ", currentUser.id)
+          console.log("property User id ", propertyResponse.data.data.userId)
+          const isCurrentUserOwner = currentUser.id === propertyResponse.data.data.userId
+          setIsOwner(isCurrentUserOwner)
 
-          if (!isOwner) {
+          if (!isCurrentUserOwner) {
             propertyResponse = await axios.get(`/webapi/items/Property/${id}`, {
               params: {
                 fields: "*, Rooms.*",
@@ -109,6 +112,7 @@ export default function RoomPage() {
         }
 
         const propertyData: Property = propertyResponse.data.data
+        console.log("la data posta", propertyData)
         setProperty(propertyData)
       } catch (error) {
         console.error("Error fetching data:", error)
@@ -122,6 +126,10 @@ export default function RoomPage() {
       fetchData()
     }
   }, [id])
+
+  useEffect(() => {
+    console.log("isOwner updated:", isOwner)
+  }, [isOwner])
 
   const decodeHtmlAndRemoveTags = (html: string): string => {
     const textWithoutTags = html.replace(/<\/?[^>]+(>|$)/g, "")

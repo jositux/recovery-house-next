@@ -199,6 +199,74 @@ export default function RegisterPropertyBasePage() {
         <h1 className="text-3xl font-bold mb-6">Registra tu propiedad</h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+
+          <div className="space-y-4 p-4 bg-white rounded-xl">
+              <h2 className="text-lg">Documentos Legales</h2>
+              <FormField
+                control={form.control}
+                name="taxIdEIN"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Número de Impuestos Tax ID/EIN</FormLabel>
+                    <FormControl>
+                      <Input type="text" placeholder="Tax ID/EIN" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="RNTFile"
+                  render={() => (
+                    <FormItem>
+                      <FormLabel>Archivo RNT</FormLabel>
+                      <FormControl>
+                        <FileUpload
+                          id={RNTFileData.id}
+                          filename_download={RNTFileData.filename_download}
+                          onUploadSuccess={(response) => {
+                            if (response.id !== RNTFileData.id) {
+                              setRNTFileData(response)
+                              form.setValue("RNTFile", response.id)
+                              form.clearErrors("RNTFile")
+                            }
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="taxIdEINFile"
+                  render={() => (
+                    <FormItem>
+                      <FormLabel>Archivo de Impuestos TAX ID</FormLabel>
+                      <FormControl>
+                        <FileUpload
+                          id={TaxFileData.id}
+                          filename_download={TaxFileData.filename_download}
+                          onUploadSuccess={(response) => {
+                            if (response.id !== TaxFileData.id) {
+                              setTaxFileData(response)
+                              form.setValue("taxIdEINFile", response.id)
+                              form.clearErrors("taxIdEINFile")
+                            }
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+            
             <div className="space-y-4 p-4 bg-white rounded-xl">
               <FormField
                 control={form.control}
@@ -415,72 +483,7 @@ export default function RegisterPropertyBasePage() {
                 )}
               />
             </div>
-            <div className="space-y-4 p-4 bg-white rounded-xl">
-              <h2 className="text-lg">Documentos Legales</h2>
-              <FormField
-                control={form.control}
-                name="taxIdEIN"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Número de Impuestos Tax ID/EIN</FormLabel>
-                    <FormControl>
-                      <Input type="text" placeholder="Tax ID/EIN" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="RNTFile"
-                  render={() => (
-                    <FormItem>
-                      <FormLabel>Archivo RNT</FormLabel>
-                      <FormControl>
-                        <FileUpload
-                          id={RNTFileData.id}
-                          filename_download={RNTFileData.filename_download}
-                          onUploadSuccess={(response) => {
-                            if (response.id !== RNTFileData.id) {
-                              setRNTFileData(response)
-                              form.setValue("RNTFile", response.id)
-                              form.clearErrors("RNTFile")
-                            }
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="taxIdEINFile"
-                  render={() => (
-                    <FormItem>
-                      <FormLabel>Archivo de Impuestos TAX ID</FormLabel>
-                      <FormControl>
-                        <FileUpload
-                          id={TaxFileData.id}
-                          filename_download={TaxFileData.filename_download}
-                          onUploadSuccess={(response) => {
-                            if (response.id !== TaxFileData.id) {
-                              setTaxFileData(response)
-                              form.setValue("taxIdEINFile", response.id)
-                              form.clearErrors("taxIdEINFile")
-                            }
-                          }}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
+           
 
             {/* <div className="container mx-auto py-12 hidden">
               <h1 className="text-2xl font-bold mb-8">

@@ -308,6 +308,65 @@ useEffect(() => {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <div className="space-y-4 p-4 bg-white rounded-xl">
+            <h2 className="text-lg">Información Legal</h2>
+          <FormField
+            control={form.control}
+            name="taxIdEIN"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Número de impuestos ID/EIN</FormLabel>
+                <FormControl>
+                  <Input placeholder="Tax ID/EIN" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          
+            {RNTFileData !== null && (
+              <FormField
+                control={form.control}
+                name="RNTFile"
+                render={() => (
+                  <FormItem>
+                    <FormLabel>Archivo RNT</FormLabel>
+                    <FormControl>
+                      <FileUpload
+                        id={RNTFileData.id}
+                        filename_download={RNTFileData.filename_download}
+                        onUploadSuccess={handleRNTFileUpload}
+                        onClearFile={handleRNTFileClear}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            {TaxFileData !== null && (
+              <FormField
+                control={form.control}
+                name="taxIdEINFile"
+                render={() => (
+                  <FormItem>
+                    <FormLabel>Archivo de Impuestos TAX ID</FormLabel>
+                    <FormControl>
+                      <FileUpload
+                        id={TaxFileData.id}
+                        filename_download={TaxFileData.filename_download}
+                        onUploadSuccess={handleTaxFileUpload}
+                        onClearFile={handleTaxFileClear}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+          </div>
+          </div>
+        <div className="space-y-4 p-4 bg-white rounded-xl">
           <FormField
             control={form.control}
             name="name"
@@ -441,65 +500,7 @@ useEffect(() => {
               </FormItem>
             )}
             />*/}
-            <div className="space-y-4 p-4 bg-white rounded-xl">
-            <h2 className="text-lg">Información Legal</h2>
-          <FormField
-            control={form.control}
-            name="taxIdEIN"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Número de impuestos ID/EIN</FormLabel>
-                <FormControl>
-                  <Input placeholder="Tax ID/EIN" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           
-            {RNTFileData !== null && (
-              <FormField
-                control={form.control}
-                name="RNTFile"
-                render={() => (
-                  <FormItem>
-                    <FormLabel>Archivo RNT</FormLabel>
-                    <FormControl>
-                      <FileUpload
-                        id={RNTFileData.id}
-                        filename_download={RNTFileData.filename_download}
-                        onUploadSuccess={handleRNTFileUpload}
-                        onClearFile={handleRNTFileClear}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-            {TaxFileData !== null && (
-              <FormField
-                control={form.control}
-                name="taxIdEINFile"
-                render={() => (
-                  <FormItem>
-                    <FormLabel>Archivo de Impuestos TAX ID</FormLabel>
-                    <FormControl>
-                      <FileUpload
-                        id={TaxFileData.id}
-                        filename_download={TaxFileData.filename_download}
-                        onUploadSuccess={handleTaxFileUpload}
-                        onClearFile={handleTaxFileClear}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-          </div>
-          </div>
 
     {/*     
           {defaultServiceTags && (

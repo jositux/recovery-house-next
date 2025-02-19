@@ -228,6 +228,61 @@ export default function RegisterPropertyBasePage() {
         <h1 className="text-3xl font-bold mb-6">Registra tu servicio</h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+
+          <div className="space-y-4 p-4 bg-white rounded-xl">
+              <h2 className="text-lg">Información Legal</h2>
+              <FormField
+                control={form.control}
+                name="taxIdEIN"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tax ID/EIN</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Tax ID/EIN" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="RNTFile"
+                  render={() => (
+                    <FormItem>
+                      <FormLabel>RNT File</FormLabel>
+                      <FormControl>
+                        <FileUpload
+                          id={RNTFileData.id}
+                          filename_download={RNTFileData.filename_download}
+                          onUploadSuccess={handleRNTFileUpload}
+                          onClearFile={handleRNTFileClear}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="taxIdEINFile"
+                  render={() => (
+                    <FormItem>
+                      <FormLabel>TAX ID File</FormLabel>
+                      <FormControl>
+                        <FileUpload
+                          id={TaxFileData.id}
+                          filename_download={TaxFileData.filename_download}
+                          onUploadSuccess={handleTaxFileUpload}
+                          onClearFile={handleTaxFileClear}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+            
             <div className="space-y-4 p-4 bg-white rounded-xl">
               <FormField
                 control={form.control}
@@ -354,59 +409,7 @@ export default function RegisterPropertyBasePage() {
             )}
             />*/}
             </div>
-            <div className="space-y-4 p-4 bg-white rounded-xl">
-              <h2 className="text-lg">Información Legal</h2>
-              <FormField
-                control={form.control}
-                name="taxIdEIN"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tax ID/EIN</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Tax ID/EIN" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="RNTFile"
-                  render={() => (
-                    <FormItem>
-                      <FormLabel>RNT File</FormLabel>
-                      <FormControl>
-                        <FileUpload
-                          id={RNTFileData.id}
-                          filename_download={RNTFileData.filename_download}
-                          onUploadSuccess={handleRNTFileUpload}
-                          onClearFile={handleRNTFileClear}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="taxIdEINFile"
-                  render={() => (
-                    <FormItem>
-                      <FormLabel>TAX ID File</FormLabel>
-                      <FormControl>
-                        <FileUpload
-                          id={TaxFileData.id}
-                          filename_download={TaxFileData.filename_download}
-                          onUploadSuccess={handleTaxFileUpload}
-                          onClearFile={handleTaxFileClear}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
+          
 
             {/*<FormField
             control={form.control}

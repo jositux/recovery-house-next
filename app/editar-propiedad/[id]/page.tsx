@@ -126,6 +126,8 @@ export default function EditPropertyPage({
     setLoading(true);
     try {
       const storedProperty = localStorage.getItem("selected_property");
+
+      console.log(JSON.stringify(storedProperty))
       if (storedProperty) {
         const selectedProperty: Property = JSON.parse(storedProperty);
 
@@ -165,6 +167,7 @@ export default function EditPropertyPage({
             postalCode: selectedProperty.postalCode || "",
           });
 
+          console.log("ID = ", selectedProperty.RNTFile)
           setRNTFileData(selectedProperty.RNTFile);
           setTaxFileData(selectedProperty.taxIdEINFile);
 
