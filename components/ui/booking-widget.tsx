@@ -127,7 +127,8 @@ export function BookingWidget({
 
       const accessToken = localStorage.getItem("access_token")
       if (!accessToken) {
-        alert("No se encontró el token de acceso.")
+        //alert("No se encontró el token de acceso.")
+        router.push("/login")
         return
       }
 

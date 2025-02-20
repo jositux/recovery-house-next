@@ -9,7 +9,7 @@ import {
 } from "@/services/RoomUpdateService";
 
 //import { usePathname } from "next/navigation";
-//import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function RoomPage() {
   /*const [submittedData, setSubmittedData] = useState<RoomUpdateData | null>(
@@ -19,15 +19,15 @@ export default function RoomPage() {
   //const pathname = usePathname(); // Obtiene la ruta actual
   ///const pathSegments = pathname.split("/"); // Divide la URL en segmentos
 
-  //const router = useRouter();
+  const router = useRouter();
 
   const handleFormSubmit = async (data: RoomUpdateData) => {
     //setSubmittedData(data);
     const response = await roomUpdateService.updateRoom(data);
 
-    if (response.id) {
-      //router.push(`/propiedades/${data.propertyId}`);
-    }
+   
+      router.push(`/propiedades/${data.propertyId}`);
+    
 
     return response.id;
   };

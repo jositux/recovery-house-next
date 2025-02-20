@@ -2,7 +2,9 @@ import type React from "react"
 import { DynamicIcon } from "lucide-react/dynamic"
 
 // Lista de íconos válidos de lucide-react
-const validIcons = ["camera", "heart", "search", "home", "bell", "star", "ghost", "wifi"] as const
+const validIcons = [
+  "camera", "heart", "search", "home", "bell", "star", "ghost", "wifi", "toilet", "plane", "coffee", "train-front-tunnel", "bed-double", "washing-machine", "accessibility", "biceps-flexed", "speech", "map-pinned", "briefcase-medical", "cooking-pot", "bus", "person-standing", "sparkles", "heart-handshake", "book-type", "users", "eye-closed", "alarm-clock-plus"
+] as const;
 
 type IconName = (typeof validIcons)[number]
 

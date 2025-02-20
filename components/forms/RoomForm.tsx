@@ -365,6 +365,12 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
               </FormItem>
             )}
           />
+
+<Textarea
+                        className="h-full min-h-[100px]"
+                        placeholder="Si necesitas explicar más sobre tus servicios, escribe aquí"
+                    
+                      />
         </div>
        
         <div className="flex gap-4 mt-4 p-4 md:p-0">
