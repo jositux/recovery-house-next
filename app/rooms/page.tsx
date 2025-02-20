@@ -33,6 +33,7 @@ interface Property {
   state: string
   city: string
   mainImage: string
+  taxIdApproved: boolean
   place: {
     type: string
     coordinates: [number, number]
@@ -156,19 +157,21 @@ function RoomsPageContent() {
     const checkOut = searchParams?.get("checkOut") || ""
     const travelers = Number.parseInt(searchParams?.get("travelers") || "1", 10)
 
-    return allRooms
-      .filter((room) => {
-        const matchesProcedures =
-          procedures.length === 0 ||
-          procedures.some((proc) => room.patology.some((pat) => pat.toLowerCase().includes(proc.toLowerCase())))
-        const matchesLocation = room.propertyLocation.toLowerCase().includes(location.toLowerCase())
-        const hasEnoughCapacity = room.capacity === undefined || room.capacity >= travelers
-        const isAvailable = isRoomAvailable(room.id, checkIn, checkOut, bookings)
+    return allRooms.filter((room) => {
+      const property = properties.find((p) => p.Rooms.some((r) => r.id === room.id))
+      if (!property || !property.taxIdApproved) {
+        return false
+      }
+      const matchesProcedures =
+        procedures.length === 0 ||
+        procedures.some((proc) => room.patology.some((pat) => pat.toLowerCase().includes(proc.toLowerCase())))
+      const matchesLocation = room.propertyLocation.toLowerCase().includes(location.toLowerCase())
+      const hasEnoughCapacity = room.capacity === undefined || room.capacity >= travelers
+      const isAvailable = isRoomAvailable(room.id, checkIn, checkOut, bookings)
 
-        return matchesProcedures && matchesLocation && hasEnoughCapacity && isAvailable
-      })
-      .reverse()
-  }, [allRooms, searchParams, bookings, isRoomAvailable])
+      return matchesProcedures && matchesLocation && hasEnoughCapacity && isAvailable
+    })
+  }, [allRooms, searchParams, bookings, isRoomAvailable, properties])
 
   useEffect(() => {
     const newVisibleRooms = filteredRooms.map((room) => room.id)
@@ -204,13 +207,14 @@ function RoomsPageContent() {
     const markerMap = new Map()
 
     filteredRooms.forEach((room) => {
-      if (room.coordinates) {
+      const property = properties.find((p) => p.Rooms.some((r) => r.id === room.id))
+      if (property && room.coordinates) {
         const [lat, lng] = room.coordinates
         const key = `${lat},${lng}`
 
         if (!markerMap.has(key)) {
           markerMap.set(key, {
-            id: room.id,
+            id: property.id, // Cambiado de room.id a property.id
             name: room.propertyName,
             lat,
             lng,
@@ -225,7 +229,7 @@ function RoomsPageContent() {
     })
 
     return Array.from(markerMap.values())
-  }, [filteredRooms])
+  }, [filteredRooms, properties])
 
   if (isLoading) {
     return <div className="flex justify-center items-center h-screen">Cargando...</div>
