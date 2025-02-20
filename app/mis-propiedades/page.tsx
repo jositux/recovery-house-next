@@ -6,7 +6,8 @@ import { getPropertiesByUserId, type Property } from "@/services/propertyCollect
 import { getCurrentUser, type User } from "@/services/userService"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { MapPin, Plus, Star, Loader2, BedDouble, Home, ArrowRight } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { MapPin, Plus, Star, Loader2, BedDouble, Home, ArrowRight, CheckCircle, AlertCircle } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -63,7 +64,6 @@ const PropertiesPage: React.FC = () => {
     return txt.value
   }
 
-
   return (
     <div className="container min-h-screen mx-auto py-16 px-4 md:px-6 lg:px-8">
       <div className="flex justify-between items-center mb-8">
@@ -96,7 +96,6 @@ const PropertiesPage: React.FC = () => {
                   </Button>
                 </Link>
               </Card>
-             
             </div>
           </CardContent>
         </Card>
@@ -129,7 +128,9 @@ const PropertiesPage: React.FC = () => {
                       <MapPin className="h-4 w-4 mr-1" />
                       {property.country}
                     </p>
-                    <p className="text-sm text-gray-600 line-clamp-2">{decodeHtmlAndRemoveTags(property.description)|| "Sin descripción"}</p>
+                    <p className="text-sm text-gray-600 line-clamp-2">
+                      {decodeHtmlAndRemoveTags(property.description) || "Sin descripción"}
+                    </p>
                     <p className="text-sm text-gray-500 mt-2 flex items-center">
                       <BedDouble className="h-4 w-4 mr-1" />
                       {property.Rooms?.length || 0} habitación{property.Rooms?.length !== 1 ? "es" : ""}
@@ -143,6 +144,17 @@ const PropertiesPage: React.FC = () => {
                         </Button>
                       </Link>
                     </div>
+                    {property.taxIdApproved ? (
+                      <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
+                        <CheckCircle className="w-3 h-3 mr-1" />
+                        Aprobado
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300">
+                        <AlertCircle className="w-3 h-3 mr-1" />
+                        En Revisión
+                      </Badge>
+                    )}
                   </div>
                 </CardContent>
               </div>
