@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
-import { countriesData, CountryData, StateData } from "@/data/countries"
+import { countriesData, type CountryData, type StateData } from "@/data/countries"
 
 interface LocationSelectorProps {
   onChange: (location: { country: string; state: string; city: string }) => void
@@ -11,9 +11,9 @@ interface LocationSelectorProps {
   defaultState?: string
   defaultCity?: string
   error?: {
-    country?: string;
-    state?: string;
-    city?: string;
+    country?: string
+    state?: string
+    city?: string
   }
 }
 
@@ -22,54 +22,71 @@ export function LocationSelector({
   defaultCountry,
   defaultState,
   defaultCity,
-  error
+  error,
 }: LocationSelectorProps) {
-  const [country, setCountry] = useState<string>(defaultCountry || "")
-  const [state, setState] = useState<string>(defaultState || "")
+  const [countryName, setCountryName] = useState<string>(defaultCountry || "")
+  const [stateName, setStateName] = useState<string>(defaultState || "")
   const [city, setCity] = useState<string>(defaultCity || "")
 
-  const [states, setStates] = useState<Record<string, string>>({})
+  const [states, setStates] = useState<string[]>([])
   const [cities, setCities] = useState<string[]>([])
 
-  useEffect(() => {
-    if (country) {
-      const selectedCountry = countriesData[country as keyof typeof countriesData]
-      if (selectedCountry) {
-        setStates(Object.fromEntries(Object.entries(selectedCountry.states).map(([key, value]) => [key, value.name])))
-        setState(prevState => prevState || "")
-        setCity(prevCity => prevCity || "")
-      }
-    }
-  }, [country, defaultState])
+  const getCountryKeyByName = useCallback((name: string): string => {
+    return Object.entries(countriesData).find(([_, country]) => country.name === name)?.[0] || ""
+  }, [])
+
+  const getStateKeyByName = useCallback((countryKey: string, stateName: string): string => {
+    const country = countriesData[countryKey as keyof typeof countriesData]
+    return Object.entries(country.states).find(([_, state]) => state.name === stateName)?.[0] || ""
+  }, [])
 
   useEffect(() => {
-    if (country && state) {
-      const selectedCountry = countriesData[country as keyof typeof countriesData] as CountryData | undefined
+    if (countryName) {
+      const countryKey = getCountryKeyByName(countryName)
+      const selectedCountry = countriesData[countryKey as keyof typeof countriesData]
+
       if (selectedCountry) {
-        const selectedState = selectedCountry.states[state as keyof typeof selectedCountry['states']] as StateData | undefined
+        setStates(Object.values(selectedCountry.states).map((state) => state.name))
+        setStateName((prevState) => prevState || "")
+        setCity((prevCity) => prevCity || "")
+      }
+    }
+  }, [countryName, getCountryKeyByName])
+
+  useEffect(() => {
+    if (countryName && stateName) {
+      const countryKey = getCountryKeyByName(countryName)
+      const stateKey = getStateKeyByName(countryKey, stateName)
+      const selectedCountry = countriesData[countryKey as keyof typeof countriesData] as CountryData | undefined
+      if (selectedCountry) {
+        const selectedState = selectedCountry.states[stateKey as keyof (typeof selectedCountry)["states"]] as
+          | StateData
+          | undefined
         if (selectedState) {
           setCities(selectedState.cities)
-          setCity(prevCity => prevCity || "")
+          setCity((prevCity) => prevCity || "")
         }
       }
     }
-  }, [country, state, defaultCity])
+  }, [countryName, stateName, getCountryKeyByName, getStateKeyByName])
+
+  useEffect(() => {
+    onChange({ country: countryName, state: stateName, city })
+  }, [countryName, stateName, city, onChange])
 
   return (
     <div className="grid grid-cols-3 md:grid-cols-3 gap-4">
       <div>
         <Label htmlFor="country">País</Label>
-        <Select onValueChange={(value) => { 
-          setCountry(value)
-          const countryName = countriesData[value as keyof typeof countriesData]?.name || ""
-          onChange({ country: countryName, state, city })
-        }} value={country}>
+        <Select onValueChange={(value) => setCountryName(value)} value={countryName}>
           <SelectTrigger id="country" className={error?.country ? "border-red-500" : ""}>
             <SelectValue placeholder="Selecciona un país" />
           </SelectTrigger>
           <SelectContent>
-            {Object.entries(countriesData).map(([key, value]) => (
-              <SelectItem key={key} value={key}>{value.name}</SelectItem>
+            {Object.values(countriesData).map((country) => (
+              <SelectItem key={country.name} value={country.name}>
+                {country.name}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -78,17 +95,15 @@ export function LocationSelector({
 
       <div>
         <Label htmlFor="state">Estado</Label>
-        <Select onValueChange={(value) => { 
-          setState(value)
-          const stateName = states[value] || ""
-          onChange({ country, state: stateName, city })
-        }} value={state}>
+        <Select onValueChange={(value) => setStateName(value)} value={stateName}>
           <SelectTrigger id="state" className={error?.state ? "border-red-500" : ""}>
             <SelectValue placeholder="Selecciona un estado" />
           </SelectTrigger>
           <SelectContent>
-            {Object.entries(states).map(([key, value]) => (
-              <SelectItem key={key} value={key}>{value}</SelectItem>
+            {states.map((state) => (
+              <SelectItem key={state} value={state}>
+                {state}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -97,16 +112,15 @@ export function LocationSelector({
 
       <div>
         <Label htmlFor="city">Ciudad</Label>
-        <Select onValueChange={(value) => { 
-          setCity(value)
-          onChange({ country, state, city: value })
-        }} value={city}>
+        <Select onValueChange={(value) => setCity(value)} value={city}>
           <SelectTrigger id="city" className={error?.city ? "border-red-500" : ""}>
             <SelectValue placeholder="Selecciona una ciudad" />
           </SelectTrigger>
           <SelectContent>
             {cities.map((city) => (
-              <SelectItem key={city} value={city}>{city}</SelectItem>
+              <SelectItem key={city} value={city}>
+                {city}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -115,3 +129,4 @@ export function LocationSelector({
     </div>
   )
 }
+

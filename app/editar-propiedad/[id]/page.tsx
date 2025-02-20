@@ -134,7 +134,7 @@ export default function EditPropertyPage({
         if (selectedProperty) {
           setProperty(selectedProperty);
 
-          console.log(selectedProperty.patology);
+          console.log("patology", selectedProperty.patology);
 
           // Actualizar el formulario con los datos de la propiedad
           form.reset({
@@ -172,7 +172,10 @@ export default function EditPropertyPage({
           setTaxFileData(selectedProperty.taxIdEINFile);
 
          
-          form.setValue("patology", selectedProperty.patology)
+          form.setValue("patology", JSON.parse(String(selectedProperty.patology)))
+
+          console.log("patologias", JSON.parse(String(selectedProperty.patology)))
+
         } else {
           throw new Error("Propiedad no encontrada");
         }
