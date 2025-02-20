@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { fetchCurrentUser } from "@/services/BookingService"
+import { fetchCurrentUser, createBooking } from "@/services/BookingService"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -10,11 +10,7 @@ import { Label } from "@/components/ui/label"
 import { format, addDays, parseISO, isWithinInterval } from "date-fns"
 import { es } from "date-fns/locale"
 import { CalendarIcon, Minus, Plus, Users } from "lucide-react"
-
-import { createBooking } from "@/services/BookingService"
-
-import { useRouter } from "next/navigation"
-
+import { useRouter, useSearchParams } from "next/navigation"
 import styles from "./BookingWidget.module.css"
 
 interface Booking {
@@ -48,9 +44,21 @@ export function BookingWidget({
   bookings: initialBookings,
   maxGuests,
 }: BookingWidgetProps) {
-  const [checkIn, setCheckIn] = useState<Date>()
-  const [checkOut, setCheckOut] = useState<Date>()
-  const [guests, setGuests] = useState(1)
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
+  const [checkIn, setCheckIn] = useState<Date | undefined>(() => {
+    const checkInParam = searchParams.get("checkIn")
+    return checkInParam ? parseISO(checkInParam) : undefined
+  })
+  const [checkOut, setCheckOut] = useState<Date | undefined>(() => {
+    const checkOutParam = searchParams.get("checkOut")
+    return checkOutParam ? parseISO(checkOutParam) : undefined
+  })
+  const [guests, setGuests] = useState(() => {
+    const travelersParam = searchParams.get("travelers")
+    return travelersParam ? Math.min(Number.parseInt(travelersParam, 10), maxGuests) : 1
+  })
   const [nights, setNights] = useState(0)
   const [totalPrice, setTotalPrice] = useState(0)
   const [loading, setLoading] = useState(false)
@@ -119,15 +127,12 @@ export function BookingWidget({
 
   const isReservationEnabled = checkIn && checkOut && nights > 0
 
-  const router = useRouter()
-
   const handleReservation = async () => {
     try {
       setLoading(true)
 
       const accessToken = localStorage.getItem("access_token")
       if (!accessToken) {
-        //alert("No se encontró el token de acceso.")
         router.push("/login")
         return
       }

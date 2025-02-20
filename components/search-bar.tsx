@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useState, Suspense } from "react"
-import { format } from "date-fns"
+import { format, parseISO } from "date-fns"
 import { es } from "date-fns/locale"
 import { Search, Check, X } from "lucide-react"
 import type { DateRange } from "react-day-picker"
@@ -56,12 +56,12 @@ function SearchParamsHandler({ setSelectedProcedures, setLocation, setDate, setT
     }
 
     if (checkInParam) {
-      const fromDate = new Date(checkInParam)
+      const fromDate = parseISO(checkInParam)
       setDate((prev) => ({ ...prev, from: fromDate }))
     }
 
     if (checkOutParam) {
-      const toDate = new Date(checkOutParam)
+      const toDate = parseISO(checkOutParam)
       setDate((prev) => ({
         from: prev?.from ?? undefined,
         to: toDate,

@@ -174,7 +174,6 @@ export default function EditPropertyPage({
          
           form.setValue("patology", JSON.parse(String(selectedProperty.patology)))
 
-          console.log("patologias", JSON.parse(String(selectedProperty.patology)))
 
         } else {
           throw new Error("Propiedad no encontrada");

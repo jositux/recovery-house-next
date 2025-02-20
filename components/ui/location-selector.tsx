@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
-import { countriesData, type CountryData, type StateData } from "@/data/countries"
+import { countriesData } from "@/data/countries"
 
 interface LocationSelectorProps {
   onChange: (location: { country: string; state: string; city: string }) => void
@@ -24,68 +24,53 @@ export function LocationSelector({
   defaultCity,
   error,
 }: LocationSelectorProps) {
-  const [countryName, setCountryName] = useState<string>(defaultCountry || "")
-  const [stateName, setStateName] = useState<string>(defaultState || "")
+  const [country, setCountry] = useState<string>(defaultCountry || "")
+  const [state, setState] = useState<string>(defaultState || "")
   const [city, setCity] = useState<string>(defaultCity || "")
 
-  const [states, setStates] = useState<string[]>([])
-  const [cities, setCities] = useState<string[]>([])
-
-  const getCountryKeyByName = useCallback((name: string): string => {
-    return Object.entries(countriesData).find(([_, country]) => country.name === name)?.[0] || ""
-  }, [])
-
-  const getStateKeyByName = useCallback((countryKey: string, stateName: string): string => {
-    const country = countriesData[countryKey as keyof typeof countriesData]
-    return Object.entries(country.states).find(([_, state]) => state.name === stateName)?.[0] || ""
-  }, [])
-
   useEffect(() => {
-    if (countryName) {
-      const countryKey = getCountryKeyByName(countryName)
-      const selectedCountry = countriesData[countryKey as keyof typeof countriesData]
-
-      if (selectedCountry) {
-        setStates(Object.values(selectedCountry.states).map((state) => state.name))
-        setStateName((prevState) => prevState || "")
-        setCity((prevCity) => prevCity || "")
-      }
+    if (country && state && city) {
+      onChange({ country, state, city })
     }
-  }, [countryName, getCountryKeyByName])
+  }, [country, state, city, onChange])
 
-  useEffect(() => {
-    if (countryName && stateName) {
-      const countryKey = getCountryKeyByName(countryName)
-      const stateKey = getStateKeyByName(countryKey, stateName)
-      const selectedCountry = countriesData[countryKey as keyof typeof countriesData] as CountryData | undefined
-      if (selectedCountry) {
-        const selectedState = selectedCountry.states[stateKey as keyof (typeof selectedCountry)["states"]] as
-          | StateData
-          | undefined
-        if (selectedState) {
-          setCities(selectedState.cities)
-          setCity((prevCity) => prevCity || "")
-        }
-      }
+  const handleCountryChange = (selectedCountry: string) => {
+    setCountry(selectedCountry)
+    setState("")
+    setCity("")
+  }
+
+  const handleStateChange = (selectedState: string) => {
+    setState(selectedState)
+    setCity("")
+  }
+
+  const getStates = (countryName: string) => {
+    const countryData = Object.values(countriesData).find((c) => c.name === countryName)
+    return countryData ? Object.values(countryData.states).map((s) => s.name) : []
+  }
+
+  const getCities = (countryName: string, stateName: string) => {
+    const countryData = Object.values(countriesData).find((c) => c.name === countryName)
+    if (countryData) {
+      const stateData = Object.values(countryData.states).find((s) => s.name === stateName)
+      return stateData ? stateData.cities : []
     }
-  }, [countryName, stateName, getCountryKeyByName, getStateKeyByName])
-
-  useEffect(() => {
-    onChange({ country: countryName, state: stateName, city })
-  }, [countryName, stateName, city, onChange])
+    return []
+  }
 
   return (
     <div className="grid grid-cols-3 md:grid-cols-3 gap-4">
       <div>
         <Label htmlFor="country">País</Label>
-        <Select onValueChange={(value) => setCountryName(value)} value={countryName}>
+        <Select onValueChange={handleCountryChange} value={country}>
           <SelectTrigger id="country" className={error?.country ? "border-red-500" : ""}>
             <SelectValue placeholder="Selecciona un país" />
           </SelectTrigger>
           <SelectContent>
-            {Object.values(countriesData).map((country) => (
-              <SelectItem key={country.name} value={country.name}>
-                {country.name}
+            {Object.values(countriesData).map((countryData) => (
+              <SelectItem key={countryData.name} value={countryData.name}>
+                {countryData.name}
               </SelectItem>
             ))}
           </SelectContent>
@@ -95,16 +80,17 @@ export function LocationSelector({
 
       <div>
         <Label htmlFor="state">Estado</Label>
-        <Select onValueChange={(value) => setStateName(value)} value={stateName}>
+        <Select onValueChange={handleStateChange} value={state}>
           <SelectTrigger id="state" className={error?.state ? "border-red-500" : ""}>
             <SelectValue placeholder="Selecciona un estado" />
           </SelectTrigger>
           <SelectContent>
-            {states.map((state) => (
-              <SelectItem key={state} value={state}>
-                {state}
-              </SelectItem>
-            ))}
+            {country &&
+              getStates(country).map((stateName) => (
+                <SelectItem key={stateName} value={stateName}>
+                  {stateName}
+                </SelectItem>
+              ))}
           </SelectContent>
         </Select>
         {error?.state && <p className="text-sm text-red-500 mt-1">{error.state}</p>}
@@ -112,16 +98,18 @@ export function LocationSelector({
 
       <div>
         <Label htmlFor="city">Ciudad</Label>
-        <Select onValueChange={(value) => setCity(value)} value={city}>
+        <Select onValueChange={setCity} value={city}>
           <SelectTrigger id="city" className={error?.city ? "border-red-500" : ""}>
             <SelectValue placeholder="Selecciona una ciudad" />
           </SelectTrigger>
           <SelectContent>
-            {cities.map((city) => (
-              <SelectItem key={city} value={city}>
-                {city}
-              </SelectItem>
-            ))}
+            {country &&
+              state &&
+              getCities(country, state).map((cityName) => (
+                <SelectItem key={cityName} value={cityName}>
+                  {cityName}
+                </SelectItem>
+              ))}
           </SelectContent>
         </Select>
         {error?.city && <p className="text-sm text-red-500 mt-1">{error.city}</p>}
