@@ -110,6 +110,7 @@ export default function RegisterPropertyBasePage() {
   }, [form.setValue])
 
   const router = useRouter()
+
   useEffect(() => {
     const token = localStorage.getItem("access_token")
     if (!token) {
@@ -151,6 +152,7 @@ export default function RegisterPropertyBasePage() {
         subscriptionType: values.subscriptionType || "",
         price: values.price || "",
       }
+      //const response = await providerService.createProperty(providerData);
 
       localStorage.setItem("new_service", JSON.stringify(providerData))
       router.push(`/subscriptions`)

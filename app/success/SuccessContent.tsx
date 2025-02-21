@@ -2,13 +2,17 @@
 
 import { useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
-import { CheckCircle, XCircle, Loader2 } from "lucide-react"
+import { CheckCircle, XCircle, Loader2, Edit, Home } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
-import { Fraunces } from "next/font/google";
+import { Fraunces } from "next/font/google"
+import { motion } from "framer-motion"
 
-const fraunces = Fraunces({ subsets: ["latin"] });
+const fraunces = Fraunces({ subsets: ["latin"] })
+
+// Import the providerService (assuming it's defined elsewhere)
+import { providerService } from "@/services/providerService"
 
 export function SuccessContent() {
   const [status, setStatus] = useState("loading")
@@ -43,6 +47,22 @@ export function SuccessContent() {
     setCustomerEmail(session.customer_email)
 
     console.log(customerEmail)
+
+    // If there's no error, read data from localStorage and create property
+    if (!error) {
+      const newServiceData = localStorage.getItem("new_service")
+      if (newServiceData) {
+        try {
+          const providerData = JSON.parse(newServiceData)
+          const propertyResponse = await providerService.createProperty(providerData)
+          console.log("Property created:", propertyResponse)
+          // You might want to handle the response here (e.g., show a success message)
+        } catch (err) {
+          console.error("Error creating property:", err)
+          // You might want to handle the error here (e.g., show an error message)
+        }
+      }
+    }
   }
 
   const renderContent = () => {
@@ -73,27 +93,51 @@ export function SuccessContent() {
         )
       default:
         return (
-          <Card className="w-full max-w-md mx-auto">
-            <CardHeader>
-              <CardTitle className={`${fraunces.className} text-2xl text-center font-medium mb-6`}>¡Suscripción Exitosa!</CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col items-center">
-              <CheckCircle className="h-16 w-16 text-green-500 mb-4" />
-              <CardDescription className="text-center">
-                Gracias por su suscripción. Se ha enviado un correo con los detalles.
-              </CardDescription>
-            </CardContent>
-            <CardFooter className="flex flex-col sm:flex-row justify-center items-center gap-4">
-              <Link href="/registrar-servicio" passHref>
-                <Button className="w-full sm:w-auto">Agregar Servicio</Button>
-              </Link>
-              <Link href="/rooms" passHref>
-                <Button variant="outline" className="w-full sm:w-auto">
-                  En otro momento
-                </Button>
-              </Link>
-            </CardFooter>
-          </Card>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+            <Card className="w-full max-w-md mx-auto overflow-hidden shadow-lg">
+              <div className="bg-gradient-to-r from-[#39759E] to-blue-500 h-2" />
+              <CardHeader className="pt-8">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2, type: "spring", stiffness: 260, damping: 20 }}
+                >
+                  <CheckCircle className="h-10 w-10 text-green-500 mx-auto mb-4" />
+                </motion.div>
+                <CardTitle className={`${fraunces.className} text-2xl text-center font-normal mb-2 text-gray-800`}>
+                  ¡Gracias por registrar su servicio!
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col items-center px-8">
+                <CardDescription className="text-center text-sm text-gray-600 mb-6">
+                Su servicio está en proceso de revisión. Le notificaremos por e-mail en cuanto esté disponible para su uso. ¡Estamos contentos que pronto pueda disfrutar de los beneficios de Recovery Care Solutions!
+
+</CardDescription>
+               <motion.div
+  className="w-full grid grid-cols-1 sm:grid-cols-2 gap-4"
+  initial={{ opacity: 0 }}
+  animate={{ opacity: 1 }}
+  transition={{ delay: 0.4 }}
+>
+<Link href="/" passHref className="w-full">
+    <Button variant="outline" className="w-full py-6 text-lg font-semibold text-sm" size="lg">
+      <Home className="mr-2 h-5 w-5" /> Volver al Inicio
+    </Button>
+  </Link>
+  <Link href="/editar-servicio" passHref className="w-full">
+    <Button className="w-full py-6 text-lg font-semibold text-sm bg-[#39759E]" size="lg">
+      <Edit className="mr-2 h-5 w-5" /> Editar Mi Servicio
+    </Button>
+  </Link>
+ 
+</motion.div>
+
+              </CardContent>
+              <CardFooter className="bg-gray-50 mt-6 py-4 text-center text-sm text-gray-500">
+                ¿Necesita ayuda? Contáctenos en info@recoverycaresolutions.com
+              </CardFooter>
+            </Card>
+          </motion.div>
         )
     }
   }

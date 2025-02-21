@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useSearchParams } from "next/navigation"
 import axios from "axios"
 import Image from "next/image"
 import { Bed, User, Pencil, Plus, Loader2, MapPin, Home, Star } from "lucide-react"
@@ -12,6 +12,8 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { MagicBackButton } from "@/components/ui/magic-back-button"
 import { getCurrentUser } from "@/services/userService"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+
 
 interface Room {
   id: string
@@ -67,7 +69,10 @@ export default function RoomPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isOwner, setIsOwner] = useState(false)
+  const [showModal, setShowModal] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -126,6 +131,12 @@ export default function RoomPage() {
       fetchData()
     }
   }, [id])
+
+  useEffect(() => {
+    if (searchParams.get("rel") === "new") {
+      setShowModal(true)
+    }
+  }, [searchParams])
 
   useEffect(() => {
     console.log("isOwner updated:", isOwner)
@@ -327,6 +338,22 @@ export default function RoomPage() {
           )}
         </div>
       </div>
+
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-xl">🏡 ¡Propiedad cargada con éxito!</DialogTitle>
+            <DialogDescription className="text-md">
+              Los moderadores de la plataforma revisarán tus documentos legales. Una vez aprobados, recibirás una notificación por email
+              y tu propiedad quedará activa.
+              <br />
+              <br />
+              Mientras tanto, puedes empezar a agregar las habitaciones. ✨
+            </DialogDescription>
+          </DialogHeader>
+          <Button className="bg-[#39759E]" onClick={() => setShowModal(false)}>Entendido</Button>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

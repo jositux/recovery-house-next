@@ -1,32 +1,21 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { useForm, Controller, useWatch } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import FileUpload from "@/components/FileUpload";
-import { LocationSelector } from "@/components/ui/location-selector";
-import { providerService, ProviderData } from "@/services/providerService";
-//import { MembershipSelector } from "@/components/ui/membership-selector";
-/*import {
-  getMembershipTags,
-  type MembershipTag,
-} from "@/services/membership-service";*/
-import { CollectionExtraTags } from "@/components/collectionExtraTags";
-//import { CollectionServiceTags } from "@/components/collectionServiceTags";
-import { getExtraTags } from "@/services/extraTagsService";
-//import { getServiceTags } from "@/services/serviceTagsService";
+import { useState, useEffect } from "react"
+import { useForm, Controller, useWatch } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import { Button } from "@/components/ui/button"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import FileUpload from "@/components/FileUpload"
+import { LocationSelector } from "@/components/ui/location-selector"
+import { ProviderData } from "@/services/providerService"
+import { CollectionExtraTags } from "@/components/collectionExtraTags"
+import { getExtraTags } from "@/services/extraTagsService"
+import { useRouter } from "next/navigation"
+import { getProvidersByUserId } from "@/services/providerCollectionService";
+import { getCurrentUser } from "@/services/userService";
 
 const formSchema = z.object({
   name: z.string().min(1, "El nombre es requerido."),
@@ -44,73 +33,50 @@ const formSchema = z.object({
   taxIdEINFile: z.string().refine((val) => val.length > 0, {
     message: "El archivo TAX ID es obligatorio.",
   }),
-  extraTags: z.array(z.string()).default([]),
+  extraTags: z.array(z.string()).min(1, "Selecciona al menos un servicio."),
   serviceTags: z.array(z.string()).default([]),
-  // Nuevos campos de suscripción
   subscriptionPrice: z.string().default(""),
   subscriptionType: z.string().default(""),
   price: z.string().default(""),
-});
+})
 
-type FormValues = z.infer<typeof formSchema>;
+
+type FormValues = z.infer<typeof formSchema>
 
 export default function RegisterPropertyBasePage() {
   const [extraTags, setExtraTags] = useState<
     {
-      id: string;
-      name: string;
-      icon: string;
-      enable_property: boolean;
-      enable_services: boolean;
+      id: string
+      name: string
+      icon: string
+      enable_property: boolean
+      enable_services: boolean
     }[]
-  >([]);
-  /*const [servicesTags, setServicesTags] = useState<
-    { id: string; name: string; icon: string; }[]
-  >([]);
-  const [selectedMembership, setSelectedMembership] = useState<string | null>(
-    null
-  );*/
-  //const [memberships, setMemberships] = useState<MembershipTag[]>([]);
-
-  /* useEffect(() => {
-    const fetchMemberships = async () => {
-      const data = await getMembershipTags();
-      setMemberships(data);
-    };
-    fetchMemberships();
-  }, []);*/
-
-  /*const handleSelectionChange = (selectedId: string | null) => {
-    setSelectedMembership(selectedId);
-    console.log("Selected membership ID:", selectedId);
-  };*/
+  >([])
 
   useEffect(() => {
     const loadTags = async () => {
       try {
-        const extraTagsData = await getExtraTags();
-        setExtraTags(extraTagsData);
-
-        //const servicesTagsData = await getServiceTags();
-        // setServicesTags(servicesTagsData);
+        const extraTagsData = await getExtraTags()
+        setExtraTags(extraTagsData)
       } catch (error) {
-        console.error(error);
+        console.error(error)
       }
-    };
-    loadTags();
-  }, []);
+    }
+    loadTags()
+  }, [])
 
   const [RNTFileData, setRNTFileData] = useState<{
-    id: string;
-    filename_download: string;
-  }>({ id: "", filename_download: "" });
+    id: string
+    filename_download: string
+  }>({ id: "", filename_download: "" })
 
   const [TaxFileData, setTaxFileData] = useState<{
-    id: string;
-    filename_download: string;
-  }>({ id: "", filename_download: "" });
+    id: string
+    filename_download: string
+  }>({ id: "", filename_download: "" })
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -126,44 +92,68 @@ export default function RegisterPropertyBasePage() {
       extraTags: [],
       serviceTags: [],
     },
-  });
+  })
 
-  const { setValue } = form;
+  const { setValue } = form
 
   const handleTagsChange = (tags: string[]) => {
     if (JSON.stringify(tags) !== JSON.stringify(selectedExtraTags)) {
-      setValue("extraTags", tags, { shouldDirty: true });
+      setValue("extraTags", tags, { shouldDirty: true })
     }
-  };
+  }
 
-  useEffect(() => {
-    const subscriptionData = localStorage.getItem("subscription");
+  /*useEffect(() => {
+    const subscriptionData = localStorage.getItem("subscription")
     if (subscriptionData) {
-      const { subscriptionPrice, subscriptionType, price } =
-        JSON.parse(subscriptionData);
-      form.setValue("subscriptionPrice", subscriptionPrice);
-      form.setValue("subscriptionType", subscriptionType);
-      form.setValue("price", price);
+      const { subscriptionPrice, subscriptionType, price } = JSON.parse(subscriptionData)
+      form.setValue("subscriptionPrice", subscriptionPrice)
+      form.setValue("subscriptionType", subscriptionType)
+      form.setValue("price", price)
     }
-  }, []);
+  }, [form.setValue])*/
+
+
 
   const selectedExtraTags = useWatch({
     control: form.control,
     name: "extraTags",
-  });
+  })
 
-  /* const selectedServiceTags = useWatch({
-    control: form.control,
-    name: "serviceTags",
-  });*/
 
-  const onSubmit = async (values: FormValues) => {
-    if (!values.RNTFile || !values.taxIdEINFile) {
-      console.error("Faltan archivos obligatorios.");
+  const router = useRouter();
+
+useEffect(() => {
+  const checkAuthAndFetchData = async () => {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      router.push("/login");
       return;
     }
 
-    setIsSubmitting(true);
+    try {
+      const currentUser = await getCurrentUser(token);
+      const data = await getProvidersByUserId(currentUser.id, token);
+
+      if (data.length > 0) {
+        router.push("/servicio-cargado");
+      }
+    } catch (error) {
+      console.error("Error al cargar los datos del proveedor:", error);
+    }
+  };
+
+  checkAuthAndFetchData();
+}, [router]);
+
+
+
+  const onSubmit = async (values: FormValues) => {
+    if (!values.RNTFile || !values.taxIdEINFile) {
+      console.error("Faltan archivos obligatorios.")
+      return
+    }
+
+    setIsSubmitting(true)
     try {
       const providerData: ProviderData = {
         userId: "",
@@ -183,44 +173,45 @@ export default function RegisterPropertyBasePage() {
         subscriptionPrice: values.subscriptionPrice || "",
         subscriptionType: values.subscriptionType || "",
         price: values.price || "",
-      };
-      const response = await providerService.createProperty(providerData);
+      }
+      //const response = await providerService.createProperty(providerData);
 
-      console.log("Servicio creado:", response);
+      localStorage.setItem("new_service", JSON.stringify(providerData))
+      router.push(`/subscriptions`)
     } catch (error) {
-      console.error("Error al registrar el servicio:", error);
+      console.error("Error al registrar el servicio:", error)
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   const handleRNTFileUpload = (response: {
-    id: string;
-    filename_download: string;
+    id: string
+    filename_download: string
   }) => {
-    setRNTFileData(response);
-    form.setValue("RNTFile", response.id);
-    form.clearErrors("RNTFile");
-  };
+    setRNTFileData(response)
+    form.setValue("RNTFile", response.id)
+    form.clearErrors("RNTFile")
+  }
 
   const handleTaxFileUpload = (response: {
-    id: string;
-    filename_download: string;
+    id: string
+    filename_download: string
   }) => {
-    setTaxFileData(response);
-    form.setValue("taxIdEINFile", response.id);
-    form.clearErrors("taxIdEINFile");
-  };
+    setTaxFileData(response)
+    form.setValue("taxIdEINFile", response.id)
+    form.clearErrors("taxIdEINFile")
+  }
 
   const handleRNTFileClear = () => {
-    setRNTFileData({ id: "", filename_download: "" });
-    form.setValue("RNTFile", "");
-  };
+    setRNTFileData({ id: "", filename_download: "" })
+    form.setValue("RNTFile", "")
+  }
 
   const handleTaxFileClear = () => {
-    setTaxFileData({ id: "", filename_download: "" });
-    form.setValue("taxIdEINFile", "");
-  };
+    setTaxFileData({ id: "", filename_download: "" })
+    form.setValue("taxIdEINFile", "")
+  }
 
   return (
     <div className="min-h-screen bg-[#F8F8F7]">
@@ -228,8 +219,7 @@ export default function RegisterPropertyBasePage() {
         <h1 className="text-3xl font-bold mb-6">Registra tu servicio</h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-
-          <div className="space-y-4 p-4 bg-white rounded-xl">
+            <div className="space-y-4 p-4 bg-white rounded-xl">
               <h2 className="text-lg">Información Legal</h2>
               <FormField
                 control={form.control}
@@ -282,7 +272,7 @@ export default function RegisterPropertyBasePage() {
                 />
               </div>
             </div>
-            
+
             <div className="space-y-4 p-4 bg-white rounded-xl">
               <FormField
                 control={form.control}
@@ -305,11 +295,7 @@ export default function RegisterPropertyBasePage() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input
-                          type="email"
-                          placeholder="Correo electrónico"
-                          {...field}
-                        />
+                        <Input type="email" placeholder="Correo electrónico" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -322,11 +308,7 @@ export default function RegisterPropertyBasePage() {
                     <FormItem>
                       <FormLabel>Teléfono</FormLabel>
                       <FormControl>
-                        <Input
-                          type="text"
-                          placeholder="Número de teléfono"
-                          {...field}
-                        />
+                        <Input type="text" placeholder="Número de teléfono" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -340,10 +322,7 @@ export default function RegisterPropertyBasePage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Textarea
-                        placeholder="Describe las características"
-                        {...field}
-                      />
+                      <Textarea placeholder="Describe las características" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -356,9 +335,7 @@ export default function RegisterPropertyBasePage() {
                 name="extraTags"
                 render={() => (
                   <FormItem>
-                    <FormLabel className="text-lg">
-                      Servicios Ofrecidos
-                    </FormLabel>
+                    <FormLabel className="text-lg">Servicios Ofrecidos</FormLabel>
                     <Controller
                       control={form.control}
                       name="extraTags"
@@ -380,9 +357,9 @@ export default function RegisterPropertyBasePage() {
               <h2 className="text-lg">Dónde ofrece su servicio?</h2>
               <LocationSelector
                 onChange={({ country, state, city }) => {
-                  form.setValue("country", country);
-                  form.setValue("state", state);
-                  form.setValue("city", city);
+                  form.setValue("country", country)
+                  form.setValue("state", state)
+                  form.setValue("city", city)
                 }}
                 error={{
                   country: form.formState.errors.country?.message,
@@ -390,58 +367,14 @@ export default function RegisterPropertyBasePage() {
                   city: form.formState.errors.city?.message,
                 }}
               />
-              {/*
-          <FormField
-            control={form.control}
-            name="membership"
-            render={() => (
-              <FormItem>
-                <FormLabel>Membresía</FormLabel>
-                <FormControl>
-                  <MembershipSelector
-                    memberships={memberships}
-                    onSelectionChange={handleSelectionChange}
-                    defaultSelectedId="bronze"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-            />*/}
             </div>
-          
-
-            {/*<FormField
-            control={form.control}
-            name="serviceTags"
-            render={() => (
-              <FormItem>
-                <FormLabel>Etiquetas de Servicio</FormLabel>
-                <Controller
-                  control={form.control}
-                  name="serviceTags"
-                  render={() => (
-                    <CollectionServiceTags
-                      onChange={handleServiceTagsChange}
-                      servicesTags={servicesTags}
-                      initialSelectedTags={selectedServiceTags}
-                    />
-                  )}
-                />
-                <FormMessage />
-              </FormItem>
-            )}
-                  />*/}
-            <Button
-              type="submit"
-              className="w-full bg-[#39759E]"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Registrando..." : "Registrar Proveedor"}
+            <Button type="submit" className="w-full bg-[#39759E]" disabled={isSubmitting}>
+              {isSubmitting ? "Registrando..." : "Continuar"}
             </Button>
           </form>
         </Form>
       </div>
     </div>
-  );
+  )
 }
+
