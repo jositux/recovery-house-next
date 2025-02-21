@@ -32,6 +32,7 @@ interface Room {
   roomNumber: string
   beds: number
   capacity: number
+  descriptionService: string
 }
 
 interface Property {

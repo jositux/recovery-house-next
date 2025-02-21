@@ -44,6 +44,7 @@ export default function RoomPage() {
     photos: [],
     extraTags: [""],
     servicesTags: [""],
+    descriptionService: ""
   };
 
   return (
