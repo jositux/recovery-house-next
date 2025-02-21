@@ -126,9 +126,9 @@ export function SuccessContent() {
       <Home className="mr-2 h-5 w-5" /> Volver al Inicio
     </Button>
   </Link>
-  <Link href="/editar-servicio" passHref className="w-full">
+  <Link href="/mi-servicio" passHref className="w-full">
     <Button className="w-full py-6 text-lg font-semibold text-sm bg-[#39759E]" size="lg">
-      <Edit className="mr-2 h-5 w-5" /> Editar Mi Servicio
+      <Edit className="mr-2 h-5 w-5" /> Ver Mi Servicio
     </Button>
   </Link>
  
