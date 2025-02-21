@@ -94,6 +94,14 @@ export function MenuProfile({ name }: ProfileMenuProps) {
             Mis reservas
             </Link>
           </li>
+          <li
+            className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2"
+          >
+             <Link href="/mi-servicio" className="flex items-center gap-2">
+            <BedIcon className="w-4 h-4" />
+            Mi Servicio
+            </Link>
+          </li>
 
           <li
             className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2"

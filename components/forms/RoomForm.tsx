@@ -50,20 +50,16 @@ const formSchema = z.object({
   pricePerNight: z
     .number()
     .positive({ message: "El precio debe ser mayor a 0" }),
-  cleaningFee: z
-    .number()
-    .positive({ message: "El precio debe ser mayor a 0" }),
+  cleaningFee: z.number().positive({ message: "El precio debe ser mayor a 0" }),
   mainImage: z.string(),
-  photos: z
-    .array(z.string())
-    .min(1, { message: "Cargar al menos 1 Foto" }),
+  photos: z.array(z.string()).min(1, { message: "Cargar al menos 1 Foto" }),
   extraTags: z
     .array(z.string())
     .min(1, { message: "Elegir por lo menos un servicio extra" }),
   servicesTags: z
     .array(z.string())
     .min(1, { message: "Elegir por lo menos un servicio base" }),
-    descriptionService: z.string()
+  descriptionService: z.string(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -91,7 +87,7 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
       photos: initialValues?.photos || [],
       extraTags: initialValues?.extraTags || [],
       servicesTags: initialValues?.servicesTags || [],
-      descriptionService: initialValues?.description || "",
+      descriptionService: initialValues?.descriptionService || "",
     },
     mode: "onTouched",
   });
@@ -373,19 +369,24 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
             name="descriptionService"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Description</FormLabel>
+                <FormLabel>Escribe algo más sobre los servicios</FormLabel>
                 <FormControl>
-                  <Textarea className="h-full min-h-[100px]" placeholder="Si necesitas explicar más sobre tus servicios, escribe aquí" {...field} />
+                  <Textarea
+                    placeholder="Si necesitas explicar más sobre tus servicios, escribe aquí"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-        
         </div>
-       
+
         <div className="flex gap-4 mt-4 p-4 md:p-0">
-          <Link href={`/propiedades/${initialValues?.propertyId}/`} className="flex-1">
+          <Link
+            href={`/propiedades/${initialValues?.propertyId}/`}
+            className="flex-1"
+          >
             <Button
               variant="outline"
               type="button"

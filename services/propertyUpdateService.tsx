@@ -49,7 +49,7 @@ export const propertyUpdateService = {
       const patient_id = responseUser.data.data.id;
 
 
-console.log("lo qye recibo", propertyData.patology);
+
       const formatedData = {
         id: propertyId,
         userId: patient_id,
@@ -69,7 +69,7 @@ console.log("lo qye recibo", propertyData.patology);
         taxIdEIN: propertyData.taxIdEIN,
         RNTFile: propertyData.RNTFile,
         taxIdEINFile: propertyData.taxIdEINFile,
-        taxIdApproved: false,
+        //taxIdApproved: false,
         mainImage: propertyData.mainImage,
         hostName: propertyData.hostName,
   guestComments: propertyData.guestComments,

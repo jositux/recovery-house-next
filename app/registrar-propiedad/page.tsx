@@ -451,7 +451,7 @@ export default function RegisterPropertyBasePage() {
               />
             </div>
 
-            <div className="space-y-4 p-4 bg-white rounded-xl">
+            <div className="space-y-4 hidden p-4 bg-white rounded-xl">
               <FormField
                 control={form.control}
                 name="type"

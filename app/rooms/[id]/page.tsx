@@ -325,7 +325,7 @@ export default function RoomPage() {
                 <h2 className="text-2xl font-bold text-[#162F40]">
                   Proveedores de servicios
                 </h2>
-                <button className="text-[#39759E]">Filtrar</button>
+                <button className="hidden text-[#39759E]">Filtrar</button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {serviceProviders.map((provider) => (
@@ -334,6 +334,7 @@ export default function RoomPage() {
                     name={provider.name}
                     service={provider.description}
                     treatment={provider.serviceTags.join(", ")}
+                    description={provider.description}
                     phone={provider.phone}
                     email={provider.email}
                   />

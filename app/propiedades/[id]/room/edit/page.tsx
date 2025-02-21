@@ -25,9 +25,7 @@ export default function RoomPage() {
     //setSubmittedData(data);
     const response = await roomUpdateService.updateRoom(data);
 
-   
-      router.push(`/propiedades/${data.propertyId}`);
-    
+    router.push(`/propiedades/${data.propertyId}`);
 
     return response.id;
   };
@@ -38,29 +36,36 @@ export default function RoomPage() {
     ? (() => {
         const parsedData = JSON.parse(storedRoomData);
 
+        console.log("que trae", parsedData.descriptionService)
+
         return {
           id: parsedData.id || "",
           propertyId: parsedData.propertyId || "",
           name: parsedData.name || "",
           roomNumber: parsedData.roomNumber || "",
-          description:
-            parsedData.description || "",
+          description: parsedData.description || "",
+          descriptionService: parsedData.descriptionService || "",
           beds: parseInt(parsedData.beds) || 2,
           capacity: parseInt(parsedData.capacity) || 4,
           pricePerNight: parseInt(parsedData.pricePerNight) || 0,
           cleaningFee: parseInt(parsedData.cleaningFee) || 0,
-          mainImage:
-            parsedData.mainImage || "",
-            photos: parsedData.photos
-            ? parsedData.photos.map((photo: { directus_files_id: string }) => photo.directus_files_id)
+          mainImage: parsedData.mainImage || "",
+          photos: parsedData.photos
+            ? parsedData.photos.map(
+                (photo: { directus_files_id: string }) =>
+                  photo.directus_files_id
+              )
             : [],
           extraTags: parsedData.extraTags
-            ? parsedData.extraTags.map((tag: { ExtraTags_id: string }) => tag.ExtraTags_id)
+            ? parsedData.extraTags.map(
+                (tag: { ExtraTags_id: string }) => tag.ExtraTags_id
+              )
             : [""],
           servicesTags: parsedData.servicesTags
-            ? parsedData.servicesTags.map((tag: { serviceTags_id: string }) => tag.serviceTags_id)
+            ? parsedData.servicesTags.map(
+                (tag: { serviceTags_id: string }) => tag.serviceTags_id
+              )
             : [""],
-            descriptionService: parsedData.descriptionService || "",
         };
       })()
     : {
@@ -77,7 +82,7 @@ export default function RoomPage() {
         photos: [],
         extraTags: [""],
         servicesTags: [""],
-        descriptionService:"",
+        descriptionService: "",
       };
 
   console.log("valores iniciales", initialValues);
@@ -85,12 +90,15 @@ export default function RoomPage() {
   return (
     <div className="min-h-screen bg-[#F8F8F7]">
       <div className="container mx-auto max-w-2xl py-16 px-4">
-      <h1 className="text-2xl font-bold mb-6">Editar Habitación</h1>
-      <div className="grid gap-6 mx-auto">
-        <div className="container">
-          <RoomForm onSubmit={handleFormSubmit} initialValues={initialValues} />
-        </div>
-        {/*
+        <h1 className="text-2xl font-bold mb-6">Editar Habitación</h1>
+        <div className="grid gap-6 mx-auto">
+          <div className="container">
+            <RoomForm
+              onSubmit={handleFormSubmit}
+              initialValues={initialValues}
+            />
+          </div>
+          {/*
         {submittedData && (
           <div>
             <Card>
@@ -140,7 +148,7 @@ export default function RoomPage() {
             </Card>
           </div>
         )}*/}
-      </div>
+        </div>
       </div>
     </div>
   );

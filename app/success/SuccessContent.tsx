@@ -62,6 +62,8 @@ export function SuccessContent() {
           // You might want to handle the error here (e.g., show an error message)
         }
       }
+
+      localStorage.removeItem("new_service");
     }
   }
 
