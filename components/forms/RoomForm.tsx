@@ -63,6 +63,7 @@ const formSchema = z.object({
   servicesTags: z
     .array(z.string())
     .min(1, { message: "Elegir por lo menos un servicio base" }),
+    descriptionService: z.string()
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -90,6 +91,7 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
       photos: initialValues?.photos || [],
       extraTags: initialValues?.extraTags || [],
       servicesTags: initialValues?.servicesTags || [],
+      descriptionService: initialValues?.description || "",
     },
     mode: "onTouched",
   });
@@ -183,7 +185,7 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Seelecciona la cantidad" />
+                      <SelectValue placeholder="Selecciona la cantidad" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -366,11 +368,20 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
             )}
           />
 
-<Textarea
-                        className="h-full min-h-[100px]"
-                        placeholder="Si necesitas explicar más sobre tus servicios, escribe aquí"
-                    
-                      />
+          <FormField
+            control={form.control}
+            name="descriptionService"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Textarea className="h-full min-h-[100px]" placeholder="Si necesitas explicar más sobre tus servicios, escribe aquí" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        
         </div>
        
         <div className="flex gap-4 mt-4 p-4 md:p-0">

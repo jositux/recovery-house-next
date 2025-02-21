@@ -60,6 +60,7 @@ export default function RoomPage() {
           servicesTags: parsedData.servicesTags
             ? parsedData.servicesTags.map((tag: { serviceTags_id: string }) => tag.serviceTags_id)
             : [""],
+            descriptionService: parsedData.descriptionService || "",
         };
       })()
     : {
@@ -76,6 +77,7 @@ export default function RoomPage() {
         photos: [],
         extraTags: [""],
         servicesTags: [""],
+        descriptionService:"",
       };
 
   console.log("valores iniciales", initialValues);

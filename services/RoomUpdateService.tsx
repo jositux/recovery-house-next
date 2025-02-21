@@ -16,6 +16,7 @@ export interface RoomUpdateData {
   photos: string[];
   extraTags: string[]; // Recibido como array de strings
   servicesTags: string[]; // Recibido como array de strings
+  descriptionService: string;
 }
 
 export const roomUpdateService = {

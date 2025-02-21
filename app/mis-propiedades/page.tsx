@@ -1,356 +1,170 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useForm, Controller, useWatch } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
+import type React from "react"
+import { useEffect, useState } from "react"
+import { getPropertiesByUserId, type Property } from "@/services/propertyCollectionService"
+import { getCurrentUser, type User } from "@/services/userService"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import FileUpload from "@/components/FileUpload"
-import { LocationSelector } from "@/components/ui/location-selector"
-import type { ProviderData } from "@/services/providerService"
-import { CollectionExtraTags } from "@/components/collectionExtraTags"
-import { getExtraTags } from "@/services/extraTagsService"
-import { useRouter } from "next/navigation"
+import { Badge } from "@/components/ui/badge"
+import { MapPin, Plus, Star, Loader2, BedDouble, Home, ArrowRight, CheckCircle, AlertCircle } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
 
-const formSchema = z.object({
-  name: z.string().min(1, "El nombre es requerido."),
-  email: z.string().email("Debe ser un email válido."),
-  phone: z.string().min(1, "El teléfono es requerido."),
-  country: z.string().min(1, "Por favor selecciona un país."),
-  state: z.string().min(1, "Por favor selecciona un estado."),
-  city: z.string().min(1, "Por favor selecciona una ciudad."),
-  membership: z.string(),
-  description: z.string().min(6, "La descripción es requerida."),
-  taxIdEIN: z.string().min(1, "El TAX ID es requerido."),
-  RNTFile: z.string().refine((val) => val.length > 0, {
-    message: "El archivo RNT es obligatorio.",
-  }),
-  taxIdEINFile: z.string().refine((val) => val.length > 0, {
-    message: "El archivo TAX ID es obligatorio.",
-  }),
-  extraTags: z.array(z.string()).default([]),
-  serviceTags: z.array(z.string()).default([]),
-  subscriptionPrice: z.string().default(""),
-  subscriptionType: z.string().default(""),
-  price: z.string().default(""),
-})
-
-type FormValues = z.infer<typeof formSchema>
-
-export default function RegisterPropertyBasePage() {
-  const [extraTags, setExtraTags] = useState<
-    {
-      id: string
-      name: string
-      icon: string
-      enable_property: boolean
-      enable_services: boolean
-    }[]
-  >([])
+const PropertiesPage: React.FC = () => {
+  const [properties, setProperties] = useState<Property[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const loadTags = async () => {
+    const fetchData = async () => {
+      setLoading(true)
       try {
-        const extraTagsData = await getExtraTags()
-        setExtraTags(extraTagsData)
-      } catch (error) {
-        console.error(error)
+        const token = localStorage.getItem("access_token")
+        if (!token) {
+          throw new Error("Token no encontrado. Inicia sesión nuevamente.")
+        }
+
+        const currentUser: User = await getCurrentUser(token)
+        const data = await getPropertiesByUserId(currentUser.id, token)
+
+        setProperties(data)
+        localStorage.setItem("properties", JSON.stringify(data))
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message)
+        } else {
+          setError("Error inesperado")
+        }
+      } finally {
+        setLoading(false)
       }
     }
-    loadTags()
+
+    fetchData()
   }, [])
 
-  const [RNTFileData, setRNTFileData] = useState<{
-    id: string
-    filename_download: string
-  }>({ id: "", filename_download: "" })
-
-  const [TaxFileData, setTaxFileData] = useState<{
-    id: string
-    filename_download: string
-  }>({ id: "", filename_download: "" })
-
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      description: "",
-      membership: "bronze",
-      taxIdEIN: "",
-      RNTFile: "",
-      taxIdEINFile: "",
-      extraTags: [],
-      serviceTags: [],
-    },
-  })
-
-  const { setValue } = form
-
-  const handleTagsChange = (tags: string[]) => {
-    if (JSON.stringify(tags) !== JSON.stringify(selectedExtraTags)) {
-      setValue("extraTags", tags, { shouldDirty: true })
-    }
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <span className="ml-2 text-lg text-gray-700">Cargando propiedades...</span>
+      </div>
+    )
   }
 
-  useEffect(() => {
-    const subscriptionData = localStorage.getItem("subscription")
-    if (subscriptionData) {
-      const { subscriptionPrice, subscriptionType, price } = JSON.parse(subscriptionData)
-      form.setValue("subscriptionPrice", subscriptionPrice)
-      form.setValue("subscriptionType", subscriptionType)
-      form.setValue("price", price)
-    }
-  }, [form.setValue])
-
-  const router = useRouter()
-  useEffect(() => {
-    const token = localStorage.getItem("access_token")
-    if (!token) {
-      router.push("/login")
-    }
-  }, [router])
-
-  const selectedExtraTags = useWatch({
-    control: form.control,
-    name: "extraTags",
-  })
-
-
-
-  const onSubmit = async (values: FormValues) => {
-    if (!values.RNTFile || !values.taxIdEINFile) {
-      console.error("Faltan archivos obligatorios.")
-      return
-    }
-
-    setIsSubmitting(true)
-    try {
-      const providerData: ProviderData = {
-        userId: "",
-        name: values.name,
-        email: values.email,
-        phone: values.phone,
-        country: values.country,
-        state: values.state,
-        city: values.city,
-        description: values.description,
-        membership: "bronze",
-        taxIdEIN: values.taxIdEIN,
-        RNTFile: values.RNTFile,
-        taxIdEINFile: values.taxIdEINFile,
-        extraTags: values.extraTags,
-        serviceTags: values.serviceTags,
-        subscriptionPrice: values.subscriptionPrice || "",
-        subscriptionType: values.subscriptionType || "",
-        price: values.price || "",
-      }
-
-      localStorage.setItem("new_service", JSON.stringify(providerData))
-      router.push(`/subscriptions`)
-    } catch (error) {
-      console.error("Error al registrar el servicio:", error)
-    } finally {
-      setIsSubmitting(false)
-    }
+  if (error) {
+    return <p className="text-center p-4 text-red-500">Error: {error}</p>
   }
 
-  const handleRNTFileUpload = (response: {
-    id: string
-    filename_download: string
-  }) => {
-    setRNTFileData(response)
-    form.setValue("RNTFile", response.id)
-    form.clearErrors("RNTFile")
-  }
-
-  const handleTaxFileUpload = (response: {
-    id: string
-    filename_download: string
-  }) => {
-    setTaxFileData(response)
-    form.setValue("taxIdEINFile", response.id)
-    form.clearErrors("taxIdEINFile")
-  }
-
-  const handleRNTFileClear = () => {
-    setRNTFileData({ id: "", filename_download: "" })
-    form.setValue("RNTFile", "")
-  }
-
-  const handleTaxFileClear = () => {
-    setTaxFileData({ id: "", filename_download: "" })
-    form.setValue("taxIdEINFile", "")
+  const decodeHtmlAndRemoveTags = (html: string): string => {
+    const textWithoutTags = html.replace(/<\/?[^>]+(>|$)/g, "")
+    const txt = document.createElement("textarea")
+    txt.innerHTML = textWithoutTags
+    return txt.value
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F8F7]">
-      <div className="container mx-auto max-w-2xl py-16 px-4">
-        <h1 className="text-3xl font-bold mb-6">Registra tu servicio</h1>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <div className="space-y-4 p-4 bg-white rounded-xl">
-              <h2 className="text-lg">Información Legal</h2>
-              <FormField
-                control={form.control}
-                name="taxIdEIN"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tax ID/EIN</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Tax ID/EIN" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="RNTFile"
-                  render={() => (
-                    <FormItem>
-                      <FormLabel>RNT File</FormLabel>
-                      <FormControl>
-                        <FileUpload
-                          id={RNTFileData.id}
-                          filename_download={RNTFileData.filename_download}
-                          onUploadSuccess={handleRNTFileUpload}
-                          onClearFile={handleRNTFileClear}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="taxIdEINFile"
-                  render={() => (
-                    <FormItem>
-                      <FormLabel>TAX ID File</FormLabel>
-                      <FormControl>
-                        <FileUpload
-                          id={TaxFileData.id}
-                          filename_download={TaxFileData.filename_download}
-                          onUploadSuccess={handleTaxFileUpload}
-                          onClearFile={handleTaxFileClear}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-4 p-4 bg-white rounded-xl">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nombre del Servicio</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ej. Peluquería Pedrito" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input type="email" placeholder="Correo electrónico" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Teléfono</FormLabel>
-                      <FormControl>
-                        <Input type="text" placeholder="Número de teléfono" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Textarea placeholder="Describe las características" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div className="space-y-4 p-4 bg-white rounded-xl">
-              <FormField
-                control={form.control}
-                name="extraTags"
-                render={() => (
-                  <FormItem>
-                    <FormLabel className="text-lg">Servicios Ofrecidos</FormLabel>
-                    <Controller
-                      control={form.control}
-                      name="extraTags"
-                      render={() => (
-                        <CollectionExtraTags
-                          onChange={handleTagsChange}
-                          extraTags={extraTags}
-                          initialSelectedTags={selectedExtraTags}
-                          enable="services"
-                        />
-                      )}
-                    />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div className="space-y-4 p-4 bg-white rounded-xl">
-              <h2 className="text-lg">Dónde ofrece su servicio?</h2>
-              <LocationSelector
-                onChange={({ country, state, city }) => {
-                  form.setValue("country", country)
-                  form.setValue("state", state)
-                  form.setValue("city", city)
-                }}
-                error={{
-                  country: form.formState.errors.country?.message,
-                  state: form.formState.errors.state?.message,
-                  city: form.formState.errors.city?.message,
-                }}
-              />
-            </div>
-            <Button type="submit" className="w-full bg-[#39759E]" disabled={isSubmitting}>
-              {isSubmitting ? "Registrando..." : "Continuar"}
-            </Button>
-          </form>
-        </Form>
+    <div className="container min-h-screen mx-auto py-16 px-4 md:px-6 lg:px-8">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Mis Propiedades</h1>
+        <Link href="/registrar-propiedad">
+          <Button className="bg-[#39759E] text-white hover:bg-[#2c5a7a] transition-colors duration-300">
+            <Plus className="mr-2 h-5 w-5" /> Nueva Propiedad
+          </Button>
+        </Link>
       </div>
+
+      {properties.length === 0 ? (
+        <Card className="p-8 text-center bg-gradient-to-br from-blue-50 to-indigo-100 border-none shadow-lg">
+          <CardContent className="flex flex-col items-center">
+            <Home className="h-24 w-24 text-[#39759E] mb-6" />
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">¡Comienza tu viaje como anfitrión!</h2>
+            <p className="text-lg text-gray-600 mb-8 max-w-2xl">
+              Aún no tienes propiedades registradas. Dar el primer paso para convertirte en anfitrión puede ser el
+              comienzo de una experiencia increíble.
+            </p>
+            <div className="grid gap-6 md:grid-cols-1 max-w-2xl w-full">
+              <Card className="p-6 bg-white shadow-md hover:shadow-lg transition-shadow duration-300">
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">Registra tu primera propiedad</h3>
+                <p className="text-gray-600 mb-4">
+                  Comienza compartiendo los detalles de tu espacio único con potenciales huéspedes.
+                </p>
+                <Link href="/registrar-propiedad">
+                  <Button className="w-full bg-[#39759E] text-white hover:bg-[#2c5a7a] transition-colors duration-300">
+                    Empezar ahora <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </Card>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {properties.map((property) => (
+            <Card key={property.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+              <div className="flex flex-col sm:flex-row">
+                <div className="relative w-full sm:w-2/5 h-48 sm:h-auto">
+                  <Link href={`/propiedades/${property.id}`}>
+                    <Image
+                      src={`/webapi/assets/${property.mainImage || "/placeholder.svg"}?key=medium`}
+                      alt={property.name}
+                      layout="fill"
+                      objectFit="cover"
+                      className="transition-transform duration-300 hover:scale-105"
+                    />
+                  </Link>
+                </div>
+                <CardContent className="flex-1 p-4 flex flex-col justify-between">
+                  <div>
+                    <div className="flex justify-between items-start mb-2">
+                      <h2 className="text-xl font-semibold text-gray-900 line-clamp-1">{property.name}</h2>
+                      <div className="flex items-center">
+                        <Star className="h-4 w-4 text-yellow-400 mr-1" />
+                        <span className="text-sm font-medium">4.9</span>
+                      </div>
+                    </div>
+                    <p className="text-sm text-gray-500 mb-2 flex items-center">
+                      <MapPin className="h-4 w-4 mr-1" />
+                      {property.country}
+                    </p>
+                    <p className="text-sm text-gray-600 line-clamp-2">
+                      {decodeHtmlAndRemoveTags(property.description) || "Sin descripción"}
+                    </p>
+                    <p className="text-sm text-gray-500 mt-2 flex items-center">
+                      <BedDouble className="h-4 w-4 mr-1" />
+                      {property.Rooms?.length || 0} habitación{property.Rooms?.length !== 1 ? "es" : ""}
+                    </p>
+                  </div>
+                  <div className="mt-4 flex justify-between items-center">
+                    <div className="space-x-2">
+                      <Link href={`/propiedades/${property.id}`}>
+                        <Button variant="outline" size="sm">
+                          Ver detalles
+                        </Button>
+                      </Link>
+                    </div>
+                    {property.taxIdApproved ? (
+                      <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
+                        <CheckCircle className="w-3 h-3 mr-1" />
+                        Aprobado
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300">
+                        <AlertCircle className="w-3 h-3 mr-1" />
+                        En Revisión
+                      </Badge>
+                    )}
+                  </div>
+                </CardContent>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
+
+export default PropertiesPage
 
