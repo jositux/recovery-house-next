@@ -150,7 +150,7 @@ export default function EditPropertyPage({
             longitude: selectedProperty.place.coordinates[1],
             type: selectedProperty.type,
             taxIdEIN: selectedProperty.taxIdEIN,
-            mainImage: selectedProperty.mainImage,
+            mainImage: selectedProperty.mainImage.id,
             RNTFile: selectedProperty.RNTFile.id,
             taxIdEINFile: selectedProperty.taxIdEINFile.id,
             address: selectedProperty.address,
@@ -332,7 +332,7 @@ export default function EditPropertyPage({
                     <FormLabel>Foto de la Propiedad</FormLabel>
                     <FormControl>
                       <ImageUpload
-                        defaultImageId={property?.mainImage}
+                        defaultImageId={property?.mainImage.id}
                         onImageIdChange={(newImageId) => {
                           if (newImageId !== imageId) {
                             setImageId(newImageId);

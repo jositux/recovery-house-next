@@ -14,6 +14,15 @@ import { MagicBackButton } from "@/components/ui/magic-back-button"
 import { getCurrentUser } from "@/services/userService"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
+interface Image {
+  id: string
+  isModerated: boolean
+}
+
+interface FileData {
+  id: string
+  filename_download: string
+}
 
 interface Room {
   id: string
@@ -48,7 +57,7 @@ interface Property {
     coordinates: [number, number]
   }
   description: string
-  mainImage: string
+  mainImage: Image
   Rooms: Room[]
   type: string
   RNTFile: FileData
@@ -57,11 +66,6 @@ interface Property {
   address: string
   fullAddress: string
   postalCode: string
-}
-
-export interface FileData {
-  id: string
-  filename_download: string
 }
 
 export default function RoomPage() {
@@ -73,7 +77,6 @@ export default function RoomPage() {
   const [showModal, setShowModal] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -90,7 +93,7 @@ export default function RoomPage() {
           propertyResponse = await axios.get(`/webapi/items/Property/${id}`, {
             params: {
               fields:
-                "*, RNTFile.filename_download,RNTFile.id,taxIdEINFile.filename_download,taxIdEINFile.id, Rooms.*,Rooms.photos.*,Rooms.extraTags.*,Rooms.servicesTags.*",
+                "*, RNTFile.filename_download,RNTFile.id,taxIdEINFile.filename_download,taxIdEINFile.id, mainImage.id, mainImage.isModerated, Rooms.*,Rooms.photos.*,Rooms.extraTags.*,Rooms.servicesTags.*",
             },
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -105,14 +108,14 @@ export default function RoomPage() {
           if (!isCurrentUserOwner) {
             propertyResponse = await axios.get(`/webapi/items/Property/${id}`, {
               params: {
-                fields: "*, Rooms.*",
+                fields: "*, mainImage.id, mainImage.isModerated, Rooms.*",
               },
             })
           }
         } else {
           propertyResponse = await axios.get(`/webapi/items/Property/${id}`, {
             params: {
-              fields: "*, Rooms.*",
+              fields: "*, mainImage.id, mainImage.isModerated, Rooms.*",
             },
           })
         }
@@ -160,6 +163,12 @@ export default function RoomPage() {
     router.push(`/propiedades/${id}/room/edit`)
   }
 
+  const getImageSrc = (image: Image) => {
+    return image.isModerated && !isOwner 
+  ? "/assets/empty.jpg" 
+  : `/webapi/assets/${image.id}`;
+  }
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -179,7 +188,12 @@ export default function RoomPage() {
     <div className="min-h-screen bg-gray-50">
       {/* Property Image */}
       <div className="relative h-[70vh] w-full">
-        <Image src={`/webapi/assets/${property.mainImage}`} alt={property.name} layout="fill" objectFit="cover" />
+        <Image
+          src={getImageSrc(property.mainImage) || "/assets/empty.jpg"}
+          alt={property.name}
+          layout="fill"
+          objectFit="cover"
+        />
 
         <div className="absolute inset-0 bg-black bg-opacity-30" />
 
@@ -345,14 +359,16 @@ export default function RoomPage() {
           <DialogHeader>
             <DialogTitle className="text-xl">🏡 ¡Propiedad cargada con éxito!</DialogTitle>
             <DialogDescription className="text-md">
-              Los moderadores de la plataforma revisarán tus documentos legales. Una vez aprobados, recibirás una notificación por email
-              y tu propiedad quedará activa.
+              Los moderadores de la plataforma revisarán tus documentos legales y fotos. Una vez aprobados, recibirás una
+              notificación por email y tu propiedad quedará activa.
               <br />
               <br />
               Mientras tanto, puedes empezar a agregar las habitaciones. ✨
             </DialogDescription>
           </DialogHeader>
-          <Button className="bg-[#39759E]" onClick={() => setShowModal(false)}>Entendido</Button>
+          <Button className="bg-[#39759E]" onClick={() => setShowModal(false)}>
+            Entendido
+          </Button>
         </DialogContent>
       </Dialog>
     </div>

@@ -23,7 +23,7 @@ export default function RoomPage() {
     const response = await roomService.createRoom(data);
   
     if (response.id) {
-      router.push(`/propiedades/${data.propertyId}`);
+      router.push(`/propiedades/${data.propertyId}?rel=new`);
     }
     
     return response.id;

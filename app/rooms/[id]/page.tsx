@@ -35,7 +35,6 @@ interface Room {
   cleaningFee: string;
   beds: number;
   capacity: number; // Added capacity field
-
   photos: {
     directus_files_id: string;
   }[];

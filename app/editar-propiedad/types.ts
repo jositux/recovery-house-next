@@ -30,6 +30,10 @@ export interface FileData {
   filename_download: string;
 }
 
+interface Image {
+  id: string
+  isModerated: boolean
+}
 
 export interface Room {
   id: string;
@@ -64,7 +68,7 @@ export interface RoomSkeleton {
 }
 
 
-export interface Property extends Omit<FormValues, 'RNTFile' | 'taxIdEINFile'> {
+export interface Property extends Omit<FormValues, 'RNTFile' | 'taxIdEINFile' | 'mainImage' > {
   userId: string;
   region: string;
   place: {
@@ -75,4 +79,5 @@ export interface Property extends Omit<FormValues, 'RNTFile' | 'taxIdEINFile'> {
   Rooms: RoomSkeleton[];
   RNTFile: FileData;
   taxIdEINFile: FileData;
+  mainImage: Image;
 }
