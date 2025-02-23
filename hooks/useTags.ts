@@ -42,6 +42,8 @@ const useTags = (
         // Si no se encuentran en el localStorage, obtenemos los datos desde la API
         const fetchedExtraTags = parsedExtraTags || await getExtraTags()
         const fetchedServiceTags = parsedServiceTags || await getServiceTags()
+        localStorage.setItem(extraTagsKey, JSON.stringify(fetchedExtraTags))
+        localStorage.setItem(serviceTagsKey, JSON.stringify(fetchedServiceTags))
 
         // Guardamos los resultados en el estado
         setExtraTags(fetchedExtraTags)

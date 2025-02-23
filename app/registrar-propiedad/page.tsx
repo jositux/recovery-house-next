@@ -51,23 +51,6 @@ const formSchema = z.object({
   patology: z.array(z.string()).min(1, "Selecciona al menos una patología."),
 })
 
-/*
-interface Room {
-  id: string;
-  name: string;
-  roomNumber: string;
-  description: string;
-  beds: number;
-  capacity: number;
-  pricePerNight: string;
-  cleaningFee: string;
-  mainImage: string;
-  photos: string[];
-  extraTags: string[];
-  servicesTags: string[];
-  propertyId: string;
-}*/
-
 type FormValues = z.infer<typeof formSchema>
 
 export default function RegisterPropertyBasePage() {
@@ -173,25 +156,6 @@ export default function RegisterPropertyBasePage() {
       setIsSubmitting(false)
     }
   }
-
-  /*
-  const [rooms, setRooms] = useState<Room[]>([
-    {
-      id: "1",
-      name: "Habitación 1",
-      roomNumber: "",
-      description: "",
-      beds: 1,
-      capacity: 1,
-      pricePerNight: "",
-      cleaningFee: "",
-      mainImage: "",
-      photos: [],
-      extraTags: [],
-      servicesTags: [],
-      propertyId: "0",
-    },
-  ]);*/
 
   return (
     <div className="min-h-screen bg-[#F8F8F7]">
