@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Search, ChevronDown, Check } from "lucide-react"
@@ -9,7 +9,7 @@ import Image from "next/image"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { format, addDays } from "date-fns"
+import { format, addDays, parse } from "date-fns"
 import { es } from "date-fns/locale"
 import { cn } from "@/lib/utils"
 import { NumberInput } from "@/components/number-input"
@@ -34,11 +34,41 @@ interface MedicalSearchMobileProps {
 
 const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
   const router = useRouter()
+  const searchParams = useSearchParams()
+
   const [selectedProcedures, setSelectedProcedures] = useState<string[]>([])
   const [location, setLocation] = useState("")
   const [startDate, setStartDate] = useState<Date | undefined>()
   const [endDate, setEndDate] = useState<Date | undefined>()
   const [patientCount, setPatientCount] = useState(1)
+
+  useEffect(() => {
+    // Initialize state from URL parameters
+    const proceduresParam = searchParams.get("procedures")
+    if (proceduresParam) {
+      setSelectedProcedures(proceduresParam.split(","))
+    }
+
+    const locationParam = searchParams.get("location")
+    if (locationParam) {
+      setLocation(locationParam)
+    }
+
+    const checkInParam = searchParams.get("checkIn")
+    if (checkInParam) {
+      setStartDate(parse(checkInParam, "yyyy-MM-dd", new Date()))
+    }
+
+    const checkOutParam = searchParams.get("checkOut")
+    if (checkOutParam) {
+      setEndDate(parse(checkOutParam, "yyyy-MM-dd", new Date()))
+    }
+
+    const travelersParam = searchParams.get("travelers")
+    if (travelersParam) {
+      setPatientCount(Number.parseInt(travelersParam, 10))
+    }
+  }, [searchParams])
 
   const toggleProcedure = (procedureName: string) => {
     setSelectedProcedures((prev) =>
@@ -83,11 +113,8 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
     return format(date, "d MMM", { locale: es })
   }
 
-  // ... (el resto del componente permanece igual)
-
   return (
     <div className="md:hidden w-full max-w-[850px] mx-auto p-4 space-y-3 bg-[#39759E] rounded-b-xl">
-      {/* ... (el resto del JSX permanece igual) */}
       <div className="w-full">
         <label className="block text-sm mb-1 text-white">Motivo médico</label>
         <DropdownMenu>
@@ -200,7 +227,7 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
           <NumberInput
             min={1}
             max={50}
-            defaultValue={1}
+            defaultValue={patientCount}
             onChange={(value) => setPatientCount(value)}
             className="text-white text-[22px]"
           />
