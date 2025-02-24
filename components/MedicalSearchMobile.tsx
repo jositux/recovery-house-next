@@ -1,15 +1,17 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Search, ChevronDown, Check } from "lucide-react"
+import { Search, ChevronDown, Check, X } from "lucide-react"
 import Image from "next/image"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { format, addDays, parse } from "date-fns"
+import { format, parse } from "date-fns"
 import { es } from "date-fns/locale"
 import { cn } from "@/lib/utils"
 import { NumberInput } from "@/components/number-input"
@@ -31,6 +33,8 @@ const procedures: Procedure[] = [
 interface MedicalSearchMobileProps {
   onSearch: () => void
 }
+
+let travelers = 1
 
 const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
   const router = useRouter()
@@ -66,7 +70,9 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
 
     const travelersParam = searchParams.get("travelers")
     if (travelersParam) {
-      setPatientCount(Number.parseInt(travelersParam, 10))
+      travelers = Number.parseInt(travelersParam, 10)
+      setPatientCount(travelers > 0 ? travelers : 1)
+      console.log(travelers, patientCount)
     }
   }, [searchParams])
 
@@ -78,9 +84,10 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
 
   const handleStartDateSelect = (date: Date | undefined) => {
     setStartDate(date)
-    if (date && (!endDate || endDate <= date)) {
-      setEndDate(addDays(date, 1))
-    }
+  }
+
+  const handleEndDateSelect = (date: Date | undefined) => {
+    setEndDate(date)
   }
 
   const handleSearch = () => {
@@ -105,12 +112,24 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
     params.append("travelers", patientCount.toString())
 
     router.push(`/rooms?${params.toString()}`)
-    onSearch() // Llamamos a la función onSearch proporcionada por el padre
+    onSearch()
   }
 
   const formatDate = (date: Date | undefined) => {
     if (!date) return ""
     return format(date, "d MMM", { locale: es })
+  }
+
+  const resetStartDate = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setStartDate(undefined)
+  }
+
+  const resetEndDate = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setEndDate(undefined)
   }
 
   return (
@@ -174,7 +193,7 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <div>
+        <div className="relative">
           <label className="block text-sm mb-1 text-white">Llegada</label>
           <Popover>
             <PopoverTrigger asChild>
@@ -191,13 +210,23 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
                 selected={startDate}
                 onSelect={handleStartDateSelect}
                 initialFocus
-                disabled={(date) => date < new Date() || (endDate ? date >= endDate : false)}
+                disabled={(date) => date < new Date()}
               />
             </PopoverContent>
           </Popover>
+          {startDate && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-0 top-6 p-4 text-gray hover:text-gray hover:bg-transparent"
+              onClick={resetStartDate}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
         </div>
 
-        <div>
+        <div className="relative">
           <label className="block text-sm mb-1 text-white">Salida</label>
           <Popover>
             <PopoverTrigger asChild>
@@ -212,12 +241,22 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
               <Calendar
                 mode="single"
                 selected={endDate}
-                onSelect={setEndDate}
+                onSelect={handleEndDateSelect}
                 initialFocus
-                disabled={(date) => date <= (startDate ? addDays(startDate, 1) : new Date())}
+                disabled={(date) => date <= (startDate || new Date())}
               />
             </PopoverContent>
           </Popover>
+          {endDate && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-0 top-6 p-4 text-gray hover:text-gray hover:bg-transparent"
+              onClick={resetEndDate}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
 
@@ -227,9 +266,9 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
           <NumberInput
             min={1}
             max={50}
-            defaultValue={patientCount}
+            defaultValue={travelers}
             onChange={(value) => setPatientCount(value)}
-            className="text-white text-[22px]"
+            className="text-white"
           />
         </div>
       </div>
