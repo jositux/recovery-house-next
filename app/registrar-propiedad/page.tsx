@@ -14,12 +14,16 @@ import { LocationSelector } from "@/components/ui/location-selector"
 import { UserTypeCard } from "@/components/ui/user-type-card"
 import { useRouter } from "next/navigation"
 
-import type { LocationDetails } from "@/components/OSMSelector"
-import dynamic from "next/dynamic"
+//import type { LocationDetails } from "@/components/OSMSelector"
+//import dynamic from "next/dynamic"
 
+/*
 const OpenStreetMapSelector = dynamic(() => import("@/components/OSMSelector").then((mod) => mod.default), {
   ssr: false,
-})
+})*/
+
+import GoogleMapsSelector, { type LocationDetails } from "@/components/google-maps-selector"
+
 
 import { propertyService, type PropertyData } from "@/services/propertyService"
 //import { roomService, type RoomData } from "@/services/RoomService";
@@ -353,7 +357,7 @@ export default function RegisterPropertyBasePage() {
                 )}
               />
 
-              <OpenStreetMapSelector onLocationSelected={handleLocationSelected} defaultLocation={defaultLocation} />
+              <GoogleMapsSelector onLocationSelected={handleLocationSelected} defaultLocation={defaultLocation} />
             </div>
             <div className="hidden">
               <FormField

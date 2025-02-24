@@ -3,10 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import axios from "axios";
-import {
-  Bed,
-  Users,
-} from "lucide-react";
+import { Bed, Users } from "lucide-react";
 import { Camera } from "lucide-react";
 import { BookingWidget } from "@/components/ui/booking-widget";
 import { ServiceProviderCard } from "@/components/ui/service-provider-card";
@@ -17,6 +14,7 @@ import { getExtraTags } from "@/services/extraTagsService";
 import useTags from "@/hooks/useExtraTags";
 import { CollectionExtraTags } from "@/components/collectionExtraTagsRoom";
 import { MagicBackButton } from "@/components/ui/magic-back-button";
+//import { useCheckOwnership } from "@/hooks/isOwner";
 
 const fraunces = Fraunces({ subsets: ["latin"] });
 
@@ -25,6 +23,13 @@ interface RoomTag {
   Room_id: string;
   ExtraTags_id: string;
 }
+
+type ImageRoom = {
+  directus_files_id: {
+    id: string;
+    isModerated: boolean;
+  };
+};
 
 interface Room {
   id: string;
@@ -35,9 +40,7 @@ interface Room {
   cleaningFee: string;
   beds: number;
   capacity: number; // Added capacity field
-  photos: {
-    directus_files_id: string;
-  }[];
+  photos: ImageRoom[];
   extraTags: RoomTag[];
   servicesTags: { serviceTags_id: string }[];
 }
@@ -94,6 +97,7 @@ interface ServiceProvider {
 
 export default function RoomPage() {
   const { id } = useParams();
+
   const [room, setRoom] = useState<Room | null>(null);
   const [property, setProperty] = useState<Property | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -117,7 +121,7 @@ export default function RoomPage() {
             axios.get("/webapi/items/Property", {
               params: {
                 fields:
-                  "*,photos.directus_files_id.*, Rooms.*, Rooms.photos.*, Rooms.extraTags.*, Rooms.servicesTags.*",
+                  "*,photos.directus_files_id.*, Rooms.*, Rooms.photos.directus_files_id.id, Rooms.photos.directus_files_id.isModerated, Rooms.extraTags.*, Rooms.servicesTags.*",
               },
               headers: {
                 "Access-Control-Allow-Origin": "*",
@@ -168,11 +172,17 @@ export default function RoomPage() {
     }
   }, [id]);
 
+  //const { isOwner } = useCheckOwnership(String(property?.id));
+
+  const getImageSrc = (image: ImageRoom) => {
+    return image.directus_files_id.isModerated
+      ? "/assets/empty.jpg"
+      : `/webapi/assets/${image.directus_files_id.id}`;
+  };
+
   useEffect(() => {
     if (room && room.photos) {
-      setPhotoIds(
-        room.photos.map((photo) => `/webapi/assets/${photo.directus_files_id}`)
-      );
+      setPhotoIds(room.photos.map((photo) => getImageSrc(photo)));
     }
   }, [room]);
 
@@ -182,7 +192,6 @@ export default function RoomPage() {
     txt.innerHTML = textWithoutTags;
     return txt.value;
   };
-
 
   if (isLoading) {
     return (
@@ -205,7 +214,8 @@ export default function RoomPage() {
       {/* Hero Image */}
       <div className="relative h-[500px] w-full">
         <img
-          src={`/webapi/assets/${room.mainImage}`}
+          src={getImageSrc(room.photos[0])
+           || "/assets/empty.jpg"}
           alt={property.name}
           className="w-full h-full object-cover"
         />
@@ -266,7 +276,7 @@ export default function RoomPage() {
                 </div>
               </div>
             </div>
-           
+
             {/* Description */}
             <div className="mb-8">
               <p className="text-[#162F40]">
@@ -296,13 +306,12 @@ export default function RoomPage() {
               >
                 Amenidades / Servicios
               </h2>
-              
+
               <CollectionExtraTags
                 extraTags={extraTags}
                 enable="property"
                 roomTags={room.extraTags}
               />
-              
             </div>
 
             {/* Map */}

@@ -13,9 +13,10 @@ interface RoomCardProps {
   propertyName: string
   country: string
   state: string
+  city: string
 }
 
-export function RoomCard({ id, name, price, image, propertyName, country, state }: RoomCardProps) {
+export function RoomCard({ id, name, price, image, propertyName, country, state, city }: RoomCardProps) {
   return (
     <Card className="overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
       <Link href={`/rooms/${id}`}>
@@ -34,7 +35,7 @@ export function RoomCard({ id, name, price, image, propertyName, country, state 
         <p className="text-sm text-gray-600 mb-2">{propertyName}</p>
         <div className="flex items-center text-sm text-gray-500">
           <MapPin size={16} className="mr-1" />
-          <span>{`${state}, ${country}`}</span>
+          <span>{`${city}, ${state}, ${country}`}</span>
         </div>
       </CardContent>
       <CardFooter className="flex justify-between items-center p-4 bg-gray-50">

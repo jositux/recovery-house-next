@@ -25,7 +25,7 @@ export default function RoomPage() {
     //setSubmittedData(data);
     const response = await roomUpdateService.updateRoom(data);
 
-    router.push(`/propiedades/${data.propertyId}`);
+    router.push(`/propiedades/${data.propertyId}?rel=new-room`);
 
     return response.id;
   };
@@ -51,11 +51,11 @@ export default function RoomPage() {
           cleaningFee: parseInt(parsedData.cleaningFee) || 0,
           mainImage: parsedData.mainImage || "",
           photos: parsedData.photos
-            ? parsedData.photos.map(
-                (photo: { directus_files_id: string }) =>
-                  photo.directus_files_id
-              )
-            : [],
+          ? parsedData.photos.map(
+              (photo: { directus_files_id: { id: string } }) =>
+                photo.directus_files_id.id
+            )
+          : [],
           extraTags: parsedData.extraTags
             ? parsedData.extraTags.map(
                 (tag: { ExtraTags_id: string }) => tag.ExtraTags_id

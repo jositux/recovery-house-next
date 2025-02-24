@@ -99,7 +99,7 @@ export function MapRooms({ markers }: MapProps) {
            <Link href={`/propiedades/${selectedMarker.id}`} className="block">
              {selectedMarker.image && (
                <Image
-                 src={`/webapi/assets/${selectedMarker.image}?key=small`}
+                 src={`${selectedMarker.image}?key=small`}
                  alt={selectedMarker.name}
                  width={200}
                  height={150}
