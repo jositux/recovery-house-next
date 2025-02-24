@@ -394,7 +394,7 @@ function RoomsPageContent() {
 
 export default function RoomsPage() {
   return (
-    <main className="flex flex-col lg:pl-8 md:pl-8">
+    <main className="flex flex-col min-h-screen lg:pl-8 md:pl-8">
       <Suspense fallback={<div className="flex justify-center items-center h-screen">Cargando...</div>}>
         <RoomsPageContent />
       </Suspense>

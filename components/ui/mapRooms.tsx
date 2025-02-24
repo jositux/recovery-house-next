@@ -29,7 +29,7 @@ const colombiaCenter = {
   lng: -74.297333,
 }
 
-const MIN_ZOOM = 10
+const MIN_ZOOM = 3
 
 export function MapRooms({ markers }: MapProps) {
   const { isLoaded } = useJsApiLoader({
