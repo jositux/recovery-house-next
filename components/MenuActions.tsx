@@ -1,28 +1,30 @@
-"use client";
+"use client"
 
-import { useState, useEffect, useRef } from "react";
-import { Plus, Building, HandHeart, Search } from "lucide-react";
-import Link from "next/link";
+import { useState, useEffect, useRef } from "react"
+import { Plus, Building, HandHeart, Search } from "lucide-react"
+import Link from "next/link"
 
 export function MenuActions() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
 
-  const toggleMenu = () => setIsMenuOpen((prev) => !prev);
+  const toggleMenu = () => setIsMenuOpen((prev) => !prev)
+
+  const closeMenu = () => setIsMenuOpen(false)
 
   // Cierra el menú si se hace clic fuera de él
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsMenuOpen(false);
+        setIsMenuOpen(false)
       }
-    };
+    }
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside)
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [])
 
   return (
     <div className="relative" ref={menuRef}>
@@ -37,26 +39,24 @@ export function MenuActions() {
       {/* Menú desplegable */}
       <div
         className={`absolute right-0 mt-2 w-48 bg-white shadow-md rounded-lg z-10 transition-all duration-300 ${
-          isMenuOpen
-            ? "opacity-100 scale-100 visible"
-            : "opacity-0 scale-95 invisible"
+          isMenuOpen ? "opacity-100 scale-100 visible" : "opacity-0 scale-95 invisible"
         }`}
       >
         <ul className="text-sm text-[#162F40]">
           <li className="px-4 py-2 hover:bg-gray-100 rounded-lg cursor-pointer">
-            <Link href="/registrar-propiedad" className="flex items-center gap-2">
+            <Link href="/registrar-propiedad" className="flex items-center gap-2" onClick={closeMenu}>
               <Building className="w-4 h-4" />
               Agregar Propiedad
             </Link>
           </li>
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-            <Link href="/registrar-servicio" className="flex items-center gap-2">
+            <Link href="/registrar-servicio" className="flex items-center gap-2" onClick={closeMenu}>
               <HandHeart className="w-4 h-4" />
               Agregar Servicio
             </Link>
           </li>
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-            <Link href="/rooms" className="flex items-center gap-2">
+            <Link href="/rooms" className="flex items-center gap-2" onClick={closeMenu}>
               <Search className="w-4 h-4" />
               Buscar Alojamiento
             </Link>
@@ -64,5 +64,6 @@ export function MenuActions() {
         </ul>
       </div>
     </div>
-  );
+  )
 }
+

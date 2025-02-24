@@ -1,25 +1,22 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Search, ChevronDown, Check } from 'lucide-react'
-import Image from 'next/image'
+import { Search, ChevronDown, Check } from "lucide-react"
+import Image from "next/image"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { format, addDays } from "date-fns"
-import { es } from 'date-fns/locale'
+import { es } from "date-fns/locale"
 import { cn } from "@/lib/utils"
 import { NumberInput } from "@/components/number-input"
 
 interface Procedure {
-  name: string;
-  icon: string;
+  name: string
+  icon: string
 }
 
 const procedures: Procedure[] = [
@@ -32,16 +29,16 @@ const procedures: Procedure[] = [
 ]
 
 const MedicalSearchMobile = () => {
+  const router = useRouter()
   const [selectedProcedures, setSelectedProcedures] = useState<string[]>([])
+  const [location, setLocation] = useState("")
   const [startDate, setStartDate] = useState<Date | undefined>()
   const [endDate, setEndDate] = useState<Date | undefined>()
   const [patientCount, setPatientCount] = useState(1)
 
   const toggleProcedure = (procedureName: string) => {
-    setSelectedProcedures(prev => 
-      prev.includes(procedureName)
-        ? prev.filter(name => name !== procedureName)
-        : [...prev, procedureName]
+    setSelectedProcedures((prev) =>
+      prev.includes(procedureName) ? prev.filter((name) => name !== procedureName) : [...prev, procedureName],
     )
   }
 
@@ -53,12 +50,28 @@ const MedicalSearchMobile = () => {
   }
 
   const handleSearch = () => {
-    console.log({
-      selectedProcedures,
-      startDate,
-      endDate,
-      patientCount
-    })
+    const params = new URLSearchParams()
+
+    if (selectedProcedures.length > 0) {
+      params.append("procedures", selectedProcedures.join(","))
+    }
+
+    if (location) {
+      params.append("location", location)
+    }
+
+    if (startDate) {
+      params.append("checkIn", format(startDate, "yyyy-MM-dd"))
+    }
+
+    if (endDate) {
+      params.append("checkOut", format(endDate, "yyyy-MM-dd"))
+    }
+
+    params.append("travelers", patientCount.toString())
+
+    router.push(`/rooms?${params.toString()}`)
+
   }
 
   const formatDate = (date: Date | undefined) => {
@@ -72,14 +85,9 @@ const MedicalSearchMobile = () => {
         <label className="block text-sm mb-1 text-white">Motivo médico</label>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              className="w-full justify-between bg-white hover:bg-white"
-            >
+            <Button variant="outline" className="w-full justify-between bg-white hover:bg-white">
               <span className="text-[#162F40]">
-                {selectedProcedures.length > 0
-                  ? `${selectedProcedures.length} seleccionados`
-                  : "Tipo de intervención"}
+                {selectedProcedures.length > 0 ? `${selectedProcedures.length} seleccionados` : "Tipo de intervención"}
               </span>
               <ChevronDown className="h-4 w-4 opacity-50" />
             </Button>
@@ -122,10 +130,12 @@ const MedicalSearchMobile = () => {
 
       <div className="w-full">
         <label className="block text-sm mb-1 text-white">Lugar</label>
-        <Input 
-          type="text" 
-          placeholder="¿Dónde deseas recuperarte?" 
+        <Input
+          type="text"
+          placeholder="¿Dónde deseas recuperarte?"
           className="bg-white text-sm"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
         />
       </div>
 
@@ -136,10 +146,7 @@ const MedicalSearchMobile = () => {
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                className={cn(
-                  "w-full justify-start bg-white hover:bg-white",
-                  !startDate && "text-muted-foreground"
-                )}
+                className={cn("w-full justify-start bg-white hover:bg-white", !startDate && "text-muted-foreground")}
               >
                 {startDate ? formatDate(startDate) : "Elegir fecha"}
               </Button>
@@ -162,10 +169,7 @@ const MedicalSearchMobile = () => {
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                className={cn(
-                  "w-full justify-start bg-white hover:bg-white",
-                  !endDate && "text-muted-foreground"
-                )}
+                className={cn("w-full justify-start bg-white hover:bg-white", !endDate && "text-muted-foreground")}
               >
                 {endDate ? formatDate(endDate) : "Elegir fecha"}
               </Button>
@@ -184,20 +188,19 @@ const MedicalSearchMobile = () => {
       </div>
 
       <div className="w-full mx-auto flex flex-col items-center text-center mt-2">
-  <label className="block text-sm mb-1 text-white">Cantidad de personas</label>
-  <div className="rounded-md px-3 py-2">
-    <NumberInput
-      min={1}
-      max={50}
-      defaultValue={1}
-      onChange={(value) => setPatientCount(value)}
-      className="text-white text-[22px]"
-    />
-  </div>
-</div>
+        <label className="block text-sm mb-1 text-white">Cantidad de personas</label>
+        <div className="rounded-md px-3 py-2">
+          <NumberInput
+            min={1}
+            max={50}
+            defaultValue={1}
+            onChange={(value) => setPatientCount(value)}
+            className="text-white text-[22px]"
+          />
+        </div>
+      </div>
 
-
-<Button
+      <Button
         className="w-full h-12 mt-4 bg-[#1B2B3A] hover:bg-[#2C3E50] text-white flex items-center justify-center gap-2"
         onClick={handleSearch}
       >
