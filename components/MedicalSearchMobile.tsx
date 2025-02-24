@@ -28,7 +28,11 @@ const procedures: Procedure[] = [
   { name: "Otro", icon: "/assets/icons/05.svg" },
 ]
 
-const MedicalSearchMobile = () => {
+interface MedicalSearchMobileProps {
+  onSearch: () => void
+}
+
+const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
   const router = useRouter()
   const [selectedProcedures, setSelectedProcedures] = useState<string[]>([])
   const [location, setLocation] = useState("")
@@ -71,16 +75,19 @@ const MedicalSearchMobile = () => {
     params.append("travelers", patientCount.toString())
 
     router.push(`/rooms?${params.toString()}`)
-
+    onSearch() // Llamamos a la función onSearch proporcionada por el padre
   }
 
   const formatDate = (date: Date | undefined) => {
     if (!date) return ""
-    return format(date, "d MMM, yyyy", { locale: es })
+    return format(date, "d MMM", { locale: es })
   }
+
+  // ... (el resto del componente permanece igual)
 
   return (
     <div className="md:hidden w-full max-w-[850px] mx-auto p-4 space-y-3 bg-[#39759E] rounded-b-xl">
+      {/* ... (el resto del JSX permanece igual) */}
       <div className="w-full">
         <label className="block text-sm mb-1 text-white">Motivo médico</label>
         <DropdownMenu>

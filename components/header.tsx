@@ -46,6 +46,10 @@ export function Header() {
     setIsSearchOpen(!isSearchOpen)
   }
 
+  const cerrarSearch = () => {
+    setIsSearchOpen(false)
+  }
+
   return (
     <>
       <header className={`${styles.Container} bg-[#39759E] p-4 relative z-1`}>
@@ -97,7 +101,7 @@ export function Header() {
             className="bg-white overflow-hidden"
           >
             <div className="container mx-auto">
-              <MedicalSearchMobile />
+              <MedicalSearchMobile onSearch={cerrarSearch} />
             </div>
           </motion.div>
         )}
