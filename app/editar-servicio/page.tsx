@@ -32,6 +32,8 @@ import { getProvidersByUserId } from "@/services/providerCollectionService";
 import { getExtraTags } from "@/services/extraTagsService";
 //import { getServiceTags } from "@/services/serviceTagsService";
 import { getCurrentUser } from "@/services/userService";
+import { useRouter } from "next/navigation"
+
 
 const formSchema = z.object({
   id: z.string(),
@@ -224,7 +226,8 @@ useEffect(() => {
     control: form.control,
     name: "serviceTags",
   });*/
-
+  const router = useRouter();
+  
   const onSubmit = async (values: FormValues) => {
     console.log("Form values before submission:", values);
     if (!values.RNTFile || !values.taxIdEINFile) {
@@ -261,6 +264,7 @@ useEffect(() => {
       );
 
       setSuccessMessage("¡Proveedor actualizado con éxito!");
+      router.push(`/mi-servicio`)
     } catch (error) {
       console.error("Error al actualizar el proveedor:", error);
       setSuccessMessage(null);
