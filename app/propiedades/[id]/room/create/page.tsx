@@ -40,7 +40,6 @@ export default function RoomPage() {
     capacity: 1,
     pricePerNight: 0,
     cleaningFee: 0,
-    mainImage: "",
     photos: [],
     extraTags: [""],
     servicesTags: [""],
