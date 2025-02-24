@@ -351,7 +351,7 @@ export default function RoomPage() {
             </div>
 
             {/* Booking Widget for mobile (at the bottom) */}
-            <div className="mt-8 lg:hidden">
+            <div className="mt-8 hidden lg:hidden">
               <BookingWidget
                 room={room.id}
                 name={room.name}
