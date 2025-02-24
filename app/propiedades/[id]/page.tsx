@@ -265,30 +265,32 @@ export default function RoomPage() {
               </div>
             )}
 
-            <h1 className="text-5xl font-bold mb-2">{property.name}</h1>
-            <p className="text-2xl">
+            <h1 className="lg:text-5xl text-3xl font-bold mb-2">{property.name}</h1>
+            <p className="text-1xl lg:text-2xl">
               {property.city}, {property.state}, {property.country}
             </p>
           </div>
         </div>
-        {isOwner && (
-          <div className="absolute top-4 right-4">
-            <Button
-              variant="secondary"
-              onClick={() => handleEditBanner(property)}
-              className="rounded-full bg-white hover:bg-gray-100 text-gray-800 px-4 py-2"
-            >
-              <Pencil className="h-4 w-4 mr-2" />
-              Editar
-            </Button>
-          </div>
-        )}
+       
       </div>
 
       <div className="absolute top-8 left-0 right-0 z-10">
         <div className="container mx-auto px-4 lg:px-20">
           <MagicBackButton />
         </div>
+        {isOwner && (
+          <div className="absolute z-100 top-4 right-4">
+            <Button
+  variant="secondary"
+  onClick={() => handleEditBanner(property)}
+  className="inline-flex items-center justify-center w-full rounded-full bg-white hover:bg-gray-100 text-gray-800 px-4 py-2"
+>
+  <Pencil className="h-4 w-4 mr-2" />
+  Editar Propiedad
+</Button>
+
+          </div>
+        )}
       </div>
 
       {/* Content */}
@@ -485,14 +487,14 @@ export default function RoomPage() {
             ) : updated === "room" ? (
               <>
                 <DialogTitle className="text-xl">
-                  🛏️ ¡Habitación registrada con éxito!
+                  🛏️ ¡Felitaciones, Puedes disfrutar de tu habitación!
                 </DialogTitle>
                 <DialogDescription className="text-md">
   Puedes seguir agregando más habitaciones o editar las que ya creaste.
   <br />
   
   <br />
-  📸 <strong>Importante:</strong> Si modificaste las fotos, serán revisadas nuevamente para asegurar que cumplan con las normas de la plataforma. Recibirás una notificación cuando sean aprobadas.
+  📸 <strong>Importante:</strong> Si agregaste nuevas fotos, serán revisadas para asegurar que cumplan con las normas de la plataforma. Recibirás una notificación cuando sean aprobadas.
 </DialogDescription>
               </>
             ) : (

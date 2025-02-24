@@ -168,7 +168,7 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
             )}
           />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-white rounded-xl">
+        <div className="grid grid-cols-2 md:grid-cols-2 gap-6 p-4 bg-white rounded-xl">
           <FormField
             control={form.control}
             name="beds"
@@ -226,7 +226,7 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
             )}
           />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-white rounded-xl">
+        <div className="grid grid-cols-2 md:grid-cols-2 gap-6 p-4 bg-white rounded-xl">
           <FormField
             control={form.control}
             name="pricePerNight"
@@ -381,35 +381,30 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
             )}
           />
         </div>
-
         <div className="flex gap-4 mt-4 p-4 md:p-0">
-          <Link
-            href={`/propiedades/${initialValues?.propertyId}/`}
-            className="flex-1"
-          >
-            <Button
-              variant="outline"
-              type="button"
-              className="w-full text-sm px-6 py-3"
-            >
-              Cancelar
-            </Button>
-          </Link>
-          <Button
-            type="submit"
-            disabled={form.formState.isSubmitting}
-            className="flex-1 text-sm px-6 py-3 bg-[#39759E]"
-          >
-            {form.formState.isSubmitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Guardando...
-              </>
-            ) : (
-              "Guardar"
-            )}
-          </Button>
-        </div>
+      <Link href={`/propiedades/${initialValues?.propertyId}/`} className="flex-1 w-full">
+        <Button variant="outline" type="button" className="w-full text-sm px-4 py-3 h-full">
+          Cancelar
+        </Button>
+      </Link>
+      <Button
+        type="submit"
+        disabled={form.formState.isSubmitting}
+        className="flex-1 w-full text-sm px-4 py-3 bg-[#39759E] h-full"
+      >
+        {form.formState.isSubmitting ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Guardando...
+          </>
+        ) : (
+          "Guardar"
+        )}
+      </Button>
+    </div>
+
+
+
       </form>
     </Form>
   );
