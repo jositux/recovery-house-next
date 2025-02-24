@@ -38,6 +38,7 @@ export function MapRooms({ markers }: MapProps) {
   })
 
   const [map, setMap] = useState<google.maps.Map | null>(null)
+  console.log(map)
   const [selectedMarker, setSelectedMarker] = useState<MapMarker | null>(null)
   const mapRef = useRef<google.maps.Map | null>(null)
 
