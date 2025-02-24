@@ -42,9 +42,12 @@ import {
   type Property,
 } from "../types";
 
+import GoogleMapsSelector, { type LocationDetails } from "@/components/google-maps-selector"
+
+/*
 import OpenStreetMapSelector, {
   type LocationDetails,
-} from "@/components/OSMSelector";
+} from "@/components/OSMSelector";*/
 
 export default function EditPropertyPage({
   params,
@@ -431,7 +434,7 @@ export default function EditPropertyPage({
                 )}
               />
 
-              <OpenStreetMapSelector
+              <GoogleMapsSelector
                 onLocationSelected={handleLocationSelected}
                 defaultLocation={defaultLocation}
               />
