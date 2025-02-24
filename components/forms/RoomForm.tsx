@@ -51,7 +51,6 @@ const formSchema = z.object({
     .number()
     .positive({ message: "El precio debe ser mayor a 0" }),
   cleaningFee: z.number().positive({ message: "El precio debe ser mayor a 0" }),
-  mainImage: z.string(),
   photos: z.array(z.string()).min(1, { message: "Cargar al menos 1 Foto" }),
   extraTags: z
     .array(z.string())
@@ -83,7 +82,6 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
       capacity: initialValues?.capacity || 1,
       pricePerNight: initialValues?.pricePerNight || 0,
       cleaningFee: initialValues?.cleaningFee || 0,
-      mainImage: initialValues?.mainImage || "",
       photos: initialValues?.photos || [],
       extraTags: initialValues?.extraTags || [],
       servicesTags: initialValues?.servicesTags || [],

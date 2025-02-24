@@ -54,7 +54,6 @@ interface Room {
   name: string;
   description: string;
   pricePerNight: string;
-  mainImage: string;
   cleaningFee: string;
   photos: ImageRoom[];
   extraTags: { ExtraTags_id: string }[];

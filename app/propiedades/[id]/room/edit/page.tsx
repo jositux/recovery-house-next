@@ -49,7 +49,6 @@ export default function RoomPage() {
           capacity: parseInt(parsedData.capacity) || 4,
           pricePerNight: parseInt(parsedData.pricePerNight) || 0,
           cleaningFee: parseInt(parsedData.cleaningFee) || 0,
-          mainImage: parsedData.mainImage || "",
           photos: parsedData.photos
           ? parsedData.photos.map(
               (photo: { directus_files_id: { id: string } }) =>
@@ -78,7 +77,6 @@ export default function RoomPage() {
         capacity: 1,
         pricePerNight: 0,
         cleaningFee: 0,
-        mainImage: "",
         photos: [],
         extraTags: [""],
         servicesTags: [""],

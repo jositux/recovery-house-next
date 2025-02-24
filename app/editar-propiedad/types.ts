@@ -20,7 +20,6 @@ export const formSchema = z.object({
   hostName: z.string().min(1, "El Hostname"),
   guestComments: z.string().min(1, "El comentario es Obligatorio"),
   patology: z.array(z.string()).min(1, "Selecciona al menos una patología."),
-
 });
 
 export type FormValues = z.infer<typeof formSchema>;
@@ -44,7 +43,6 @@ export interface Room {
   capacity: number;
   pricePerNight: string;
   cleaningFee: string;
-  mainImage: string;
   photos: string[];
   extraTags: string[]; // Aquí es un array de cadenas
   servicesTags: string[];

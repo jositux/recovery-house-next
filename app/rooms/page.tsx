@@ -26,7 +26,6 @@ interface Room {
   name: string
   description: string
   pricePerNight: string
-  mainImage: string
   photos: ImageRoom[]
   extraTags: { ExtraTags_id: string }[]
   servicesTags: { serviceTags_id: string }[]

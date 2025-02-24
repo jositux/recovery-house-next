@@ -36,7 +36,6 @@ interface Room {
   name: string;
   description: string;
   pricePerNight: string;
-  mainImage: string;
   cleaningFee: string;
   beds: number;
   capacity: number; // Added capacity field

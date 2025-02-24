@@ -10,7 +10,6 @@ export interface RoomUpdateData {
   capacity: number;
   description: string;
   pricePerNight: number;
-  mainImage: string;
   propertyId: string;
   cleaningFee: number;
   photos: string[];
@@ -49,11 +48,10 @@ export const roomUpdateService = {
 
       // Transformar photos, asignando mainImage si photos está vacío
       const formattedPhotos =
-        data.photos.length > 0
-          ? data.photos.map((photo) => ({
+          data.photos.map((photo) => ({
               directus_files_id: photo,
             }))
-          : [{ directus_files_id: data.mainImage }];
+         
 
       // Transformar propertyId de string a { id: string }
       const formattedPropertyId = { id: data.propertyId };
@@ -66,7 +64,6 @@ export const roomUpdateService = {
       // Crear una copia de data con servicesTags, extraTags, photos, y propertyId transformados
       const transformedData = {
         ...data,
-        mainImage: formattedPhotos[0].directus_files_id,
         pricePerNight: normalizedPricePerNight,
         cleaningFee: normalizedCleaningFee,
         servicesTags: formattedServiceTags,
