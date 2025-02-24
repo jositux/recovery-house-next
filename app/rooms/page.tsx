@@ -286,7 +286,7 @@ function RoomsPageContent() {
         <SelectionSearch initialSelected={selectedOptions} onChange={handleSelectionChange} />
       </div>
       <div
-        className={`flex flex-col lg:flex-row mt-8 mb-16 transition-all duration-300 ease-in-out ${
+        className={`flex lg:flex-row mt-8 p-4 lg:p-0 md:p-0 mb-16 transition-all duration-300 ease-in-out ${
           isMapVisible ? "gap-0 lg:gap-6" : "gap-0"
         }`}
       >
@@ -394,7 +394,7 @@ function RoomsPageContent() {
 
 export default function RoomsPage() {
   return (
-    <main className="flex flex-col min-h-screen pl-8">
+    <main className="flex flex-col lg:pl-8 md:pl-8">
       <Suspense fallback={<div className="flex justify-center items-center h-screen">Cargando...</div>}>
         <RoomsPageContent />
       </Suspense>
