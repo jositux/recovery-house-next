@@ -20,7 +20,7 @@ type StoredTagsData = {
 }
 
 // Constante para el intervalo de actualización (8 horas en milisegundos)
-const UPDATE_INTERVAL = 8 * 60 * 60 * 10 // 8 horas
+const UPDATE_INTERVAL = 8 * 60 * 60 * 1000 // 8 horas
 
 // Hook para obtener y gestionar las etiquetas
 const useTags = (extraTagsKey: string, getExtraTags: () => Promise<ExtraTags>) => {
@@ -38,8 +38,6 @@ const useTags = (extraTagsKey: string, getExtraTags: () => Promise<ExtraTags>) =
         // Verificamos si hay datos almacenados y si no han pasado 8 horas
         if (storedData) {
           const { tags, timestamp }: StoredTagsData = JSON.parse(storedData)
-
-          console.log("datos", tags)
           const currentTime = Date.now()
 
           // Si no han pasado 8 horas, usamos los datos almacenados
