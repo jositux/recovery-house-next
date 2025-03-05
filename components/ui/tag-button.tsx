@@ -4,10 +4,41 @@ import { DynamicIcon } from "lucide-react/dynamic";
 
 // Lista de íconos válidos de lucide-react
 const validIcons = [
-  "camera", "heart", "search", "home", "bell", "star", "ghost", "wifi", "toilet", "plane", "coffee", "train-front-tunnel", "bed-double", "washing-machine", "accessibility", "biceps-flexed", "speech", "map-pinned", "briefcase-medical", "cooking-pot", "bus", "person-standing", "sparkles", "heart-handshake", "book-type", "users", "eye-closed", "alarm-clock-plus", "car-front",
+  "camera",
+  "heart",
+  "search",
+  "home",
+  "bell",
+  "star",
+  "ghost",
+  "wifi",
+  "toilet",
+  "plane",
+  "coffee",
+  "train-front-tunnel",
+  "bed-double",
+  "washing-machine",
+  "accessibility",
+  "biceps-flexed",
+  "speech",
+  "map-pinned",
+  "briefcase-medical",
+  "cooking-pot",
+  "bus",
+  "person-standing",
+  "sparkles",
+  "heart-handshake",
+  "book-type",
+  "users",
+  "eye-closed",
+  "alarm-clock-plus",
+  "car-front",
+  "monitor",
+  "sofa",
+  "fingerprint"
 ] as const;
 
-type IconName = typeof validIcons[number];
+type IconName = (typeof validIcons)[number];
 
 interface TagButtonProps {
   id: string;
@@ -18,8 +49,16 @@ interface TagButtonProps {
   className?: string;
 }
 
-export function TagButton({ icon, label, selected, onClick, className }: TagButtonProps) {
-  const iconToUse: IconName = validIcons.includes(icon as IconName) ? (icon as IconName) : "home";
+export function TagButton({
+  icon,
+  label,
+  selected,
+  onClick,
+  className,
+}: TagButtonProps) {
+  const iconToUse: IconName = validIcons.includes(icon as IconName)
+    ? (icon as IconName)
+    : "home";
 
   return (
     <div

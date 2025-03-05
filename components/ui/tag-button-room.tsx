@@ -32,6 +32,9 @@ const validIcons = [
   "eye-closed",
   "alarm-clock-plus",
   "car-front",
+  "monitor",
+  "sofa", 
+  "fingerprint"
 ] as const;
 
 type IconName = (typeof validIcons)[number];
