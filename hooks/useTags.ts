@@ -27,7 +27,7 @@ type StoredTagsData<T> = {
 }
 
 // Constante para el intervalo de actualización (8 horas en milisegundos)
-const UPDATE_INTERVAL = 8 * 60 * 60 * 10 // 8 horas
+const UPDATE_INTERVAL = 8 * 60 * 60 * 1000 // 8 horas
 
 // Hook para obtener y gestionar las etiquetas
 const useTags = (
