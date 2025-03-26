@@ -7,13 +7,23 @@ import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { format, isSameDay, addMonths, isWithinInterval, addDays, isBefore, startOfDay, isSameMonth } from "date-fns"
+import {
+  format,
+  isSameDay,
+  addMonths,
+  isWithinInterval,
+  addDays,
+  isBefore,
+  startOfDay,
+  isSameMonth,
+  parseISO,
+} from "date-fns"
 import { es } from "date-fns/locale"
 import { cn } from "@/lib/utils"
 import { CalendarIcon, Save, CheckCircle } from "lucide-react"
 //import { toast } from "@/components/ui/use-toast"
 import styles from "./calendar.module.css"
-import { serviceRoomEnabled } from "@/services/serviceRoomEnabled"
+import { serviceRoomDisabled } from "@/services/serviceRoomDisabled"
 import { useRouter } from "next/navigation"
 import {
   Dialog,
@@ -34,10 +44,20 @@ interface CalendarDay {
 
 interface CalendarViewProps {
   roomId: string
+  bookedDays?: {
+    start: string
+    end: string
+  }[]
+  unavailableDates?: string[] // Array de fechas no disponibles en formato "YYYY-MM-DD" o "YYYY-M-D"
 }
 
 // Función para analizar una fecha en formato "2025-3-25"
 function parseCustomDateFormat(dateString: string): Date {
+  // Verificar si la fecha ya está en formato ISO (YYYY-MM-DD)
+  if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+    return parseISO(dateString)
+  }
+
   const [year, month, day] = dateString.split("-").map((num) => Number.parseInt(num, 10))
   // Remember that months are 0-indexed in JavaScript Date objects
   return new Date(year, month - 1, day)
@@ -201,7 +221,20 @@ MonthCalendar.displayName = "MonthCalendar"
 // Crear un mapa para acceso rápido a los días
 type DayMap = Map<string, { index: number; status: DayStatus }>
 
-export default function CalendarView({ roomId = "1" }: CalendarViewProps) {
+export default function CalendarView({
+  roomId = "1",
+  bookedDays = [
+    {
+      start: "2025-3-25",
+      end: "2025-3-28",
+    },
+    {
+      start: "2025-4-5",
+      end: "2025-4-8",
+    },
+  ],
+  unavailableDates = [],
+}: CalendarViewProps) {
   const router = useRouter()
 
   // Estado para almacenar el estado de cada día
@@ -233,25 +266,33 @@ export default function CalendarView({ roomId = "1" }: CalendarViewProps) {
     const dayMap: DayMap = new Map()
     let currentDate = new Date(today)
 
-    // Crear algunos días reservados de ejemplo
-    const bookedDays = [
-      {
-        start: parseCustomDateFormat("2025-3-25"),
-        end: parseCustomDateFormat("2025-3-28"),
-      },
-      {
-        start: parseCustomDateFormat("2025-4-5"),
-        end: parseCustomDateFormat("2025-4-8"),
-      },
-      // Other booked days...
-    ]
+    // Usar los bookedDays recibidos como prop
+    const parsedBookedDays = bookedDays.map((day) => ({
+      start: parseCustomDateFormat(day.start),
+      end: parseCustomDateFormat(day.end),
+    }))
+
+    // Convertir las fechas no disponibles a objetos Date
+    const parsedUnavailableDates = unavailableDates.map((dateStr) => parseCustomDateFormat(dateStr))
 
     // Generar todos los días hasta un año después
     let index = 0
     while (isBefore(currentDate, oneYearLater)) {
       // Verificar si el día está en alguno de los rangos reservados
-      const isBooked = bookedDays.some((range) => isWithinInterval(currentDate, { start: range.start, end: range.end }))
-      const status = isBooked ? "booked" : "available"
+      const isBooked = parsedBookedDays.some((range) =>
+        isWithinInterval(currentDate, { start: range.start, end: range.end }),
+      )
+
+      // Verificar si el día está en las fechas no disponibles
+      const isUnavailable = parsedUnavailableDates.some((date) => isSameDay(currentDate, date))
+
+      // Determinar el estado del día
+      let status: DayStatus = "available"
+      if (isBooked) {
+        status = "booked"
+      } else if (isUnavailable) {
+        status = "unavailable"
+      }
 
       days.push({
         date: new Date(currentDate),
@@ -268,7 +309,7 @@ export default function CalendarView({ roomId = "1" }: CalendarViewProps) {
 
     setCalendarDays(days)
     dayMapRef.current = dayMap
-  }, [today, oneYearLater])
+  }, [today, oneYearLater, bookedDays, unavailableDates])
 
   // Función para verificar si un día está reservado - optimizada con mapa
   const isDayBooked = useCallback((date: Date): boolean => {
@@ -429,32 +470,37 @@ export default function CalendarView({ roomId = "1" }: CalendarViewProps) {
   // Modificar la función handleSaveChanges para enviar los datos al endpoint
   const handleSaveChanges = useCallback(async () => {
     // Recopilar todas las fechas marcadas como no disponibles
-    const unavailableDates = calendarDays
+    const disabledDates = calendarDays
       .filter((day) => day.status === "unavailable")
       .map((day) => format(day.date, "yyyy-MM-dd"))
-
-    // Mostrar el array de fechas no disponibles en la consola
-    console.log("Fechas no disponibles:", unavailableDates)
-
+  
+    console.log("Fechas no disponibles:", disabledDates)
+  
     try {
       setIsLoading(true)
-
-      // Llamar al servicio para actualizar la disponibilidad
-      await serviceRoomEnabled.updateRoomAvailability(roomId, unavailableDates)
-
+  
+      // Obtener el access_token del localStorage
+      const accessToken = localStorage.getItem("access_token")
+  
+      if (!accessToken) {
+        throw new Error("No se encontró el token de acceso")
+      }
+  
+      // Llamar al servicio para actualizar la disponibilidad con el token
+      await serviceRoomDisabled.updateRoomAvailability(roomId, JSON.stringify(disabledDates), accessToken)
+  
       // Mostrar notificación de éxito
-     /* toast({
+      /* toast({
         title: "Cambios guardados",
-        description: `Se han guardado ${unavailableDates.length} fechas como no disponibles.`,
+        description: `Se han guardado ${disabledDates.length} fechas como no disponibles.`,
       })*/
-
-      // Mostrar el diálogo de confirmación
+  
       setShowConfirmDialog(true)
     } catch (error) {
-
-      console.log(error)
+      console.error("Error al guardar disponibilidad:", error)
+  
       // Mostrar notificación de error
-     /* toast({
+      /* toast({
         title: "Error al guardar",
         description: "No se pudieron guardar los cambios. Inténtalo de nuevo.",
         variant: "destructive",
@@ -463,6 +509,7 @@ export default function CalendarView({ roomId = "1" }: CalendarViewProps) {
       setIsLoading(false)
     }
   }, [calendarDays, roomId])
+  
 
   // Renderizar el día personalizado - optimizado con useCallback
   const renderDay = useCallback(

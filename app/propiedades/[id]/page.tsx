@@ -15,9 +15,10 @@ import {
   Star,
   CheckCircle,
   AlertCircle,
+  Calendar,
 } from "lucide-react";
 import { GoogleMap } from "@/components/ui/google-map";
-import { PropertyBlockForm } from "@/components/property-block-form";
+//import { PropertyBlockForm } from "@/components/property-block-form";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
@@ -62,6 +63,7 @@ interface Room {
   beds: number;
   capacity: number;
   descriptionService: string;
+  disabledDates: string;
 }
 
 interface Property {
@@ -193,6 +195,11 @@ export default function RoomPage() {
   const handleEditRoom = (room: Room) => {
     localStorage.setItem("selected_room", JSON.stringify(room));
     router.push(`/propiedades/${id}/room/edit`);
+  };
+
+  const handleCalendarRoom = (room: Room) => {
+    localStorage.setItem("selected_room", JSON.stringify(room));
+    router.push(`/calendar/${room.id}/`);
   };
 
   const transformImageRoomToImage = (fileData: ImageRoom): Image => {
@@ -424,7 +431,18 @@ export default function RoomPage() {
                     <p className="text-sm text-gray-600 mb-4">
                       Tarifa de limpieza: ${room.cleaningFee}
                     </p>
-                    {isOwner && <PropertyBlockForm />}
+                    {isOwner && (
+                      <div className="top-2 right-2">
+                        <Button
+                          variant="secondary"
+                          onClick={() => handleCalendarRoom(room)}
+                          className="rounded-full bg-white hover:bg-gray-100 text-gray-800 px-4 py-2"
+                        >
+                          <Calendar className="h-4 w-4 mr-2" />
+                          Calendario
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
