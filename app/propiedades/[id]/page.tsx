@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { useParams, useSearchParams } from "next/navigation"
 import axios from "axios"
 import Image from "next/image"
-import { Bed, User, Pencil, Plus, Loader2, MapPin, Home, Trash, CheckCircle, AlertCircle, Calendar } from "lucide-react"
+import { Bed, User, Pencil, Plus, Loader2, MapPin, Trash, CheckCircle, AlertCircle, Calendar } from "lucide-react"
 import { GoogleMap } from "@/components/ui/google-map"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -188,30 +188,32 @@ export default function RoomPage() {
 
   const confirmDeleteProperty = async () => {
     if (!property) return
-
+  
     try {
-      /*const accessToken = localStorage.getItem("access_token")
-      if (!accessToken) {
-        console.error("No access token found")
-        return
-      }*/
-
-      // Aquí implementar la lógica de eliminación real
-      await axios.delete(`/webapi/items/Property/${property.id}`/*, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }*/)
-
-     
-
-      // Redireccionar a la lista de propiedades después de eliminar
+      // 1️⃣ Obtener los IDs de las habitaciones asociadas a la propiedad
+      const roomIds = property.Rooms.map((room) => room.id)
+  
+      // 2️⃣ Eliminar cada habitación de forma secuencial
+      for (const id of roomIds) {
+        try {
+          await axios.delete(`/webapi/items/Room/${id}`)
+          console.log(`✅ Habitación ${id} eliminada`)
+        } catch (error) {
+          console.error(`❌ Error al eliminar la habitación ${id}:`, error)
+        }
+      }
+  
+      // 3️⃣ Luego, eliminar la propiedad
+      await axios.delete(`/webapi/items/Property/${property.id}`)
+      console.log(`🏠 Propiedad ${property.id} eliminada`)
+  
+      // 4️⃣ Redireccionar a la lista de propiedades
       router.push("/mis-propiedades")
     } catch (error) {
-      console.error("Error al eliminar la propiedad:", error)
-      // Aquí podrías mostrar un mensaje de error
+      console.error("❌ Error al eliminar la propiedad:", error)
     }
   }
+  
 
   const confirmDeleteRoom = async () => {
     if (!selectedRoomForDeletion) return

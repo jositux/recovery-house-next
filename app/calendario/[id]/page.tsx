@@ -5,6 +5,7 @@ import axios from "axios"
 import { useState, useEffect } from "react"
 import CalendarView from "./calendar"
 import { Loader2 } from 'lucide-react' // Asegúrate de importar el ícono correcto
+import { MagicBackButton } from "@/components/ui/magic-back-button"
 
 interface Booking {
   id: string
@@ -27,6 +28,7 @@ export default function CalendarPage() {
   const { id } = useParams()
   const [bookedDays, setBookedDays] = useState<BookedDay[]>([])
   const [unavailableDates, setUnavailableDates] = useState<string[]>([])
+  const [roomName, setRoomName] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -70,8 +72,12 @@ export default function CalendarPage() {
     try {
       // Parsear el JSON correctamente
       const parsedRoom = JSON.parse(selectedRoom)
-      const disableDatesString = parsedRoom?.disableDates
+      
+      if (parsedRoom?.name) {
+        setRoomName(parsedRoom.name) // Guardar el nombre de la habitación
+      }
 
+      const disableDatesString = parsedRoom?.disableDates
       if (!disableDatesString) return
 
       // Convertir el string a array
@@ -85,23 +91,29 @@ export default function CalendarPage() {
 
       setUnavailableDates(formattedDates)
     } catch (error) {
-      console.error("Error parsing unavailableDates from localStorage:", error)
+      console.error("Error parsing selected_room from localStorage:", error)
     }
   }, [])
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-10 flex justify-center items-center">
+    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-10 flex flex-col items-center">
       {loading ? (
         <div className="flex justify-center items-center h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2 text-lg text-gray-700">
-          Cargando Calendario...
-        </span>
-      </div>
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <span className="ml-2 text-lg text-gray-700">
+            Cargando Calendario...
+          </span>
+        </div>
       ) : error ? (
         <p className="text-red-500">{error}</p>
       ) : (
-        <CalendarView roomId={String(id)} bookedDays={bookedDays} unavailableDates={unavailableDates} />
+        <>
+        <div className="relative container px-4">
+          <MagicBackButton />  {roomName && <h1 className="text-3xl absolute left-16 top-0 text font-medium text-gray-800 mb-4">{roomName}</h1>}
+        </div>
+         
+          <CalendarView roomId={String(id)} bookedDays={bookedDays} unavailableDates={unavailableDates} />
+        </>
       )}
     </main>
   )
