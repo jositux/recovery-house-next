@@ -31,7 +31,11 @@ interface Room {
   beds: number
   capacity: number
   description: string
-  mainImage: string
+  photos: {
+    directus_files_id: {
+      id: string
+    }
+  }[]
   propertyId: string
   cleaningFee: string
   pricePerNight: string
@@ -50,6 +54,8 @@ const BookingList: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null)
+  const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null)
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -65,8 +71,12 @@ const BookingList: React.FC = () => {
         const bookingsResponse = await fetch(`/webapi/items/Booking?filter[patient][_eq]=${user.id}&fields=*`)
         const bookingsData = await bookingsResponse.json()
 
-        const propertiesResponse = await fetch(`/webapi/items/Property?&fields=*,+Rooms.*`)
+        
+
+        const propertiesResponse = await fetch(`/webapi/items/Property?&fields=*,+Rooms.*, Rooms.photos.directus_files_id.id`)
         const propertiesData = await propertiesResponse.json()
+
+        
 
         setBookings(bookingsData.data)
         setProperties(propertiesData.data)
@@ -89,8 +99,9 @@ const BookingList: React.FC = () => {
     return { room: undefined, property: undefined }
   }
 
-  const handleReviewClick = (bookingId: string) => {
+  const handleReviewClick = (bookingId: string, roomId: string) => {
     setSelectedBookingId(bookingId)
+    setSelectedRoomId(roomId)
     setIsReviewModalOpen(true)
   }
 
@@ -102,14 +113,15 @@ const BookingList: React.FC = () => {
           throw new Error("No access token found")
         }
 
-        const response = await fetch("/webapi/items/Review", {
+        const response = await fetch("/webapi/items/Reviews", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            bookingId: selectedBookingId,
+            booking_id: selectedBookingId,
+            room_id: selectedRoomId,
             rating,
             comment,
           }),
@@ -178,7 +190,7 @@ const BookingList: React.FC = () => {
                   <div className="flex flex-col md:flex-row">
                     <div className="relative w-full md:w-1/3 h-64 md:h-auto">
                       <Image
-                        src={roomDetails?.mainImage ? `/webapi/assets/${roomDetails.mainImage}` : "/placeholder.svg"}
+                        src={roomDetails?.photos[0]?.directus_files_id.id ? `/webapi/assets/${roomDetails.photos[0]?.directus_files_id.id}?key=medium` : "/placeholder.svg"}
                         alt={roomDetails?.name || "Room image"}
                         layout="fill"
                         objectFit="cover"
@@ -215,14 +227,14 @@ const BookingList: React.FC = () => {
                           <DollarSign className="h-5 w-5 text-gray-500 mr-2" />
                           <div>
                             <p className="text-sm text-gray-600">Precio por noche</p>
-                            <p className="font-medium">${booking.price}</p>
+                            <p className="font-medium">${booking.price} USD</p>
                           </div>
                         </div>
                         <div className="flex items-center">
                           <Home className="h-5 w-5 text-gray-500 mr-2" />
                           <div>
                             <p className="text-sm text-gray-600">Limpieza</p>
-                            <p className="font-medium">${booking.cleaning}</p>
+                            <p className="font-medium">${booking.cleaning} USD</p>
                           </div>
                         </div>
                         <div className="flex items-center">
@@ -236,10 +248,10 @@ const BookingList: React.FC = () => {
                       {roomDetails && <p className="text-sm text-gray-600 mb-4">{roomDetails.description}</p>}
                       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-4">
                         <p className="text-2xl font-semibold text-gray-900 mb-4 sm:mb-0">
-                          Total: ${calculateTotal(booking)}
+                          Total: ${calculateTotal(booking)} USD
                         </p>
                         <Button
-                          onClick={() => handleReviewClick(booking.id)}
+                          onClick={() => handleReviewClick(booking.id, booking.room)}
                           className="bg-[#39759E] text-white hover:[#39759E]-700 rounded-lg px-6 py-2 transition-colors duration-300 flex items-center"
                         >
                           <Star className="mr-2 h-5 w-5" />

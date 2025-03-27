@@ -199,7 +199,7 @@ export default function RoomPage() {
 
   const handleCalendarRoom = (room: Room) => {
     localStorage.setItem("selected_room", JSON.stringify(room));
-    router.push(`/calendar/${room.id}/`);
+    router.push(`/calendario/${room.id}/`);
   };
 
   const transformImageRoomToImage = (fileData: ImageRoom): Image => {
@@ -212,7 +212,7 @@ export default function RoomPage() {
   const getImageSrc = (image: Image) => {
     return image.isModerated && !isOwner
       ? "/assets/empty.jpg"
-      : `/webapi/assets/${image.id}`;
+      : `/webapi/assets/${image.id}?key=full`;
   };
 
   if (isLoading) {

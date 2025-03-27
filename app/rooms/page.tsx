@@ -187,10 +187,17 @@ function RoomsPageContent() {
       const matchesProcedures =
         procedures.length === 0 ||
         procedures.some((proc) => room.patology.some((pat) => pat.toLowerCase().includes(proc.toLowerCase())))
-      const matchesLocation = location
-        ? normalizeString(room.propertyLocation.city).includes(normalizeString(location)) ||
-          normalizeString(room.propertyLocation.state).includes(normalizeString(location)) ||
-          normalizeString(room.propertyLocation.country).includes(normalizeString(location))
+        const matchesLocation = location
+        ? location
+            .toLowerCase()
+            .replace(/,/g, "") // Elimina las comas
+            .split(" ") // Divide en palabras
+            .every(
+              (word) =>
+                normalizeString(room.propertyLocation.city).includes(normalizeString(word)) ||
+                normalizeString(room.propertyLocation.state).includes(normalizeString(word)) ||
+                normalizeString(room.propertyLocation.country).includes(normalizeString(word))
+            )
         : true
       const hasEnoughCapacity = room.capacity === undefined || room.capacity >= travelers
       const isAvailable = isRoomAvailable(room.id, checkIn, checkOut, bookings)

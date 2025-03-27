@@ -9,7 +9,8 @@ import type { DateRange } from "react-day-picker"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { NumberCounter } from "./number-counter"
-import { Input } from "@/components/ui/input"
+//import { Input } from "@/components/ui/input"
+import LocationAutocomplete from "@/components/ui/location-autocomplete"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import Image from "next/image"
 import styles from "./MedicalSearch.module.css"
@@ -96,7 +97,7 @@ export function SearchBar() {
     )
   }
 
-  const resetLocation = () => setLocation("")
+  //const resetLocation = () => setLocation("")
   const resetDates = () => setDate(undefined)
   const resetTravelers = () => setTravelers(1)
 
@@ -181,7 +182,8 @@ export function SearchBar() {
           <div className="relative flex-1">
             <div className="py-1">
               <div className="text-sm font-semibold mb-1">Lugar</div>
-              <div className="relative">
+              <LocationAutocomplete  value={location} onChange={setLocation} />
+              {/*<div className="relative">
                 <Input
                   type="text"
                   value={location}
@@ -199,7 +201,9 @@ export function SearchBar() {
                     <X className="h-3 w-3" />
                   </Button>
                 )}
-              </div>
+
+
+                </div>*/}
             </div>
           </div>
 

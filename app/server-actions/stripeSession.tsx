@@ -24,7 +24,7 @@ export const postStripeSession = async ({ priceId }: NewSessionOptions) => {
     line_items: [
         {
           price_data: {
-            currency: 'cop',
+            currency: 'usd',
             product_data: {
               name: 'Meme "This is fine"',
               description: "ghjksgahjgjs",

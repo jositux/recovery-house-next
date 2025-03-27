@@ -4,6 +4,7 @@ import { useParams } from "next/navigation"
 import axios from "axios"
 import { useState, useEffect } from "react"
 import CalendarView from "./calendar"
+import { Loader2 } from 'lucide-react' // Asegúrate de importar el ícono correcto
 
 interface Booking {
   id: string
@@ -49,6 +50,7 @@ export default function CalendarPage() {
         }))
 
         setBookedDays(transformedData)
+
       } catch (err) {
         setError("Error al obtener las reservas")
         console.error("Error fetching bookings:", err)
@@ -88,10 +90,19 @@ export default function CalendarPage() {
   }, [])
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-10">
-      {loading && <p>Cargando reservas...</p>}
-      {error && <p className="text-red-500">{error}</p>}
-      {!loading && !error && <CalendarView roomId={String(id)} bookedDays={bookedDays} unavailableDates={unavailableDates} />}
+    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-10 flex justify-center items-center">
+      {loading ? (
+        <div className="flex justify-center items-center h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <span className="ml-2 text-lg text-gray-700">
+          Cargando Calendario...
+        </span>
+      </div>
+      ) : error ? (
+        <p className="text-red-500">{error}</p>
+      ) : (
+        <CalendarView roomId={String(id)} bookedDays={bookedDays} unavailableDates={unavailableDates} />
+      )}
     </main>
   )
 }

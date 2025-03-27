@@ -27,7 +27,7 @@ export const postStripeSession = async ({
     line_items: [
       {
         price_data: {
-          currency: "cop",
+          currency: "usd",
           product_data: {
             name,
             description,

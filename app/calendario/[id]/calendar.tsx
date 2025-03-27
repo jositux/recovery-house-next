@@ -7,6 +7,8 @@ import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { motion } from "framer-motion"
+
 import {
   format,
   isSameDay,
@@ -110,7 +112,7 @@ const CalendarDayComponent = memo(
     return (
       <div
         ref={dayRef}
-        className={cn(`w-full h-full flex items-center justify-center relative ${styles.numerito} cursor-pointer`, {
+        className={cn(`w-full h-full flex items-center justify-center relative ${styles.calendarDay} cursor-pointer`, {
           "bg-white text-gray-300 cursor-not-allowed": isPast,
           "bg-white": visualStatus === "available" && !isInSelection && !isPast,
           "hover:bg-gray-50": visualStatus === "available" && !isInSelection && !isPast,
@@ -182,7 +184,7 @@ const MonthCalendar = memo(
     renderDay: (date: Date) => React.ReactElement | null
   }) => {
     return (
-      <div className="border overflow-hidden rounded-sm">
+      <div className="border overflow-hidden rounded-sm w-full">
         <CustomMonthHeader month={month} />
         <Calendar
           mode="multiple"
@@ -190,7 +192,7 @@ const MonthCalendar = memo(
           onSelect={() => {}}
           disabled={() => false}
           locale={es}
-          className="p-0"
+          className={`p-0 w-full ${styles.calendarContainer}`}
           month={month}
           numberOfMonths={1}
           showOutsideDays={true}
@@ -255,11 +257,18 @@ export default function CalendarView({
   // Estado para controlar la visibilidad del modal de confirmación
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
 
+  const [showFixedHeader, setShowFixedHeader] = useState(false)
+
+
   // Fechas para mostrar en el calendario (hoy + 12 meses)
   const today = useMemo(() => startOfDay(new Date()), [])
   const oneYearLater = useMemo(() => addMonths(today, 12), [today])
 
-  // Inicializar el calendario con datos de ejemplo
+  // Agregar un estado para controlar si los datos están listos
+  const [dataReady, setDataReady] = useState(false)
+
+  // Modificar el useEffect que inicializa los datos del calendario para marcar cuando los datos están listos
+  // Buscar el useEffect que contiene "// Inicializar el calendario con datos de ejemplo" y modificarlo así:
   useEffect(() => {
     // Generar días para un año completo
     const days: CalendarDay[] = []
@@ -309,7 +318,48 @@ export default function CalendarView({
 
     setCalendarDays(days)
     dayMapRef.current = dayMap
+
+    // Marcar los datos como listos después de un pequeño retraso para asegurar que el DOM se actualice
+    setTimeout(() => {
+      setDataReady(true)
+    }, 50)
   }, [today, oneYearLater, bookedDays, unavailableDates])
+
+  // Agregar un useEffect adicional para forzar una actualización cuando los datos estén listos
+  useEffect(() => {
+    if (dataReady) {
+      // Forzar una actualización del componente
+      const forceUpdate = () => {
+        setCalendarDays((prev) => [...prev])
+      }
+
+      forceUpdate()
+
+      // También podemos forzar una actualización después de que el componente esté montado
+      const timer = setTimeout(forceUpdate, 100)
+      return () => clearTimeout(timer)
+    }
+  }, [dataReady])
+
+
+   // Add scroll event listener to track scroll position
+   useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY
+      setShowFixedHeader(scrollPosition > 100)
+    }
+
+    // Add event listener
+    window.addEventListener("scroll", handleScroll)
+
+    // Initial check
+    handleScroll()
+
+    // Clean up
+    return () => {
+      window.removeEventListener("scroll", handleScroll)
+    }
+  }, [])
 
   // Función para verificar si un día está reservado - optimizada con mapa
   const isDayBooked = useCallback((date: Date): boolean => {
@@ -447,7 +497,7 @@ export default function CalendarView({
       })
 
       // Mostrar notificación solo si se seleccionaron múltiples días
-     /* toast({
+      /* toast({
         title: `Días actualizados`,
         description: `Se han actualizado ${currentSelection.length} días en el calendario.`,
       })*/
@@ -467,7 +517,6 @@ export default function CalendarView({
     router.push("/rooms")
   }, [router])
 
-  // Modificar la función handleSaveChanges para enviar los datos al endpoint
   const handleSaveChanges = useCallback(async () => {
     // Recopilar todas las fechas marcadas como no disponibles
     const disabledDates = calendarDays
@@ -509,7 +558,6 @@ export default function CalendarView({
       setIsLoading(false)
     }
   }, [calendarDays, roomId])
-  
 
   // Renderizar el día personalizado - optimizado con useCallback
   const renderDay = useCallback(
@@ -547,61 +595,147 @@ export default function CalendarView({
     return { availableDays, unavailableDays, bookedDays }
   }, [calendarDays, isPastDay])
 
+  // Modificar el return para mostrar un indicador de carga mientras los datos no estén listos
+  // Justo antes del primer div del return, agregar:
+  if (!dataReady) {
+    return (
+      <div className="container min-h-screen mx-auto py-6 px-4 sm:px-6">
+       {/* <Card className="mx-auto">
+          <CardContent className="flex items-center justify-center p-8">
+            <div className="flex flex-col items-center gap-2">
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+              <p className="text-sm text-muted-foreground">Cargando calendario...</p>
+            </div>
+    </CardContent>
+        </Card>*/ }
+      </div>
+    )
+  }
+
+
+  
+
+    // Add a fixed mobile header component at the top of the component, before the return statement
+  // This will be a fixed header for mobile devices
+
+  // Add this function inside the CalendarioDisponibilidad component, before the return statement
+  const MobileFixedHeader = () => {
+    return (
+<div
+        className={`fixed top-0 right-0 left-0 z-50 bg-white border-b border-gray-200 px-2 py-2 flex items-center justify-between md:hidden ${
+          showFixedHeader ? "opacity-100 visible" : "opacity-0 invisible"
+        } transition-opacity duration-500 ease-in-out`}
+      >        <div className="flex items-center space-x-1">
+          <Badge variant="outline" className="text-xs bg-green-100 text-green-600 border-green-200 px-2 py-0.5">
+            Disponible: {stats.availableDays}
+          </Badge>
+          <Badge variant="outline" className="text-xs bg-red-100 text-red-600 border-red-200 px-2 py-0.5">
+            No disponible: {stats.unavailableDays}
+          </Badge>
+        </div>
+        <Button
+          onClick={handleSaveChanges}
+          size="sm"
+          className="bg-primary hover:bg-primary/90 transition-all duration-300"
+          disabled={isLoading}
+        >
+          {isLoading ? "..." : "Guardar"}
+        </Button>
+      </div>
+    )
+  }
+
   return (
     <>
-      <div className="container mx-auto py-6 px-4 sm:px-6">
-        <Card className="mx-auto rounded-xl">
+
+<MobileFixedHeader />
+      <div className="container min-h-screen mx-auto py-6">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+        <Card className="mx-auto rounded-xl shadow-lg border-t-4 border-t-[#39759E] max-w-7xl">
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl">
-              <CalendarIcon className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-              Calendario de Disponibilidad
-            </CardTitle>
-            <CardDescription className="text-xs sm:text-sm">
-              Visualiza los días disponibles y no disponibles
-            </CardDescription>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl text-primary">
+                  <CalendarIcon className="h-6 w-6 sm:h-7 sm:w-7 text-primary" />
+                  Calendario de Disponibilidad
+                </CardTitle>
+                <CardDescription className="text-xs sm:text-sm mt-1">
+                  Visualiza y gestiona los días disponibles para reservas
+                </CardDescription>
+              </div>
+              <Button
+                onClick={handleSaveChanges}
+                className="flex items-center gap-2 bg-[#39759E] hover:bg-primary/90 transition-all duration-300"
+                disabled={isLoading}
+              >
+                <Save className="h-4 w-4" />
+                {isLoading ? "Guardando..." : "Guardar Calendario"}
+              </Button>
+            </div>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex flex-wrap gap-2 sm:gap-4">
-              <div className="ml-auto flex flex-wrap items-center gap-1 sm:gap-2">
-                <Badge variant="outline" className="text-xs bg-green-100 text-green-600 border-green-200">
+
+          <CardContent className="space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 bg-slate-50 rounded-lg border border-slate-100">
+              <div className="space-y-1 text-xs sm:text-sm text-slate-600">
+                <p className="flex items-center gap-2">
+                  <span className="inline-block w-3 h-3 rounded-full bg-green-500"></span>
+                  Haz clic para marcar o desmarcar días como no disponibles
+                </p>
+                <p className="flex items-center gap-2">
+                  <span className="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
+                  Haz clic y arrastra para seleccionar múltiples días
+                </p>
+                <p className="flex items-center gap-2">
+                  <span className="inline-block w-3 h-3 rounded-full bg-gray-400"></span>
+                  Los días en gris ya están reservados y no se pueden modificar
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="outline" className="text-xs bg-green-100 text-green-600 border-green-200 px-3 py-1">
                   Disponible: {stats.availableDays}
                 </Badge>
-                <Badge variant="outline" className="text-xs flex items-center gap-1 border-red-200">
-                  <span className="bg-red-600 h-1.5 w-1.5 rounded-full"></span>
-                  <span>No disponible: {stats.unavailableDays}</span>
+                <Badge variant="outline" className="text-xs bg-red-100 text-red-600 border-red-200 px-3 py-1">
+                  No disponible: {stats.unavailableDays}
                 </Badge>
-                <Badge
-                  variant="outline"
-                  className="text-xs flex items-center gap-1 bg-gray-100 text-gray-800 border-gray-200"
-                >
-                  <span className="bg-gray-500 h-1.5 w-1.5 rounded-full"></span>
-                  <span>Reservado: {stats.bookedDays}</span>
+                <Badge variant="outline" className="text-xs bg-gray-100 text-gray-600 border-gray-200 px-3 py-1">
+                  Reservado: {stats.bookedDays}
                 </Badge>
               </div>
             </div>
 
-            <div className="text-xs sm:text-sm text-muted-foreground mb-2 space-y-1">
-              <p>• Haz clic para marcar o desmarcar días como no disponibles</p>
-              <p>• Haz clic y arrastra para seleccionar múltiples días</p>
-              <p>• Los días en gris ya están reservados y no se pueden modificar</p>
-            </div>
-
-            <div className="flex justify-center">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 w-fit">
+            <div className="flex justify-center w-full">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 w-full">
                 {months.map((month, i) => (
                   <MonthCalendar key={i} month={month} renderDay={renderDay} />
                 ))}
               </div>
             </div>
 
-            <div className="flex justify-end mt-4">
-              <Button onClick={handleSaveChanges} className="flex items-center gap-2" disabled={isLoading}>
-                <Save className="h-4 w-4" />
-                {isLoading ? "Guardando..." : "Guardar Cambios"}
+            <div className="flex gap-2 justify-end mt-8">
+            <Button
+                onClick={handleSaveChanges}
+                size="lg"
+                className="flex items-center gap-2 bg-black hover:bg-primary/90 transition-all duration-300"
+                disabled={isLoading}
+              >
+               Salir
+              </Button>
+
+              <Button
+                onClick={handleSaveChanges}
+                size="lg"
+                className="flex items-center gap-2 bg-[#39759E] hover:bg-primary/90 transition-all duration-300"
+                disabled={isLoading}
+              >
+                <Save className="h-5 w-5" />
+                {isLoading ? "Guardando Calendario..." : "Guardar Calendario"}
               </Button>
             </div>
           </CardContent>
         </Card>
+      </motion.div>
+
       </div>
 
       {/* Diálogo de confirmación */}

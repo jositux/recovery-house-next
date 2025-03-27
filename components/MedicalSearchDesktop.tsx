@@ -141,12 +141,14 @@ const MedicalSearchDesktop = () => {
       <div className="bg-white p-4 rounded-3xl flex flex-wrap gap-4">
         <div className="w-full md:w-[calc(22%-0.5rem)]">
           <label className="block text-sm font-medium mb-1">Lugar</label>
+         
           <Input
             type="text"
             placeholder="¿Dónde se hospeda?"
             className="border-0 focus-visible:ring-0 px-0"
             onChange={(e) => setLocation(e.target.value)}
           />
+         
         </div>
         <div className="w-full md:w-[calc(25%-0.5rem)]">
           <label className="block text-sm font-medium mb-1">Llegada</label>
