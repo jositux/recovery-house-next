@@ -40,7 +40,7 @@ export function CollectionExtraTags({ extraTags, enable, roomTags }: ExtraTagsSe
 
   return (
     <div
-      className="grid grid-cols-4 sm:grid-cols-2 md:grid-cols-4 gap-4"
+      className="grid grid-cols-2 md:grid-cols-4 gap-4"
       role="list"
       aria-label="Lista de etiquetas adicionales"
     >

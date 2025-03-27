@@ -7,7 +7,7 @@ import { getCurrentUser, type User } from "@/services/userService"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { MapPin, Plus, Star, Loader2, BedDouble, Home, ArrowRight, CheckCircle, AlertCircle } from "lucide-react"
+import { MapPin, Plus, /*Star,*/ Loader2, BedDouble, Home, ArrowRight, CheckCircle, AlertCircle } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -119,10 +119,10 @@ const PropertiesPage: React.FC = () => {
                   <div>
                     <div className="flex justify-between items-start mb-2">
                       <h2 className="text-xl font-semibold text-gray-900 line-clamp-1">{property.name}</h2>
-                      <div className="flex items-center">
+                      {/*<div className="flex items-center">
                         <Star className="h-4 w-4 text-yellow-400 mr-1" />
                         <span className="text-sm font-medium">4.9</span>
-                      </div>
+          </div>*/}
                     </div>
                     <p className="text-sm text-gray-500 mb-2 flex items-center">
                       <MapPin className="h-4 w-4 mr-1" />

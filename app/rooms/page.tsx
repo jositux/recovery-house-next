@@ -30,6 +30,7 @@ interface Room {
   extraTags: { ExtraTags_id: string }[]
   servicesTags: { serviceTags_id: string }[]
   capacity?: number
+  disableDates: string | null
   propertyLocation: {
     city: string
     state: string
@@ -151,24 +152,48 @@ function RoomsPageContent() {
     )
   }, [properties])
 
+  // Función para convertir el string disableDates en un array de fechas
+  const parseDisabledDates = (disableDates: string | null): string[] => {
+    if (!disableDates) return []
+
+    try {
+      return JSON.parse(disableDates)
+    } catch (error) {
+      console.error("Error parsing disabled dates:", error)
+      return []
+    }
+  }
+
   const isRoomAvailable = useMemo(
-    () => (roomId: string, checkIn: string, checkOut: string, bookings: Booking[]) => {
-      const requestedCheckIn = new Date(checkIn)
-      const requestedCheckOut = new Date(checkOut)
+    () =>
+      (roomId: string, checkIn: string, checkOut: string, bookings: Booking[], disabledDates: string[] = []) => {
+        if (!checkIn || !checkOut) return true
 
-      return !bookings.some((booking) => {
-        if (booking.room !== roomId) return false
+        const requestedCheckIn = new Date(checkIn)
+        const requestedCheckOut = new Date(checkOut)
 
-        const bookingCheckIn = new Date(booking.checkIn)
-        const bookingCheckOut = new Date(booking.checkOut)
+        // Verificar si alguna fecha deshabilitada cae dentro del rango solicitado
+        const hasDisabledDateInRange = disabledDates.some((disabledDate) => {
+          const date = new Date(disabledDate)
+          return date >= requestedCheckIn && date < requestedCheckOut
+        })
 
-        return (
-          (requestedCheckIn >= bookingCheckIn && requestedCheckIn < bookingCheckOut) ||
-          (requestedCheckOut > bookingCheckIn && requestedCheckOut <= bookingCheckOut) ||
-          (requestedCheckIn <= bookingCheckIn && requestedCheckOut >= bookingCheckOut)
-        )
-      })
-    },
+        if (hasDisabledDateInRange) return false
+
+        // Verificar si hay reservas que se solapan con las fechas solicitadas
+        return !bookings.some((booking) => {
+          if (booking.room !== roomId) return false
+
+          const bookingCheckIn = new Date(booking.checkIn)
+          const bookingCheckOut = new Date(booking.checkOut)
+
+          return (
+            (requestedCheckIn >= bookingCheckIn && requestedCheckIn < bookingCheckOut) ||
+            (requestedCheckOut > bookingCheckIn && requestedCheckOut <= bookingCheckOut) ||
+            (requestedCheckIn <= bookingCheckIn && requestedCheckOut >= bookingCheckOut)
+          )
+        })
+      },
     [],
   )
 
@@ -184,10 +209,15 @@ function RoomsPageContent() {
       if (!property || !property.taxIdApproved) {
         return false
       }
+
+      // Convertir disableDates a un array
+      const disabledDates = parseDisabledDates(room.disableDates)
+
       const matchesProcedures =
         procedures.length === 0 ||
         procedures.some((proc) => room.patology.some((pat) => pat.toLowerCase().includes(proc.toLowerCase())))
-        const matchesLocation = location
+
+      const matchesLocation = location
         ? location
             .toLowerCase()
             .replace(/,/g, "") // Elimina las comas
@@ -196,11 +226,14 @@ function RoomsPageContent() {
               (word) =>
                 normalizeString(room.propertyLocation.city).includes(normalizeString(word)) ||
                 normalizeString(room.propertyLocation.state).includes(normalizeString(word)) ||
-                normalizeString(room.propertyLocation.country).includes(normalizeString(word))
+                normalizeString(room.propertyLocation.country).includes(normalizeString(word)),
             )
         : true
+
       const hasEnoughCapacity = room.capacity === undefined || room.capacity >= travelers
-      const isAvailable = isRoomAvailable(room.id, checkIn, checkOut, bookings)
+
+      // Pasar el array de fechas deshabilitadas a la función isRoomAvailable
+      const isAvailable = isRoomAvailable(room.id, checkIn, checkOut, bookings, disabledDates)
 
       return matchesProcedures && matchesLocation && hasEnoughCapacity && isAvailable
     })
@@ -246,9 +279,12 @@ function RoomsPageContent() {
     }
   }
 
-  const getImageSrc = (image: Image) => {
-    return image.isModerated ? "/assets/empty.jpg" : `/webapi/assets/${image.id}`
-  }
+  const getImageSrc = useMemo(
+    () => (image: Image) => {
+      return image.isModerated ? "/assets/empty.jpg" : `/webapi/assets/${image.id}`
+    },
+    [],
+  )
 
   const mapMarkers = useMemo(() => {
     const markerMap = new Map()
@@ -276,7 +312,7 @@ function RoomsPageContent() {
     })
 
     return Array.from(markerMap.values())
-  }, [filteredRooms, properties, getImageSrc])
+  }, [filteredRooms, properties])
 
   if (isLoading) {
     return <div className="flex justify-center items-center h-screen">Cargando...</div>

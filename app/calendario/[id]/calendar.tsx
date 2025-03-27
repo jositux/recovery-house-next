@@ -514,7 +514,7 @@ export default function CalendarView({
     setShowConfirmDialog(false)
 
     // Redirigir a la página principal o a donde sea necesario
-    router.push("/rooms")
+    router.push("/mis-propiedades")
   }, [router])
 
   const handleSaveChanges = useCallback(async () => {
@@ -714,7 +714,7 @@ export default function CalendarView({
 
             <div className="flex gap-2 justify-end mt-8">
             <Button
-                onClick={handleSaveChanges}
+                onClick={handleExit}
                 size="lg"
                 className="flex items-center gap-2 bg-black hover:bg-primary/90 transition-all duration-300"
                 disabled={isLoading}
