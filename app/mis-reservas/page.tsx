@@ -56,6 +56,7 @@ const BookingList: React.FC = () => {
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null)
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null)
 
+  let name = ""
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,6 +68,10 @@ const BookingList: React.FC = () => {
         }
 
         const user = await getCurrentUser(token)
+
+       
+
+        name = user.first_name
 
         const bookingsResponse = await fetch(`/webapi/items/Booking?filter[patient][_eq]=${user.id}&fields=*`)
         const bookingsData = await bookingsResponse.json()
@@ -105,25 +110,26 @@ const BookingList: React.FC = () => {
     setIsReviewModalOpen(true)
   }
 
-  const handleReviewSubmit = async (rating: number, comment: string) => {
+  const handleReviewSubmit = async (ranking: number, comment: string) => {
     if (selectedBookingId) {
       try {
-        const token = localStorage.getItem("access_token")
+        /*const token = localStorage.getItem("access_token")
         if (!token) {
           throw new Error("No access token found")
-        }
+        }*/
 
         const response = await fetch("/webapi/items/Reviews", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            //Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             booking_id: selectedBookingId,
             room_id: selectedRoomId,
-            rating,
+            ranking,
             comment,
+            name: name,
           }),
         })
 
@@ -252,7 +258,7 @@ const BookingList: React.FC = () => {
                         </p>
                         <Button
                           onClick={() => handleReviewClick(booking.id, booking.room)}
-                          className="bg-[#39759E] text-white hover:[#39759E]-700 rounded-lg px-6 py-2 transition-colors duration-300 flex items-center"
+                          className="bg-[#39759E] invisible text-white hover:[#39759E]-700 rounded-lg px-6 py-2 transition-colors duration-300 flex items-center"
                         >
                           <Star className="mr-2 h-5 w-5" />
                           Dejar Comentario
