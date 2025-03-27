@@ -182,7 +182,7 @@ export function SearchBar() {
           <div className="relative flex-1">
             <div className="py-1">
               <div className="text-sm font-semibold mb-1">Lugar</div>
-              <LocationAutocomplete  value={location} onChange={setLocation} />
+              <LocationAutocomplete value={location} onChange={setLocation} />
               {/*<div className="relative">
                 <Input
                   type="text"
@@ -249,6 +249,7 @@ export function SearchBar() {
                 onSelect={setDate}
                 numberOfMonths={2}
                 locale={es}
+                disabled={{ before: new Date() }}
               />
             </PopoverContent>
           </Popover>
