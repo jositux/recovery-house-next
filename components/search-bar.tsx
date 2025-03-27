@@ -182,7 +182,12 @@ export function SearchBar() {
           <div className="relative flex-1">
             <div className="py-1">
               <div className="text-sm font-semibold mb-1">Lugar</div>
-              <LocationAutocomplete value={location} onChange={setLocation} />
+              <LocationAutocomplete
+                value={location}
+                onChange={(newLocation) => {
+                  setLocation(newLocation)
+                }}
+              />
               {/*<div className="relative">
                 <Input
                   type="text"

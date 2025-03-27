@@ -4,16 +4,18 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import axios from "axios";
 import { Bed, Users } from "lucide-react";
-import { Camera } from "lucide-react";
+//import { Camera } from "lucide-react";
 import { BookingWidget } from "@/components/ui/booking-widget";
 import { ServiceProviderCard } from "@/components/ui/service-provider-card";
 import { GoogleMap } from "@/components/ui/google-map";
 import { Fraunces } from "next/font/google";
-import { PhotoGallery } from "@/components/ui/photo-gallery";
+//import { PhotoGallery } from "@/components/ui/photo-gallery";
 import { getExtraTags } from "@/services/extraTagsService";
 import useTags from "@/hooks/useExtraTags";
 import { CollectionExtraTags } from "@/components/collectionExtraTagsRoom";
 import { MagicBackButton } from "@/components/ui/magic-back-button";
+import { PopupSwiperGallery } from "./popup-swiper-gallery"
+
 //import { useCheckOwnership } from "@/hooks/isOwner";
 
 const fraunces = Fraunces({ subsets: ["latin"] });
@@ -105,8 +107,8 @@ export default function RoomPage() {
   );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [photoIds, setPhotoIds] = useState<string[]>([]);
-  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  //const [photoIds, setPhotoIds] = useState<string[]>([]);
+  //const [isGalleryOpen, setIsGalleryOpen] = useState(false);
 
   const { extraTags } = useTags("extraTags", getExtraTags);
 
@@ -170,7 +172,6 @@ export default function RoomPage() {
 
         setRoom(roomData);
         setProperty(propertyData);
-        console.log(propertyData);
         setServiceProviders(providerResponse.data.data);
         setBookings(bookingsResponse.data.data);
       } catch (error) {
@@ -196,11 +197,30 @@ export default function RoomPage() {
       : `/webapi/assets/${image.directus_files_id.id}?key=full`;
   }, []);
 
-  useEffect(() => {
+  /*useEffect(() => {
     if (room && room.photos) {
       setPhotoIds(room.photos.map((photo) => getImageSrc(photo)));
     }
-  }, [room, getImageSrc]);
+  }, [room, getImageSrc]);*/
+
+  const [imagesSwiper, setImagesSwiper] = useState<{ src: string; alt: string }[]>([]);
+
+// Modificar el useEffect para transformar las fotos al formato requerido
+useEffect(() => {
+  if (room && room.photos) {
+    // Transformar el array de fotos al formato que espera el componente Swiper
+    const swiperImages = room.photos.map((photo) => ({
+      src: getImageSrc(photo),
+      alt: "Imagen de Habitación"
+    }));
+    
+    setImagesSwiper(swiperImages);
+    
+    // Mantener también el array original de URLs si lo necesitas para otros componentes
+    //setPhotoIds(room.photos.map((photo) => getImageSrc(photo)));
+  }
+}, [room, getImageSrc]);
+
 
   const decodeHtmlAndRemoveTags = (html: string): string => {
     const textWithoutTags = html.replace(/<\/?[^>]+(>|$)/g, "");
@@ -242,7 +262,7 @@ export default function RoomPage() {
         </div>
       </div>
 
-      {photoIds.length > 1 && (
+      {/*photoIds.length > 1 && (
         <div className="container relative mx-auto px-4 lg:px-20">
           <button
             className="absolute left-20 bottom-8 bg-white px-4 py-2 rounded-md text-[#162F40] flex items-center gap-2"
@@ -252,15 +272,28 @@ export default function RoomPage() {
             Ver todas las fotos
           </button>
         </div>
-      )}
+      )*/}
 
-      {/* Photo Gallery */}
+      {/* Photo Gallery
 
       <PhotoGallery
         photos={photoIds}
         isOpen={isGalleryOpen}
         onClose={() => setIsGalleryOpen(false)}
-      />
+      /> */}
+
+{imagesSwiper.length > 1 && (
+  <div className="container relative mx-auto px-4 lg:px-20">
+    <div className="absolute left-20 bottom-8">
+    <PopupSwiperGallery 
+      images={imagesSwiper} 
+      buttonText="Ver todas las fotos" 
+      autoplay={true} 
+    />
+    </div>
+    </div>
+
+)}
 
       {/* Content */}
       <div className="container mx-auto px-4 lg:px-20 py-8">

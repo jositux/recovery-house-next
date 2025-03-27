@@ -101,3 +101,48 @@
 }
 
 
+/* Ocultar las flechas de navegación predeterminadas de Swiper */
+.swiper-button-next::after,
+.swiper-button-prev::after {
+  display: none;
+}
+
+/* Estilo para la paginación de Swiper */
+.swiper-pagination-bullet {
+  width: 6px;
+  height: 6px;
+  background: white;
+  opacity: 0.5;
+}
+
+.swiper-pagination-bullet-active {
+  opacity: 1;
+  background: white;
+}
+
+/* Estilo para las miniaturas */
+.swiper-slide-thumb-active {
+  opacity: 1;
+  border-color: theme("colors.primary.DEFAULT");
+}
+
+/* Estilos para la barra de desplazamiento */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+
+

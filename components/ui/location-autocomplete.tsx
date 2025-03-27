@@ -32,7 +32,7 @@ const normalizeText = (text: string): string => {
 }
 
 export default function LocationAutocomplete({ value, onChange }: Props) {
-  const [inputValue, setInputValue] = useState(value)
+  const [inputValue, setInputValue] = useState(value || "")
   const [suggestions, setSuggestions] = useState<LocationOption[]>([])
   const [selectedLocation, setSelectedLocation] = useState<LocationOption | null>(null)
   const [isOpen, setIsOpen] = useState(false)
@@ -59,6 +59,26 @@ export default function LocationAutocomplete({ value, onChange }: Props) {
 
     setAllLocations(locations)
   }, [])
+
+  // Sincronizar el valor interno con el valor externo
+  useEffect(() => {
+    if (value !== undefined) {
+      setInputValue(value)
+
+      // Si hay un valor pero no hay una ubicación seleccionada, intentar encontrar una coincidencia
+      if (value && !selectedLocation && allLocations.length > 0) {
+        const normalizedValue = normalizeText(value)
+        const matchingLocation = allLocations.find((location) => {
+          const formattedLoc = formatLocation(location)
+          return normalizeText(formattedLoc).includes(normalizedValue)
+        })
+
+        if (matchingLocation) {
+          setSelectedLocation(matchingLocation)
+        }
+      }
+    }
+  }, [value, allLocations, selectedLocation])
 
   // Calcular puntuación de relevancia para ordenar resultados
   const calculateRelevanceScore = (location: LocationOption, normalizedInput: string): number => {
@@ -134,7 +154,7 @@ export default function LocationAutocomplete({ value, onChange }: Props) {
     const value = e.target.value
     setInputValue(value)
     filterLocations(value)
-    if (onChange) onChange(value) 
+    if (onChange) onChange(value)
     setIsOpen(true)
 
     if (selectedLocation) {
@@ -156,7 +176,7 @@ export default function LocationAutocomplete({ value, onChange }: Props) {
   const handleSelectLocation = (location: LocationOption) => {
     setSelectedLocation(location)
     setInputValue(formatLocation(location))
-    if (onChange) onChange(formatLocation(location)) 
+    if (onChange) onChange(formatLocation(location))
     setSuggestions([])
     setIsOpen(false)
   }
@@ -179,7 +199,7 @@ export default function LocationAutocomplete({ value, onChange }: Props) {
   const handleClear = () => {
     setSelectedLocation(null)
     setInputValue("")
-    if (onChange) onChange("") 
+    if (onChange) onChange("")
     setSuggestions([])
   }
 
