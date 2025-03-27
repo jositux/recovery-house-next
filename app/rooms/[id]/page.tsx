@@ -42,6 +42,7 @@ interface Room {
   photos: ImageRoom[];
   extraTags: RoomTag[];
   servicesTags: { serviceTags_id: string }[];
+  descriptionService: string;
   Property_id: string;
   disableDates: string;
 }
@@ -328,6 +329,16 @@ export default function RoomPage() {
                 roomTags={room.extraTags}
               />
             </div>
+
+             {/* Description */}
+             {room.descriptionService && (
+             <div className="mb-8">
+             <h3 className="text-lg font-semibold text-gray-900">Más acerca de los servicios:</h3>
+              <p className="text-[#162F40]">
+                {decodeHtmlAndRemoveTags(room.descriptionService)}
+              </p>
+            </div>
+            )}
 
             {/* Sección de Anfitrión */}
 {property.hostName && (

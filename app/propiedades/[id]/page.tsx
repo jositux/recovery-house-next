@@ -203,6 +203,8 @@ export default function RoomPage() {
         },
       }*/)
 
+     
+
       // Redireccionar a la lista de propiedades después de eliminar
       router.push("/mis-propiedades")
     } catch (error) {
@@ -425,10 +427,7 @@ export default function RoomPage() {
               <MapPin className="h-5 w-5 mr-2" />
               <p>{property.fullAddress}</p>
             </div>
-            <div className="flex items-center text-gray-600">
-              <Home className="h-5 w-5 mr-2" />
-              <p>{property.type === "Stay" ? "Estancia" : "Casa de Recuperación"}</p>
-            </div>
+            
           </div>
           <div className="h-64 rounded-lg overflow-hidden shadow-lg">
             <GoogleMap lat={property.place.coordinates[0]} lng={property.place.coordinates[1]} />
