@@ -1,10 +1,10 @@
-'use client'
+"use client"
 
 import { useParams } from "next/navigation"
 import axios from "axios"
 import { useState, useEffect } from "react"
 import CalendarView from "./calendar"
-import { Loader2 } from 'lucide-react' // Asegúrate de importar el ícono correcto
+import { Loader2 } from "lucide-react" // Asegúrate de importar el ícono correcto
 import { MagicBackButton } from "@/components/ui/magic-back-button"
 
 interface Booking {
@@ -29,6 +29,7 @@ export default function CalendarPage() {
   const [bookedDays, setBookedDays] = useState<BookedDay[]>([])
   const [unavailableDates, setUnavailableDates] = useState<string[]>([])
   const [roomName, setRoomName] = useState<string | null>(null)
+  const [propertyId, setPropertyId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -52,7 +53,6 @@ export default function CalendarPage() {
         }))
 
         setBookedDays(transformedData)
-
       } catch (err) {
         setError("Error al obtener las reservas")
         console.error("Error fetching bookings:", err)
@@ -72,9 +72,15 @@ export default function CalendarPage() {
     try {
       // Parsear el JSON correctamente
       const parsedRoom = JSON.parse(selectedRoom)
-      
+
       if (parsedRoom?.name) {
         setRoomName(parsedRoom.name) // Guardar el nombre de la habitación
+      }
+
+      // Extraer y guardar el propertyId
+      if (parsedRoom?.propertyId) {
+        setPropertyId(parsedRoom.propertyId)
+        console.log("Property ID:", parsedRoom.propertyId) // Imprimir el propertyId en la consola
       }
 
       const disableDatesString = parsedRoom?.disableDates
@@ -100,21 +106,24 @@ export default function CalendarPage() {
       {loading ? (
         <div className="flex justify-center items-center h-screen">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <span className="ml-2 text-lg text-gray-700">
-            Cargando Calendario...
-          </span>
+          <span className="ml-2 text-lg text-gray-700">Cargando Calendario...</span>
         </div>
       ) : error ? (
         <p className="text-red-500">{error}</p>
       ) : (
         <>
-        <div className="relative container px-4">
-          <MagicBackButton />  {roomName && <h1 className="text-3xl absolute left-16 top-0 text font-medium text-gray-800 mb-4">{roomName}</h1>}
-        </div>
-         
-          <CalendarView roomId={String(id)} bookedDays={bookedDays} unavailableDates={unavailableDates} />
+          <div className="relative container px-4">
+            <MagicBackButton />
+            {roomName && (
+              <h1 className="text-3xl absolute left-16 top-0 text font-medium text-gray-800 mb-4">{roomName}</h1>
+            )}
+           
+          </div>
+
+          <CalendarView roomId={String(id)} propertyId={propertyId || ""} bookedDays={bookedDays} unavailableDates={unavailableDates} />
         </>
       )}
     </main>
   )
 }
+

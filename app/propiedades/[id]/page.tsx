@@ -394,7 +394,7 @@ export default function RoomPage() {
         </div>
         {isOwner && (
           <div>
-            <div className="absolute z-100 top-4 right-4">
+            <div className="absolute z-100 top-0 right-4">
               <Button
                 variant="secondary"
                 onClick={() => handleEditBanner(property)}
