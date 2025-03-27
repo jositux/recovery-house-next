@@ -40,7 +40,7 @@ export function RoomCard({ id, name, price, image, propertyName, country, state,
       </CardContent>
       <CardFooter className="flex justify-between items-center p-4 bg-gray-50">
         <span className="text-lg font-bold text-gray-800">
-          ${price} <span className="text-sm font-normal">/ noche</span>
+          ${price} <span className="text-sm font-normal"> USD / noche</span>
         </span>
         <Link href={`/rooms/${id}`}>
           <Button variant="outline" className="rounded-full">

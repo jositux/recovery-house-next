@@ -522,10 +522,10 @@ export default function RoomPage() {
                     </div>
                     <div className="flex justify-between items-center mb-4">
                       <p className="text-2xl font-bold text-primary">
-                        ${room.pricePerNight} <span className="text-sm font-normal text-gray-600">/ noche</span>
+                        ${room.pricePerNight} <span className="text-sm font-normal text-gray-600"> USD / noche</span>
                       </p>
                     </div>
-                    <p className="text-sm text-gray-600 mb-4">Tarifa de limpieza: ${room.cleaningFee}</p>
+                    <p className="text-sm text-gray-600 mb-4">Tarifa de limpieza: ${room.cleaningFee} USD</p>
                     {isOwner && (
                       <div className="absolute bottom-4 right-2">
                         <Button
