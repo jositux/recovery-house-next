@@ -191,9 +191,9 @@ export function BookingWidget({
 
       await createBooking(newBookingData, accessToken)
 
-      //localStorage.setItem("booking", JSON.stringify(formattedBooking))
+      localStorage.setItem("booking", JSON.stringify(formattedBooking))
 
-      //router.push("/checkout")
+      router.push("/checkout")
     } catch (error) {
       console.error("Error al realizar la reserva:", error)
       alert("Ocurrió un error al realizar la reserva.")
@@ -208,7 +208,7 @@ export function BookingWidget({
     <div className="border rounded-lg p-6 space-y-6 shadow-md bg-white">
       <div className="flex justify-between items-center">
         <div>
-          <span className="text-3xl font-bold text-[#39759E]">${price.toLocaleString("es-CO")} US$</span>
+          <span className="text-3xl font-bold text-[#39759E]">${price.toLocaleString("es-CO")} USD</span>
           <span className="text-[#162F40] ml-2">/noche</span>
         </div>
       </div>
@@ -319,15 +319,15 @@ export function BookingWidget({
               <span className="text-[#162F40]">
                 ${price.toLocaleString("es-CO")} x {nights} noche(s)
               </span>
-              <span className="font-semibold">${(price * nights).toLocaleString("es-CO")} <span className="font-semibold text-[#162F40]">US$</span></span>
+              <span className="font-semibold">${(price * nights).toLocaleString("es-CO")} <span className="font-semibold text-[#162F40]">USD</span></span>
             </div>
             <div className="flex justify-between items-center text-sm">
               <span className="text-[#162F40]">Tarifa de limpieza</span>
-              <span className="font-semibold">${cleaning.toLocaleString("es-CO")} US$</span>
+              <span className="font-semibold">${cleaning.toLocaleString("es-CO")} USD</span>
             </div>
             <div className="flex justify-between items-center text-sm pt-2 border-t">
               <span className="text-[#162F40] font-semibold">Total</span>
-              <span className="font-bold text-lg">${totalPrice.toLocaleString("es-CO")} US$</span>
+              <span className="font-bold text-lg">${totalPrice.toLocaleString("es-CO")} USD</span>
             </div>
           </div>
         )}
