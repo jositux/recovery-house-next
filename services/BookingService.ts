@@ -27,7 +27,7 @@ export const createBooking = async (
   accessToken: string
 ) => {
   const response = await axios.post(
-    `${API_BASE_URL}/items/Booking/`,
+    `${API_BASE_URL}/items/Booking`,
     bookingData,
     {
       headers: {

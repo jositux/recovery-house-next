@@ -5,8 +5,9 @@ import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { getCurrentUser } from "@/services/userService"
-import { format, differenceInDays } from "date-fns"
+import { format, parseISO, differenceInDays } from "date-fns"
 import { es } from "date-fns/locale"
+
 import Image from "next/image"
 import ReviewModal from "@/components/ReviewModal"
 import { Calendar, Users, DollarSign, Home, Star, Loader2,  Search  } from "lucide-react"
@@ -212,14 +213,14 @@ const BookingList: React.FC = () => {
                           <Calendar className="h-5 w-5 text-gray-500 mr-2" />
                           <div>
                             <p className="text-sm text-gray-600">Ingreso</p>
-                            <p className="font-medium">{format(new Date(booking.checkIn), "PPP", { locale: es })}</p>
+                            <p className="font-medium">{format(parseISO(booking.checkIn), "PPP", { locale: es })}</p>
                           </div>
                         </div>
                         <div className="flex items-center">
                           <Calendar className="h-5 w-5 text-gray-500 mr-2" />
                           <div>
                             <p className="text-sm text-gray-600">Salida</p>
-                            <p className="font-medium">{format(new Date(booking.checkOut), "PPP", { locale: es })}</p>
+                            <p className="font-medium">{format(parseISO(booking.checkIn), "PPP", { locale: es })}</p>
                           </div>
                         </div>
                         <div className="flex items-center">

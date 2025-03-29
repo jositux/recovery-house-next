@@ -60,7 +60,7 @@ export function BookingWidget({ price }: BookingWidgetProps) {
     <div className="border rounded-lg p-4 space-y-4">
       <div className="flex justify-between items-center">
         <div>
-          <span className="text-2xl font-bold">${price.toLocaleString('es-CO')} US$</span>
+          <span className="text-2xl font-bold">${price.toLocaleString('es-CO')} USD</span>
           <span className="text-[#162F40]">/noche</span>
         </div>
       </div>
@@ -141,19 +141,19 @@ export function BookingWidget({ price }: BookingWidgetProps) {
           <>
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span>${price.toLocaleString('es-CO')} US$ x {nights} noches x {guests} huéspedes</span>
-                <span>${(price * nights * guests).toLocaleString('es-CO')} US$</span>
+                <span>${price.toLocaleString('es-CO')} USD x {nights} noches x {guests} huéspedes</span>
+                <span>${(price * nights * guests).toLocaleString('es-CO')} USD</span>
               </div>
               <div className="flex justify-between">
                 <span>Tarifa de limpieza</span>
-                <span>${(price * 0.1).toLocaleString('es-CO')} US$</span>
+                <span>${(price * 0.1).toLocaleString('es-CO')} USD</span>
               </div>
             </div>
 
             <div className="border-t pt-4">
               <div className="flex justify-between font-bold">
                 <span>Total</span>
-                <span>${totalPrice.toLocaleString('es-CO')} US$</span>
+                <span>${totalPrice.toLocaleString('es-CO')} USD</span>
               </div>
             </div>
           </>

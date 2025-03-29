@@ -170,14 +170,16 @@ export function BookingWidget({
 
       const newBookingData = {
         status: "pay-pending",
-        checkIn: checkIn?.toISOString() || "",
-        checkOut: checkOut?.toISOString() || "",
+        checkIn: checkIn?.toISOString().split('T')[0] || "",
+        checkOut: checkOut?.toISOString().split('T')[0] || "",
         patient: patient_id,
         guests: guests,
         price: price,
         cleaning: cleaning,
         room: room,
       }
+
+      console.log(newBookingData)
 
       const formattedBooking = {
         ...newBookingData,
@@ -189,9 +191,9 @@ export function BookingWidget({
 
       await createBooking(newBookingData, accessToken)
 
-      localStorage.setItem("booking", JSON.stringify(formattedBooking))
+      //localStorage.setItem("booking", JSON.stringify(formattedBooking))
 
-      router.push("/checkout")
+      //router.push("/checkout")
     } catch (error) {
       console.error("Error al realizar la reserva:", error)
       alert("Ocurrió un error al realizar la reserva.")
