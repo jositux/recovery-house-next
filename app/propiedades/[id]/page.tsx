@@ -190,13 +190,24 @@ export default function RoomPage() {
     if (!property) return
   
     try {
+
+      const accessToken = localStorage.getItem("access_token")
+      if (!accessToken) {
+        console.error("No access token found")
+        return
+      }
+
       // 1️⃣ Obtener los IDs de las habitaciones asociadas a la propiedad
       const roomIds = property.Rooms.map((room) => room.id)
   
       // 2️⃣ Eliminar cada habitación de forma secuencial
       for (const id of roomIds) {
         try {
-          await axios.delete(`/webapi/items/Room/${id}`)
+          await axios.delete(`/webapi/items/Room/${id}`, {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          })
           console.log(`✅ Habitación ${id} eliminada`)
         } catch (error) {
           console.error(`❌ Error al eliminar la habitación ${id}:`, error)
@@ -204,7 +215,11 @@ export default function RoomPage() {
       }
   
       // 3️⃣ Luego, eliminar la propiedad
-      await axios.delete(`/webapi/items/Property/${property.id}`)
+      await axios.delete(`/webapi/items/Property/${property.id}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
       console.log(`🏠 Propiedad ${property.id} eliminada`)
   
       // 4️⃣ Redireccionar a la lista de propiedades
@@ -219,18 +234,18 @@ export default function RoomPage() {
     if (!selectedRoomForDeletion) return
 
     try {
-      /*const accessToken = localStorage.getItem("access_token")
+      const accessToken = localStorage.getItem("access_token")
       if (!accessToken) {
         console.error("No access token found")
         return
-      }*/
+      }
 
       // Aquí implementar la lógica de eliminación real
-      await axios.delete(`/webapi/items/Room/${selectedRoomForDeletion.id}`/*, {
+      await axios.delete(`/webapi/items/Room/${selectedRoomForDeletion.id}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
-      }*/)
+      })
 
       // Actualizar la lista de habitaciones en la UI
       if (property) {
