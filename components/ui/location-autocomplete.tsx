@@ -214,7 +214,7 @@ export default function LocationAutocomplete({ value, onChange }: Props) {
               value={inputValue}
               onChange={handleInputChange}
               onFocus={() => inputValue && setIsOpen(true)}
-              className="w-full h-6 border-0 p-0 focus-visible:ring-0"
+              className="w-full h-6 border-0 p-4 md:p-0 mx-0 bg-white focus-visible:ring-0 text-sm"
               aria-label="Dónde deseas recuperarte?"
             />
             {selectedLocation && (

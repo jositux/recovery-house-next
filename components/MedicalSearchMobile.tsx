@@ -5,7 +5,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+//import { Input } from "@/components/ui/input"
 import { Search, ChevronDown, Check, X } from "lucide-react"
 import Image from "next/image"
 import { Calendar } from "@/components/ui/calendar"
@@ -15,6 +15,7 @@ import { format, parse } from "date-fns"
 import { es } from "date-fns/locale"
 import { cn } from "@/lib/utils"
 import { NumberInput } from "@/components/number-input"
+import LocationAutocomplete from "@/components/ui/location-autocomplete"
 
 interface Procedure {
   name: string
@@ -182,14 +183,45 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
       </div>
 
       <div className="w-full">
-        <label className="block text-sm mb-1 text-white">Lugar</label>
+        {/*<label className="block text-sm mb-1 text-white">Lugar</label>
         <Input
           type="text"
           placeholder="¿Dónde deseas recuperarte?"
           className="bg-white text-sm"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
-        />
+        />*/}
+
+<div className="py-1">
+  <label className="block text-sm mb-1 text-white">Lugar</label>
+              <LocationAutocomplete
+                value={location}
+                onChange={(newLocation) => {
+                  setLocation(newLocation)
+                }}
+              />
+              {/*<div className="relative">
+                <Input
+                  type="text"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  placeholder="Dónde deseas recuperarte?"
+                  className="border-0 p-0 h-6 text-sm focus-visible:ring-0 placeholder:text-muted-foreground pr-6"
+                />
+                {location && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-1/2 -translate-y-1/2 h-4 w-4 p-0"
+                    onClick={resetLocation}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                )}
+
+
+                </div>*/}
+            </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3">

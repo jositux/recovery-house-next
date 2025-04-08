@@ -42,7 +42,7 @@ export default function RoomPage() {
     cleaningFee: 0,
     photos: [],
     extraTags: [""],
-    servicesTags: [""],
+    servicesTags: ["all-included"],
     descriptionService: ""
   };
 

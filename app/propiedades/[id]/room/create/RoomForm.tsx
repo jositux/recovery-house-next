@@ -50,7 +50,6 @@ const formSchema = z.object({
   cleaningFee: z
     .number()
     .positive({ message: "Cleaning fee must be a positive number" }),
-  mainImage: z.string(),
   photos: z
     .array(z.string())
     .min(1, { message: "At least one photo is required" }),
@@ -83,7 +82,6 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
       capacity: initialValues?.capacity || 1,
       pricePerNight: initialValues?.pricePerNight || 0,
       cleaningFee: initialValues?.cleaningFee || 0,
-      mainImage: initialValues?.mainImage || "",
       photos: initialValues?.photos || [],
       extraTags: initialValues?.extraTags || [],
       servicesTags: initialValues?.servicesTags || [],
@@ -270,19 +268,7 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="mainImage"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Main Image URL</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter main image URL" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+       
         <FormField
           control={form.control}
           name="photos"
@@ -342,7 +328,7 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
                     }
                   }}
                   servicesTags={serviceTags || []}
-                  initialSelectedTags={field.value}
+                  initialSelectedTags={['all-included']}
                 />
               </FormControl>
               <FormMessage />

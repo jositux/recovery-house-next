@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
-import { countriesData } from "@/data/countries"
+import { countriesData } from "@/data/countries-all"
 
 interface LocationSelectorProps {
   onChange: (location: { country: string; state: string; city: string }) => void
