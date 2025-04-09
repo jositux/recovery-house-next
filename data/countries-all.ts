@@ -1436,14 +1436,6 @@ export const countriesData: { [key: string]: CountryData } = {
       }
     }
   },
-  "AIA": {
-    "name": "Anguilla",
-    "states": {}
-  },
-  "ATA": {
-    "name": "Antarctica",
-    "states": {}
-  },
   "ATG": {
     "name": "Antigua and Barbuda",
     "states": {
@@ -1500,7 +1492,7 @@ export const countriesData: { [key: string]: CountryData } = {
     "name": "Argentina",
     "states": {
       "C": {
-        "name": "Autonomous City of Buenos Aires",
+        "name": "CABA",
         "cities": [
           "Agronomía",
           "Almagro",
@@ -10867,7 +10859,7 @@ export const countriesData: { [key: string]: CountryData } = {
     }
   },
   "BEL": {
-    "name": "Belgium",
+    "name": "Bélgica",
     "states": {
       "VAN": {
         "name": "Antwerp",
@@ -12574,7 +12566,7 @@ export const countriesData: { [key: string]: CountryData } = {
     "states": {}
   },
   "BRA": {
-    "name": "Brazil",
+    "name": "Brasil",
     "states": {
       "AC": {
         "name": "Acre",
@@ -29031,7 +29023,7 @@ export const countriesData: { [key: string]: CountryData } = {
     }
   },
   "DOM": {
-    "name": "Dominican Republic",
+    "name": "República Dominicana",
     "states": {
       "02": {
         "name": "Azua",
@@ -29637,7 +29629,7 @@ export const countriesData: { [key: string]: CountryData } = {
     }
   },
   "EGY": {
-    "name": "Egypt",
+    "name": "Egipto",
     "states": {
       "ALX": {
         "name": "Alexandria",
@@ -30109,7 +30101,7 @@ export const countriesData: { [key: string]: CountryData } = {
     }
   },
   "GNQ": {
-    "name": "Equatorial Guinea",
+    "name": "Guinea Ecuatorial",
     "states": {
       "AN": {
         "name": "Annobón",
@@ -30905,7 +30897,7 @@ export const countriesData: { [key: string]: CountryData } = {
     }
   },
   "FIN": {
-    "name": "Finland",
+    "name": "Finlandia",
     "states": {
       "01": {
         "name": "Åland Islands",
@@ -31453,7 +31445,7 @@ export const countriesData: { [key: string]: CountryData } = {
     }
   },
   "FRA": {
-    "name": "France",
+    "name": "Francia",
     "states": {
       "01": {
         "name": "Ain",
@@ -41198,7 +41190,7 @@ export const countriesData: { [key: string]: CountryData } = {
     }
   },
   "DEU": {
-    "name": "Germany",
+    "name": "Alemania",
     "states": {
       "BW": {
         "name": "Baden-Württemberg",
@@ -79374,7 +79366,7 @@ export const countriesData: { [key: string]: CountryData } = {
     }
   },
   "MEX": {
-    "name": "Mexico",
+    "name": "México",
     "states": {
       "AGU": {
         "name": "Aguascalientes",
@@ -128558,7 +128550,7 @@ export const countriesData: { [key: string]: CountryData } = {
     }
   },
   "ESP": {
-    "name": "Spain",
+    "name": "España",
     "states": {
       "C": {
         "name": "A Coruña",
