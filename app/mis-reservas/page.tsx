@@ -1,28 +1,24 @@
+
 "use client"
 
 import type React from "react"
+
 import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { getCurrentUser } from "@/services/userService"
 import { format, parseISO, differenceInDays } from "date-fns"
 import { es } from "date-fns/locale"
-
 import Image from "next/image"
 import ReviewModal from "@/components/ReviewModal"
-import { Calendar, Users, DollarSign, Home, Star, Loader2,  Search  } from "lucide-react"
-import Link from 'next/link'
+import { Calendar, Users, DollarSign, Home, Star, Loader2, Search } from "lucide-react"
+import Link from "next/link"
 
-interface Booking {
-  id: string
-  status: string
-  checkOut: string
-  checkIn: string
-  patient: string
-  price: string
-  cleaning: string
-  room: string
-  guests: number
+// Tipos basados en el JSON proporcionado
+interface Photo {
+  directus_files_id: {
+    id: string
+  }
 }
 
 interface Room {
@@ -32,25 +28,46 @@ interface Room {
   beds: number
   capacity: number
   description: string
-  photos: {
-    directus_files_id: {
-      id: string
-    }
-  }[]
-  propertyId: string
   cleaningFee: string
   pricePerNight: string
+  photos: Photo[]
+  propertyId: Property
 }
 
 interface Property {
   id: string
   name: string
-  Rooms: Room[]
+  country: string
+  state: string
+  city: string
+  address: string
+  fullAddress: string
+  hostName: string
+  description: string
+  mainImage: string
+  type: string
 }
 
-const BookingList: React.FC = () => {
+interface Booking {
+  id: string
+  status: string
+  checkOut: string
+  checkIn: string
+  patient: string
+  guests: number
+  price: string
+  cleaning: string
+  room: Room
+}
+
+interface BookingListProps {
+  initialData?: {
+    data: Booking[]
+  }
+}
+
+const BookingList: React.FC<BookingListProps> = ({ initialData }) => {
   const [bookings, setBookings] = useState<Booking[]>([])
-  const [properties, setProperties] = useState<Property[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
@@ -70,22 +87,14 @@ const BookingList: React.FC = () => {
 
         const user = await getCurrentUser(token)
 
-       
-
         name = user.first_name
 
-        const bookingsResponse = await fetch(`/webapi/items/Booking?filter[patient][_eq]=${user.id}&fields=*`)
+        const bookingsResponse = await fetch(
+          `/webapi/items/Booking?filter[patient][_eq]=${user.id}&fields=*, +room.*, +room.photos.directus_files_id.id, +room.propertyId.*`,
+        )
         const bookingsData = await bookingsResponse.json()
 
-        
-
-        const propertiesResponse = await fetch(`/webapi/items/Property?&fields=*,+Rooms.*, Rooms.photos.directus_files_id.id`)
-        const propertiesData = await propertiesResponse.json()
-
-        
-
         setBookings(bookingsData.data)
-        setProperties(propertiesData.data)
       } catch (error) {
         console.error("Error fetching data:", error)
         setError("Error al cargar las reservas. Por favor, intente de nuevo más tarde.")
@@ -97,33 +106,25 @@ const BookingList: React.FC = () => {
     fetchData()
   }, [])
 
-  const findRoomAndPropertyDetails = (roomId: string): { room: Room | undefined; property: Property | undefined } => {
-    for (const property of properties) {
-      const room = property.Rooms.find((room) => room.id === roomId)
-      if (room) return { room, property }
-    }
-    return { room: undefined, property: undefined }
-  }
-
   const handleReviewClick = (bookingId: string, roomId: string) => {
     setSelectedBookingId(bookingId)
     setSelectedRoomId(roomId)
     setIsReviewModalOpen(true)
   }
 
+  function calculateTotal(booking: Booking): string {
+    const nights = differenceInDays(new Date(booking.checkOut), new Date(booking.checkIn))
+    const total = nights * Number.parseFloat(booking.price) + Number.parseFloat(booking.cleaning)
+    return total.toFixed(2)
+  }
+
   const handleReviewSubmit = async (ranking: number, comment: string) => {
     if (selectedBookingId) {
       try {
-        /*const token = localStorage.getItem("access_token")
-        if (!token) {
-          throw new Error("No access token found")
-        }*/
-
         const response = await fetch("/webapi/items/Reviews", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            //Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             booking_id: selectedBookingId,
@@ -141,6 +142,8 @@ const BookingList: React.FC = () => {
         console.log("Review submitted successfully")
       } catch (error) {
         console.error("Error submitting review:", error)
+      } finally {
+        setIsReviewModalOpen(false)
       }
     }
   }
@@ -167,29 +170,30 @@ const BookingList: React.FC = () => {
       <h1 className="text-3xl font-bold mb-6 text-gray-900">Mis Reservas</h1>
       {bookings.length === 0 ? (
         <main className="flex-grow flex items-center justify-center px-4">
-        <div className="text-center max-w-2xl">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            ¡Encuentra tu espacio ideal para una recuperación tranquila!
-          </h2>
-          <p className="text-lg text-gray-600 mb-8">
-            Aún no tienes reservas, pero estamos aquí para ayudarte a encontrar la casa de recuperación perfecta para tu
-            proceso de sanación y bienestar.
-          </p>
-          <Button
-            className="inline-flex items-center px-6 py-3 text-white bg-[#4A90E2] hover:bg-[#3A7BC8] transition-colors duration-300"
-            asChild
-          >
-            <Link href="/rooms">
-              <Search className="mr-2 h-5 w-5" />
-              Buscar casa de recuperación
-            </Link>
-          </Button>
-        </div>
-      </main>
+          <div className="text-center max-w-2xl">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              ¡Encuentra tu espacio ideal para una recuperación tranquila!
+            </h2>
+            <p className="text-lg text-gray-600 mb-8">
+              Aún no tienes reservas, pero estamos aquí para ayudarte a encontrar la casa de recuperación perfecta para
+              tu proceso de sanación y bienestar.
+            </p>
+            <Button
+              className="inline-flex items-center px-6 py-3 text-white bg-[#4A90E2] hover:bg-[#3A7BC8] transition-colors duration-300"
+              asChild
+            >
+              <Link href="/rooms">
+                <Search className="mr-2 h-5 w-5" />
+                Buscar casa de recuperación
+              </Link>
+            </Button>
+          </div>
+        </main>
       ) : (
         <ul className="space-y-8">
           {bookings.map((booking) => {
-            const { room: roomDetails, property } = findRoomAndPropertyDetails(booking.room)
+            const roomDetails = booking.room
+            const property = booking.room.propertyId
             const nights = differenceInDays(new Date(booking.checkOut), new Date(booking.checkIn))
             return (
               <li key={booking.id}>
@@ -197,7 +201,11 @@ const BookingList: React.FC = () => {
                   <div className="flex flex-col md:flex-row">
                     <div className="relative w-full md:w-1/3 h-64 md:h-auto">
                       <Image
-                        src={roomDetails?.photos[0]?.directus_files_id.id ? `/webapi/assets/${roomDetails.photos[0]?.directus_files_id.id}?key=medium` : "/placeholder.svg"}
+                        src={
+                          roomDetails?.photos[0]?.directus_files_id.id
+                            ? `/webapi/assets/${roomDetails.photos[0]?.directus_files_id.id}?key=medium`
+                            : "/placeholder.svg?height=400&width=600"
+                        }
                         alt={roomDetails?.name || "Room image"}
                         layout="fill"
                         objectFit="cover"
@@ -258,8 +266,8 @@ const BookingList: React.FC = () => {
                           Total: ${calculateTotal(booking)} USD
                         </p>
                         <Button
-                          onClick={() => handleReviewClick(booking.id, booking.room)}
-                          className="bg-[#39759E] invisible text-white hover:[#39759E]-700 rounded-lg px-6 py-2 transition-colors duration-300 flex items-center"
+                          onClick={() => handleReviewClick(booking.id, booking.room.id)}
+                          className="bg-[#39759E] text-white invisible hover:[#39759E]-700 rounded-lg px-6 py-2 transition-colors duration-300 flex items-center"
                         >
                           <Star className="mr-2 h-5 w-5" />
                           Dejar Comentario
@@ -273,7 +281,7 @@ const BookingList: React.FC = () => {
           })}
         </ul>
       )}
-      <ReviewModal
+       <ReviewModal
         isOpen={isReviewModalOpen}
         onClose={() => setIsReviewModalOpen(false)}
         onSubmit={handleReviewSubmit}
@@ -283,11 +291,4 @@ const BookingList: React.FC = () => {
   )
 }
 
-function calculateTotal(booking: Booking): string {
-  const nights = differenceInDays(new Date(booking.checkOut), new Date(booking.checkIn))
-  const total = nights * booking.guests * Number.parseFloat(booking.price) + Number.parseFloat(booking.cleaning)
-  return total.toFixed(2)
-}
-
 export default BookingList
-
