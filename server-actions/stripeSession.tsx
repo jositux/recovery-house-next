@@ -20,7 +20,7 @@ export const postStripeSession = async ({
   unit_amount,
 }: NewSessionOptions) => {
   const returnUrl =
-    "http://localhost:3000/checkout-return?session_id={CHECKOUT_SESSION_ID}";
+    "http://recoverycaresolutions.com/checkout-return?session_id={CHECKOUT_SESSION_ID}";
 
   const session = await stripe.checkout.sessions.create({
     ui_mode: "embedded",
