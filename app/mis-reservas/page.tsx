@@ -220,7 +220,7 @@ const BookingList: React.FC = () => {
                           <Calendar className="h-5 w-5 text-gray-500 mr-2" />
                           <div>
                             <p className="text-sm text-gray-600">Salida</p>
-                            <p className="font-medium">{format(parseISO(booking.checkIn), "PPP", { locale: es })}</p>
+                            <p className="font-medium">{format(parseISO(booking.checkOut), "PPP", { locale: es })}</p>
                           </div>
                         </div>
                         <div className="flex items-center">

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { fetchCurrentUser, createBooking } from "@/services/BookingService"
+import { fetchCurrentUser/*, createBooking */} from "@/services/BookingService"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -179,7 +179,6 @@ export function BookingWidget({
         room: room,
       }
 
-      console.log(newBookingData)
 
       const formattedBooking = {
         ...newBookingData,
@@ -189,7 +188,7 @@ export function BookingWidget({
         description: description,
       }
 
-      await createBooking(newBookingData, accessToken)
+      //await createBooking(newBookingData, accessToken)
 
       localStorage.setItem("booking", JSON.stringify(formattedBooking))
 

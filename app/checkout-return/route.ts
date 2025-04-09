@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { NextRequest} from "next/server";
+import { NextRequest } from "next/server";
 import Stripe from "stripe";
 
 const apiKey = process.env.NEXT_STRIPE_KEY as string;
@@ -10,15 +10,24 @@ export const GET = async (request: NextRequest) => {
 
   const stripeSessionId = searchParams.get("session_id");
 
-  if (!stripeSessionId?.length) return redirect("/shop");
+  if (!stripeSessionId?.length) return redirect("/checkout");
 
   const session = await stripe.checkout.sessions.retrieve(stripeSessionId);
 
   if (session.status === "complete") {
-
-
-    // Go to a success page!
-    return redirect(`/checkout/success`);
+    // Trae datos del payment
+    if (
+      typeof session.payment_intent === "string"
+    ) {
+      const paymentIntent = await stripe.paymentIntents.retrieve(
+        session.payment_intent
+      );
+      // Go to a success page!
+      return redirect(`/checkout/success/?rel=${paymentIntent.id}`);
+      // Seguí con tu lógica aquí...
+    } else {
+      
+    }
   }
 
   if (session.status === "open") {

@@ -5,57 +5,8 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { createBooking } from "@/services/BookingService"
 
 const SuccessPage = () => {
-  const router = useRouter()
-
-  useEffect(() => {
-    const sendBooking = async () => {
-      const accessToken = localStorage.getItem("access_token")
-      if (!accessToken) {
-        router.push("/login")
-        return
-      }
-
-      const bookingRaw = localStorage.getItem("booking")
-      if (!bookingRaw) return
-
-      try {
-        const parsedBooking = JSON.parse(bookingRaw)
-        const {
-          status,
-          checkIn,
-          checkOut,
-          patient,
-          guests,
-          price,
-          cleaning,
-          room,
-        } = parsedBooking
-
-        const bookingData = {
-          status,
-          checkIn,
-          checkOut,
-          patient,
-          guests,
-          price,
-          cleaning,
-          room,
-        }
-
-        await createBooking(bookingData, accessToken)
-      } catch (error) {
-        console.error("Error al enviar la reserva:", error)
-      }
-    }
-
-    sendBooking()
-  }, [])
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
@@ -110,3 +61,4 @@ const SuccessPage = () => {
 }
 
 export default SuccessPage
+

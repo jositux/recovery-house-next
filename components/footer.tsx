@@ -1,6 +1,6 @@
 import Link from "next/link"
 import Image from "next/image"
-import { LanguageSelector } from "@/components/ui/language-selector"
+//import { LanguageSelector } from "@/components/ui/language-selector"
 
 import { Fraunces } from 'next/font/google'
 
@@ -14,8 +14,7 @@ const assistanceLinks = [
 ]
 
 const hostLinks = [
-  { title: "Pon tu espacio con nosotros", href: "#" },
-  { title: "Recursos", href: "#" },
+  { title: "Pon tu espacio con nosotros", href: "/registro" },
 ]
 
 const socialLinks = [
@@ -134,7 +133,7 @@ export function Footer() {
         <div className="border-t border-gray-300 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-[#162F40] text-sm">
-              © 2024 Recovery Care Solutions. Todos los derechos reservados.
+              © 2025 Recovery Care Solutions. Todos los derechos reservados.
             </p>
             <div className="flex flex-wrap justify-center gap-4 text-sm items-center">
               <Link href="#" className="text-[#162F40] hover:text-[#39759E]">
@@ -146,7 +145,7 @@ export function Footer() {
               <Link href="#" className="text-[#162F40] hover:text-[#39759E]">
                 Configuración de Cookies
               </Link>
-              <LanguageSelector />
+              {/*<LanguageSelector />*/}
             </div>
           </div>
         </div>
