@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { updateService, UpdateUserCredentials, UpdateUserResponse } from "@/services/updateUserService";
+import { updateService, UpdateUserCredentials } from "@/services/updateUserService";
 import UpdateUserForm, { formSchema } from "@/components/forms/UpdateUserForm";
 import { z } from "zod"
 import { useRouter } from "next/navigation"
@@ -96,7 +96,7 @@ export default function UpdateUserPage() {
       }
       
       // Send the update request
-      const updatedUser: UpdateUserResponse = await updateService.updateUser(values.id, dataToSubmit as UpdateUserCredentials);
+      await updateService.updateUser(values.id, dataToSubmit as UpdateUserCredentials);
       
       // If password was changed, log out the user
       if (passwordChanged) {
