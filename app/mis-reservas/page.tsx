@@ -1,8 +1,6 @@
-
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -14,7 +12,6 @@ import ReviewModal from "@/components/ReviewModal"
 import { Calendar, Users, DollarSign, Home, Star, Loader2, Search } from "lucide-react"
 import Link from "next/link"
 
-// Tipos basados en el JSON proporcionado
 interface Photo {
   directus_files_id: {
     id: string
@@ -60,20 +57,13 @@ interface Booking {
   room: Room
 }
 
-interface BookingListProps {
-  initialData?: {
-    data: Booking[]
-  }
-}
-
-const BookingList: React.FC<BookingListProps> = ({ initialData }) => {
+const BookingList: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null)
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null)
-
   let name = ""
 
   useEffect(() => {
@@ -86,14 +76,12 @@ const BookingList: React.FC<BookingListProps> = ({ initialData }) => {
         }
 
         const user = await getCurrentUser(token)
-
         name = user.first_name
 
         const bookingsResponse = await fetch(
           `/webapi/items/Booking?filter[patient][_eq]=${user.id}&fields=*, +room.*, +room.photos.directus_files_id.id, +room.propertyId.*`,
         )
         const bookingsData = await bookingsResponse.json()
-
         setBookings(bookingsData.data)
       } catch (error) {
         console.error("Error fetching data:", error)
@@ -123,9 +111,7 @@ const BookingList: React.FC<BookingListProps> = ({ initialData }) => {
       try {
         const response = await fetch("/webapi/items/Reviews", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             booking_id: selectedBookingId,
             room_id: selectedRoomId,
@@ -135,10 +121,7 @@ const BookingList: React.FC<BookingListProps> = ({ initialData }) => {
           }),
         })
 
-        if (!response.ok) {
-          throw new Error("Failed to submit review")
-        }
-
+        if (!response.ok) throw new Error("Failed to submit review")
         console.log("Review submitted successfully")
       } catch (error) {
         console.error("Error submitting review:", error)
@@ -175,13 +158,9 @@ const BookingList: React.FC<BookingListProps> = ({ initialData }) => {
               ¡Encuentra tu espacio ideal para una recuperación tranquila!
             </h2>
             <p className="text-lg text-gray-600 mb-8">
-              Aún no tienes reservas, pero estamos aquí para ayudarte a encontrar la casa de recuperación perfecta para
-              tu proceso de sanación y bienestar.
+              Aún no tienes reservas, pero estamos aquí para ayudarte a encontrar la casa de recuperación perfecta para tu proceso de sanación y bienestar.
             </p>
-            <Button
-              className="inline-flex items-center px-6 py-3 text-white bg-[#4A90E2] hover:bg-[#3A7BC8] transition-colors duration-300"
-              asChild
-            >
+            <Button className="inline-flex items-center px-6 py-3 text-white bg-[#4A90E2] hover:bg-[#3A7BC8] transition-colors duration-300" asChild>
               <Link href="/rooms">
                 <Search className="mr-2 h-5 w-5" />
                 Buscar casa de recuperación
@@ -217,48 +196,12 @@ const BookingList: React.FC<BookingListProps> = ({ initialData }) => {
                         {roomDetails?.name || "Habitación"} - {property?.name || "Propiedad desconocida"}
                       </h2>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                        <div className="flex items-center">
-                          <Calendar className="h-5 w-5 text-gray-500 mr-2" />
-                          <div>
-                            <p className="text-sm text-gray-600">Ingreso</p>
-                            <p className="font-medium">{format(parseISO(booking.checkIn), "PPP", { locale: es })}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center">
-                          <Calendar className="h-5 w-5 text-gray-500 mr-2" />
-                          <div>
-                            <p className="text-sm text-gray-600">Salida</p>
-                            <p className="font-medium">{format(parseISO(booking.checkOut), "PPP", { locale: es })}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center">
-                          <Users className="h-5 w-5 text-gray-500 mr-2" />
-                          <div>
-                            <p className="text-sm text-gray-600">Huéspedes</p>
-                            <p className="font-medium">{booking.guests}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center">
-                          <DollarSign className="h-5 w-5 text-gray-500 mr-2" />
-                          <div>
-                            <p className="text-sm text-gray-600">Precio por noche</p>
-                            <p className="font-medium">${booking.price} USD</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center">
-                          <Home className="h-5 w-5 text-gray-500 mr-2" />
-                          <div>
-                            <p className="text-sm text-gray-600">Limpieza</p>
-                            <p className="font-medium">${booking.cleaning} USD</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center">
-                          <Calendar className="h-5 w-5 text-gray-500 mr-2" />
-                          <div>
-                            <p className="text-sm text-gray-600">Noches</p>
-                            <p className="font-medium">{nights}</p>
-                          </div>
-                        </div>
+                        <InfoItem icon={<Calendar />} label="Ingreso" value={format(parseISO(booking.checkIn), "PPP", { locale: es })} />
+                        <InfoItem icon={<Calendar />} label="Salida" value={format(parseISO(booking.checkOut), "PPP", { locale: es })} />
+                        <InfoItem icon={<Users />} label="Huéspedes" value={booking.guests} />
+                        <InfoItem icon={<DollarSign />} label="Precio por noche" value={`$${booking.price} USD`} />
+                        <InfoItem icon={<Home />} label="Limpieza" value={`$${booking.cleaning} USD`} />
+                        <InfoItem icon={<Calendar />} label="Noches" value={nights} />
                       </div>
                       {roomDetails && <p className="text-sm text-gray-600 mb-4">{roomDetails.description}</p>}
                       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-4">
@@ -281,7 +224,7 @@ const BookingList: React.FC<BookingListProps> = ({ initialData }) => {
           })}
         </ul>
       )}
-       <ReviewModal
+      <ReviewModal
         isOpen={isReviewModalOpen}
         onClose={() => setIsReviewModalOpen(false)}
         onSubmit={handleReviewSubmit}
@@ -290,5 +233,15 @@ const BookingList: React.FC<BookingListProps> = ({ initialData }) => {
     </div>
   )
 }
+
+const InfoItem = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: React.ReactNode }) => (
+  <div className="flex items-center">
+    <div className="h-5 w-5 text-gray-500 mr-2">{icon}</div>
+    <div>
+      <p className="text-sm text-gray-600">{label}</p>
+      <p className="font-medium">{value}</p>
+    </div>
+  </div>
+)
 
 export default BookingList
