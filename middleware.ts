@@ -3,43 +3,43 @@ import type { NextRequest } from 'next/server'
 
 // This middleware will run on routes defined in matcher
 export function middleware(request: NextRequest) {
-  /*
-  //[5384] Por ahora no, despues vemos de implementar el middleware
   // Get the path of the request
   const path = request.nextUrl.pathname
 
-  // Check if the path is protected (needs authentication)
-  const isProtectedRoute = 
-    path.startsWith('/profile') || 
-    path.startsWith('/dashboard') ||
-    path.startsWith('/admin') ||
-    path.startsWith('/w-host') || 
-    path.startsWith('/w-visitante') || 
-    path.startsWith('/w-proveedor')
+  // Define public routes that don't require authentication
+  const isPublicRoute = 
+    path === '/webapi/auth/login' ||
+    path === '/login' ||
+    path === '/rooms' ||
+    path.startsWith('/rooms/') ||
+    path.startsWith('/propiedades/') ||
+    path === '/user' ||
+    path.startsWith('/user/')
 
   // Get auth token from cookies
   const token = request.cookies.get('access_token')?.value
 
   // Redirect logic
-  if (isProtectedRoute) {
-    // If no token and on a protected route, redirect to login
-    if (!token) {
-      const url = new URL('/login', request.url)
-      return NextResponse.redirect(url)
-    }
+  if (!isPublicRoute && !token) {
+    // If not on a public route and no token, redirect to login
+    const url = new URL('/login', request.url)
+    return NextResponse.redirect(url)
   }
-  */
+
   return NextResponse.next()
 }
 
 // Configure the paths that should trigger this middleware
 export const config = {
   matcher: [
-    '/profile/:path*',
-    '/dashboard/:path*',
-    '/admin/:path*',
-    '/w-host/:path*',
-    '/w-visitante/:path*',
-    '/w-proveedor/:path*'
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public files (e.g. robots.txt)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 }

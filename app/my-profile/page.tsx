@@ -18,6 +18,8 @@ import {
 // Form component
 import UpdateUserForm from "@/components/forms/UpdateUserForm";
 
+import { logoutUser } from "@/services/LogoutService"
+
 // Define schema for the update form (from mi-perfil)
 const updatedFormSchema = z.object({
   id: z.string().min(2, {
@@ -257,10 +259,16 @@ export default function CombinedProfilePage() {
 
       // If password was changed, log out the user
       if (passwordChanged) {
-        // Clear authentication data
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("user_data");
-        // Any other auth data that might be stored
+        const refreshToken = localStorage.getItem("refresh_token");
+        
+        if (!refreshToken) {
+          console.error("No se encontró el token de refresco")
+          router.push("/login");
+          return
+        }
+
+        // Llama al servicio de logout
+        await logoutUser(refreshToken);
 
         // Show a success message
         showTemporaryMessage(
