@@ -35,18 +35,22 @@ export function MenuProfile({ name }: ProfileMenuProps) {
   // Logout utilizando el servicio
   const handleLogout = async () => {
     try {
-      // Obtén el accessToken desde localStorage
-      const accessToken = localStorage.getItem("access_token")
-      if (!accessToken) {
-        console.error("No se encontró el token de acceso")
+      // Obtén el refreshToken desde localStorage
+      const refreshToken = localStorage.getItem("refresh_token")
+      if (!refreshToken) {
+        console.error("No se encontró el token de refresco")
         return
       }
 
       // Llama al servicio de logout
-      await logoutUser(accessToken)
+      await logoutUser(refreshToken)
 
-      // Limpia el localStorage y redirige al login
+      // Limpia todos los items relevantes del localStorage
       localStorage.removeItem("access_token")
+      localStorage.removeItem("refresh_token")
+      localStorage.removeItem("expires")
+      localStorage.removeItem("nombre")
+      // Si hay otros datos específicos del usuario, también deberían eliminarse aquí
 
       window.dispatchEvent(new Event("storage"))
 
