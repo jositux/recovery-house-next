@@ -99,6 +99,12 @@ export function MenuProfile({ name }: ProfileMenuProps) {
               Mi Servicio
             </Link>
           </li>
+          <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+            <Link href="/my-profile" className="flex items-center gap-2" onClick={closeMenu}>
+              <User className="w-4 h-4" />
+              Editar Perfil
+            </Link>
+          </li>
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2" onClick={handleLogout}>
             <LogOut className="w-4 h-4" />
             Salir

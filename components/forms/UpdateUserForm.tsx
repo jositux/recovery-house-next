@@ -44,7 +44,6 @@ export const formSchema = z.object({
   password: z.string().optional()
 })
 
-// Define a base type for our form fields
 type FormFields = {
   id: string;
   first_name: string;
@@ -65,7 +64,6 @@ type UpdateUserFormProps = {
 
 export default function UpdateUserForm({ onSubmit, initialValues, formSchema: customFormSchema }: UpdateUserFormProps) {
   const [showPassword, setShowPassword] = useState(false)
-  //const [formattedDate, setFormattedDate] = useState("") //Removed
 
   const schemaToUse = customFormSchema || formSchema;
   
@@ -80,21 +78,19 @@ export default function UpdateUserForm({ onSubmit, initialValues, formSchema: cu
       emergencyPhone: initialValues?.emergencyPhone || "",
       address: initialValues?.address || "",
       email: initialValues?.email || "",
-      password: "" // Always start with empty password
+      password: "" 
     },
   })
 
-
-  const handleRegisterSubmit = (values: z.infer<typeof schemaToUse>) => {
-    
-    // Check for empty required fields and log them
+  const handleRegisterSubmit = async (values: z.infer<typeof schemaToUse>) => {
     const requiredFields = ['id', 'first_name', 'last_name', 'birthDate', 'phone', 'address', 'email'];
     const emptyFields = requiredFields.filter(field => !values[field as keyof typeof values]);
-    
+
     if (emptyFields.length > 0) {
       console.warn("Empty required fields detected:", emptyFields);
     }
-    
+
+    await new Promise(resolve => setTimeout(resolve, 1000)); // espera mínimo 2s
     onSubmit(values);
   };
 
@@ -120,12 +116,7 @@ export default function UpdateUserForm({ onSubmit, initialValues, formSchema: cu
                 <FormItem>
                   <FormLabel>Nombre <span className="text-red-500">*</span></FormLabel>
                   <FormControl>
-                    <Input 
-                      placeholder="Nombre" 
-                      {...field} 
-                      required
-                   
-                    />
+                    <Input placeholder="Nombre" {...field} required />
                   </FormControl>
                   <FormMessage className="text-red-600 font-medium mt-1" />
                 </FormItem>
@@ -138,12 +129,7 @@ export default function UpdateUserForm({ onSubmit, initialValues, formSchema: cu
                 <FormItem>
                   <FormLabel>Apellido <span className="text-red-500">*</span></FormLabel>
                   <FormControl>
-                    <Input 
-                      placeholder="Apellido" 
-                      {...field} 
-                      required
-                     
-                    />
+                    <Input placeholder="Apellido" {...field} required />
                   </FormControl>
                   <FormMessage className="text-red-600 font-medium mt-1" />
                 </FormItem>
@@ -155,23 +141,18 @@ export default function UpdateUserForm({ onSubmit, initialValues, formSchema: cu
         <div className="space-y-4">
           <h2 className="text-lg font-medium">Informacion de contacto</h2>
           <FormField
-              control={form.control}
-              name="address"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Domicilio <span className="text-red-500">*</span></FormLabel>
-                  <FormControl>
-                    <Input 
-                      placeholder="Dirección, Calle #" 
-                      {...field} 
-                      required
-                    
-                    />
-                  </FormControl>
-                  <FormMessage className="text-red-600 font-medium mt-1" />
-                </FormItem>
-              )}
-            />
+            control={form.control}
+            name="address"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Domicilio <span className="text-red-500">*</span></FormLabel>
+                <FormControl>
+                  <Input placeholder="Dirección, Calle #" {...field} required />
+                </FormControl>
+                <FormMessage className="text-red-600 font-medium mt-1" />
+              </FormItem>
+            )}
+          />
           <div className="grid grid-cols-2 gap-4">
             <FormField
               control={form.control}
@@ -180,12 +161,7 @@ export default function UpdateUserForm({ onSubmit, initialValues, formSchema: cu
                 <FormItem>
                   <FormLabel>Telefono<span className="text-red-500">*</span></FormLabel>
                   <FormControl>
-                    <Input 
-                      placeholder="Telefono" 
-                      {...field} 
-                      required
-                     
-                    />
+                    <Input placeholder="Telefono" {...field} required />
                   </FormControl>
                   <FormMessage className="text-red-600 font-medium mt-1" />
                 </FormItem>
@@ -196,13 +172,9 @@ export default function UpdateUserForm({ onSubmit, initialValues, formSchema: cu
               name="emergencyPhone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tel. de emergencia <span className="text-red-500"></span></FormLabel>
+                  <FormLabel>Tel. de emergencia</FormLabel>
                   <FormControl>
-                    <Input 
-                      placeholder="Tel. de emergencia" 
-                      {...field} 
-                     
-                    />
+                    <Input placeholder="Tel. de emergencia" {...field} />
                   </FormControl>
                   <FormMessage className="text-red-600 font-medium mt-1" />
                 </FormItem>
@@ -221,11 +193,11 @@ export default function UpdateUserForm({ onSubmit, initialValues, formSchema: cu
                 <FormItem>
                   <FormLabel htmlFor="email">Email <span className="text-red-500">*</span></FormLabel>
                   <FormControl>
-                    <Input 
+                    <Input
                       id="email"
-                      type="email" 
-                      placeholder="Email" 
-                      {...field} 
+                      type="email"
+                      placeholder="Email"
+                      {...field}
                       required
                       disabled={true}
                       className="bg-gray-100"
@@ -237,53 +209,50 @@ export default function UpdateUserForm({ onSubmit, initialValues, formSchema: cu
               )}
             />
             <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-            <FormItem>
-            <FormLabel htmlFor="password">Contraseña (opcional)</FormLabel>
-            <FormControl>
-            <div className="relative">
-            <Input
-            id="password"
-            type={showPassword ? "text" : "password"}
-            placeholder="Dejar vacío para no cambiar"
-            {...field}
-            aria-describedby="password-strength"
-            
-            />
-            <Button
-              type="button"
-            variant="ghost"
-            size="icon"
-            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-            onClick={() => setShowPassword(!showPassword)}
-            aria-label={showPassword ? "Hide password" : "Show password"}
-            >
-              {showPassword ? (
-              <EyeOff className="h-4 w-4" />
-            ) : (
-              <Eye className="h-4 w-4" />
-            )}
-            </Button>
-            </div>
-            </FormControl>
-            <p className="text-xs text-gray-500">Deja en blanco para mantener la contraseña actual. Si la cambias, deberás iniciar sesión nuevamente.</p>
-            <FormMessage className="text-red-600 font-medium mt-1" />
-            </FormItem>
-            )}
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="password">Contraseña (opcional)</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Dejar vacío para no cambiar"
+                        {...field}
+                        aria-describedby="password-strength"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        onClick={() => setShowPassword(!showPassword)}
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </FormControl>
+                  <p className="text-xs text-gray-500">Deja en blanco para mantener la contraseña actual. Si la cambias, deberás iniciar sesión nuevamente.</p>
+                  <FormMessage className="text-red-600 font-medium mt-1" />
+                </FormItem>
+              )}
             />
           </div>
         </div>
 
-
-        <Button 
-          type="submit" 
+        <Button
+          type="submit"
           className="w-full bg-[#39759E] hover:bg-[#39759E]"
           aria-label="Guardar Cambios"
           disabled={form.formState.isSubmitting}
           onClick={() => {
-            // If there are validation errors, scroll to the top to show the error summary
             if (Object.keys(form.formState.errors).length > 0) {
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }
