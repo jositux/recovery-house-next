@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ProfileImageCropper,
   type FileWithPreview,
@@ -12,16 +12,24 @@ import { Button } from "@/components/ui/button";
 
 interface ProfileImageUploaderProps {
   onImageCropped: (croppedImage: string) => void;
+  existingAvatarId?: string;
 }
 
 export function ProfileImageUploader({
   onImageCropped,
+  existingAvatarId,
 }: ProfileImageUploaderProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(
-    null
-  );
+  const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
+  const [avatarSrc, setAvatarSrc] = useState<string | undefined>(undefined);
+  
+  // Use existing avatar if provided
+  useEffect(() => {
+    if (existingAvatarId) {
+      setAvatarSrc(`/webapi/assets/${existingAvatarId}`);
+    }
+  }, [existingAvatarId]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -35,26 +43,26 @@ export function ProfileImageUploader({
   };
 
   const handleCroppedImage = (image: string) => {
-    console.log("Image cropped in uploader:", image.substring(0, 50) + "..."); // Log the first 50 characters
+    console.debug(croppedImage);
     setCroppedImage(image);
+    setAvatarSrc(image); // Update avatar preview immediately
     onImageCropped(image);
   };
 
   return (
     <div className="flex flex-col items-center space-y-4">
       <Avatar
-        className="w-32 h-32 cursor-pointer"
+        className="w-32 h-32 cursor-pointer hover:opacity-90 transition-opacity"
         onClick={() => document.getElementById("profile-image-upload")?.click()}
       >
-        <AvatarImage src={croppedImage || undefined} alt="Profile" />
+        <AvatarImage src={avatarSrc} alt="Profile" />
         <AvatarFallback>
           <User className="w-16 h-16" />
         </AvatarFallback>
       </Avatar>
 
       <Button
-        className="w-full mb-4 bg-[#4A89DC] hover:bg-[#4A89DC]/90"
-        size="lg"
+        className="w-full mb-4 bg-[#39759E] hover:bg-[#39759E]"
         onClick={() => document.getElementById("profile-image-upload")?.click()}
       >
         Subir foto

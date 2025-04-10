@@ -35,19 +35,26 @@ export function MenuProfile({ name }: ProfileMenuProps) {
   // Logout utilizando el servicio
   const handleLogout = async () => {
     try {
-      // Obtén el accessToken desde localStorage
-      const accessToken = localStorage.getItem("access_token")
-      if (!accessToken) {
-        console.error("No se encontró el token de acceso")
+      // Obtén el refreshToken desde localStorage
+      const refreshToken = localStorage.getItem("refresh_token")
+      if (!refreshToken) {
+        console.error("No se encontró el token de refresco")
         return
       }
 
       // Llama al servicio de logout
-      await logoutUser(accessToken)
+      await logoutUser(refreshToken)
 
-      // Limpia el localStorage y redirige al login
+      // Limpia el localStorage y cookies
       localStorage.removeItem("access_token")
-
+      localStorage.removeItem("refresh_token")
+      localStorage.removeItem("expires")
+      localStorage.removeItem("nombre")
+      
+      // Clear cookies
+      document.cookie = "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
+      document.cookie = "refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
+      
       window.dispatchEvent(new Event("storage"))
 
       router.push("/login")
@@ -90,6 +97,12 @@ export function MenuProfile({ name }: ProfileMenuProps) {
             <Link href="/mi-servicio" className="flex items-center gap-2" onClick={closeMenu}>
               <HandHelping className="w-4 h-4" />
               Mi Servicio
+            </Link>
+          </li>
+          <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+            <Link href="/my-profile" className="flex items-center gap-2" onClick={closeMenu}>
+              <User className="w-4 h-4" />
+              Editar Perfil
             </Link>
           </li>
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2" onClick={handleLogout}>

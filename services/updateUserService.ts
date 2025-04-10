@@ -28,10 +28,18 @@ export interface UpdateUserResponse {
 export const updateService = {
   updateUser: async (id: string, userData: UpdateUserCredentials): Promise<UpdateUserResponse> => {
     try {
-      // Hacemos la solicitud PATCH a la API, incluyendo el id en la URL
-      const response = await axios.patch<UpdateUserResponse>(`${API_URL}/${id}`, userData);
+      // Get token from localStorage
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("Token no encontrado. Inicia sesión nuevamente.");
+      }
 
-      console.log(response.data);  // Si necesitas depurar la respuesta
+      const response = await axios.patch<UpdateUserResponse>(`/webapi/users/me`, userData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       return response.data;  // Devuelves los datos de usuario actualizados
     } catch (error) {
       // Manejamos el error si ocurre una excepción con Axios
