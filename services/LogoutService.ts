@@ -4,7 +4,7 @@ const API_BASE_URL = "/webapi"; // Cambiar por la URL de tu instancia de Directu
 
 /**
  * Realiza el logout en Directus utilizando el refresh token.
- * @param refreshToken - El token de acceso almacenado en localStorage.
+ * @param refreshToken - El token de refresco almacenado en localStorage.
  */
 export const logoutUser = async (refreshToken: string): Promise<void> => {
   try {
