@@ -2,8 +2,33 @@
 
 import { useEffect, useState } from "react"
 import { updateService, UpdateUserCredentials } from "@/services/updateUserService";
-import UpdateUserForm, { formSchema } from "@/components/forms/UpdateUserForm";
+import UpdateUserForm from "@/components/forms/UpdateUserForm";
 import { z } from "zod"
+
+// Define a new schema with removed validations for email and birthDate
+const updatedFormSchema = z.object({
+  id: z.string().min(2, {
+    message: "El nombre debe tener al menos 2 caracteres.",
+  }),
+  first_name: z.string().min(2, {
+    message: "El nombre debe tener al menos 2 caracteres.",
+  }),
+  last_name: z.string().min(2, {
+    message: "El apellido debe tener al menos 2 caracteres.",
+  }),
+  birthDate: z.string(), // Removed min length validation
+  email: z.string(), // Removed email validation
+  phone: z.string().min(2, {
+    message: "El Telefono debe tener al menos 2 caracteres.",
+  }),
+  emergencyPhone: z.string().min(0, {
+    message: "El Telefono debe tener al menos 2 caracteres.",
+  }),
+  address: z.string().min(2, {
+    message: "El domicilio debe tener al menos 2 caracteres.",
+  }),
+  password: z.string().optional()
+});
 import { useRouter } from "next/navigation"
 import { getCurrentUser, User } from "@/services/userService"
 
@@ -79,7 +104,7 @@ export default function UpdateUserPage() {
     };
   }, [messageTimer]);
 
-  const handleRegisterSubmit = async (values: z.infer<typeof formSchema>): Promise<void> => {
+  const handleRegisterSubmit = async (values: z.infer<typeof updatedFormSchema>): Promise<void> => {
     
     setRegistrationData(prev => ({...prev, ...values} as User));
     
@@ -89,6 +114,10 @@ export default function UpdateUserPage() {
     try {
       // Create a copy of the values object for API submission
       const dataToSubmit: Partial<UpdateUserCredentials> = { ...values };
+      
+      // Remove email and birthDate from the update submission
+      delete dataToSubmit.email;
+      delete dataToSubmit.birthDate;
       
       // Only include password in the request if it's not empty
       if (!passwordChanged) {
@@ -113,6 +142,12 @@ export default function UpdateUserPage() {
           router.push("/login");
         }, 4000);
       } else {
+      // Store the updated name in localStorage
+      localStorage.setItem("nombre", values.first_name + " " + values.last_name);
+      
+      // Trigger the storage event for the header to update
+      window.dispatchEvent(new Event("storage"));
+              
         // Show success message that disappears after 10 seconds
         showTemporaryMessage("Perfil actualizado exitosamente", null);
       }
@@ -156,7 +191,11 @@ export default function UpdateUserPage() {
         {loading ? (
           <p>Cargando...</p>
         ) : (
-          <UpdateUserForm onSubmit={handleRegisterSubmit} initialValues={registrationData || undefined} />
+          <UpdateUserForm 
+            onSubmit={handleRegisterSubmit} 
+            initialValues={registrationData || undefined} 
+            formSchema={updatedFormSchema} 
+          />
         )}
       </div>
     </div>

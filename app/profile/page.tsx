@@ -1,60 +1,161 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { ProfileImageUploader } from "./ProfileImageUploader"
 import { uploadBase64ToDirectus } from "@/services/uploadAvatarService"
+import { getCurrentUser, type User } from "@/services/userService"
+import { useRouter } from "next/navigation"
 
 export default function ProfileImagePage() {
   const [croppedImageUrl, setCroppedImageUrl] = useState<string | null>(null)
   const [avatarId, setAvatarId] = useState<string | null>(null)
   const [accessToken, setAccessToken] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isUploading, setIsUploading] = useState(false)
+  const [user, setUser] = useState<User | null>(null)
+  const router = useRouter()
+  
+  // Keep track of the images we've already processed
+  const processedImages = useRef(new Set<string>())
 
-  // Leer `access_token` de localStorage al montar el componente
+  // Auth check and get user data
   useEffect(() => {
     const token = localStorage.getItem("access_token")
-    if (token) {
-      setAccessToken(token)
+    if (!token) {
+      // Redirect to login if no token found
+      router.push("/login")
+      return
     }
-  }, [])
+
+    setAccessToken(token)
+    
+    // Fetch current user information
+    const fetchUserData = async () => {
+      try {
+        const userData = await getCurrentUser(token)
+        setUser(userData)
+        
+        // If user already has an avatar, set it
+        if (userData.avatar) {
+          setAvatarId(userData.avatar)
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error)
+        // If authentication error, redirect to login
+        if (error instanceof Error && error.message.includes("Token")) {
+          router.push("/login")
+        }
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchUserData()
+  }, [router])
 
   const handleCroppedImage = (image: string) => {
-    console.log("Cropped image received:", image.substring(0, 50) + "...")
     setCroppedImageUrl(image)
   }
 
   useEffect(() => {
-    if (croppedImageUrl && accessToken) {
-      (async () => {
-        const id = await uploadBase64ToDirectus(croppedImageUrl, accessToken)
-        if (id) setAvatarId(id)
-      })()
+    if (!croppedImageUrl || !accessToken || isUploading) {
+      return
     }
-  }, [croppedImageUrl, accessToken]) // Se ejecuta cuando cambia la imagen o el token
+
+    // Skip if we've already processed this image
+    if (processedImages.current.has(croppedImageUrl)) {
+      return
+    }
+
+    // Mark as uploading and add to processed images
+    setIsUploading(true)
+    processedImages.current.add(croppedImageUrl)
+    
+    const uploadAvatar = async () => {
+      try {
+        const id = await uploadBase64ToDirectus(croppedImageUrl, accessToken)
+        
+        if (id) {
+          setAvatarId(id)
+          
+          // Update user avatar in Directus
+          if (user) {
+            await updateUserAvatar(user.id, id, accessToken)
+          }
+        }
+      } catch (error) {
+        console.error("Error uploading avatar:", error)
+      } finally {
+        // Reset uploading state but keep the URL to prevent re-upload attempts
+        setIsUploading(false)
+      }
+    }
+    
+    uploadAvatar()
+  }, [croppedImageUrl, accessToken, user, isUploading])
+  
+  // Function to update user's avatar in the database
+  const updateUserAvatar = async (userId: string, avatarId: string, token: string) => {
+    try {
+      const response = await fetch(`/webapi/users/${userId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          avatar: avatarId
+        })
+      })
+      
+      if (!response.ok) {
+        throw new Error(`Failed to update user avatar: ${response.statusText}`)
+      }
+      
+      // Update local user state
+      if (user) {
+        setUser({...user, avatar: avatarId})
+      }
+      
+    } catch (error) {
+      console.error("Error updating user avatar:", error)
+      throw error
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto py-10 flex justify-center items-center h-[60vh]">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="mt-4 text-gray-600">Actualizando su perfil...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="container mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-6 text-center">Profile Image Upload</h1>
-      <div className="max-w-md mx-auto">
-        <ProfileImageUploader onImageCropped={handleCroppedImage} />
-      </div>
-      <p className="mt-2 text-center text-gray-600">
-        Click on the avatar or the upload button to select and crop your profile image.
-      </p>
-
-      {avatarId && (
-        <div className="mt-8 text-center">
-          <h2 className="text-2xl font-bold mb-4">Your Profile Image</h2>
-          <img
-            src={`/webapi/assets/${avatarId}`}
-            alt="Profile"
-            className="mx-auto mb-4 max-w-xs rounded-full"
+      
+      <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-xl font-semibold mb-4 text-center">Imagen de perfil</h2>
+        <div className="max-w-md mx-auto">
+          <ProfileImageUploader 
+            onImageCropped={handleCroppedImage} 
+            existingAvatarId={avatarId || undefined} 
           />
-          <h3 className="text-xl font-bold mb-2">Avatar ID</h3>
-          <div className="bg-gray-100 p-4 rounded-md overflow-auto">
-            <code className="text-sm break-all">{avatarId}</code>
-          </div>
         </div>
-      )}
+        <p className="mt-2 text-center text-gray-600">
+          Haz clic en la imagen del perfil o en el botón de carga para seleccionar y recortar su imagen de perfil.
+        </p>
+        
+        {isUploading && (
+          <div className="mt-4 p-2 bg-blue-50 text-blue-700 rounded text-center">
+            <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+            Subiendo su imagen de perfil...
+          </div>
+        )}
+      </div>
     </div>
   )
 }

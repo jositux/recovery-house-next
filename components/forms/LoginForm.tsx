@@ -44,9 +44,14 @@ export function LoginForm() {
     try {
       const response = await loginService.login(values as LoginCredentials)
 
+      // Store in localStorage for client-side access
       localStorage.setItem("expires", response.data.expires)
       localStorage.setItem("refresh_token", response.data.refresh_token)
       localStorage.setItem("access_token", response.data.access_token)
+      
+      // Store in cookies for middleware auth check
+      document.cookie = `access_token=${response.data.access_token}; path=/; max-age=${60*60*24*7}` // 7 days
+      document.cookie = `refresh_token=${response.data.refresh_token}; path=/; max-age=${60*60*24*30}` // 30 days
 
       const currentUser: User = await getCurrentUser(response.data.access_token)
       localStorage.setItem("nombre", currentUser.first_name + " " + currentUser.last_name)

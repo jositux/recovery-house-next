@@ -45,9 +45,16 @@ export function MenuProfile({ name }: ProfileMenuProps) {
       // Llama al servicio de logout
       await logoutUser(accessToken)
 
-      // Limpia el localStorage y redirige al login
+      // Limpia el localStorage y cookies
       localStorage.removeItem("access_token")
-
+      localStorage.removeItem("refresh_token")
+      localStorage.removeItem("expires")
+      localStorage.removeItem("nombre")
+      
+      // Clear cookies
+      document.cookie = "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
+      document.cookie = "refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
+      
       window.dispatchEvent(new Event("storage"))
 
       router.push("/login")

@@ -33,8 +33,6 @@ export const uploadBase64ToDirectus = async (
       },
     })
 
-    console.log("Imagen subida a Directus:", response.data)
-
     return response.data.data?.id || null // Retorna el ID del archivo
   } catch (error) {
     console.error("Error al subir la imagen a Directus:", error)

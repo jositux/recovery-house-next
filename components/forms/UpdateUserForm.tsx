@@ -44,17 +44,33 @@ export const formSchema = z.object({
   password: z.string().optional()
 })
 
+// Define a base type for our form fields
+type FormFields = {
+  id: string;
+  first_name: string;
+  last_name: string;
+  birthDate: string;
+  email: string;
+  phone: string;
+  emergencyPhone: string;
+  address: string;
+  password?: string;
+};
+
 type UpdateUserFormProps = {
-  onSubmit: (values: z.infer<typeof formSchema>) => void
-  initialValues?: Partial<z.infer<typeof formSchema>>
+  onSubmit: (values: FormFields) => void
+  initialValues?: Partial<FormFields>
+  formSchema?: z.ZodType<FormFields>
 }
 
-export default function UpdateUserForm({ onSubmit, initialValues }: UpdateUserFormProps) {
+export default function UpdateUserForm({ onSubmit, initialValues, formSchema: customFormSchema }: UpdateUserFormProps) {
   const [showPassword, setShowPassword] = useState(false)
   //const [formattedDate, setFormattedDate] = useState("") //Removed
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const schemaToUse = customFormSchema || formSchema;
+  
+  const form = useForm<z.infer<typeof schemaToUse>>({
+    resolver: zodResolver(schemaToUse),
     defaultValues: {
       id: initialValues?.id || "",
       first_name: initialValues?.first_name || "",
@@ -69,8 +85,7 @@ export default function UpdateUserForm({ onSubmit, initialValues }: UpdateUserFo
   })
 
 
-  const handleRegisterSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log("Form submission triggered in UpdateUserForm component", { values });
+  const handleRegisterSubmit = (values: z.infer<typeof schemaToUse>) => {
     
     // Check for empty required fields and log them
     const requiredFields = ['id', 'first_name', 'last_name', 'birthDate', 'phone', 'address', 'email'];
@@ -280,4 +295,3 @@ export default function UpdateUserForm({ onSubmit, initialValues }: UpdateUserFo
     </Form>
   )
 }
-
