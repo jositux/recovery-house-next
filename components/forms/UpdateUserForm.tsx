@@ -41,11 +41,7 @@ export const formSchema = z.object({
   address: z.string().min(2, {
     message: "El domicilio debe tener al menos 2 caracteres.",
   }),
-  password: z.string().min(8, {
-    message: "La contraseña debe tener al menos 8 caracteres.",
-  }).refine((val) => val.trim().length >= 8, {
-    message: "La contraseña debe tener al menos 8 caracteres no vacíos.",
-  })
+  password: z.string().optional()
 })
 
 type UpdateUserFormProps = {
@@ -60,7 +56,7 @@ export default function UpdateUserForm({ onSubmit, initialValues }: UpdateUserFo
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      id: initialValues?.first_name || "",
+      id: initialValues?.id || "",
       first_name: initialValues?.first_name || "",
       last_name: initialValues?.last_name || "",
       birthDate: initialValues?.birthDate || "",
@@ -68,17 +64,37 @@ export default function UpdateUserForm({ onSubmit, initialValues }: UpdateUserFo
       emergencyPhone: initialValues?.emergencyPhone || "",
       address: initialValues?.address || "",
       email: initialValues?.email || "",
-      password: initialValues?.password || ""
+      password: "" // Always start with empty password
     },
   })
 
 
   const handleRegisterSubmit = (values: z.infer<typeof formSchema>) => {
+    console.log("Form submission triggered in UpdateUserForm component", { values });
+    
+    // Check for empty required fields and log them
+    const requiredFields = ['id', 'first_name', 'last_name', 'birthDate', 'phone', 'address', 'email'];
+    const emptyFields = requiredFields.filter(field => !values[field as keyof typeof values]);
+    
+    if (emptyFields.length > 0) {
+      console.warn("Empty required fields detected:", emptyFields);
+    }
+    
     onSubmit(values);
   };
 
   return (
     <Form {...form}>
+      {Object.keys(form.formState.errors).length > 0 && (
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded" role="alert">
+          <p className="font-bold">Por favor corrige los siguientes errores:</p>
+          <ul className="mt-2 list-disc pl-5">
+            {Object.entries(form.formState.errors).map(([field, error]) => (
+              <li key={field}>{error?.message as string}</li>
+            ))}
+          </ul>
+        </div>
+      )}
       <form onSubmit={form.handleSubmit(handleRegisterSubmit)} className="space-y-8">
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -96,7 +112,7 @@ export default function UpdateUserForm({ onSubmit, initialValues }: UpdateUserFo
                    
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-600 font-medium mt-1" />
                 </FormItem>
               )}
             />
@@ -114,7 +130,7 @@ export default function UpdateUserForm({ onSubmit, initialValues }: UpdateUserFo
                      
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-600 font-medium mt-1" />
                 </FormItem>
               )}
             />
@@ -137,7 +153,7 @@ export default function UpdateUserForm({ onSubmit, initialValues }: UpdateUserFo
                     
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-600 font-medium mt-1" />
                 </FormItem>
               )}
             />
@@ -156,7 +172,7 @@ export default function UpdateUserForm({ onSubmit, initialValues }: UpdateUserFo
                      
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-600 font-medium mt-1" />
                 </FormItem>
               )}
             />
@@ -173,7 +189,7 @@ export default function UpdateUserForm({ onSubmit, initialValues }: UpdateUserFo
                      
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-600 font-medium mt-1" />
                 </FormItem>
               )}
             />
@@ -196,50 +212,51 @@ export default function UpdateUserForm({ onSubmit, initialValues }: UpdateUserFo
                       placeholder="Email" 
                       {...field} 
                       required
+                      disabled={true}
+                      className="bg-gray-100"
                       aria-describedby="email-error"
-                    
                     />
                   </FormControl>
-                  <FormMessage id="email-error" aria-live="polite" />
+                  <FormMessage id="email-error" aria-live="polite" className="text-red-600 font-medium mt-1" />
                 </FormItem>
               )}
             />
             <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel htmlFor="password">Password <span className="text-red-500">*</span></FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <Input
-                        id="password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Password"
-                        {...field}
-                        required
-                        aria-describedby="password-strength"
-                        
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                        onClick={() => setShowPassword(!showPassword)}
-                        aria-label={showPassword ? "Hide password" : "Show password"}
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+            <FormItem>
+            <FormLabel htmlFor="password">Contraseña (opcional)</FormLabel>
+            <FormControl>
+            <div className="relative">
+            <Input
+            id="password"
+            type={showPassword ? "text" : "password"}
+            placeholder="Dejar vacío para no cambiar"
+            {...field}
+            aria-describedby="password-strength"
+            
+            />
+            <Button
+              type="button"
+            variant="ghost"
+            size="icon"
+            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+            onClick={() => setShowPassword(!showPassword)}
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? (
+              <EyeOff className="h-4 w-4" />
+            ) : (
+              <Eye className="h-4 w-4" />
+            )}
+            </Button>
+            </div>
+            </FormControl>
+            <p className="text-xs text-gray-500">Deja en blanco para mantener la contraseña actual. Si la cambias, deberás iniciar sesión nuevamente.</p>
+            <FormMessage className="text-red-600 font-medium mt-1" />
+            </FormItem>
+            )}
             />
           </div>
         </div>
@@ -248,9 +265,16 @@ export default function UpdateUserForm({ onSubmit, initialValues }: UpdateUserFo
         <Button 
           type="submit" 
           className="w-full bg-[#39759E] hover:bg-[#39759E]"
-          aria-label="Complete registration"
+          aria-label="Guardar Cambios"
+          disabled={form.formState.isSubmitting}
+          onClick={() => {
+            // If there are validation errors, scroll to the top to show the error summary
+            if (Object.keys(form.formState.errors).length > 0) {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+          }}
         >
-          Guardar Cambios
+          {form.formState.isSubmitting ? "Guardando..." : "Guardar Cambios"}
         </Button>
       </form>
     </Form>
