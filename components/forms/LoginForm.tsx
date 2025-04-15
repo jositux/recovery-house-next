@@ -56,6 +56,12 @@ export function LoginForm() {
       const currentUser: User = await getCurrentUser(response.data.access_token)
       localStorage.setItem("nombre", currentUser.first_name + " " + currentUser.last_name)
 
+      // Redirect to complementary registration if first_name or last_name is missing
+      if (!currentUser.first_name || !currentUser.last_name) {
+        router.push("/registro-complementario")
+        return
+      }
+
       window.dispatchEvent(new Event("storage"))
 
       // Verificar el initialRole y redirigir
@@ -153,4 +159,3 @@ export function LoginForm() {
     </Form>
   )
 }
-
