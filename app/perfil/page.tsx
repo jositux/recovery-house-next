@@ -5,6 +5,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 // Import the new form and schema
 import ComplementaryRegisterForm, { complementaryFormSchema } from "@/components/forms/ComplementaryRegisterForm";
+// Import the ProfileImageSection component
+import { ProfileImageSection } from "@/components/profile/ProfileImageSection";
+// Import getCurrentUser from userService
+import { getCurrentUser, type User } from "@/services/userService";
 // Removed LoginForm import
 import { Fraunces } from "next/font/google";
 import Image from "next/image";
@@ -37,13 +41,38 @@ export default function RegistrationPage() {
   // Changed successMessage state to reflect completion
   const [completionMessage, setCompletionMessage] = useState<string | null>(null);
   
-  const router = useRouter()
+  const router = useRouter();
+  
+  // States for user data and token
+  const [user, setUser] = useState<User | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("access_token")
+    const token = localStorage.getItem("access_token");
     if (!token) {
-      router.push("/login")
+      router.push("/login");
+      return;
     }
+    
+    setAccessToken(token);
+    
+    // Fetch the current user data using the imported service
+    const fetchUserData = async () => {
+      try {
+        const userData = await getCurrentUser(token);
+        setUser(userData);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        
+        if (error instanceof Error && error.message.includes("Token")) {
+          setTimeout(() => {
+            router.push("/login");
+          }, 2000);
+        }
+      }
+    };
+    
+    fetchUserData();
   }, [router])
 
   useEffect(() => {
@@ -70,6 +99,18 @@ export default function RegistrationPage() {
     }
   }, [registrationData]); // Este useEffect se ejecuta cuando registrationData cambia
 
+  // Handler for avatar updates
+  const handleAvatarUpdate = async (newAvatarId: string) => {
+    if (user) {
+      try {
+        // Update the user state with the new avatar
+        setUser({ ...user, avatar: newAvatarId });
+      } catch (error) {
+        console.error("Error updating user avatar:", error);
+      }
+    }
+  };
+  
   const handleTermsAccept = async () => {
     if (!registrationData) {
       return;
@@ -84,7 +125,7 @@ export default function RegistrationPage() {
       setCompletionMessage("Error: No se pudo obtener la información del usuario. Por favor, inicia sesión de nuevo.");
       console.error("Session or access token missing");
       return; 
-    }
+    };
 
     try {
       // Use credentials type
@@ -103,8 +144,11 @@ export default function RegistrationPage() {
 
       console.log("Usuario actualizado: ", updatedUser); // Log updated user data
 
-      // Assuming success if no error is thrown
       localStorage.setItem("initialRole", updateData.initialRole); // Keep setting role if needed
+      window.dispatchEvent(new Event("storage"));
+      
+      localStorage.setItem("nombre", updatedUser.first_name + " " + updatedUser.last_name)
+      document.cookie = `nombre=${encodeURIComponent(updatedUser.first_name + " " + updatedUser.last_name)}; path=/; max-age=${60*60*24*7}` //7 days
       
       // Set success message and move to success step
       setCompletionMessage("¡Información actualizada con éxito!");
@@ -137,7 +181,9 @@ export default function RegistrationPage() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-        
+          <h1 className={`${fraunces.className} text-2xl font-medium mb-6`}>
+            Perfil de Usuario
+          </h1>
         </motion.div>
 
           {currentStep === "details" && (
@@ -148,9 +194,17 @@ export default function RegistrationPage() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <h1 className={`${fraunces.className} text-2xl font-medium mb-6`}>
-          Registrar Usuario
-        </h1>
+              {/* Profile Image Section */}
+              {user && accessToken && (
+                  <div className="bg-white p-6 rounded-lg shadow-sm">
+                    <ProfileImageSection
+                      userId={user.id}
+                      accessToken={accessToken}
+                      existingAvatarId={user.avatar}
+                    />
+                  </div>
+              )}
+              <h2 className={`${fraunces.className} text-xl font-medium mb-6`}></h2>
               {/* Use the new form component */}
               <ComplementaryRegisterForm
                 onSubmit={handleRegisterSubmit}

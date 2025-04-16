@@ -11,6 +11,8 @@ const clearSessionData = (): void => {
   localStorage.removeItem("refresh_token");
   localStorage.removeItem("expires");
   localStorage.removeItem("nombre");
+  localStorage.removeItem("initialRole");
+  localStorage.removeItem("properties");
   
   // Clear cookies
   document.cookie = "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";

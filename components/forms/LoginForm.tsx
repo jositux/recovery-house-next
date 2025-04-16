@@ -56,12 +56,6 @@ export function LoginForm() {
       const currentUser: User = await getCurrentUser(response.data.access_token)
       localStorage.setItem("nombre", currentUser.first_name + " " + currentUser.last_name)
       document.cookie = `nombre=${encodeURIComponent(currentUser.first_name + " " + currentUser.last_name)}; path=/; max-age=${60*60*24*7}` //7 days
-      
-      // Redirect to complementary registration if first_name or last_name is missing
-      if (!currentUser.first_name || !currentUser.last_name) {
-        router.push("/perfil")
-        return
-      }
 
       window.dispatchEvent(new Event("storage"))
 
@@ -79,6 +73,12 @@ export function LoginForm() {
           break
         default:
           router.push("/rooms")
+      }
+
+      // Redirect to complementary registration if first_name or last_name is missing
+      if (!currentUser.first_name || !currentUser.last_name) {
+        router.push("/perfil")
+        return
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {

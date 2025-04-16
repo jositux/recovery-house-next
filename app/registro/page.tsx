@@ -59,8 +59,6 @@ export default function RegistrationPage() {
           "El email ya está siendo utilizado por otro usuario, por favor use otro"
         );
       } else {
-        // Assuming successful registration if not 409
-        // Removed localStorage logic for initialRole and verificationChallenge as they are not needed/available in simple form
         setShowVerificationMessage(true); // Show verification message instead of changing step
       }
     } catch (error) {
@@ -84,7 +82,7 @@ export default function RegistrationPage() {
         {!showVerificationMessage ? (
           <>
             <h1 className={`${fraunces.className} text-2xl font-medium mb-6`}>
-              Registrar Usuario
+            Completa los datos de tu registro
             </h1>
             {/* Use SimpleRegisterForm */}
             <SimpleRegisterForm

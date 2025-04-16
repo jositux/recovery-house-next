@@ -4,9 +4,8 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 
-// Image upload components and services
-import { ProfileImageUploader } from "../profile/ProfileImageUploader";
-import { uploadBase64ToDirectus } from "@/services/uploadAvatarService";
+// Import the new ProfileImageSection component
+import { ProfileImageSection } from "@/components/profile/ProfileImageSection";
 
 // User data services
 import { getCurrentUser, type User } from "@/services/userService";
@@ -52,14 +51,10 @@ export default function CombinedProfilePage() {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [croppedImageUrl, setCroppedImageUrl] = useState<string | null>(null);
   const [avatarId, setAvatarId] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const processedImages = useRef(new Set<string>());
 
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [imageSuccessMessage, setImageSuccessMessage] = useState<string | null>(null);
   const [messageTimer, setMessageTimer] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -130,71 +125,16 @@ export default function CombinedProfilePage() {
     };
   }, [messageTimer]);
 
-  const handleCroppedImage = (image: string) => {
-    setCroppedImageUrl(image);
-  };
-
-  useEffect(() => {
-    if (!croppedImageUrl || !accessToken || isUploading) return;
-
-    if (processedImages.current.has(croppedImageUrl)) return;
-
-    setIsUploading(true);
-    processedImages.current.add(croppedImageUrl);
-
-    const uploadAvatar = async () => {
+  // Handler for when avatar is updated in the ProfileImageSection
+  const handleAvatarUpdate = async (newAvatarId: string) => {
+    if (user) {
       try {
-        const id = await uploadBase64ToDirectus(croppedImageUrl, accessToken);
-        if (id) {
-          setAvatarId(id);
-          if (user) {
-            await updateUserAvatar(user.id, id, accessToken);
-            setImageSuccessMessage("Imagen de perfil actualizada exitosamente");
-            setTimeout(() => {
-              setImageSuccessMessage(null);
-            }, 5000);
-          }
-        }
+        // Update the user state with the new avatar ID
+        setUser({ ...user, avatar: newAvatarId });
       } catch (error) {
-        console.error("Error uploading avatar:", error);
-        let errorMessage = "Error al subir la imagen";
-        if (error instanceof Error) {
-          errorMessage = error.message;
-        }
-        showTemporaryMessage(null, errorMessage);
-      } finally {
-        setIsUploading(false);
+        console.error("Error updating user with new avatar:", error);
+        throw error;
       }
-    };
-
-    uploadAvatar();
-  }, [croppedImageUrl, accessToken, user, isUploading]);
-
-  const updateUserAvatar = async (
-    userId: string,
-    avatarId: string,
-    token: string
-  ) => {
-    try {
-      const response = await fetch(`/webapi/users/${userId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ avatar: avatarId }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to update user avatar: ${response.statusText}`);
-      }
-
-      if (user) {
-        setUser({ ...user, avatar: avatarId });
-      }
-    } catch (error) {
-      console.error("Error updating user avatar:", error);
-      throw error;
     }
   };
 
@@ -265,29 +205,14 @@ export default function CombinedProfilePage() {
   return (
     <div className="container mx-auto max-w-2xl py-16 px-4">
       <div className="flex flex-col gap-8 max-w-3xl mx-auto">
-        {/* Profile Image Section */}
-        <div className="bg-white">
-          <h2 className="text-xl font-semibold mb-4 text-center">
-            Actualizar imagen de perfil
-          </h2>
-          <div className="max-w-xs mx-auto">
-            <ProfileImageUploader
-              onImageCropped={handleCroppedImage}
-              existingAvatarId={avatarId || undefined}
-            />
-            {isUploading && (
-              <div className="mt-2 p-2 bg-blue-50 text-blue-700 rounded text-sm text-center">
-                <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-                Subiendo imagen de perfil...
-              </div>
-            )}
-            {imageSuccessMessage && (
-              <div className="mt-2 text-green-600 text-sm text-center">
-                {imageSuccessMessage}
-              </div>
-            )}
-          </div>
-        </div>
+        {/* Profile Image Section - Using our new reusable component */}
+        {user && accessToken && (
+          <ProfileImageSection 
+            userId={user.id} 
+            accessToken={accessToken}
+            existingAvatarId={avatarId}
+          />
+        )}
 
         {/* Profile Update Form Section */}
         <div className="bg-white p-6 rounded-lg shadow-md">

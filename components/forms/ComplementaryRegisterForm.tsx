@@ -101,6 +101,7 @@ export default function ComplementaryRegisterForm({ onSubmit, initialValues }: C
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleRegisterSubmit)} className="space-y-8">
         <div className="space-y-4 p-4 bg-white rounded-xl">
+          <h2 className="text-lg font-medium">Información Personal</h2>
           <div className="grid grid-cols-2 gap-4">
             <FormField
               control={form.control}

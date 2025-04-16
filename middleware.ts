@@ -14,7 +14,6 @@ export function middleware(request: NextRequest) {
   path === '/' ||
     path === '/login' ||
     path === '/registro' ||
-    path === '/placeholder.svg' ||
     path === '/user' ||    
     path === '/webapi/auth/login' ||
     path === '/webapi/users' ||    
@@ -54,6 +53,6 @@ export const config = {
      * - assets (assets folder)
      * - webapi/assets (assets folder)
      */
-    '/((?!api|_next/static|_next/image|assets|webapi/assets|favicon.ico).*)',
+    '/((?!api|_next/static|_next/image|assets|webapi/assets|favicon.ico|placeholder.svg).*)',
   ],
 }
