@@ -157,7 +157,8 @@ export default function RegistrationPage() {
       const updatedUser = await complementaryRegisterService.updateUser(updateData, token);
 
       localStorage.setItem("initialRole", updateData.initialRole);
-      const nombre = (updatedUser.first_name || '' + ' ' + updatedUser.last_name || '').trim();
+      const nombre = ((updatedUser.first_name || '') + ' ' + (updatedUser.last_name || '')).trim();
+      console.log(nombre);
       localStorage.setItem("nombre", nombre);
       document.cookie = `nombre=${encodeURIComponent(nombre)}; path=/; max-age=${60*60*24*7}` //7 days
       

@@ -1,6 +1,27 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
+/**
+ * Verifica si un nombre es válido
+ * @param nombre El nombre a validar
+ * @returns true si el nombre es válido, false en caso contrario
+ */
+
+function esNombreValido(nombre: string | null | undefined): boolean {
+  // Verifica si es undefined, null, cadena vacía o solo espacios
+  if (nombre === undefined || nombre === null || nombre === "" || (typeof nombre === 'string' && nombre.trim() === "")) {
+    return false;
+  }
+
+  // Verifica si contiene la palabra "null" (independiente de los espacios alrededor)
+  if (typeof nombre === 'string' && nombre.toLowerCase().includes("null")) {
+    return false;
+  }
+
+  // Si pasa todas las validaciones, es válido
+  return true;
+}
+
 // This middleware will run on routes defined in matcher
 export function middleware(request: NextRequest) {
   // Get the path of the request
@@ -49,14 +70,14 @@ export function middleware(request: NextRequest) {
   }
 
   // If route requires completed profile but user doesn't have their name set
-  if (token && requiresCompletedProfile && (nombre === undefined || nombre === null || nombre === "" || nombre.trim() === "")) {
+  if (token && requiresCompletedProfile && (esNombreValido(nombre) === false)) {
     // Redirect to profile completion page
     const url = new URL('/perfil', request.url)
     return NextResponse.redirect(url)
   }
 
   //si intenta acceder a perfil con datos ya cargados
-  if (token && (path.startsWith('/perfil')) && !(nombre === undefined || nombre === null || nombre === "" || nombre.trim() === "")) {
+  if (token && (path.startsWith('/perfil')) && (esNombreValido(nombre) === true)) {
     // Redirect to profile completion page
     const url = new URL('/mi-perfil', request.url)
     return NextResponse.redirect(url)

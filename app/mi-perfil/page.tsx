@@ -162,10 +162,9 @@ export default function CombinedProfilePage() {
           router.push("/login");
         }, 4000);
       } else {
-        localStorage.setItem(
-          "nombre",
-          values.first_name + " " + values.last_name
-        );
+        const nombre = ((values.first_name || '') + ' ' + (values.last_name || '')).trim();
+        localStorage.setItem("nombre", nombre);
+        document.cookie = `nombre=${encodeURIComponent(nombre)}; path=/; max-age=${60*60*24*7}` //7 days
         window.dispatchEvent(new Event("storage"));
         showTemporaryMessage("Perfil actualizado exitosamente", null);
       }
