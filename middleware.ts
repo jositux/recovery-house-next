@@ -55,9 +55,9 @@ export function middleware(request: NextRequest) {
 
   // Define routes that require the user to have completed their profile (have their name set)
   const requiresCompletedProfile = 
-    path === '/registrar-propiedad' ||
+    /*path === '/registrar-propiedad' ||
     path === '/registrar-servicio' ||
-    path === '/editar-servicio' ||
+    path === '/editar-servicio' ||*/
     path.match(/^\/mi-perfil\/.*$/) !== null ||
     path.match(/^\/propiedades\/[^/]+\/room\/create$/) !== null ||
     path.match(/^\/propiedades\/[^/]+\/room\/edit$/) !== null ||
