@@ -83,6 +83,10 @@ export default function RegistrationPage() {
             <h1 className={`${fraunces.className} text-2xl sm:mx-auto font-medium mb-6`}>
             Registrate en RecoverCare Solutions
             </h1>
+            <p className="mb-4">
+            Solo necesitás un correo y una contraseña. Después puedes continuar configurando tu perfil.
+
+              </p>
             </div>
             {/* Use SimpleRegisterForm */}
             <div className="sm:mx-auto p-8 sm:w-full sm:max-w-md bg-white bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
