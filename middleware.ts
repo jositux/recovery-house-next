@@ -44,6 +44,7 @@ export function middleware(request: NextRequest) {
     path.startsWith('/webapi/items/Provider') ||    
     path.startsWith('/webapi/items/Room') ||
     path.startsWith('/webapi/auth/password/request') ||
+    path.startsWith('/webapi/auth/password/reset') ||    
     path.startsWith('/webapi/users/register');
     
   // Get auth token from cookies
