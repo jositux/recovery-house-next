@@ -36,7 +36,6 @@ export default function RegistrationPage() {
   const [currentStep, setCurrentStep] = useState<RegistrationStep>("details");
   const [registrationData, setRegistrationData] =
     useState<RegistrationData | null>(null);
-  // Removed verification error state
 
   // Changed successMessage state to reflect completion
   const [completionMessage, setCompletionMessage] = useState<string | null>(null);
@@ -46,6 +45,7 @@ export default function RegistrationPage() {
   // States for user data and token
   const [user, setUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem("access_token");
@@ -55,6 +55,7 @@ export default function RegistrationPage() {
     }
     
     setAccessToken(token);
+    setIsLoading(true);
     
     // Fetch the current user data using the imported service
     const fetchUserData = async () => {
@@ -69,11 +70,13 @@ export default function RegistrationPage() {
             router.push("/login");
           }, 2000);
         }
+      } finally {
+        setIsLoading(false);
       }
     };
     
     fetchUserData();
-  }, [router])
+  }, [router]);
 
   useEffect(() => {
     if (currentStep === "terms") {
@@ -111,6 +114,29 @@ export default function RegistrationPage() {
     }
   };
   
+  // Create initial values based on user data or fallback to registrationData
+  const getInitialValues = () => {
+    // If user data exists, use it for the specified fields
+    if (user) {
+      return {
+        // Use user data for the specified fields
+        first_name: user.first_name || "",
+        last_name: user.last_name || "",
+        address: user.address || "",
+        phone: user.phone || "",
+        emergencyPhone: user.emergencyPhone || "",
+        // Keep other fields from registrationData if they exist
+        ...(registrationData && {
+          birthDate: registrationData.birthDate || "",
+          initialRole: registrationData.initialRole || "Patient",
+        }),
+      };
+    }
+    
+    // Otherwise, use existing registrationData or undefined
+    return registrationData || undefined;
+  };
+  
   const handleTermsAccept = async () => {
     if (!registrationData) {
       return;
@@ -142,14 +168,12 @@ export default function RegistrationPage() {
       // Call the updated service function with credentials and access token
       const updatedUser = await complementaryRegisterService.updateUser(updateData, token);
 
-      console.log("Usuario actualizado: ", updatedUser); // Log updated user data
-
-      localStorage.setItem("initialRole", updateData.initialRole); // Keep setting role if needed
-      window.dispatchEvent(new Event("storage"));
-      
+      localStorage.setItem("initialRole", updateData.initialRole); // Keep setting role if needed      
       localStorage.setItem("nombre", updatedUser.first_name + " " + updatedUser.last_name)
       document.cookie = `nombre=${encodeURIComponent(updatedUser.first_name + " " + updatedUser.last_name)}; path=/; max-age=${60*60*24*7}` //7 days
       
+      window.dispatchEvent(new Event("storage"));
+
       // Set success message and move to success step
       setCompletionMessage("¡Información actualizada con éxito!");
       setCurrentStep("success");
@@ -205,11 +229,18 @@ export default function RegistrationPage() {
                   </div>
               )}
               <h2 className={`${fraunces.className} text-xl font-medium mb-6`}></h2>
-              {/* Use the new form component */}
-              <ComplementaryRegisterForm
-                onSubmit={handleRegisterSubmit}
-                initialValues={registrationData || undefined}
-              />
+              
+              {/* Display loading state or form when ready */}
+              {isLoading ? (
+                <div className="flex justify-center items-center p-10 bg-white rounded-lg">
+                  <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#39759E]"></div>
+                </div>
+              ) : (
+                <ComplementaryRegisterForm
+                  onSubmit={handleRegisterSubmit}
+                  initialValues={getInitialValues()}
+                />
+              )}
             </motion.div>
           )}
 

@@ -166,6 +166,13 @@ export function BookingWidget({
       }
 
       const currentUser = await fetchCurrentUser(accessToken)
+
+      // Redirect to complementary registration if first_name or last_name is missing
+      if (!currentUser.first_name || !currentUser.last_name) {
+        router.push("/perfil")
+        return
+      }
+
       const patient_id = currentUser.id
 
       const newBookingData = {

@@ -33,8 +33,6 @@ export default function RegistrationPage() {
     setSuccessMessage(null); // Clear previous messages
     setShowVerificationMessage(false);
 
-    //[5384] Cambiar esto antes de subir!!!
-    //verification_url: "https://recoverycaresolutions.com/user/verify"
     try {
       // Construct payload with defaults for missing fields
       const registerData: RegisterCredentials = {
@@ -47,7 +45,7 @@ export default function RegistrationPage() {
         email: values.email, // From form
         password: values.password, // From form
         initialRole: "Patient", // Default role
-        verification_url: "https://localtunnel.elcanoso.lat/user/verify", // Keep verification URL
+        verification_url: "https://recoverycaresolutions.com/user/verify", // Keep verification URL
       };
 
       const response = await simpleRegisterService.register(registerData);

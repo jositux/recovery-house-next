@@ -6,9 +6,6 @@ export function middleware(request: NextRequest) {
   // Get the path of the request
   const path = request.nextUrl.pathname
 
-  //[5384]  Cambiar esto antes de subir!!!
-  console.log(path);
-
   // Define public routes that don't require authentication
   const isPublicRoute = 
   path === '/' ||
@@ -29,11 +26,32 @@ export function middleware(request: NextRequest) {
     
   // Get auth token from cookies
   const token = request.cookies.get('access_token')?.value
+  
+  // Get user name from cookies
+  const nombre = request.cookies.get('nombre')?.value
+
+  // Define routes that require the user to have completed their profile (have their name set)
+  const requiresCompletedProfile = 
+    path === '/registrar-propiedad' ||
+    path === '/registrar-servicio' ||
+    path === '/mi-perfil' ||
+    path === '/editar-servicio' ||
+    path.match(/^\/propiedades\/[^/]+\/room\/create$/) !== null ||
+    path.match(/^\/editar-propiedad\/.*$/) !== null ||
+    path.match(/^\/calendario\/.*$/) !== null ||
+    path.match(/^\/propiedades\/[^/]+\/room\/edit$/) !== null;
 
   // Redirect logic
   if (!isPublicRoute && !token) {
     // If not on a public route and no token, redirect to login
     const url = new URL('/login', request.url)
+    return NextResponse.redirect(url)
+  }
+
+  // If route requires completed profile but user doesn't have their name set
+  if (token && requiresCompletedProfile && !(nombre === undefined || nombre === null || nombre === "")) {
+    // Redirect to profile completion page
+    const url = new URL('/perfil', request.url)
     return NextResponse.redirect(url)
   }
 
