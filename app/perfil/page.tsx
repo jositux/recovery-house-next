@@ -101,18 +101,6 @@ export default function RegistrationPage() {
       handleTermsAccept();
     }
   }, [registrationData]); // Este useEffect se ejecuta cuando registrationData cambia
-
-  // Handler for avatar updates
-  const handleAvatarUpdate = async (newAvatarId: string) => {
-    if (user) {
-      try {
-        // Update the user state with the new avatar
-        setUser({ ...user, avatar: newAvatarId });
-      } catch (error) {
-        console.error("Error updating user avatar:", error);
-      }
-    }
-  };
   
   // Create initial values based on user data or fallback to registrationData
   const getInitialValues = () => {

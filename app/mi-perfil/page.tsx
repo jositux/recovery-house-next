@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 
@@ -124,19 +124,6 @@ export default function CombinedProfilePage() {
       }
     };
   }, [messageTimer]);
-
-  // Handler for when avatar is updated in the ProfileImageSection
-  const handleAvatarUpdate = async (newAvatarId: string) => {
-    if (user) {
-      try {
-        // Update the user state with the new avatar ID
-        setUser({ ...user, avatar: newAvatarId });
-      } catch (error) {
-        console.error("Error updating user with new avatar:", error);
-        throw error;
-      }
-    }
-  };
 
   const handleProfileUpdate = async (
     values: z.infer<typeof updatedFormSchema>
