@@ -156,9 +156,10 @@ export default function RegistrationPage() {
       // Call the updated service function with credentials and access token
       const updatedUser = await complementaryRegisterService.updateUser(updateData, token);
 
-      localStorage.setItem("initialRole", updateData.initialRole); // Keep setting role if needed      
-      localStorage.setItem("nombre", updatedUser.first_name + " " + updatedUser.last_name)
-      document.cookie = `nombre=${encodeURIComponent(updatedUser.first_name + " " + updatedUser.last_name)}; path=/; max-age=${60*60*24*7}` //7 days
+      localStorage.setItem("initialRole", updateData.initialRole);
+      const nombre = (updatedUser.first_name || '' + ' ' + updatedUser.last_name || '').trim();
+      localStorage.setItem("nombre", nombre);
+      document.cookie = `nombre=${encodeURIComponent(nombre)}; path=/; max-age=${60*60*24*7}` //7 days
       
       window.dispatchEvent(new Event("storage"));
 

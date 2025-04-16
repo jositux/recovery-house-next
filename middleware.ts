@@ -28,7 +28,7 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get('access_token')?.value
   
   // Get user name from cookies
-  const nombre = request.cookies.get('nombre')?.value
+  const nombre = request.cookies.get('nombre')?.value ? decodeURIComponent(request.cookies.get('nombre')?.value || '').trim() : '';
 
   // Define routes that require the user to have completed their profile (have their name set)
   const requiresCompletedProfile = 
@@ -49,11 +49,18 @@ export function middleware(request: NextRequest) {
   }
 
   // If route requires completed profile but user doesn't have their name set
-  if (token && requiresCompletedProfile && !(nombre === undefined || nombre === null || nombre === "")) {
+  if (token && requiresCompletedProfile && (nombre === undefined || nombre === null || nombre === "" || nombre.trim() === "")) {
     // Redirect to profile completion page
     const url = new URL('/perfil', request.url)
     return NextResponse.redirect(url)
   }
+
+  //si intenta acceder a perfil con datos ya cargados
+  if (token && (path.startsWith('/perfil')) && !(nombre === undefined || nombre === null || nombre === "" || nombre.trim() === "")) {
+    // Redirect to profile completion page
+    const url = new URL('/mi-perfil', request.url)
+    return NextResponse.redirect(url)
+  }  
 
   return NextResponse.next()
 }
