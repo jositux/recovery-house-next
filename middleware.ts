@@ -25,7 +25,7 @@ function esNombreValido(nombre: string | null | undefined): boolean {
 // This middleware will run on routes defined in matcher
 export function middleware(request: NextRequest) {
   // Get the path of the request
-  const path = request.nextUrl.pathname
+  const path = request.nextUrl.pathname;
 
   // Define public routes that don't require authentication
   const isPublicRoute = 
@@ -48,7 +48,7 @@ export function middleware(request: NextRequest) {
     path.startsWith('/webapi/users/register');
     
   // Get auth token from cookies
-  const token = request.cookies.get('access_token')?.value
+  const token = request.cookies.get('access_token')?.value;
   
   // Get user name from cookies
   const nombre = request.cookies.get('nombre')?.value ? decodeURIComponent(request.cookies.get('nombre')?.value || '').trim() : '';
@@ -57,35 +57,35 @@ export function middleware(request: NextRequest) {
   const requiresCompletedProfile = 
     path === '/registrar-propiedad' ||
     path === '/registrar-servicio' ||
-    path === '/mi-perfil' ||
     path === '/editar-servicio' ||
+    path.match(/^\/mi-perfil\/.*$/) !== null ||
     path.match(/^\/propiedades\/[^/]+\/room\/create$/) !== null ||
+    path.match(/^\/propiedades\/[^/]+\/room\/edit$/) !== null ||
     path.match(/^\/editar-propiedad\/.*$/) !== null ||
-    path.match(/^\/calendario\/.*$/) !== null ||
-    path.match(/^\/propiedades\/[^/]+\/room\/edit$/) !== null;
+    path.match(/^\/calendario\/.*$/) !== null;
 
   // Redirect logic
   if (!isPublicRoute && !token) {
     // If not on a public route and no token, redirect to login
-    const url = new URL('/login', request.url)
-    return NextResponse.redirect(url)
+    const url = new URL('/login', request.url);
+    return NextResponse.redirect(url);
   }
 
   // If route requires completed profile but user doesn't have their name set
   if (token && requiresCompletedProfile && (esNombreValido(nombre) === false)) {
     // Redirect to profile completion page
-    const url = new URL('/perfil', request.url)
-    return NextResponse.redirect(url)
+    const url = new URL('/perfil', request.url);
+    return NextResponse.redirect(url);
   }
 
   //si intenta acceder a perfil con datos ya cargados
   if (token && (path.startsWith('/perfil')) && (esNombreValido(nombre) === true)) {
     // Redirect to profile completion page
-    const url = new URL('/mi-perfil', request.url)
-    return NextResponse.redirect(url)
+    const url = new URL('/mi-perfil', request.url);
+    return NextResponse.redirect(url);
   }  
 
-  return NextResponse.next()
+  return NextResponse.next();
 }
 
 // Configure the paths that should trigger this middleware

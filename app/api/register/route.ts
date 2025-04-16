@@ -24,7 +24,6 @@ export async function POST(request: Request) {
 
         const directusUrl = process.env.NEXT_PUBLIC_SITE_BACKEND_URL;
 
-        console.log('durectur URL ', directusUrl)
         const appUrl = process.env.NEXT_PUBLIC_APP_URL; // Read the app URL from env
         //const roleId = process.env.DIRECTUS_REGISTER_ROLE_ID; // Role ID is commented out, assuming default role or handled by Directus
         const supervisorToken = process.env.DIRECTUS_USER_SUPERVISOR_TOKEN; // Read supervisor token
