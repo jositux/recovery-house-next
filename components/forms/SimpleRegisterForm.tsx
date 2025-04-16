@@ -85,10 +85,10 @@ export default function SimpleRegisterForm({ onSubmit, initialValues }: SimpleRe
   return (
     <Form {...form}>
       {/* Removed outer space-y-8 from form */}
-      <form onSubmit={form.handleSubmit(handleRegisterSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(handleRegisterSubmit)} className="space-y-6 ">
         {/* Removed Name, Contact Info, Birth Date sections */}
 
-        <div className="space-y-4 p-4 bg-white rounded-xl">
+        <div>
           {/* Removed Security heading */}
           {/* Changed grid layout */}
           <div className="space-y-4">
@@ -170,7 +170,7 @@ export default function SimpleRegisterForm({ onSubmit, initialValues }: SimpleRe
               Registrando
             </>
           ) : (
-            "Registrar"
+            "Registrarme"
           )}
         </Button>
       </form>

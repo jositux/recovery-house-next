@@ -79,14 +79,18 @@ export default function RegistrationPage() {
 
         {!showVerificationMessage ? (
           <>
-            <h1 className={`${fraunces.className} text-2xl font-medium mb-6`}>
-            Completa los datos de tu registro
+          <div className="sm:mx-auto sm:w-full sm:max-w-md">
+            <h1 className={`${fraunces.className} text-2xl sm:mx-auto font-medium mb-6`}>
+            Registrate en RecoverCare Solutions
             </h1>
+            </div>
             {/* Use SimpleRegisterForm */}
+            <div className="sm:mx-auto p-8 sm:w-full sm:max-w-md bg-white bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
             <SimpleRegisterForm
               onSubmit={handleRegisterSubmit}
               // Removed initialValues as they are not relevant for simple form state
             />
+            </div>
           </>
         ) : (
           // Display verification message directly

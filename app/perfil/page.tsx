@@ -198,6 +198,9 @@ export default function RegistrationPage() {
           <h1 className={`${fraunces.className} text-2xl font-medium mb-6`}>
             Perfil de Usuario
           </h1>
+          <p className="mb-4">
+          Completa tu perfil para utilizar la plataforma. Si prefieres hacerlo más adelante, ten en cuenta que se te solicitará esta información en el futuro para poder operar.
+              </p>
         </motion.div>
 
           {currentStep === "details" && (
