@@ -45,16 +45,6 @@ export function MenuProfile({ name }: ProfileMenuProps) {
       // Llama al servicio de logout
       await logoutUser(refreshToken)
 
-      // Limpia el localStorage y cookies
-      localStorage.removeItem("access_token")
-      localStorage.removeItem("refresh_token")
-      localStorage.removeItem("expires")
-      localStorage.removeItem("nombre")
-      
-      // Clear cookies
-      document.cookie = "access_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
-      document.cookie = "refresh_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
-      
       window.dispatchEvent(new Event("storage"))
 
       router.push("/login")
@@ -100,7 +90,7 @@ export function MenuProfile({ name }: ProfileMenuProps) {
             </Link>
           </li>
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-            <Link href="/my-profile" className="flex items-center gap-2" onClick={closeMenu}>
+            <Link href="/mi-perfil" className="flex items-center gap-2" onClick={closeMenu}>
               <User className="w-4 h-4" />
               Editar Perfil
             </Link>

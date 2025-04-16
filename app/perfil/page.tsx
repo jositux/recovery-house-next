@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react"; // Import useSession
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 // Import the new form and schema

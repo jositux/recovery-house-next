@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Eye, EyeOff, User, Building2, Stethoscope, Loader2 } from "lucide-react"
+import { User, Building2, Stethoscope, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { SimpleTermsCheckbox } from "@/components/ui/simple-terms-checkbox"
 
