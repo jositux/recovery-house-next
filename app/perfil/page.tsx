@@ -204,6 +204,7 @@ export default function RegistrationPage() {
     <div className="min-h-screen bg-[#F8F8F7]">
       <div className="container mx-auto max-w-2xl py-16 px-4">
         <AnimatePresence mode="wait">
+        {currentStep === "details" && (
           <motion.div
             key="title"
             initial={{ opacity: 0, y: 20 }}
@@ -211,7 +212,7 @@ export default function RegistrationPage() {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
           >
-            {currentStep === "details" && (
+          
               <div>
                 <h1
                   className={`${fraunces.className} text-2xl font-medium mb-6`}
@@ -224,9 +225,9 @@ export default function RegistrationPage() {
                   información en el futuro para poder operar.
                 </p>
               </div>
-            )}
+           
           </motion.div>
-
+ )}
           {currentStep === "details" && (
             <motion.div
               key="details"
