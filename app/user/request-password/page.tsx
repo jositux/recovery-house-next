@@ -20,9 +20,10 @@ export default function ForgotPassword() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
+    
     try {
-      const response = await fetch('/webapi/auth/password/request', {
+      const directusUrl = process.env.NEXT_PUBLIC_SITE_BACKEND_URL;
+      const response = await fetch(`${directusUrl}/auth/password/request` , {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -32,7 +33,7 @@ export default function ForgotPassword() {
           reset_url: "https://recoverycaresolutions.com/user/reset-password"
         }),
       });
-
+      
       if (response.ok) {
         router.push('/login?message=reset'); // Redirige al usuario a la página de inicio de sesión
       } else {
