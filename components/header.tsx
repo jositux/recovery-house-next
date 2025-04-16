@@ -25,7 +25,14 @@ export function Header() {
     // Función para verificar autenticación y obtener nombre
     const checkAuth = () => {
       const token = localStorage.getItem("access_token")
-      const name = localStorage.getItem("nombre") || "Usuario"
+      
+      const rawName = localStorage.getItem("nombre");
+      const name = (
+        rawName && 
+        rawName !== "null" &&
+        rawName.trim() !== ""
+      ) ? rawName : "Usuario sin nombre";
+
       setIsLoggedIn(!!token)
       setUserName(name)
     }

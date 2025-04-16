@@ -16,7 +16,7 @@ function MessageBanner() {
       <div className="m-4 p-4 rounded-2xl text-center">
       <LucideUserCheck className="w-8 h-8 mx-auto text-green-700" />
       <p className="mt-2 text-gl text-green-700">
-      ¡Bienvenido! Puedes empezar a usar el sistema.   </p>
+      ¡Bienvenido! Ingresa a la plataforma y puedes continuar configurando tu perfil.   </p>
     </div>
     
     )

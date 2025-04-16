@@ -21,9 +21,7 @@ const nextConfig: NextConfig = {
         destination: 'https://us-east-1a.recoverycaresolutions.com/:path*', // Use environment variable  
       },  
     ];  
-  }, 
-
+  },
 };
 
 export default nextConfig;
-
