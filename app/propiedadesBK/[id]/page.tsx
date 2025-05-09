@@ -45,13 +45,6 @@ interface Room {
   roomNumber: string
   beds: number
   capacity: number
-  isPrivate: boolean
-  singleBeds: number
-  doubleBeds: number
-  singleBedPrice: string
-  singleBedCleaningPrice: string
-  doubleBedPrice: string
-  doubleBedCleaningPrice: string
   descriptionService: string
   disabledDates: string
 }
@@ -185,7 +178,7 @@ export default function RoomPage() {
 
   const handleEditRoom = (room: Room) => {
     localStorage.setItem("selected_room", JSON.stringify(room))
-    router.push(`/propiedades2/${id}/room/edit`)
+    router.push(`/propiedades/${id}/room/edit`)
   }
 
   const handleCalendarRoom = (room: Room) => {
@@ -195,8 +188,9 @@ export default function RoomPage() {
 
   const confirmDeleteProperty = async () => {
     if (!property) return
-
+  
     try {
+
       const accessToken = localStorage.getItem("access_token")
       if (!accessToken) {
         console.error("No access token found")
@@ -205,7 +199,7 @@ export default function RoomPage() {
 
       // 1️⃣ Obtener los IDs de las habitaciones asociadas a la propiedad
       const roomIds = property.Rooms.map((room) => room.id)
-
+  
       // 2️⃣ Eliminar cada habitación de forma secuencial
       for (const id of roomIds) {
         try {
@@ -219,7 +213,7 @@ export default function RoomPage() {
           console.error(`❌ Error al eliminar la habitación ${id}:`, error)
         }
       }
-
+  
       // 3️⃣ Luego, eliminar la propiedad
       await axios.delete(`/webapi/items/Property/${property.id}`, {
         headers: {
@@ -227,13 +221,14 @@ export default function RoomPage() {
         },
       })
       console.log(`🏠 Propiedad ${property.id} eliminada`)
-
+  
       // 4️⃣ Redireccionar a la lista de propiedades
       router.push("/mis-propiedades")
     } catch (error) {
       console.error("❌ Error al eliminar la propiedad:", error)
     }
   }
+  
 
   const confirmDeleteRoom = async () => {
     if (!selectedRoomForDeletion) return
@@ -449,6 +444,7 @@ export default function RoomPage() {
               <MapPin className="h-5 w-5 mr-2" />
               <p>{property.fullAddress}</p>
             </div>
+            
           </div>
           <div className="h-64 rounded-lg overflow-hidden shadow-lg">
             <GoogleMap lat={property.place.coordinates[0]} lng={property.place.coordinates[1]} />
@@ -539,33 +535,12 @@ export default function RoomPage() {
                         <span>{room.capacity} huéspedes</span>
                       </div>
                     </div>
-
-                    {room.isPrivate === true || room.isPrivate === null ? (
-                      <>
-                        <div className="flex justify-between items-center mb-4">
-                          <p className="text-2xl font-bold text-primary">
-                            ${room.pricePerNight}{" "}
-                            <span className="text-sm font-normal text-gray-600"> USD / noche</span>
-                          </p>
-                        </div>
-                        <p className="text-sm text-gray-600 mb-4">Tarifa de limpieza: ${room.cleaningFee} USD</p>
-                      </>
-                    ) : (
-                      <>
-                        <div className="flex flex-col gap-2 mb-4">
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Camas simples: {room.singleBeds} <span className="font-semibold">(${room.singleBedPrice} USD)</span></span>
-      
-                          </div>
-                          <div className="flex justify-between">
-                          <span className="text-gray-600">Camas dobles: {room.doubleBeds} <span className="font-semibold">(${room.doubleBedPrice} USD)</span></span>
-      
-                          </div>
-                          
-                        </div>
-                      </>
-                    )}
-
+                    <div className="flex justify-between items-center mb-4">
+                      <p className="text-2xl font-bold text-primary">
+                        ${room.pricePerNight} <span className="text-sm font-normal text-gray-600"> USD / noche</span>
+                      </p>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-4">Tarifa de limpieza: ${room.cleaningFee} USD</p>
                     {isOwner && (
                       <div className="absolute bottom-4 right-2">
                         <Button
@@ -604,7 +579,7 @@ export default function RoomPage() {
                     asChild
                     className="bg-primary text-white hover:bg-primary-dark transition-colors duration-300 rounded-full px-8 py-4 text-lg shadow-lg hover:shadow-xl"
                   >
-                    <Link href={`/propiedades2/${property.id}/room/create`}>
+                    <Link href={`/propiedades/${property.id}/room/create`}>
                       <Plus className="h-6 w-6 mr-2 inline-block" />
                       Agregar tu primera habitación
                     </Link>
@@ -674,3 +649,4 @@ export default function RoomPage() {
     </div>
   )
 }
+

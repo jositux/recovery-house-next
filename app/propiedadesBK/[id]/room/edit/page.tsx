@@ -1,12 +1,12 @@
 "use client";
 
 //import { useState } from "react";
-import RoomForm from "./RoomForm";
+import RoomForm from "@/components/forms/RoomForm";
 //import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   roomUpdateService,
   type RoomUpdateData,
-} from "@/services/RoomUpdateService2";
+} from "@/services/RoomUpdateService";
 
 //import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
@@ -25,7 +25,7 @@ export default function RoomPage() {
     //setSubmittedData(data);
     const response = await roomUpdateService.updateRoom(data);
 
-    router.push(`/propiedades2/${data.propertyId}?rel=new-room`);
+    router.push(`/propiedades/${data.propertyId}?rel=new-room`);
 
     return response.id;
   };
@@ -36,7 +36,7 @@ export default function RoomPage() {
     ? (() => {
         const parsedData = JSON.parse(storedRoomData);
 
-        console.log("que trae todo", parsedData)
+        console.log("que trae", parsedData.descriptionService)
 
         return {
           id: parsedData.id || "",
@@ -44,13 +44,6 @@ export default function RoomPage() {
           name: parsedData.name || "",
           roomNumber: parsedData.roomNumber || "",
           description: parsedData.description || "",
-          isPrivate: parsedData.isPrivate === false ? false : true,
-          singleBeds: parsedData.singleBeds || 0,
-          doubleBeds: parsedData.doubleBeds || 0,
-          singleBedPrice: parsedData.singleBedPrice || 0,
-          singleBedCleaningPrice: parsedData.singleBedCleaningPrice || 0,
-          doubleBedPrice: parsedData.doubleBedPrice || 0,
-          doubleBedCleaningPrice: parsedData.doubleBedCleaningPrice || 0,
           descriptionService: parsedData.descriptionService || "",
           beds: parseInt(parsedData.beds) || 2,
           capacity: parseInt(parsedData.capacity) || 4,
@@ -75,32 +68,19 @@ export default function RoomPage() {
         };
       })()
     : {
-      id: "",
-      propertyId: "",
-      name: "",
-      roomNumber: "",
-      description: "",
-      // Campos de tipo de habitación
-      isPrivate: true,
-      // Configuración de camas
-      singleBeds: 0,
-      doubleBeds: 0,
-      // Total de camas y capacidad
-      beds: 1,
-      capacity: 1,
-      // Precios para habitación privada
-      pricePerNight: 0,
-      cleaningFee: 0,
-      // Precios para habitación compartida
-      singleBedPrice: 0,
-      singleBedCleaningPrice: 0,
-      doubleBedPrice: 0,
-      doubleBedCleaningPrice: 0,
-      // Otros campos
-      photos: [],
-      extraTags: [""],
-      servicesTags: ["all-included"],
-      descriptionService: "",
+        id: "",
+        propertyId: "",
+        name: "",
+        roomNumber: "",
+        description: "",
+        beds: 1,
+        capacity: 1,
+        pricePerNight: 0,
+        cleaningFee: 0,
+        photos: [],
+        extraTags: [""],
+        servicesTags: [""],
+        descriptionService: "",
       };
 
   console.log("valores iniciales", initialValues);

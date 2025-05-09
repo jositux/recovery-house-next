@@ -119,7 +119,7 @@ function SubscriptionPlans() {
             </CardHeader>
             <CardContent className="flex-grow pb-4">
               <p className="text-2xl font-bold mb-2">
-                100.00 US$<span className="text-sm font-normal"> / año</span>
+                $100.00 USD<span className="text-sm font-normal"> / año</span>
               </p>
               <ul className="space-y-1 text-sm">
                 <li className="flex items-center space-x-1">
@@ -145,8 +145,10 @@ function SubscriptionPlans() {
                 onClick={() =>
                   handleSubscribe(
                     //josi"price_1Qk9kjJ7zGXf4A6tew2ueobK",
-                    //test "price_1R7cqLGDJ9gekygzcT6RrHD8",
-                    "price_1R7fIeGDJ9gekygzgS7tXPiV",
+                    
+                    //test
+                    "price_1R7cqLGDJ9gekygzcT6RrHD8",
+                    //prod"price_1R7fIeGDJ9gekygzgS7tXPiV",
                     "annual",
                     "$100.00"
                   )
@@ -169,7 +171,7 @@ function SubscriptionPlans() {
             </CardHeader>
             <CardContent className="flex-grow pb-4">
               <p className="text-2xl font-bold mb-2">
-                40.00 US$<span className="text-sm font-normal"> / cada 3 meses</span>
+                $40.00 USD<span className="text-sm font-normal"> / cada 3 meses</span>
               </p>
               <ul className="space-y-1 text-sm">
                 <li className="flex items-center space-x-1">
@@ -195,8 +197,9 @@ function SubscriptionPlans() {
                 onClick={() =>
                   handleSubscribe(
                     //josi"price_1QsVaEJ7zGXf4A6t3m8k0BLq",
-                    //test"price_1R7ctQGDJ9gekygzhq6qw9Eo",
-                    "price_1R7fGXGDJ9gekygzgEmpQf0f",
+                    //test
+                    "price_1R7ctQGDJ9gekygzhq6qw9Eo",
+                    //prod"price_1R7fGXGDJ9gekygzgEmpQf0f",
                     "quarterly",
                     "$40.00"
                   )

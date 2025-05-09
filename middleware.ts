@@ -60,7 +60,9 @@ export function middleware(request: NextRequest) {
     path === '/editar-servicio' ||*/
     path.match(/^\/mi-perfil\/.*$/) !== null ||
     path.match(/^\/propiedades\/[^/]+\/room\/create$/) !== null ||
+    path.match(/^\/propiedades\/[^/]+\/room\/agregar$/) !== null ||
     path.match(/^\/propiedades\/[^/]+\/room\/edit$/) !== null ||
+    path.match(/^\/propiedades\/[^/]+\/room\/editar$/) !== null ||
     path.match(/^\/editar-propiedad\/.*$/) !== null ||
     path.match(/^\/calendario\/.*$/) !== null;
 

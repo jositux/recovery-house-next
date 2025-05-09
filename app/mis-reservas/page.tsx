@@ -27,6 +27,14 @@ interface Room {
   description: string
   cleaningFee: string
   pricePerNight: string
+  descriptionService: string
+  isPrivate: boolean
+  singleBeds: number
+  doubleBeds: number
+  singleBedPrice: string
+  doubleBedPrice: string
+  singleBedCleaningPrice: string
+  doubleBedCleaningPrice: string
   photos: Photo[]
   propertyId: Property
 }
@@ -55,6 +63,21 @@ interface Booking {
   price: string
   cleaning: string
   room: Room
+
+  // Nuevos campos
+  roomName?: string | null
+  roomDescription?: string | null
+  propertyName?: string | null
+  paymentId?: string | null
+  ownerName?: string | null
+  patientName?: string | null
+  isPrivate?: boolean
+  singleBeds?: number | null
+  doubleBeds?: number | null
+  singleBedPrice?: string | null
+  doubleBedPrice?: string | null
+  singleBedCleaningPrice?: string | null
+  doubleBedCleaningPrice?: string | null
 }
 
 const BookingList: React.FC = () => {
@@ -102,7 +125,29 @@ const BookingList: React.FC = () => {
 
   function calculateTotal(booking: Booking): string {
     const nights = differenceInDays(new Date(booking.checkOut), new Date(booking.checkIn))
-    const total = nights * Number.parseFloat(booking.price) + Number.parseFloat(booking.cleaning)
+    let total: number
+
+    // Si isPrivate es false (explícitamente), usar cálculo para habitaciones compartidas
+    // Si isPrivate es null o true, considerar como habitación privada
+    if (booking.isPrivate === false) {
+      const bedPrice =
+        Number(booking.singleBedPrice) * Number(booking.singleBeds) +
+        Number(booking.doubleBedPrice) * Number(booking.doubleBeds)
+    
+      let cleaningPrice = 0
+      if (Number(booking.singleBeds) > 0) {
+        cleaningPrice += Number(booking.singleBedCleaningPrice)
+      }
+      if (Number(booking.doubleBeds) > 0) {
+        cleaningPrice += Number(booking.doubleBedCleaningPrice)
+      }
+    
+      total = bedPrice * nights + cleaningPrice
+    } else {
+      // For private rooms (isPrivate is true or null), use the original calculation
+      total = nights * Number.parseFloat(booking.price) + Number.parseFloat(booking.cleaning)
+    }
+
     return total.toFixed(2)
   }
 
@@ -158,9 +203,13 @@ const BookingList: React.FC = () => {
               ¡Encuentra tu espacio ideal para una recuperación tranquila!
             </h2>
             <p className="text-lg text-gray-600 mb-8">
-              Aún no tienes reservas, pero estamos aquí para ayudarte a encontrar la casa de recuperación perfecta para tu proceso de sanación y bienestar.
+              Aún no tienes reservas, pero estamos aquí para ayudarte a encontrar la casa de recuperación perfecta para
+              tu proceso de sanación y bienestar.
             </p>
-            <Button className="inline-flex items-center px-6 py-3 text-white bg-[#4A90E2] hover:bg-[#3A7BC8] transition-colors duration-300" asChild>
+            <Button
+              className="inline-flex items-center px-6 py-3 text-white bg-[#4A90E2] hover:bg-[#3A7BC8] transition-colors duration-300"
+              asChild
+            >
               <Link href="/rooms">
                 <Search className="mr-2 h-5 w-5" />
                 Buscar casa de recuperación
@@ -176,7 +225,11 @@ const BookingList: React.FC = () => {
             const nights = differenceInDays(new Date(booking.checkOut), new Date(booking.checkIn))
             return (
               <li key={booking.id}>
-                <Card className="overflow-hidden shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300">
+                <Card
+                  className={`overflow-hidden shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300 ${
+                    roomDetails?.isPrivate === false ? "border-l-4 border-amber-500" : "border-l-4 border-emerald-500"
+                  }`}
+                >
                   <div className="flex flex-col md:flex-row">
                     <div className="relative w-full md:w-1/3 h-64 md:h-auto">
                       <Image
@@ -190,27 +243,79 @@ const BookingList: React.FC = () => {
                         objectFit="cover"
                         className="rounded-t-lg md:rounded-l-lg md:rounded-t-none"
                       />
+                      <div
+                        className={`absolute top-4 left-4 px-3 py-1 rounded-full text-sm font-medium ${
+                          roomDetails?.isPrivate === false ? "bg-amber-500 text-white" : "bg-emerald-500 text-white"
+                        }`}
+                      >
+                        {roomDetails?.isPrivate === false ? "Compartido" : "Privado"}
+                      </div>
                     </div>
                     <CardContent className="flex-1 p-6 md:w-2/3">
                       <h2 className="text-2xl font-semibold text-gray-900 mb-3">
                         {roomDetails?.name || "Habitación"} - {property?.name || "Propiedad desconocida"}
                       </h2>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                        <InfoItem icon={<Calendar />} label="Ingreso" value={format(parseISO(booking.checkIn), "PPP", { locale: es })} />
-                        <InfoItem icon={<Calendar />} label="Salida" value={format(parseISO(booking.checkOut), "PPP", { locale: es })} />
-                        <InfoItem icon={<Users />} label="Huéspedes" value={booking.guests} />
-                        <InfoItem icon={<DollarSign />} label="Precio por noche" value={`$${booking.price} USD`} />
-                        <InfoItem icon={<Home />} label="Limpieza" value={`$${booking.cleaning} USD`} />
+                        <InfoItem
+                          icon={<Calendar />}
+                          label="Ingreso"
+                          value={format(parseISO(booking.checkIn), "PPP", { locale: es })}
+                        />
+                        <InfoItem
+                          icon={<Calendar />}
+                          label="Salida"
+                          value={format(parseISO(booking.checkOut), "PPP", { locale: es })}
+                        />
                         <InfoItem icon={<Calendar />} label="Noches" value={nights} />
+
+                        {/* Mostrar estos campos solo para habitaciones privadas */}
+                        {roomDetails?.isPrivate !== false && (
+                          <>
+                            <InfoItem icon={<Users />} label="Huéspedes" value={booking.guests} />
+                            <InfoItem icon={<DollarSign />} label="Precio por noche" value={`$${booking.price} USD`} />
+                            <InfoItem icon={<Home />} label="Limpieza" value={`$${booking.cleaning} USD`} />
+                          </>
+                        )}
+
+                        {/* Mostrar estos campos solo para habitaciones compartidas */}
+                        {roomDetails?.isPrivate === false && (
+                          <>
+                            <InfoItem
+                              icon={<Home />}
+                              label="Camas individuales"
+                              value={`${booking?.singleBeds || 0} ($${roomDetails?.singleBedPrice || 0} c/u)`}
+                            />
+                            <InfoItem
+                              icon={<Home />}
+                              label="Camas dobles"
+                              value={`${booking?.doubleBeds || 0} ($${roomDetails?.doubleBedPrice || 0} c/u)`}
+                            />
+                          </>
+                        )}
                       </div>
                       {roomDetails && <p className="text-sm text-gray-600 mb-4">{roomDetails.description}</p>}
                       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-4">
-                        <p className="text-2xl font-semibold text-gray-900 mb-4 sm:mb-0">
-                          Total: ${calculateTotal(booking)} USD
-                        </p>
+                        <div>
+                          <p className="text-2xl font-semibold text-gray-900 mb-1">
+                            Total: ${calculateTotal(booking)} USD
+                          </p>
+                          {roomDetails?.isPrivate === false && (
+                            <p className="text-sm text-gray-600">
+                              Incluye: Camas ($
+                              {(Number(booking?.singleBedPrice || 0) * (booking?.singleBeds || 0) +
+                                Number(booking?.doubleBedPrice || 0) * (booking?.doubleBeds || 0)) *
+                                nights}{" "}
+                             USD) + Limpieza ($
+  {(
+    ((booking?.singleBeds ?? 0) > 0 ? Number(booking?.singleBedCleaningPrice || 0) : 0) +
+    ((booking?.doubleBeds ?? 0) > 0 ? Number(booking?.doubleBedCleaningPrice || 0) : 0)
+  ).toFixed(2)} USD)
+                            </p>
+                          )}
+                        </div>
                         <Button
                           onClick={() => handleReviewClick(booking.id, booking.room.id)}
-                          className="bg-[#39759E] text-white invisible hover:[#39759E]-700 rounded-lg px-6 py-2 transition-colors duration-300 flex items-center"
+                          className="bg-[#39759E] text-white hover:bg-[#2c5a7a] rounded-lg px-6 py-2 transition-colors duration-300 flex items-center"
                         >
                           <Star className="mr-2 h-5 w-5" />
                           Dejar Comentario
