@@ -517,28 +517,31 @@ export default function RoomPage() {
               </div>
 
               {room.isPrivate === false && (
-                <div className="flex items-center mt-4 space-x-4 text-[#162F40]">
-                  {room.singleBeds > 0 && (
-                    <div className="flex items-center">
-                      <BedSingle className="w-5 h-5 mr-2" />
-                      <span>
-                        {room.singleBeds} cama{room.singleBeds > 1 ? "s" : ""}{" "}
-                        simple{room.singleBeds > 1 ? "s" : ""}
-                      </span>
-                    </div>
-                  )}
+  <div className="flex items-center mt-4 space-x-4 text-[#162F40]">
+    {room.singleBeds > 0 && (
+      <div className="flex items-center">
+        <BedSingle className="w-5 h-5 mr-2" />
+        <span>
+          {room.singleBeds} cama{room.singleBeds > 1 ? "s" : ""} simple{room.singleBeds > 1 ? "s" : ""}{" "}
+          ({availableBeds?.availableSingleBeds ?? 0} disponible
+          {availableBeds?.availableSingleBeds === 1 ? "" : "s"})
+        </span>
+      </div>
+    )}
 
-                  {room.doubleBeds > 0 && (
-                    <div className="flex items-center">
-                      <BedDouble className="w-5 h-5 mr-2" />
-                      <span>
-                        {room.doubleBeds} cama{room.doubleBeds > 1 ? "s" : ""}{" "}
-                        doble{room.doubleBeds > 1 ? "s" : ""}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )}
+    {room.doubleBeds > 0 && (
+      <div className="flex items-center">
+        <BedDouble className="w-5 h-5 mr-2" />
+        <span>
+          {room.doubleBeds} cama{room.doubleBeds > 1 ? "s" : ""} doble{room.doubleBeds > 1 ? "s" : ""}{" "}
+          ({availableBeds?.availableDoubleBeds ?? 0} disponible
+          {availableBeds?.availableDoubleBeds === 1 ? "" : "s"})
+        </span>
+      </div>
+    )}
+  </div>
+)}
+
             </div>
 
             {/* Description */}
