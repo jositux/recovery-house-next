@@ -1,54 +1,53 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { fetchCurrentUser/*, createBooking */} from "@/services/BookingService"
+
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { format, addDays, parseISO,/*, isWithinInterval*/ } from "date-fns"
+import { format, addDays, parseISO /*, isWithinInterval*/ } from "date-fns"
 import { es } from "date-fns/locale"
 import { CalendarIcon, Minus, Plus, Users, X } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
 import styles from "./BookingWidget.module.css"
 
+interface BookingData {
+  checkIn: string
+  checkOut: string
+  guests: number
+  nights: number
+  price: number
+  cleaning: number
+  totalPrice: number
+}
+
 interface Booking {
-  id: string
-  status: string
   checkIn: string
   checkOut: string
   patient: string
   guests: number
   price: number
   cleaning: number
-  room: string
 }
 
 interface BookingWidgetProps {
-  room: string
-  roomName: string
-  ownerId: string
-  description: string
   price: number
   cleaning: number
-  isPrivate: boolean
   bookings: Booking[]
   maxGuests: number
   disableDates: string
+  onReservation?: (bookingData: BookingData) => void
 }
 
 export function BookingWidget({
-  room,
-  roomName,
-  ownerId,
-  description,
   price,
   cleaning,
-  isPrivate,
   bookings: initialBookings,
   maxGuests,
   disableDates,
+  onReservation,
 }: BookingWidgetProps) {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -70,13 +69,12 @@ export function BookingWidget({
   const [loading, setLoading] = useState(false)
   //const [disabledDates, setDisabledDates] = useState<string[]>([])
   const bookings = initialBookings
-  
+
   const today = useMemo(() => {
     const todayDate = new Date()
     todayDate.setHours(0, 0, 0, 0)
     return todayDate
   }, [])
-
 
   useEffect(() => {
     if (checkIn && checkOut) {
@@ -96,7 +94,6 @@ export function BookingWidget({
   const handleGuestsChange = (increment: number) => {
     setGuests((prevGuests) => Math.max(1, Math.min(prevGuests + increment, maxGuests)))
   }
-  
 
   const isDateReserved = useMemo(() => {
     const reservedDates: string[] = []
@@ -105,7 +102,7 @@ export function BookingWidget({
     bookings.forEach((booking) => {
       let currentDate = parseISO(booking.checkIn)
       const endDate = parseISO(booking.checkOut)
-      
+
       while (currentDate <= endDate) {
         reservedDates.push(format(currentDate, "yyyy-MM-dd"))
         currentDate = addDays(currentDate, 1)
@@ -169,38 +166,21 @@ export function BookingWidget({
         return
       }
 
-      const currentUser = await fetchCurrentUser(accessToken)
-      const patient_id = currentUser.id
-
-      const newBookingData = {
-        room: room,
-        roomName: roomName,
-        status: "pay-pending",
-        checkIn: checkIn?.toISOString().split('T')[0] || "",
-        checkOut: checkOut?.toISOString().split('T')[0] || "",
-        patient: patient_id,
-        ownerId: ownerId,
+      // Create booking data
+      const formattedBooking: BookingData = {
+        checkIn: checkIn?.toISOString().split("T")[0] || "",
+        checkOut: checkOut?.toISOString().split("T")[0] || "",
         guests: guests,
+        nights: nights,
         price: price,
-        isPrivate: isPrivate,
         cleaning: cleaning,
-        
+        totalPrice: totalPrice,
       }
 
-
-      const formattedBooking = {
-        ...newBookingData,
-        unit_amount: totalPrice * 100,
-        guests: guests,
-        roomName: roomName,
-        description: description,
+      // Call the onReservation callback if provided
+      if (onReservation) {
+        onReservation(formattedBooking)
       }
-
-      //await createBooking(newBookingData, accessToken)
-
-      localStorage.setItem("booking", JSON.stringify(formattedBooking))
-
-      router.push("/checkout")
     } catch (error) {
       console.error("Error al realizar la reserva:", error)
       alert("Ocurrió un error al realizar la reserva.")
@@ -208,8 +188,6 @@ export function BookingWidget({
       setLoading(false)
     }
   }
-
-
 
   return (
     <div className="border rounded-lg p-6 space-y-6 shadow-md bg-white">
@@ -223,20 +201,20 @@ export function BookingWidget({
       <div className="grid grid-cols-2 gap-4">
         <Popover>
           <PopoverTrigger asChild>
-          <div className="relative">
-            <Button
-              variant="outline"
-              className={`w-full justify-start text-left font-normal ${!checkIn && "text-muted-foreground"}`}
-            >
-              <CalendarIcon className="mr-0 h-4 w-4" />
-              {checkIn ? format(checkIn, "PP", { locale: es }) : "Llegada"}
-            </Button>
-            {checkIn && (
-              <X
-                className="absolute right-1 top-3 h-4 w-4 cursor-pointer text-gray-500 hover:text-red-500"
-                onClick={() => setCheckIn(undefined)}
-              />
-            )}
+            <div className="relative">
+              <Button
+                variant="outline"
+                className={`w-full justify-start text-left font-normal ${!checkIn && "text-muted-foreground"}`}
+              >
+                <CalendarIcon className="mr-0 h-4 w-4" />
+                {checkIn ? format(checkIn, "PP", { locale: es }) : "Llegada"}
+              </Button>
+              {checkIn && (
+                <X
+                  className="absolute right-1 top-3 h-4 w-4 cursor-pointer text-gray-500 hover:text-red-500"
+                  onClick={() => setCheckIn(undefined)}
+                />
+              )}
             </div>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
@@ -248,7 +226,7 @@ export function BookingWidget({
                 const isBeforeToday = date < today
                 return isBeforeToday || isDateReserved(date)
               }}
-              defaultMonth={checkIn || today} 
+              defaultMonth={checkIn || today}
               modifiers={{
                 reserved: isDateReserved,
               }}
@@ -260,20 +238,20 @@ export function BookingWidget({
         </Popover>
         <Popover>
           <PopoverTrigger asChild>
-          <div className="relative">
-            <Button
-              variant="outline"
-              className={`w-full justify-start text-left font-normal ${!checkOut && "text-muted-foreground"}`}
-            >
-              <CalendarIcon className="mr-0 h-4 w-4" />
-              {checkOut ? format(checkOut, "PP", { locale: es }) : "Salida"}
-            </Button>
-            {checkIn && (
-              <X
-                className="absolute right-1 top-3 h-4 w-4 cursor-pointer text-gray-500 hover:text-red-500"
-                onClick={() => setCheckOut(undefined)}
-              />
-            )}
+            <div className="relative">
+              <Button
+                variant="outline"
+                className={`w-full justify-start text-left font-normal ${!checkOut && "text-muted-foreground"}`}
+              >
+                <CalendarIcon className="mr-0 h-4 w-4" />
+                {checkOut ? format(checkOut, "PP", { locale: es }) : "Salida"}
+              </Button>
+              {checkIn && (
+                <X
+                  className="absolute right-1 top-3 h-4 w-4 cursor-pointer text-gray-500 hover:text-red-500"
+                  onClick={() => setCheckOut(undefined)}
+                />
+              )}
             </div>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
@@ -286,7 +264,7 @@ export function BookingWidget({
                 const hasBetweenReservation = checkIn ? hasReservedDateBetween(checkIn, date) : false
                 return isBeforeOrEqualCheckIn || isDateReserved(date) || hasBetweenReservation
               }}
-              defaultMonth={checkOut || checkIn || today} 
+              defaultMonth={checkOut || checkIn || today}
               modifiers={{
                 reserved: isDateReserved,
               }}
@@ -326,7 +304,9 @@ export function BookingWidget({
               <span className="text-[#162F40]">
                 ${price.toLocaleString("es-CO")} x {nights} noche(s)
               </span>
-              <span className="font-semibold">${(price * nights).toLocaleString("es-CO")} <span className="font-semibold text-[#162F40]">USD</span></span>
+              <span className="font-semibold">
+                ${(price * nights).toLocaleString("es-CO")} <span className="font-semibold text-[#162F40]">USD</span>
+              </span>
             </div>
             <div className="flex justify-between items-center text-sm">
               <span className="text-[#162F40]">Tarifa de limpieza</span>

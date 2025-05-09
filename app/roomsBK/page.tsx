@@ -8,7 +8,6 @@ import { MapRooms } from "@/components/ui/mapRooms"
 import axios from "axios"
 import styles from "./RoomsPage.module.css"
 import { EyeOff, Eye } from "lucide-react"
-import { RoomCardShared } from "@/components/ui/room-card2"
 
 interface Image {
   id: string
@@ -26,24 +25,12 @@ interface Room {
   id: string
   name: string
   description: string
-  isPrivate: boolean
-  // Configuración de camas
-  singleBeds: number
-  doubleBeds: number
-  // Total de camas y capacidad
-  beds: number
-  capacity: number
-  // Precios para habitación privada
   pricePerNight: string
-  cleaningFee: number
-  // Precios para habitación compartida
-  singleBedPrice: number
-  singleBedCleaningPrice: number
-  doubleBedPrice: number
-  doubleBedCleaningPrice: number
+  isPrivate: boolean
   photos: ImageRoom[]
   extraTags: { ExtraTags_id: string }[]
   servicesTags: { serviceTags_id: string }[]
+  capacity?: number
   disableDates: string | null
   propertyLocation: {
     city: string
@@ -360,59 +347,40 @@ function RoomsPageContent() {
               isMapVisible ? "lg:grid-cols-3" : "lg:grid-cols-4"
             } gap-6 auto-rows-fr`}
           >
-            {currentRooms.map((room, index) => {
-              // Preparar los parámetros comunes para ambos tipos de tarjetas
-              const roomId =
-                searchParams?.get("checkIn") || searchParams?.get("checkOut") || searchParams?.get("travelers")
-                  ? `${room.id}?${new URLSearchParams({
-                      checkIn: searchParams.get("checkIn") || "",
-                      checkOut: searchParams.get("checkOut") || "",
-                      travelers: searchParams.get("travelers") || "1",
-                    }).toString()}`
-                  : room.id
-
-              const imageSrc =
-                room.photos && room.photos.length > 0 && getImageSrc(transformImageRoomToImage(room.photos[0]))
-                  ? `${getImageSrc(transformImageRoomToImage(room.photos[0]))}?key=medium`
-                  : "/assets/empty.jpg"
-
-              return (
-                <div
-                  key={`${room.id}-${refreshKey}`}
-                  id={`room-${room.id}`}
-                  className={`${styles.roomCard} ${visibleRooms.includes(room.id) ? styles.fadeIn : ""}`}
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
-                  {room.isPrivate === false ? (
-  <RoomCardShared
-    id={roomId}
-    name={room.name}
-    description={room.description || ""}
-    singleBedPrice={room.singleBedPrice || 0}
-    doubleBedPrice={room.doubleBedPrice || 0}
-    image={imageSrc}
-    propertyName={room.propertyName || ""}
-    country={room.propertyLocation?.country || ""}
-    state={room.propertyLocation?.state || ""}
-    city={room.propertyLocation?.city || ""}
-  />
-) : (
-  <RoomCard
-    id={roomId}
-    name={room.name}
-    description={room.description || ""}
-    price={room.pricePerNight ? Number.parseFloat(room.pricePerNight) : 0}
-    image={imageSrc}
-    propertyName={room.propertyName || ""}
-    country={room.propertyLocation?.country || ""}
-    state={room.propertyLocation?.state || ""}
-    city={room.propertyLocation?.city || ""}
-  />
-)}
-
-                </div>
-              )
-            })}
+            {currentRooms.map((room, index) => (
+              <div
+                key={`${room.id}-${refreshKey}`}
+                id={`room-${room.id}`}
+                className={`${styles.roomCard} ${visibleRooms.includes(room.id) ? styles.fadeIn : ""}`}
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
+                <RoomCard
+                  id={
+                    searchParams?.get("checkIn") || searchParams?.get("checkOut") || searchParams?.get("travelers")
+                      ? `${room.id}?${new URLSearchParams({
+                          checkIn: searchParams.get("checkIn") || "",
+                          checkOut: searchParams.get("checkOut") || "",
+                          travelers: searchParams.get("travelers") || "1",
+                        }).toString()}`
+                      : room.id
+                  }
+                  name={room.name}
+                  description={room.description}
+                  price={Number.parseFloat(room.pricePerNight)}
+                  
+                  // image={`/webapi/assets/${room.mainImage}?key=medium`}
+                  image={
+                    getImageSrc(transformImageRoomToImage(room.photos[0]))
+                      ? `${getImageSrc(transformImageRoomToImage(room.photos[0]))}?key=medium`
+                      : "/assets/empty.jpg"
+                  }
+                  propertyName={room.propertyName}
+                  country={room.propertyLocation.country}
+                  state={room.propertyLocation.state}
+                  city={room.propertyLocation.city}
+                />
+              </div>
+            ))}
           </div>
           {filteredRooms.length === 0 && (
             <p className="text-center text-[#162F40] mt-8">
@@ -477,3 +445,4 @@ export default function RoomsPage() {
     </main>
   )
 }
+

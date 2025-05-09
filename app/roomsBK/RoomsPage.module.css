@@ -1,0 +1,30 @@
+/* RoomsPage.module.css */
+.fade {
+  opacity: 0;
+  transition: opacity 500ms ease-in-out;
+}
+
+.fade-visible {
+  opacity: 1;
+}
+
+.roomCard {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.fadeIn {
+  animation: fadeInAnimation 0.5s ease forwards;
+}
+
+@keyframes fadeInAnimation {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

@@ -13,7 +13,6 @@ interface CheckoutFormProps {
     name?: string
     description?: string
     unit_amount: number
-    guests?: number
   }
 }
 
