@@ -185,7 +185,7 @@ export default function RoomPage() {
 
   const handleEditRoom = (room: Room) => {
     localStorage.setItem("selected_room", JSON.stringify(room))
-    router.push(`/propiedades2/${id}/room/edit`)
+    router.push(`/propiedades/${id}/room/edit`)
   }
 
   const handleCalendarRoom = (room: Room) => {
@@ -604,7 +604,7 @@ export default function RoomPage() {
                     asChild
                     className="bg-primary text-white hover:bg-primary-dark transition-colors duration-300 rounded-full px-8 py-4 text-lg shadow-lg hover:shadow-xl"
                   >
-                    <Link href={`/propiedades2/${property.id}/room/create`}>
+                    <Link href={`/propiedades/${property.id}/room/create`}>
                       <Plus className="h-6 w-6 mr-2 inline-block" />
                       Agregar tu primera habitación
                     </Link>
