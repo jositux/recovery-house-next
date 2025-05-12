@@ -25,7 +25,7 @@ export default function RoomPage() {
     //setSubmittedData(data);
     const response = await roomUpdateService.updateRoom(data);
 
-    router.push(`/propiedades2/${data.propertyId}?rel=new-room`);
+    router.push(`/propiedades/${data.propertyId}?rel=new-room`);
 
     return response.id;
   };
