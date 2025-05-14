@@ -50,17 +50,15 @@ export const formSchema = z
       .min(0, { message: "Debe seleccionar cantidad" })
       .transform((val) => (isNaN(val) ? 0 : val)),
 
-    // Total beds and capacity
+    // Total beds and capacity - Modificado para aceptar 0 sin mostrar error
     beds: z.coerce
       .number()
-      .int()
-      .positive()
+      .min(0)
       .max(99, { message: "Máximo 99 camas" })
       .transform((val) => (isNaN(val) ? 0 : val)),
     capacity: z.coerce
       .number()
-      .int()
-      .positive()
+      .min(0)
       .max(99, { message: "Capacidad máxima 99" })
       .transform((val) => (isNaN(val) ? 0 : val)),
 
@@ -68,7 +66,7 @@ export const formSchema = z
     pricePerNight: z.coerce.number().transform((val) => (isNaN(val) ? 0 : val)),
     cleaningFee: z.coerce.number().transform((val) => (isNaN(val) ? 0 : val)),
 
-    // Pricing for shared room
+    // Pricing for shared room - Modificado para que precio por noche sea requerido
     singleBedPrice: z.coerce
       .number()
       .min(0, { message: "El precio no puede ser negativo" })
@@ -94,19 +92,69 @@ export const formSchema = z
   })
   .refine(
     (data) => {
+      // Si no hay camas, no validamos precios
+      if (data.singleBeds === 0 && data.doubleBeds === 0) {
+        return true
+      }
+
       // Si es habitación privada, validar que los precios sean positivos
       if (data.isPrivate) {
-        return data.pricePerNight > 0 && data.cleaningFee > 0
+        return data.pricePerNight > 0
       }
-      // Si es compartida, validar que al menos un tipo de cama tenga precio positivo
-      return (
-        (data.singleBeds > 0 && data.singleBedPrice > 0 && data.singleBedCleaningPrice > 0) ||
-        (data.doubleBeds > 0 && data.doubleBedPrice > 0 && data.doubleBedCleaningPrice > 0)
-      )
+
+      // Si es compartida, validar que cada tipo de cama tenga precio por noche > 0
+      if (data.singleBeds > 0 && data.singleBedPrice <= 0) {
+        return false
+      }
+
+      if (data.doubleBeds > 0 && data.doubleBedPrice <= 0) {
+        return false
+      }
+
+      return true
     },
     {
-      message: "Los precios deben ser mayores que 0 según el tipo de habitación",
+      message: "Los precios por noche deben ser mayores que 0",
       path: ["pricePerNight"], // Este campo mostrará el error
+    },
+  )
+  .refine(
+    (data) => {
+      // Si es habitación privada, validar que la tarifa de limpieza sea positiva
+      if (data.isPrivate && data.beds > 0) {
+        return data.cleaningFee >= 0
+      }
+      return true
+    },
+    {
+      message: "La tarifa de limpieza no puede ser negativa",
+      path: ["cleaningFee"],
+    },
+  )
+  .refine(
+    (data) => {
+      // Si es compartida con camas individuales, validar que la tarifa de limpieza no sea negativa
+      if (!data.isPrivate && data.singleBeds > 0) {
+        return data.singleBedCleaningPrice >= 0
+      }
+      return true
+    },
+    {
+      message: "La tarifa de limpieza no puede ser negativa",
+      path: ["singleBedCleaningPrice"],
+    },
+  )
+  .refine(
+    (data) => {
+      // Si es compartida con camas dobles, validar que la tarifa de limpieza no sea negativa
+      if (!data.isPrivate && data.doubleBeds > 0) {
+        return data.doubleBedCleaningPrice >= 0
+      }
+      return true
+    },
+    {
+      message: "La tarifa de limpieza no puede ser negativa",
+      path: ["doubleBedCleaningPrice"],
     },
   )
 
@@ -136,8 +184,8 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
       doubleBeds: initialValues?.doubleBeds || 0,
 
       // Total beds and capacity
-      beds: initialValues?.beds || 1,
-      capacity: initialValues?.capacity || 1,
+      beds: initialValues?.beds || 0,
+      capacity: initialValues?.capacity || 0,
 
       // Pricing for private room
       pricePerNight: initialValues?.pricePerNight || 0,
@@ -174,6 +222,14 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
     // Assuming 1 person per single bed and 2 per double bed
     const estimatedCapacity = singleBeds + doubleBeds * 2
     form.setValue("capacity", estimatedCapacity)
+
+    // Limpiar errores cuando se seleccionan camas
+    if (totalBeds > 0) {
+      form.clearErrors("beds")
+      form.clearErrors("capacity")
+      form.clearErrors("singleBeds")
+      form.clearErrors("doubleBeds")
+    }
   }, [singleBeds, doubleBeds, form])
 
   // Modificar la validación en el handleSubmit para manejar correctamente los precios según el tipo de habitación
@@ -194,31 +250,75 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
         doubleBedCleaningPrice: Number(values.doubleBedCleaningPrice),
       }
 
+      // Validar que haya al menos una cama
+      if (processedValues.singleBeds === 0 && processedValues.doubleBeds === 0) {
+        toast({
+          title: "Error de validación",
+          description: "Debe seleccionar al menos una cama",
+          variant: "destructive",
+        })
+        return
+      }
+
       // Validación adicional según el tipo de habitación
       if (processedValues.isPrivate) {
-        if (processedValues.pricePerNight <= 0 || processedValues.cleaningFee <= 0) {
-          toast({
-            title: "Error de validación",
-            description:
-              "Para habitaciones privadas, el precio por noche y la tarifa de limpieza deben ser mayores que 0",
-            variant: "destructive",
+        if (processedValues.pricePerNight <= 0) {
+          form.setError("pricePerNight", {
+            type: "manual",
+            message: "El precio por noche debe ser mayor que 0",
           })
+          document.getElementById("pricePerNight")?.focus()
+          return
+        }
+
+        if (processedValues.cleaningFee < 0) {
+          form.setError("cleaningFee", {
+            type: "manual",
+            message: "La tarifa de limpieza no puede ser negativa",
+          })
+          document.getElementById("cleaningFee")?.focus()
           return
         }
       } else {
-        // Para habitaciones compartidas, validar que al menos un tipo de cama tenga precio
-        const hasSingleBeds = processedValues.singleBeds > 0
-        const hasDoubleBeds = processedValues.doubleBeds > 0
-        const hasSingleBedPrice = processedValues.singleBedPrice > 0 && processedValues.singleBedCleaningPrice > 0
-        const hasDoubleBedPrice = processedValues.doubleBedPrice > 0 && processedValues.doubleBedCleaningPrice > 0
+        // Para habitaciones compartidas, validar precios por tipo de cama
+        if (processedValues.singleBeds > 0) {
+          if (processedValues.singleBedPrice <= 0) {
+            form.setError("singleBedPrice", {
+              type: "manual",
+              message: "El precio por noche debe ser mayor que 0",
+            })
+            document.getElementById("singleBedPrice")?.focus()
+            return
+          }
 
-        if ((hasSingleBeds && !hasSingleBedPrice) || (hasDoubleBeds && !hasDoubleBedPrice)) {
-          toast({
-            title: "Error de validación",
-            description: "Cada tipo de cama seleccionada debe tener un precio por noche y de limpieza",
-            variant: "destructive",
-          })
-          return
+          if (processedValues.singleBedCleaningPrice < 0) {
+            form.setError("singleBedCleaningPrice", {
+              type: "manual",
+              message: "La tarifa de limpieza no puede ser negativa",
+            })
+            document.getElementById("singleBedCleaningPrice")?.focus()
+            return
+          }
+        }
+
+        if (processedValues.doubleBeds > 0) {
+          if (processedValues.doubleBedPrice <= 0) {
+            form.setError("doubleBedPrice", {
+              type: "manual",
+              message: "El precio por noche debe ser mayor que 0",
+            })
+            document.getElementById("doubleBedPrice")?.focus()
+            return
+          }
+
+          if (processedValues.doubleBedCleaningPrice < 0) {
+            form.setError("doubleBedCleaningPrice", {
+              type: "manual",
+              message: "La tarifa de limpieza no puede ser negativa",
+            })
+            document.getElementById("doubleBedCleaningPrice")?.focus()
+            return
+          }
         }
       }
 

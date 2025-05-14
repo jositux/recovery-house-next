@@ -48,6 +48,30 @@ export default function RoomTypeSelector({
     setValue("capacity", estimatedCapacity)
   }, [singleBeds, doubleBeds, setValue])
 
+  // Efecto para resetear los precios cuando cambia la cantidad de camas
+  useEffect(() => {
+    // Si se selecciona 0 camas individuales, resetear sus precios
+    if (singleBeds === 0 && !isPrivate) {
+      setValue("singleBedPrice", 0)
+      setValue("singleBedCleaningPrice", 0)
+    }
+
+    // Si se selecciona 0 camas dobles, resetear sus precios
+    if (doubleBeds === 0 && !isPrivate) {
+      setValue("doubleBedPrice", 0)
+      setValue("doubleBedCleaningPrice", 0)
+    }
+
+    // Si no hay camas en habitación privada, resetear los precios
+    if (singleBeds === 0 && doubleBeds === 0 && isPrivate) {
+      setValue("pricePerNight", 0)
+      setValue("cleaningFee", 0)
+    }
+  }, [singleBeds, doubleBeds, isPrivate, setValue])
+
+  // Verificar si no hay camas seleccionadas
+  const noBeds = singleBeds === 0 && doubleBeds === 0
+
   return (
     <div className="p-4 bg-white rounded-xl">
       <FormField
@@ -139,8 +163,10 @@ export default function RoomTypeSelector({
                       <FormLabel>Precio por noche (por cama)</FormLabel>
                       <FormControl>
                         <Input
+                          id="singleBedPrice"
                           type="number"
                           min="0"
+                          disabled={singleBeds === 0}
                           value={field.value || ""}
                           onChange={(e) => {
                             const value = e.target.value
@@ -160,6 +186,11 @@ export default function RoomTypeSelector({
                           }}
                         />
                       </FormControl>
+                      {singleBeds > 0 && (
+                        <FormDescription className="text-amber-600 font-medium">
+                          Requerido para camas individuales
+                        </FormDescription>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -172,8 +203,10 @@ export default function RoomTypeSelector({
                       <FormLabel>Precio de limpieza (por cama)</FormLabel>
                       <FormControl>
                         <Input
+                          id="singleBedCleaningPrice"
                           type="number"
                           min="0"
+                          disabled={singleBeds === 0}
                           value={field.value || ""}
                           onChange={(e) => {
                             const value = e.target.value
@@ -193,6 +226,7 @@ export default function RoomTypeSelector({
                           }}
                         />
                       </FormControl>
+                      <FormDescription>Puede ser 0</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -248,8 +282,10 @@ export default function RoomTypeSelector({
                       <FormLabel>Precio por noche (por cama)</FormLabel>
                       <FormControl>
                         <Input
+                          id="doubleBedPrice"
                           type="number"
                           min="0"
+                          disabled={doubleBeds === 0}
                           value={field.value || ""}
                           onChange={(e) => {
                             const value = e.target.value
@@ -269,6 +305,11 @@ export default function RoomTypeSelector({
                           }}
                         />
                       </FormControl>
+                      {doubleBeds > 0 && (
+                        <FormDescription className="text-amber-600 font-medium">
+                          Requerido para camas dobles
+                        </FormDescription>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -281,8 +322,10 @@ export default function RoomTypeSelector({
                       <FormLabel>Precio de limpieza (por cama)</FormLabel>
                       <FormControl>
                         <Input
+                          id="doubleBedCleaningPrice"
                           type="number"
                           min="0"
+                          disabled={doubleBeds === 0}
                           value={field.value || ""}
                           onChange={(e) => {
                             const value = e.target.value
@@ -302,6 +345,7 @@ export default function RoomTypeSelector({
                           }}
                         />
                       </FormControl>
+                      <FormDescription>Puede ser 0</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -311,6 +355,13 @@ export default function RoomTypeSelector({
           </div>
         </div>
       </div>
+
+      {/* Mensaje de advertencia cuando no hay camas */}
+      {noBeds && (
+        <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-800">
+          <p className="text-sm font-medium">Debe seleccionar al menos 1 cama para configurar los precios.</p>
+        </div>
+      )}
 
       {/* Capacity and Total Beds (calculated fields) */}
       <div className="grid grid-cols-2 md:grid-cols-2 gap-4 pt-4 bg-white rounded-xl">
@@ -324,7 +375,7 @@ export default function RoomTypeSelector({
                 <Input type="number" {...field} readOnly className="bg-gray-50" />
               </FormControl>
               <FormDescription>Según camas elegidas</FormDescription>
-              <FormMessage />
+              {/* Eliminamos el FormMessage para que no muestre errores */}
             </FormItem>
           )}
         />
@@ -338,7 +389,7 @@ export default function RoomTypeSelector({
                 <Input type="number" {...field} />
               </FormControl>
               <FormDescription>Sugerido, pero puede ajustarse</FormDescription>
-              <FormMessage />
+              {/* Eliminamos el FormMessage para que no muestre errores */}
             </FormItem>
           )}
         />
@@ -355,8 +406,10 @@ export default function RoomTypeSelector({
                 <FormLabel>Precio por Noche</FormLabel>
                 <FormControl>
                   <Input
+                    id="pricePerNight"
                     type="number"
                     step="1"
+                    disabled={noBeds}
                     value={field.value || ""}
                     onChange={(e) => {
                       const value = e.target.value
@@ -376,7 +429,11 @@ export default function RoomTypeSelector({
                     }}
                   />
                 </FormControl>
-                <FormDescription>Requerido para habitaciones privadas</FormDescription>
+                {!noBeds && (
+                  <FormDescription className="text-amber-600 font-medium">
+                    Requerido para habitaciones privadas
+                  </FormDescription>
+                )}
                 <FormMessage />
               </FormItem>
             )}
@@ -389,8 +446,10 @@ export default function RoomTypeSelector({
                 <FormLabel>Tarifa de Limpieza</FormLabel>
                 <FormControl>
                   <Input
+                    id="cleaningFee"
                     type="number"
                     step="1"
+                    disabled={noBeds}
                     value={field.value || ""}
                     onChange={(e) => {
                       const value = e.target.value
@@ -410,7 +469,7 @@ export default function RoomTypeSelector({
                     }}
                   />
                 </FormControl>
-                <FormDescription>Requerido para habitaciones privadas</FormDescription>
+                <FormDescription>Puede ser 0</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
