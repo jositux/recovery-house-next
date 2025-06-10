@@ -54,8 +54,7 @@ export function LoginForm() {
       document.cookie = `refresh_token=${response.data.refresh_token}; path=/; max-age=${60*60*24*30}` // 30 days
       
       const currentUser: User = await getCurrentUser(response.data.access_token);
-      const nombre = ((currentUser.first_name || '') + ' ' + (currentUser.last_name || '')).trim();
-      console.log(nombre);
+      const nombre = (currentUser.first_name || '' + ' ' + currentUser.last_name || '').trim();
       localStorage.setItem("nombre", nombre);
       document.cookie = `nombre=${encodeURIComponent(nombre)}; path=/; max-age=${60*60*24*7}` //7 days
 

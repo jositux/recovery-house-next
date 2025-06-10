@@ -184,7 +184,6 @@ export function BookingWidget({
         price: price,
         isPrivate: isPrivate,
         cleaning: cleaning,
-        
       }
 
 

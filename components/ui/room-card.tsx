@@ -27,7 +27,7 @@ export function RoomCard({
   city,
 }: RoomCardProps) {
   return (
-    <Card className="overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+    <Card className="overflow-hidden h-full rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
       <Link href={`/rooms/${id}`}>
         <div className="relative h-48 w-full">
           <Image

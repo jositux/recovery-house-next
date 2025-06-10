@@ -120,6 +120,7 @@ function RoomsPageContent() {
     const fetchData = async () => {
       setIsLoading(true)
       setError(null)
+      const today = new Date().toISOString().split("T")[0] // Formato YYYY-MM-DD
 
       try {
         const [propertiesResponse, bookingsResponse] = await Promise.all([
@@ -129,7 +130,7 @@ function RoomsPageContent() {
                 "*,mainImage.id, mainImage.isModerated,Rooms.*, Rooms.photos.directus_files_id.id, Rooms.photos.directus_files_id.isModerated, Rooms.extraTags.*, Rooms.servicesTags.*",
             },
           }),
-          axios.get("/webapi/items/Booking"),
+          axios.get(`/webapi/items/Booking?filter[checkOut][_gt]=${today}`),
         ])
 
         if (JSON.stringify(propertiesResponse.data.data) !== JSON.stringify(prevPropertiesRef.current)) {
@@ -224,9 +225,6 @@ function RoomsPageContent() {
         return false
       }
 
-      // Convertir disableDates a un array
-      const disabledDates = parseDisabledDates(room.disableDates)
-
       const matchesProcedures =
         procedures.length === 0 ||
         procedures.some((proc) => room.patology.some((pat) => pat.toLowerCase().includes(proc.toLowerCase())))
@@ -234,8 +232,8 @@ function RoomsPageContent() {
       const matchesLocation = location
         ? location
             .toLowerCase()
-            .replace(/,/g, "") // Elimina las comas
-            .split(" ") // Divide en palabras
+            .replace(/,/g, "")
+            .split(" ")
             .every(
               (word) =>
                 normalizeString(room.propertyLocation.city).includes(normalizeString(word)) ||
@@ -246,10 +244,17 @@ function RoomsPageContent() {
 
       const hasEnoughCapacity = room.capacity === undefined || room.capacity >= travelers
 
-      // Pasar el array de fechas deshabilitadas a la función isRoomAvailable
-      const isAvailable = isRoomAvailable(room.id, checkIn, checkOut, bookings, disabledDates)
-
-      return matchesProcedures && matchesLocation && hasEnoughCapacity && isAvailable
+      // SEPARAR COMPLETAMENTE LA LÓGICA PARA HABITACIONES PRIVADAS VS COMPARTIDAS
+      if (room.isPrivate === false) {
+        // HABITACIONES COMPARTIDAS: Solo verificar procedimientos, ubicación y capacidad
+        // IGNORAR COMPLETAMENTE fechas, reservas y fechas deshabilitadas
+        return matchesProcedures && matchesLocation && hasEnoughCapacity
+      } else {
+        // HABITACIONES PRIVADAS: Verificar TODO incluyendo disponibilidad
+        const disabledDates = parseDisabledDates(room.disableDates)
+        const isAvailable = isRoomAvailable(room.id, checkIn, checkOut, bookings, disabledDates)
+        return matchesProcedures && matchesLocation && hasEnoughCapacity && isAvailable
+      }
     })
   }, [allRooms, searchParams, bookings, isRoomAvailable, properties])
 
@@ -257,7 +262,6 @@ function RoomsPageContent() {
     const newVisibleRooms = filteredRooms.map((room) => room.id)
     setVisibleRooms((prevVisibleRooms) => {
       const roomsToRemove = prevVisibleRooms.filter((id) => !newVisibleRooms.includes(id))
-      //const roomsToAdd = newVisibleRooms.filter((id) => !prevVisibleRooms.includes(id))
 
       // Trigger fade-out for rooms that are being removed
       roomsToRemove.forEach((id) => {
@@ -311,7 +315,7 @@ function RoomsPageContent() {
 
         if (!markerMap.has(key)) {
           markerMap.set(key, {
-            id: property.id, // Cambiado de room.id a property.id
+            id: property.id,
             name: room.propertyName,
             lat,
             lng,
@@ -351,7 +355,6 @@ function RoomsPageContent() {
             isMapVisible ? "w-full lg:w-2/3 hidden lg:block" : "w-full pr-0 lg:pr-8"
           }`}
         >
-          {/* Add the results counter here */}
           <div className="mb-4 text-lg font-semibold text-[#162F40]">
             {filteredRooms.length} {filteredRooms.length === 1 ? "resultado" : "resultados"}
           </div>
@@ -361,7 +364,6 @@ function RoomsPageContent() {
             } gap-6 auto-rows-fr`}
           >
             {currentRooms.map((room, index) => {
-              // Preparar los parámetros comunes para ambos tipos de tarjetas
               const roomId =
                 searchParams?.get("checkIn") || searchParams?.get("checkOut") || searchParams?.get("travelers")
                   ? `${room.id}?${new URLSearchParams({
@@ -380,36 +382,35 @@ function RoomsPageContent() {
                 <div
                   key={`${room.id}-${refreshKey}`}
                   id={`room-${room.id}`}
-                  className={`${styles.roomCard} ${visibleRooms.includes(room.id) ? styles.fadeIn : ""}`}
+                  className={`${styles.roomCard} ${visibleRooms.includes(room.id) ? styles.fadeIn : ""} h-full flex flex-col`}
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
                   {room.isPrivate === false ? (
-  <RoomCardShared
-    id={roomId}
-    name={room.name}
-    description={room.description || ""}
-    singleBedPrice={room.singleBedPrice || 0}
-    doubleBedPrice={room.doubleBedPrice || 0}
-    image={imageSrc}
-    propertyName={room.propertyName || ""}
-    country={room.propertyLocation?.country || ""}
-    state={room.propertyLocation?.state || ""}
-    city={room.propertyLocation?.city || ""}
-  />
-) : (
-  <RoomCard
-    id={roomId}
-    name={room.name}
-    description={room.description || ""}
-    price={room.pricePerNight ? Number.parseFloat(room.pricePerNight) : 0}
-    image={imageSrc}
-    propertyName={room.propertyName || ""}
-    country={room.propertyLocation?.country || ""}
-    state={room.propertyLocation?.state || ""}
-    city={room.propertyLocation?.city || ""}
-  />
-)}
-
+                    <RoomCardShared
+                      id={roomId}
+                      name={room.name}
+                      description={room.description || ""}
+                      singleBedPrice={room.singleBedPrice || 0}
+                      doubleBedPrice={room.doubleBedPrice || 0}
+                      image={imageSrc}
+                      propertyName={room.propertyName || ""}
+                      country={room.propertyLocation?.country || ""}
+                      state={room.propertyLocation?.state || ""}
+                      city={room.propertyLocation?.city || ""}
+                    />
+                  ) : (
+                    <RoomCard
+                      id={roomId}
+                      name={room.name}
+                      description={room.description || ""}
+                      price={room.pricePerNight ? Number.parseFloat(room.pricePerNight) : 0}
+                      image={imageSrc}
+                      propertyName={room.propertyName || ""}
+                      country={room.propertyLocation?.country || ""}
+                      state={room.propertyLocation?.state || ""}
+                      city={room.propertyLocation?.city || ""}
+                    />
+                  )}
                 </div>
               )
             })}

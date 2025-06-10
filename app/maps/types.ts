@@ -20,7 +20,6 @@ export const formSchema = z.object({
   hostName: z.string().min(1, "El Hostname"),
   guestComments: z.string().min(1, "El comentario es Obligatorio"),
   patology: z.array(z.string()).min(1, "Selecciona al menos una patología."),
-
 });
 
 export type FormValues = z.infer<typeof formSchema>;
