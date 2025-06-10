@@ -1,157 +1,158 @@
-"use client";
+"use client"
 
-import { useState, useEffect, useCallback } from "react";
-import { useParams } from "next/navigation";
-import axios from "axios";
-import { Bed, Users } from "lucide-react";
-//import { Camera } from "lucide-react";
-import { BookingWidget } from "@/components/ui/booking-widget-private";
-import BookingWidgetShared from "@/components/ui/booking-widget-shared";
-import { ServiceProviderCard } from "@/components/ui/service-provider-card";
-import { GoogleMap } from "@/components/ui/google-map";
-import { Fraunces } from "next/font/google";
+import { useState, useEffect, useCallback } from "react"
+import { useParams } from "next/navigation"
+import axios from "axios"
+import { Bed, Users } from "lucide-react"
+//import { Camera } from 'lucide-react';
+import { BookingWidget } from "@/components/ui/booking-widget-private"
+import BookingWidgetShared from "@/components/ui/booking-widget-shared"
+import BookingWidgetShared2 from "@/components/ui/booking-widget-shared2"
+import { ServiceProviderCard } from "@/components/ui/service-provider-card"
+import { GoogleMap } from "@/components/ui/google-map"
+import { Fraunces } from "next/font/google"
 //import { PhotoGallery } from "@/components/ui/photo-gallery";
-import { getExtraTags } from "@/services/extraTagsService";
-import useTags from "@/hooks/useExtraTags";
-import { CollectionExtraTags } from "@/components/collectionExtraTagsRoom";
-import { MagicBackButton } from "@/components/ui/magic-back-button";
-import { PopupSwiperGallery } from "./popup-swiper-gallery";
-import { BedSingle, BedDouble } from "lucide-react";
+import { getExtraTags } from "@/services/extraTagsService"
+import useTags from "@/hooks/useExtraTags"
+import { CollectionExtraTags } from "@/components/collectionExtraTagsRoom"
+import { MagicBackButton } from "@/components/ui/magic-back-button"
+import { PopupSwiperGallery } from "./popup-swiper-gallery"
+import { BedSingle, BedDouble } from "lucide-react"
+import { Calendar } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
-import { fetchCurrentUser } from "@/services/BookingService";
-import { useRouter } from "next/navigation";
+import { fetchCurrentUser } from "@/services/BookingService"
+import { useRouter } from "next/navigation"
 
 //import { useCheckOwnership } from "@/hooks/isOwner";
 
-const fraunces = Fraunces({ subsets: ["latin"] });
+const fraunces = Fraunces({ subsets: ["latin"] })
 
 interface RoomTag {
-  id: string;
-  Room_id: string;
-  ExtraTags_id: string;
+  id: string
+  Room_id: string
+  ExtraTags_id: string
 }
 
 type ImageRoom = {
   directus_files_id: {
-    id: string;
-    isModerated: boolean;
-  };
-};
+    id: string
+    isModerated: boolean
+  }
+}
 
 interface Room {
-  id: string;
-  name: string;
-  description: string;
-  pricePerNight: string;
-  cleaningFee: string;
-  beds: number;
-  capacity: number; // Added capacity field
-  isPrivate: boolean;
+  id: string
+  name: string
+  description: string
+  pricePerNight: string
+  cleaningFee: string
+  beds: number
+  capacity: number // Added capacity field
+  isPrivate: boolean
   // Configuración de camas
-  singleBeds: number;
-  doubleBeds: number;
+  singleBeds: number
+  doubleBeds: number
   // Precios para habitación compartida
-  singleBedPrice: number;
-  singleBedCleaningPrice: number;
-  doubleBedPrice: number;
-  doubleBedCleaningPrice: number;
-  photos: ImageRoom[];
-  extraTags: RoomTag[];
-  servicesTags: { serviceTags_id: string }[];
-  descriptionService: string;
-  Property_id: string;
-  disableDates: string;
+  singleBedPrice: number
+  singleBedCleaningPrice: number
+  doubleBedPrice: number
+  doubleBedCleaningPrice: number
+  photos: ImageRoom[]
+  extraTags: RoomTag[]
+  servicesTags: { serviceTags_id: string }[]
+  descriptionService: string
+  Property_id: string
+  disableDates: string
 }
 
 interface Property {
-  id: string;
-  name: string;
-  country: string;
-  region: string;
-  state: string;
-  city: string;
+  id: string
+  name: string
+  country: string
+  region: string
+  state: string
+  city: string
   place: {
-    type: string;
-    coordinates: [number, number];
-  };
-  userId: string;
-  hostName: string;
-  guestComments: string;
+    type: string
+    coordinates: [number, number]
+  }
+  userId: string
+  hostName: string
+  guestComments: string
 }
 
 interface Booking {
-  id: string;
-  status: string;
-  checkIn: string;
-  checkOut: string;
-  patient: string;
-  guests: number;
-  price: number;
-  cleaning: number;
-  room: string;
-  singleBeds: number;
-  doubleBeds: number;
+  id: string
+  status: string
+  checkIn: string
+  checkOut: string
+  patient: string
+  guests: number
+  price: number
+  cleaning: number
+  room: string
+  singleBeds: number
+  doubleBeds: number
 }
 
 interface ServiceProvider {
-  id: string;
-  date_created: string;
-  taxIdEIN: string;
-  taxIdEINFile: string;
-  RNTFile: string;
-  taxIdApproved: boolean;
-  membership: string;
-  userId: string;
-  phone: string;
-  email: string;
-  name: string;
-  description: string;
-  country: string;
-  state: string;
-  city: string;
-  extraTags: number[];
-  serviceTags: number[];
+  id: string
+  date_created: string
+  taxIdEIN: string
+  taxIdEINFile: string
+  RNTFile: string
+  taxIdApproved: boolean
+  membership: string
+  userId: string
+  phone: string
+  email: string
+  name: string
+  description: string
+  country: string
+  state: string
+  city: string
+  extraTags: number[]
+  serviceTags: number[]
 }
 
 interface BookingPrivateData {
-  checkIn: string;
-  checkOut: string;
-  guests: number;
-  nights: number;
-  price: number;
-  cleaning: number;
-  totalPrice: number;
+  checkIn: string
+  checkOut: string
+  guests: number
+  nights: number
+  price: number
+  cleaning: number
+  totalPrice: number
 }
 
 interface BookingSharedData {
-  checkIn: string;
-  checkOut: string;
-  guests: number;
-  nights: number;
-  singleBeds: number;
-  doubleBeds: number;
-  singleBedPrice: number;
-  doubleBedPrice: number;
-  singleBedCleaningPrice: number;
-  doubleBedCleaningPrice: number;
-  totalPrice: number;
+  checkIn: string
+  checkOut: string
+  guests: number
+  nights: number
+  singleBeds: number
+  doubleBeds: number
+  singleBedPrice: number
+  doubleBedPrice: number
+  singleBedCleaningPrice: number
+  doubleBedCleaningPrice: number
+  totalPrice: number
 }
 
 export default function RoomPage() {
-  const { id } = useParams();
+  const { id } = useParams()
 
-  const [room, setRoom] = useState<Room | null>(null);
-  const [property, setProperty] = useState<Property | null>(null);
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [serviceProviders, setServiceProviders] = useState<ServiceProvider[]>(
-    []
-  );
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [room, setRoom] = useState<Room | null>(null)
+  const [property, setProperty] = useState<Property | null>(null)
+  const [bookings, setBookings] = useState<Booking[]>([])
+  const [serviceProviders, setServiceProviders] = useState<ServiceProvider[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   //const [photoIds, setPhotoIds] = useState<string[]>([]);
   //const [isGalleryOpen, setIsGalleryOpen] = useState(false);
 
-  const { extraTags } = useTags("extraTags", getExtraTags);
+  const { extraTags } = useTags("extraTags", getExtraTags)
 
   /*const [bookingPrivateData, setBookingPrivateData] =
     useState<BookingPrivateData | null>(null);
@@ -159,40 +160,56 @@ export default function RoomPage() {
   const [bookingSharedData, setBookingSharedData] =
     useState<BookingSharedData | null>(null);*/
 
-  const router = useRouter();
+  const router = useRouter()
 
   interface User {
-    id: string;
-    first_name: string;
-    last_name: string;
+    id: string
+    first_name: string
+    last_name: string
   }
 
-  const [currentUser, setCurrentUser] = useState<User| null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null)
+
+  // Filter bookings to only include those with checkout dates in the future
+  const filterCurrentBookings = (bookings: Booking[]) => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0) // Set to beginning of day for accurate comparison
+
+    return bookings.filter((booking) => {
+      const checkOutDate = new Date(booking.checkOut)
+      return checkOutDate >= today
+    })
+  }
+
+  const [filteredBookings, setFilteredBookings] = useState<Booking[]>([])
+
+  useEffect(() => {
+    setFilteredBookings(filterCurrentBookings(bookings))
+  }, [bookings])
 
   useEffect(() => {
     const fetchUser = async () => {
-      const accessToken = localStorage.getItem("access_token");
+      const accessToken = localStorage.getItem("access_token")
       if (!accessToken) {
-        return;
+        return
       }
 
-      const user = await fetchCurrentUser(accessToken);
+      const user = await fetchCurrentUser(accessToken)
       console.log(user)
-      setCurrentUser(user);
-    };
+      setCurrentUser(user)
+    }
 
-    fetchUser();
-  }, []); // solo se ejecuta una vez al montar el componente
+    fetchUser()
+  }, []) // solo se ejecuta una vez al montar el componente
 
   // Handle reservation from the BookingWidgetPrivate
   const handleReservation = async (data: BookingPrivateData) => {
-   // setBookingPrivateData(data);
-   
+    // setBookingPrivateData(data);
 
     if (!currentUser) {
-      console.error("User not loaded");
-      router.push("/login");
-      return;
+      console.error("User not loaded")
+      router.push("/login")
+      return
     }
 
     const formattedPrivateBooking = {
@@ -205,38 +222,32 @@ export default function RoomPage() {
       ownerName: property?.name,
       propertyName: property?.name,
       description: room?.description,
-    };
+    }
 
-    localStorage.setItem(
-      "bookingPrivateData",
-      JSON.stringify(formattedPrivateBooking)
-    );
+    localStorage.setItem("bookingPrivateData", JSON.stringify(formattedPrivateBooking))
 
-    localStorage.removeItem('bookingSharedData');
+    localStorage.removeItem("bookingSharedData")
 
     const formattedBooking = {
       isPrivate: room?.isPrivate,
       name: room?.name,
       description: room?.description,
-      unit_amount: data.totalPrice
-    };
+      unit_amount: data.totalPrice,
+    }
 
-    localStorage.setItem(
-      "booking",
-      JSON.stringify(formattedBooking)
-    );
+    localStorage.setItem("booking", JSON.stringify(formattedBooking))
 
-    router.push("/checkout");
-  };
+    router.push("/checkout")
+  }
 
   // Handle reservation from the BookingWidgetPrivate
   const handleReservationShared = async (data: BookingSharedData) => {
-   // setBookingSharedData(data);
+    // setBookingSharedData(data);
 
     if (!currentUser) {
-      console.error("User not loaded");
-      router.push("/login");
-      return;
+      console.error("User not loaded")
+      router.push("/login")
+      return
     }
 
     const formattedSharedBooking = {
@@ -249,35 +260,28 @@ export default function RoomPage() {
       ownerName: property?.name,
       propertyName: property?.name,
       description: room?.description,
-    };
+    }
 
-    localStorage.setItem(
-      "bookingSharedData",
-      JSON.stringify(formattedSharedBooking)
-    );
+    localStorage.setItem("bookingSharedData", JSON.stringify(formattedSharedBooking))
 
-    localStorage.removeItem('bookingPrivateData');
+    localStorage.removeItem("bookingPrivateData")
 
     const formattedBooking = {
       isPrivate: room?.isPrivate,
       name: room?.name,
       description: room?.description,
-      unit_amount: data.totalPrice
-    };
+      unit_amount: data.totalPrice,
+    }
 
-    localStorage.setItem(
-      "booking",
-      JSON.stringify(formattedBooking)
-    );
+    localStorage.setItem("booking", JSON.stringify(formattedBooking))
 
-    router.push("/checkout");
-
-  };
+    router.push("/checkout")
+  }
 
   useEffect(() => {
     const fetchRoomData = async () => {
-      setIsLoading(true);
-      setError(null);
+      setIsLoading(true)
+      setError(null)
       try {
         // Primero obtenemos los datos de la habitación
         const roomResponse = await axios.get("/webapi/items/Room", {
@@ -289,75 +293,75 @@ export default function RoomPage() {
           headers: {
             "Access-Control-Allow-Origin": "*",
           },
-        });
+        })
 
-        const roomData = roomResponse.data.data?.[0];
+        const roomData = roomResponse.data.data?.[0]
 
-        
         if (!roomData) {
-          setError("Habitación no encontrada");
-          return;
+          setError("Habitación no encontrada")
+          return
         }
+
+        const today = new Date().toISOString().split("T")[0];
+
 
         // Usamos el Property_id de la habitación para obtener la propiedad específica
-        const [propertyResponse, bookingsResponse, providerResponse] =
-          await Promise.all([
-            axios.get("/webapi/items/Property", {
-              params: {
-                fields: "*",
-                "filter[id][_eq]": roomData.propertyId,
-              },
-              headers: {
-                "Access-Control-Allow-Origin": "*",
-              },
-            }),
-            axios.get(`/webapi/items/Booking`, {
-              params: {
-                "filter[room][_eq]": id,
-              },
-              headers: {
-                "Access-Control-Allow-Origin": "*",
-              },
-            }),
-            axios.get("/webapi/items/Provider", {
-              headers: {
-                "Access-Control-Allow-Origin": "*",
-              },
-            }),
-          ]);
+        const [propertyResponse, bookingsResponse, providerResponse] = await Promise.all([
+          axios.get("/webapi/items/Property", {
+            params: {
+              fields: "*",
+              "filter[id][_eq]": roomData.propertyId,
+            },
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+            },
+          }),
+          axios.get(`/webapi/items/Booking`, {
+            params: {
+              "filter[room][_eq]": id,
+              "filter[checkOut][_gt]": today,
+            },
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+            },
+          }),
+          axios.get("/webapi/items/Provider", {
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+            },
+          }),
+        ])
 
-        const propertyData = propertyResponse.data.data?.[0];
+        const propertyData = propertyResponse.data.data?.[0]
         if (!propertyData) {
-          setError("Propiedad no encontrada");
-          return;
+          setError("Propiedad no encontrada")
+          return
         }
 
-        setRoom(roomData);
-        setProperty(propertyData);
-        setServiceProviders(providerResponse.data.data);
-        setBookings(bookingsResponse.data.data);
+        setRoom(roomData)
+        setProperty(propertyData)
+        setServiceProviders(providerResponse.data.data)
+        setBookings(bookingsResponse.data.data)
       } catch (error) {
-        console.error("Error fetching room data:", error);
-        setError(
-          "Error al cargar los datos de la habitación. Por favor, intenta de nuevo más tarde."
-        );
+        console.error("Error fetching room data:", error)
+        setError("Error al cargar los datos de la habitación. Por favor, intenta de nuevo más tarde.")
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
+    }
 
     if (id) {
-      fetchRoomData();
+      fetchRoomData()
     }
-  }, [id]);
+  }, [id])
 
   //const { isOwner } = useCheckOwnership(String(property?.id));
 
   const getImageSrc = useCallback((image: ImageRoom) => {
     return image.directus_files_id.isModerated
       ? "/assets/empty.jpg"
-      : `/webapi/assets/${image.directus_files_id.id}?key=full`;
-  }, []);
+      : `/webapi/assets/${image.directus_files_id.id}?key=full`
+  }, [])
 
   /*useEffect(() => {
     if (room && room.photos) {
@@ -365,9 +369,7 @@ export default function RoomPage() {
     }
   }, [room, getImageSrc]);*/
 
-  const [imagesSwiper, setImagesSwiper] = useState<
-    { src: string; alt: string }[]
-  >([]);
+  const [imagesSwiper, setImagesSwiper] = useState<{ src: string; alt: string }[]>([])
 
   // Modificar el useEffect para transformar las fotos al formato requerido
   useEffect(() => {
@@ -376,57 +378,50 @@ export default function RoomPage() {
       const swiperImages = room.photos.map((photo) => ({
         src: getImageSrc(photo),
         alt: "Imagen de Habitación",
-      }));
+      }))
 
-      setImagesSwiper(swiperImages);
+      setImagesSwiper(swiperImages)
 
       // Mantener también el array original de URLs si lo necesitas para otros componentes
       //setPhotoIds(room.photos.map((photo) => getImageSrc(photo)));
     }
-  }, [room, getImageSrc]);
+  }, [room, getImageSrc])
 
   const decodeHtmlAndRemoveTags = (html: string): string => {
-    const textWithoutTags = html.replace(/<\/?[^>]+(>|$)/g, "");
-    const txt = document.createElement("textarea");
-    txt.innerHTML = textWithoutTags;
-    return txt.value;
-  };
-
+    const textWithoutTags = html.replace(/<\/?[^>]+(>|$)/g, "")
+    const txt = document.createElement("textarea")
+    txt.innerHTML = textWithoutTags
+    return txt.value
+  }
 
   const getAvailableBeds = (
     room: Room,
-    bookingsForRoom: Booking[]
+    bookingsForRoom: Booking[],
   ): { availableSingleBeds: number; availableDoubleBeds: number } => {
-    const reservedSingleBeds = bookingsForRoom.reduce((sum, b) => sum + (b.singleBeds || 0), 0);
-    const reservedDoubleBeds = bookingsForRoom.reduce((sum, b) => sum + (b.doubleBeds || 0), 0);
-  
+    const reservedSingleBeds = bookingsForRoom.reduce((sum, b) => sum + (b.singleBeds || 0), 0)
+    const reservedDoubleBeds = bookingsForRoom.reduce((sum, b) => sum + (b.doubleBeds || 0), 0)
+
     return {
       availableSingleBeds: room.singleBeds - reservedSingleBeds,
       availableDoubleBeds: room.doubleBeds - reservedDoubleBeds,
-    };
-  };
+    }
+  }
 
   const [availableBeds, setAvailableBeds] = useState<{ availableSingleBeds: number; availableDoubleBeds: number }>({
     availableSingleBeds: 0,
-    availableDoubleBeds: 0
-  });
+    availableDoubleBeds: 0,
+  })
 
   useEffect(() => {
     if (room) {
-      const bookingsForRoom = bookings.filter(b => b.room === room.id);
-      const { availableSingleBeds, availableDoubleBeds } = getAvailableBeds(room, bookingsForRoom);
-      setAvailableBeds({ availableSingleBeds, availableDoubleBeds });
+      const bookingsForRoom = filteredBookings.filter((b) => b.room === room.id)
+      const { availableSingleBeds, availableDoubleBeds } = getAvailableBeds(room, bookingsForRoom)
+      setAvailableBeds({ availableSingleBeds, availableDoubleBeds })
     }
-  }, [room, bookings]);  // Recalcular cuando room o bookings cambien
-
-
+  }, [room, filteredBookings]) // Recalcular cuando room o bookings cambien
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        Cargando...
-      </div>
-    );
+    return <div className="flex justify-center items-center h-screen">Cargando...</div>
   }
 
   if (error || !room || !property) {
@@ -434,7 +429,7 @@ export default function RoomPage() {
       <div className="flex justify-center items-center h-screen text-red-500">
         {error || "Habitación no encontrada"}
       </div>
-    );
+    )
   }
 
   return (
@@ -477,11 +472,7 @@ export default function RoomPage() {
       {imagesSwiper.length > 1 && (
         <div className="container relative mx-auto px-4 lg:px-20">
           <div className="absolute left-20 bottom-8">
-            <PopupSwiperGallery
-              images={imagesSwiper}
-              buttonText="Ver todas las fotos"
-              autoplay={true}
-            />
+            <PopupSwiperGallery images={imagesSwiper} buttonText="Ver todas las fotos" autoplay={true} />
           </div>
         </div>
       )}
@@ -493,18 +484,13 @@ export default function RoomPage() {
           <div className="lg:col-span-2">
             {/* Title and Stats */}
             <div className="mb-6">
-              <h1
-                className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}
-              >
-                {room.name}
-              </h1>
+              <h1 className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}>{room.name}</h1>
               <p className="text-xl text-[#162F40] mb-4">{property.name}</p>
               <div className="flex items-center space-x-4 text-[#162F40]">
                 <div className="flex items-center">
                   <Bed className="w-5 h-5 mr-2" />
                   <span>
-                    {room.beds}{" "}
-                    {room.beds === 1 ? "cama en total" : "camas en total"}
+                    {room.beds} {room.beds === 1 ? "cama en total" : "camas en total"}
                   </span>
                 </div>
                 <div className="flex items-center">
@@ -517,38 +503,51 @@ export default function RoomPage() {
               </div>
 
               {room.isPrivate === false && (
-  <div className="flex items-center mt-4 space-x-4 text-[#162F40]">
-    {room.singleBeds > 0 && (
-      <div className="flex items-center">
-        <BedSingle className="w-5 h-5 mr-2" />
-        <span>
-          {room.singleBeds} cama{room.singleBeds > 1 ? "s" : ""} simple{room.singleBeds > 1 ? "s" : ""}{" "}
-          ({availableBeds?.availableSingleBeds ?? 0} disponible
-          {availableBeds?.availableSingleBeds === 1 ? "" : "s"})
-        </span>
-      </div>
-    )}
+                <div className="flex items-center mt-4 space-x-4 text-[#162F40]">
+                  {room.singleBeds > 0 && (
+                    <div className="flex items-center">
+                      <BedSingle className="w-5 h-5 mr-2" />
+                      <span>
+                        {room.singleBeds} cama{room.singleBeds > 1 ? "s" : ""} simple{room.singleBeds > 1 ? "s" : ""} 
+            
+                      </span>
+                    </div>
+                  )}
 
-    {room.doubleBeds > 0 && (
-      <div className="flex items-center">
-        <BedDouble className="w-5 h-5 mr-2" />
-        <span>
-          {room.doubleBeds} cama{room.doubleBeds > 1 ? "s" : ""} doble{room.doubleBeds > 1 ? "s" : ""}{" "}
-          ({availableBeds?.availableDoubleBeds ?? 0} disponible
-          {availableBeds?.availableDoubleBeds === 1 ? "" : "s"})
-        </span>
-      </div>
-    )}
-  </div>
-)}
-
+                  {room.doubleBeds > 0 && (
+                    <div className="flex items-center">
+                      <BedDouble className="w-5 h-5 mr-2" />
+                      <span>
+                        {room.doubleBeds} cama{room.doubleBeds > 1 ? "s" : ""} doble{room.doubleBeds > 1 ? "s" : ""} 
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
+            {room.isPrivate === false && (
+            <Alert className="border-blue-200 bg-white/50 backdrop-blur-sm mb-6">
+     
+      <AlertDescription className="text-gray-700 font-medium">
+        <div className="flex items-start gap-3">
+          <div className="flex-1">
+            <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-blue-600" />
+              NOTA: 
+            </h3>
+            <p className="text-sm leading-relaxed">
+              La disponibilidad de habitaciones depende de las fechas que seleccione. Una vez que elija sus fechas de
+              llegada y salida, podrá seleccionar la cantidad de camas.
+            </p>
+          </div>
+        </div>
+      </AlertDescription>
+    </Alert>
+      )}
 
             {/* Description */}
             <div className="mb-8">
-              <p className="text-[#162F40]">
-                {decodeHtmlAndRemoveTags(room.description)}
-              </p>
+              <p className="text-[#162F40]">{decodeHtmlAndRemoveTags(room.description)}</p>
             </div>
 
             {/* Booking Widget for mobile */}
@@ -557,25 +556,24 @@ export default function RoomPage() {
               {/* Modified margin */}
               {room.isPrivate === false ? (
                 // Si es exactamente false, muestro la versión compartida
-                <BookingWidgetShared
-                  singleBedPrice={room.singleBedPrice}
-                  singleBedCleaningPrice={room.singleBedCleaningPrice}
-                  doubleBedPrice={room.doubleBedPrice}
-                  doubleBedCleaningPrice={room.doubleBedCleaningPrice}
-                  bookings={bookings}
-                  availableSingleBeds={availableBeds.availableSingleBeds}
-                  availableDoubleBeds={availableBeds.availableDoubleBeds}
-                  disableDates={room.disableDates}
-                  onReservation={handleReservationShared}
-                />
+                <BookingWidgetShared2
+                singleBedPrice={room.singleBedPrice}
+                singleBedCleaningPrice={room.singleBedCleaningPrice}
+                doubleBedPrice={room.doubleBedPrice}
+                doubleBedCleaningPrice={room.doubleBedCleaningPrice}
+                bookings={filteredBookings}
+                availableSingleBeds={room.singleBeds}
+                availableDoubleBeds={room.doubleBeds}
+                onReservation={handleReservationShared}
+              />
               ) : (
                 // En cualquier otro caso (true, null, undefined, etc.), muestro la versión privada
                 <BookingWidget
-                  price={parseInt(room.pricePerNight, 10)}
-                  cleaning={parseInt(room.cleaningFee, 10)}
+                  price={Number.parseInt(room.pricePerNight, 10)}
+                  cleaning={Number.parseInt(room.cleaningFee, 10)}
                   maxGuests={room.capacity}
                   disableDates={room.disableDates}
-                  bookings={bookings}
+                  bookings={filteredBookings}
                   onReservation={handleReservation}
                 />
               )}
@@ -583,28 +581,18 @@ export default function RoomPage() {
 
             {/* Amenities */}
             <div className="mb-8">
-              <h2
-                className={`${fraunces.className} text-2xl font-normal text-[#162F40] mb-4`}
-              >
+              <h2 className={`${fraunces.className} text-2xl font-normal text-[#162F40] mb-4`}>
                 Amenidades / Servicios
               </h2>
 
-              <CollectionExtraTags
-                extraTags={extraTags}
-                enable="property"
-                roomTags={room.extraTags}
-              />
+              <CollectionExtraTags extraTags={extraTags} enable="property" roomTags={room.extraTags} />
             </div>
 
             {/* Description */}
             {room.descriptionService && (
               <div className="mb-8">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Más acerca de los servicios:
-                </h3>
-                <p className="text-[#162F40]">
-                  {decodeHtmlAndRemoveTags(room.descriptionService)}
-                </p>
+                <h3 className="text-lg font-semibold text-gray-900">Más acerca de los servicios:</h3>
+                <p className="text-[#162F40]">{decodeHtmlAndRemoveTags(room.descriptionService)}</p>
               </div>
             )}
 
@@ -616,9 +604,7 @@ export default function RoomPage() {
                     {property.hostName.charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      Anfitrión:
-                    </h3>
+                    <h3 className="text-lg font-semibold text-gray-900">Anfitrión:</h3>
                     <p className="text-gray-700">{property.hostName}</p>
                   </div>
                 </div>
@@ -628,46 +614,33 @@ export default function RoomPage() {
             {/* Sección de Comentarios */}
             {property.guestComments && (
               <div className="mb-8">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Comentarios para el huésped:
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-900">Comentarios para el huésped:</h3>
                 <p className="text-gray-700">{property.guestComments}</p>
               </div>
             )}
 
             {/* Map */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#162F40] mb-4">
-                El vecindario
-              </h2>
+              <h2 className="text-2xl font-bold text-[#162F40] mb-4">El vecindario</h2>
               <div className="h-[300px] w-full relative rounded-lg overflow-hidden">
-                <GoogleMap
-                  lat={property.place.coordinates[0]}
-                  lng={property.place.coordinates[1]}
-                />
+                <GoogleMap lat={property.place.coordinates[0]} lng={property.place.coordinates[1]} />
               </div>
             </div>
 
             {/* Service Providers */}
             <div>
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#162F40]">
-                  Proveedores de servicios
-                </h2>
+                <h2 className="text-2xl font-bold text-[#162F40]">Proveedores de servicios</h2>
                 <button className="hidden text-[#39759E]">Filtrar</button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {(() => {
-                  const stateProviders = serviceProviders.filter(
-                    (provider) => provider.state === property.state
-                  );
+                  const stateProviders = serviceProviders.filter((provider) => provider.state === property.state)
 
                   const providersToShow =
                     stateProviders.length > 0
                       ? stateProviders
-                      : serviceProviders.filter(
-                          (provider) => provider.country === property.country
-                        );
+                      : serviceProviders.filter((provider) => provider.country === property.country)
 
                   return providersToShow.map((provider) => (
                     <ServiceProviderCard
@@ -679,7 +652,7 @@ export default function RoomPage() {
                       phone={provider.phone}
                       email={provider.email}
                     />
-                  ));
+                  ))
                 })()}
               </div>
             </div>
@@ -693,7 +666,7 @@ export default function RoomPage() {
                   singleBedCleaningPrice={room.singleBedCleaningPrice}
                   doubleBedPrice={room.doubleBedPrice}
                   doubleBedCleaningPrice={room.doubleBedCleaningPrice}
-                  bookings={bookings}
+                  bookings={filteredBookings}
                   availableSingleBeds={availableBeds.availableSingleBeds}
                   availableDoubleBeds={availableBeds.availableDoubleBeds}
                   disableDates={room.disableDates}
@@ -702,11 +675,11 @@ export default function RoomPage() {
               ) : (
                 // En cualquier otro caso (true, null, undefined, etc.), muestro la versión privada
                 <BookingWidget
-                  price={parseInt(room.pricePerNight, 10)}
-                  cleaning={parseInt(room.cleaningFee, 10)}
+                  price={Number.parseInt(room.pricePerNight, 10)}
+                  cleaning={Number.parseInt(room.cleaningFee, 10)}
                   maxGuests={room.capacity}
                   disableDates={room.disableDates}
-                  bookings={bookings}
+                  bookings={filteredBookings}
                   onReservation={handleReservation}
                 />
               )}
@@ -718,25 +691,24 @@ export default function RoomPage() {
             <div className="sticky top-4">
               {room.isPrivate === false ? (
                 // Si es exactamente false, muestro la versión compartida
-                <BookingWidgetShared
-                singleBedPrice={room.singleBedPrice}
-                singleBedCleaningPrice={room.singleBedCleaningPrice}
-                doubleBedPrice={room.doubleBedPrice}
-                doubleBedCleaningPrice={room.doubleBedCleaningPrice}
-                bookings={bookings}
-                availableSingleBeds={availableBeds.availableSingleBeds}
-                availableDoubleBeds={availableBeds.availableDoubleBeds}
-                disableDates={room.disableDates}
-                onReservation={handleReservationShared}
-              />
+                <BookingWidgetShared2
+                  singleBedPrice={room.singleBedPrice}
+                  singleBedCleaningPrice={room.singleBedCleaningPrice}
+                  doubleBedPrice={room.doubleBedPrice}
+                  doubleBedCleaningPrice={room.doubleBedCleaningPrice}
+                  bookings={filteredBookings}
+                  availableSingleBeds={room.singleBeds}
+                  availableDoubleBeds={room.doubleBeds}
+                  onReservation={handleReservationShared}
+                />
               ) : (
                 // En cualquier otro caso (true, null, undefined, etc.), muestro la versión privada
                 <BookingWidget
-                  price={parseInt(room.pricePerNight, 10)}
-                  cleaning={parseInt(room.cleaningFee, 10)}
+                  price={Number.parseInt(room.pricePerNight, 10)}
+                  cleaning={Number.parseInt(room.cleaningFee, 10)}
                   maxGuests={room.capacity}
                   disableDates={room.disableDates}
-                  bookings={bookings}
+                  bookings={filteredBookings}
                   onReservation={handleReservation}
                 />
               )}
@@ -745,5 +717,5 @@ export default function RoomPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }
