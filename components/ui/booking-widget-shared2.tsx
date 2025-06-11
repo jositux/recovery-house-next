@@ -296,14 +296,14 @@ export default function BookingCompartidaAirbnb({
           <span className="text-sm mt-0 text-amber-600 mb-2">Selecciona las fechas de llegada y salida</span>
         )}
 
-{checkIn && checkOut && (
-  <span className="text-sm text-blue-600 mb-2">
-    Disponibles: {getAvailableBedsInRange.singleBeds} simple{getAvailableBedsInRange.singleBeds !== 1 ? 's' : ''},{" "}
-    {getAvailableBedsInRange.doubleBeds} doble{getAvailableBedsInRange.doubleBeds !== 1 ? 's' : ''}
-  </span>
-)}
-
-
+        {checkIn && checkOut && (
+          <span className="text-sm text-blue-600 mb-2">
+            Disponibles: {getAvailableBedsInRange.singleBeds - singleBeds} simple
+            {getAvailableBedsInRange.singleBeds - singleBeds !== 1 ? "s" : ""},{" "}
+            {getAvailableBedsInRange.doubleBeds - doubleBeds} doble
+            {getAvailableBedsInRange.doubleBeds - doubleBeds !== 1 ? "s" : ""}
+          </span>
+        )}
 
         {/* Contenedor único para ambos tipos de camas */}
         <div className={`border rounded-lg p-4 ${!checkIn || !checkOut ? "bg-gray-100 opacity-75" : "bg-gray-50"}`}>
