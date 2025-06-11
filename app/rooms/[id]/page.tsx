@@ -661,17 +661,16 @@ export default function RoomPage() {
             <div className="mt-8 hidden lg:hidden">
               {room.isPrivate === false ? (
                 // Si es exactamente false, muestro la versión compartida
-                <BookingWidgetShared
-                  singleBedPrice={room.singleBedPrice}
-                  singleBedCleaningPrice={room.singleBedCleaningPrice}
-                  doubleBedPrice={room.doubleBedPrice}
-                  doubleBedCleaningPrice={room.doubleBedCleaningPrice}
-                  bookings={filteredBookings}
-                  availableSingleBeds={availableBeds.availableSingleBeds}
-                  availableDoubleBeds={availableBeds.availableDoubleBeds}
-                  disableDates={room.disableDates}
-                  onReservation={handleReservationShared}
-                />
+                <BookingWidgetShared2
+                singleBedPrice={room.singleBedPrice}
+                singleBedCleaningPrice={room.singleBedCleaningPrice}
+                doubleBedPrice={room.doubleBedPrice}
+                doubleBedCleaningPrice={room.doubleBedCleaningPrice}
+                bookings={filteredBookings}
+                availableSingleBeds={room.singleBeds}
+                availableDoubleBeds={room.doubleBeds}
+                onReservation={handleReservationShared}
+              />
               ) : (
                 // En cualquier otro caso (true, null, undefined, etc.), muestro la versión privada
                 <BookingWidget
