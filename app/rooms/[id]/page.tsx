@@ -6,7 +6,7 @@ import axios from "axios"
 import { Bed, Users } from "lucide-react"
 //import { Camera } from 'lucide-react';
 import { BookingWidget } from "@/components/ui/booking-widget-private"
-import BookingWidgetShared from "@/components/ui/booking-widget-shared"
+//import BookingWidgetShared from "@/components/ui/booking-widget-shared"
 import BookingWidgetShared2 from "@/components/ui/booking-widget-shared2"
 import { ServiceProviderCard } from "@/components/ui/service-provider-card"
 import { GoogleMap } from "@/components/ui/google-map"
@@ -411,6 +411,8 @@ export default function RoomPage() {
     availableSingleBeds: 0,
     availableDoubleBeds: 0,
   })
+
+  console.log(availableBeds)
 
   useEffect(() => {
     if (room) {
