@@ -292,7 +292,6 @@ export default function BookingCompartidaAirbnb({
 
       {/* Selección de camas */}
       <div className="space-y-4 mt-6">
-        <h3 className="font-medium text-[#162F40]">Selecciona tus camas para estas fechas:</h3>
         {(!checkIn || !checkOut) && (
           <span className="text-sm mt-0 text-amber-600 mb-2">Selecciona las fechas de llegada y salida</span>
         )}

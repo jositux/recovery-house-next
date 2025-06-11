@@ -31461,7 +31461,7 @@ export const countriesData: { [key: string]: CountryData } = {
       "DC": {
         "name": "Bogotá D.C.",
         "cities": [
-          "Bogotá D.C."
+          "Bogotá"
         ]
       },
       "BOL": {
