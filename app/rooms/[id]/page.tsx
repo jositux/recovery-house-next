@@ -392,12 +392,20 @@ export default function RoomPage() {
     }
   }, [room, getImageSrc]);
 
-  const decodeHtmlAndRemoveTags = (html: string): string => {
-    const textWithoutTags = html.replace(/<\/?[^>]+(>|$)/g, "");
-    const txt = document.createElement("textarea");
-    txt.innerHTML = textWithoutTags;
-    return txt.value;
-  };
+  type HtmlContentProps = {
+    html?: string | null
+  }
+  
+  const HtmlContent = ({ html }: HtmlContentProps) => {
+    if (!html || html.trim() === "") return null
+  
+    return (
+      <div
+        className="prose"
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+    )
+  }
 
   const getAvailableBeds = (
     room: Room,
@@ -580,7 +588,8 @@ export default function RoomPage() {
             {/* Description */}
             <div className="mb-8">
               <p className="text-[#162F40]">
-                {decodeHtmlAndRemoveTags(room.description)}
+              <HtmlContent html={room.description} />
+               
               </p>
             </div>
 
@@ -632,7 +641,7 @@ export default function RoomPage() {
                   Más acerca de los servicios:
                 </h3>
                 <p className="text-[#162F40]">
-                  {decodeHtmlAndRemoveTags(room.descriptionService)}
+                  {room.descriptionService}
                 </p>
               </div>
             )}

@@ -65,7 +65,7 @@ export default function RoomPage() {
   return (
     <div className="min-h-screen bg-[#F8F8F7]">
       <div className="container mx-auto max-w-2xl py-10 px-4">
-        <h1 className="text-2xl font-bold mb-6">Agregar Habitación</h1>
+        <h1 className="text-2xl font-bold mb-6">Agregar Habitación / Cama</h1>
         <div className="grid gap-6 md:grid-cols-1">
           <div>
             <RoomForm onSubmit={handleFormSubmit} initialValues={initialValues} />
