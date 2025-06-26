@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { useParams, useSearchParams } from "next/navigation"
 import axios from "axios"
 import Image from "next/image"
-import { Bed, User, Pencil, Plus, Loader2, MapPin, Trash, CheckCircle, AlertCircle, Calendar } from "lucide-react"
+import { Bed, BedSingle, BedDouble, User, Pencil, Plus, Loader2, MapPin, Trash, CheckCircle, AlertCircle, Calendar } from "lucide-react"
 import { GoogleMap } from "@/components/ui/google-map"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -48,10 +48,16 @@ interface Room {
   isPrivate: boolean
   singleBeds: number
   doubleBeds: number
-  singleBedPrice: string
-  singleBedCleaningPrice: string
-  doubleBedPrice: string
-  doubleBedCleaningPrice: string
+ // Precios para habitación o cama
+ privateRoomPrice: number,
+ privateRoomCleaning: number,
+
+ // Pricing for SHARED room - 2 campos separados
+ sharedRoomPrice: number,
+ sharedRoomCleaning: number,
+
+ bedType: string,
+ bedName: string,
   descriptionService: string
   disabledDates: string
 }
@@ -457,7 +463,7 @@ export default function RoomPage() {
 
         <div className="mb-12">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold">Habitaciones disponibles</h2>
+            <h2 className="text-2xl font-semibold">Alojamientos disponibles</h2>
             {isOwner && (
               <Button asChild>
                 <Link
@@ -465,7 +471,7 @@ export default function RoomPage() {
                   className="flex items-center gap-2 bg-primary text-white hover:bg-primary-dark"
                 >
                   <Plus className="h-5 w-5" />
-                  Agregar Habitación
+                  Agregar Habitación o Cama
                 </Link>
               </Button>
             )}
@@ -528,8 +534,13 @@ export default function RoomPage() {
                   </div>
 
                   <div className="p-6">
-                    <h3 className="text-xl font-semibold mb-2">{room.name}</h3>
-                    <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-xl font-semibold mb-2">{room.isPrivate === false && `${room.bedName} -`} {room.name}</h3>
+                    
+
+                    {room.isPrivate === true || room.isPrivate === null ? (
+                      <>
+
+<div className="flex justify-between items-center mb-4">
                       <div className="flex items-center text-gray-600">
                         <Bed className="w-5 h-5 mr-2" />
                         <span>{room.beds} camas</span>
@@ -540,30 +551,42 @@ export default function RoomPage() {
                       </div>
                     </div>
 
-                    {room.isPrivate === true || room.isPrivate === null ? (
-                      <>
                         <div className="flex justify-between items-center mb-4">
                           <p className="text-2xl font-bold text-primary">
-                            ${room.pricePerNight}{" "}
+                            ${room.privateRoomPrice}{" "}
                             <span className="text-sm font-normal text-gray-600"> USD / noche</span>
                           </p>
                         </div>
-                        <p className="text-sm text-gray-600 mb-4">Tarifa de limpieza: ${room.cleaningFee} USD</p>
+                        <p className="text-sm text-gray-600 mb-4">Tarifa de limpieza: ${room.privateRoomCleaning} USD</p>
                       </>
                     ) : (
                       <>
-                        <div className="flex flex-col gap-2 mb-4">
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Camas simples: {room.singleBeds} <span className="font-semibold">(${room.singleBedPrice} USD)</span></span>
-      
-                          </div>
-                          <div className="flex justify-between">
-                          <span className="text-gray-600">Camas dobles: {room.doubleBeds} <span className="font-semibold">(${room.doubleBedPrice} USD)</span></span>
-      
-                          </div>
-                          
-                        </div>
-                      </>
+                      <div className="flex justify-between items-center mb-4">
+                      <div className="flex items-center text-gray-600">
+                      
+                        {room.bedType === 'double' ? (
+    <>
+      <BedDouble size={16} color="#333" />&nbsp; 
+      <span>1 cama doble</span>
+    </>
+  ) : (
+    <>
+      <BedSingle size={16} color="#333" />
+      <span> 1 cama simple</span>
+    </>
+  )}
+                      </div>
+                     
+                    </div>
+
+                      <div className="flex justify-between items-center mb-4">
+                        <p className="text-2xl font-bold text-primary">
+                          ${room.sharedRoomPrice}{" "}
+                          <span className="text-sm font-normal text-gray-600"> USD / noche</span>
+                        </p>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-4">Tarifa de limpieza: ${room.sharedRoomCleaning} USD</p>
+                    </>
                     )}
 
                     {isOwner && (
@@ -595,8 +618,7 @@ export default function RoomPage() {
               </div>
               <h3 className="text-3xl font-semibold mb-4 text-gray-800">¡Desbloquea el potencial de tu propiedad!</h3>
               <p className="text-lg text-gray-600 mb-6 max-w-2xl mx-auto">
-                Agregar habitaciones es el primer paso para convertir tu espacio en una fuente de ingresos. Muestra tus
-                espacios únicos y comienza a recibir reservas hoy mismo.
+              ¡Convertí tu espacio en ingresos! Ya sea una habitación privada o una cama en un cuarto compartido, mostrala al mundo y empezá a recibir reservas hoy mismo.
               </p>
               {isOwner && (
                 <div className="flex flex-col items-center space-y-4">
@@ -606,7 +628,7 @@ export default function RoomPage() {
                   >
                     <Link href={`/propiedades/${property.id}/room/create`}>
                       <Plus className="h-6 w-6 mr-2 inline-block" />
-                      Agregar tu primera habitación
+                      Agregar tu primera habitación o cama
                     </Link>
                   </Button>
                 </div>
@@ -628,14 +650,14 @@ export default function RoomPage() {
                   recibirás una notificación por email y tu propiedad quedará activa.
                   <br />
                   <br />
-                  Mientras tanto, puedes empezar a agregar las habitaciones. ✨
+                  Mientras tanto, puedes empezar a agregar las habitaciones o camas. ✨
                 </DialogDescription>
               </>
             ) : updated === "room" ? (
               <>
                 <DialogTitle className="text-xl">🛏️ ¡Felitaciones, Puedes disfrutar de tu habitación!</DialogTitle>
                 <DialogDescription className="text-md">
-                  Puedes seguir agregando más habitaciones o editar las que ya creaste.
+                  Puedes seguir agregando más habitaciones / camas o editar las que ya creaste.
                   <br />
                   <br />📸 <strong>Importante:</strong> Si agregaste nuevas fotos, serán revisadas para asegurar que
                   cumplan con las normas de la plataforma. Recibirás una notificación cuando sean aprobadas.

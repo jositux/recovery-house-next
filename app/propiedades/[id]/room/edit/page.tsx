@@ -6,7 +6,7 @@ import RoomForm from "./RoomForm";
 import {
   roomUpdateService,
   type RoomUpdateData,
-} from "@/services/RoomUpdateService2";
+} from "@/services/RoomUpdateService3";
 
 //import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
@@ -36,7 +36,7 @@ export default function RoomPage() {
     ? (() => {
         const parsedData = JSON.parse(storedRoomData);
 
-        console.log("que trae todo", parsedData)
+        console.log("que trae todo", parsedData);
 
         return {
           id: parsedData.id || "",
@@ -47,21 +47,30 @@ export default function RoomPage() {
           isPrivate: parsedData.isPrivate === false ? false : true,
           singleBeds: parsedData.singleBeds || 0,
           doubleBeds: parsedData.doubleBeds || 0,
-          singleBedPrice: parsedData.singleBedPrice || 0,
-          singleBedCleaningPrice: parsedData.singleBedCleaningPrice || 0,
-          doubleBedPrice: parsedData.doubleBedPrice || 0,
-          doubleBedCleaningPrice: parsedData.doubleBedCleaningPrice || 0,
+
           descriptionService: parsedData.descriptionService || "",
           beds: parseInt(parsedData.beds) || 2,
           capacity: parseInt(parsedData.capacity) || 4,
           pricePerNight: parseInt(parsedData.pricePerNight) || 0,
           cleaningFee: parseInt(parsedData.cleaningFee) || 0,
+
+          // Precios para habitación privada o cama
+          privateRoomPrice: parseInt(parsedData.privateRoomPrice) || 0,
+          privateRoomCleaning: parseInt(parsedData.privateRoomCleaning) || 0,
+
+          // Pricing for SHARED room - 2 campos separados
+          sharedRoomPrice: parseInt(parsedData.sharedRoomPrice) || 0,
+          sharedRoomCleaning: parseInt(parsedData.sharedRoomCleaning) || 0,
+
+          bedType: parsedData.bedType || "",
+          bedName: parsedData.bedName || "",
+
           photos: parsedData.photos
-          ? parsedData.photos.map(
-              (photo: { directus_files_id: { id: string } }) =>
-                photo.directus_files_id.id
-            )
-          : [],
+            ? parsedData.photos.map(
+                (photo: { directus_files_id: { id: string } }) =>
+                  photo.directus_files_id.id
+              )
+            : [],
           extraTags: parsedData.extraTags
             ? parsedData.extraTags.map(
                 (tag: { ExtraTags_id: string }) => tag.ExtraTags_id
@@ -75,32 +84,34 @@ export default function RoomPage() {
         };
       })()
     : {
-      id: "",
-      propertyId: "",
-      name: "",
-      roomNumber: "",
-      description: "",
-      // Campos de tipo de habitación
-      isPrivate: true,
-      // Configuración de camas
-      singleBeds: 0,
-      doubleBeds: 0,
-      // Total de camas y capacidad
-      beds: 1,
-      capacity: 1,
-      // Precios para habitación privada
-      pricePerNight: 0,
-      cleaningFee: 0,
-      // Precios para habitación compartida
-      singleBedPrice: 0,
-      singleBedCleaningPrice: 0,
-      doubleBedPrice: 0,
-      doubleBedCleaningPrice: 0,
-      // Otros campos
-      photos: [],
-      extraTags: [""],
-      servicesTags: ["all-included"],
-      descriptionService: "",
+        id: "",
+        propertyId: "",
+        name: "",
+        roomNumber: "",
+        description: "",
+        // Campos de tipo de habitación
+        isPrivate: true,
+        // Configuración de camas
+        singleBeds: 0,
+        doubleBeds: 0,
+        // Total de camas y capacidad
+        beds: 1,
+        capacity: 1,
+        // Precios para habitación privada o cama
+        privateRoomPrice: 0,
+        privateRoomCleaning: 0,
+
+        // Pricing for SHARED room - 2 campos separados
+        sharedRoomPrice: 0,
+        sharedRoomCleaning: 0,
+
+        bedType: "single",
+        bedName: "",
+        // Otros campos
+        photos: [],
+        extraTags: [""],
+        servicesTags: ["all-included"],
+        descriptionService: "",
       };
 
   console.log("valores iniciales", initialValues);

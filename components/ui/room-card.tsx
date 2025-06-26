@@ -41,7 +41,7 @@ export function RoomCard({
 
           <div className="absolute top-2 right-2 flex items-center space-x-1 bg-white px-2 py-1 rounded-full shadow-md">
             <User size={16} color="#333" />
-            <span className="text-sm text-gray-800">Privado</span>
+            <span className="text-sm text-gray-800">Habitación Privada</span>
           </div>
         </div>
       </Link>

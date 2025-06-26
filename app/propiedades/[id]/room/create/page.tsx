@@ -3,7 +3,7 @@
 //import { useState } from "react";
 import RoomForm from "./RoomForm"
 //import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { roomService, type RoomData } from "@/services/AddRoomService2"
+import { roomService, type RoomData } from "@/services/AddRoomService3"
 
 import { usePathname } from "next/navigation"
 import { useRouter } from "next/navigation"
@@ -19,6 +19,8 @@ export default function RoomPage() {
 
   const handleFormSubmit = async (data: RoomData) => {
     //setSubmittedData(data);
+
+    console.log(data)
     const response = await roomService.createRoom(data)
 
     if (response.id) {
@@ -42,14 +44,17 @@ export default function RoomPage() {
     // Total de camas y capacidad
     beds: 1,
     capacity: 1,
-    // Precios para habitación privada
-    pricePerNight: 0,
-    cleaningFee: 0,
-    // Precios para habitación compartida
-    singleBedPrice: 0,
-    singleBedCleaningPrice: 0,
-    doubleBedPrice: 0,
-    doubleBedCleaningPrice: 0,
+    // Precios para habitación privada o cama
+     privateRoomPrice: 0,
+     privateRoomCleaning: 0,
+
+     // Pricing for SHARED room - 2 campos separados
+     sharedRoomPrice: 0,
+     sharedRoomCleaning: 0,
+
+     bedType: "single",
+     bedName: "",
+
     // Otros campos
     photos: [],
     extraTags: [""],

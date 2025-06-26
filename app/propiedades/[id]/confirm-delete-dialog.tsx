@@ -19,12 +19,12 @@ interface ConfirmDeleteDialogProps {
 }
 
 export function ConfirmDeleteDialog({ isOpen, onClose, type, onConfirm }: ConfirmDeleteDialogProps) {
-  const title = type === "room" ? "¿Eliminar habitación?" : "¿Eliminar propiedad?"
+  const title = type === "room" ? "¿Eliminar Alojamiento?" : "¿Eliminar propiedad?"
 
   const description =
     type === "room"
-      ? "Esta acción no se puede deshacer. La habitación será eliminada permanentemente del sistema."
-      : "Esta acción no se puede deshacer. La propiedad y todas sus habitaciones serán eliminadas permanentemente del sistema."
+      ? "Esta acción no se puede deshacer. El alojamiento será eliminada permanentemente del sistema."
+      : "Esta acción no se puede deshacer. La propiedad y todas sus habitaciones / camas serán eliminadas permanentemente del sistema."
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
