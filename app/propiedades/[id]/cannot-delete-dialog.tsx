@@ -18,11 +18,11 @@ interface CannotDeleteDialogProps {
 }
 
 export function CannotDeleteDialog({ isOpen, onClose, type }: CannotDeleteDialogProps) {
-  const title = type === "room" ? "No se puede eliminar la habitación" : "No se puede eliminar la propiedad"
+  const title = type === "room" ? "No se puede eliminar el alojamiento" : "No se puede eliminar la propiedad"
 
   const description =
     type === "room"
-      ? "Esta habitación tiene reservas activas o futuras. Para eliminarla, primero debes cancelar todas las reservas asociadas."
+      ? "Este alojamiento tiene reservas activas o futuras. Para eliminarla, primero debes cancelar todas las reservas asociadas."
       : "Esta propiedad tiene habitaciones con reservas activas o futuras. Para eliminarla, primero debes cancelar todas las reservas asociadas a sus habitaciones."
 
   return (

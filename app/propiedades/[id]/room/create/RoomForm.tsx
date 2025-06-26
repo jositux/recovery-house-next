@@ -1,40 +1,55 @@
-"use client"
+"use client";
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { Loader2 } from "lucide-react"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { Loader2 } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { useToast } from "@/hooks/use-toast"
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+// Import the RichTextEditor component
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { useToast } from "@/hooks/use-toast";
 
-import GalleryUpload from "@/components/GalleryUpload"
-import { CollectionExtraTags } from "@/components/collectionExtraTags"
-import { CollectionServiceTags } from "@/components/collectionServiceTags"
-import { getExtraTags } from "@/services/extraTagsService"
-import { getServiceTags } from "@/services/serviceTagsService"
-import useTags from "@/hooks/useTags"
+import GalleryUpload from "@/components/GalleryUpload";
+import { CollectionExtraTags } from "@/components/collectionExtraTags";
+import { CollectionServiceTags } from "@/components/collectionServiceTags";
+import { getExtraTags } from "@/services/extraTagsService";
+import { getServiceTags } from "@/services/serviceTagsService";
+import useTags from "@/hooks/useTags";
 
-import Link from "next/link"
-import { useEffect } from "react"
+import Link from "next/link";
+import { useEffect } from "react";
 
 // Importar el nuevo componente
-import RoomTypeSelector from "./room-type-selector"
+import RoomTypeSelector from "./room-type-selector";
 
 // Function to pluralize words in Spanish
-export const pluralize = (quantity: number, singular: string, plural: string) => {
-  return quantity === 1 ? `${quantity} ${singular}` : `${quantity} ${plural}`
-}
+export const pluralize = (
+  quantity: number,
+  singular: string,
+  plural: string
+) => {
+  return quantity === 1 ? `${quantity} ${singular}` : `${quantity} ${plural}`;
+};
 
 export const formSchema = z
   .object({
     id: z.string(),
     propertyId: z.string(),
     name: z.string().min(1, { message: "El nombre es requerido" }),
-    roomNumber: z.string().min(1, { message: "El número de habitación es requerido" }),
+    roomNumber: z
+      .string()
+      .min(1, { message: "El número de habitación es requerido" }),
     description: z.string().min(1, { message: "La descripción es requerida" }),
 
     // Room type fields from previous component
@@ -62,111 +77,59 @@ export const formSchema = z
       .max(99, { message: "Capacidad máxima 99" })
       .transform((val) => (isNaN(val) ? 0 : val)),
 
-    // Pricing for private room - ahora condicional basado en isPrivate
-    pricePerNight: z.coerce.number().transform((val) => (isNaN(val) ? 0 : val)),
-    cleaningFee: z.coerce.number().transform((val) => (isNaN(val) ? 0 : val)),
+    // Pricing for PRIVATE room - CAMPOS COMPLETAMENTE INDEPENDIENTES
+    privateRoomPrice: z.coerce
+      .number()
+      .transform((val) => (isNaN(val) ? 0 : val)),
+    privateRoomCleaning: z.coerce
+      .number()
+      .transform((val) => (isNaN(val) ? 0 : val)),
 
-    // Pricing for shared room - Modificado para que precio por noche sea requerido
-    singleBedPrice: z.coerce
+    // Pricing for SHARED room - CAMPOS COMPLETAMENTE INDEPENDIENTES
+    sharedRoomPrice: z.coerce
       .number()
-      .min(0, { message: "El precio no puede ser negativo" })
       .transform((val) => (isNaN(val) ? 0 : val)),
-    singleBedCleaningPrice: z.coerce
+    sharedRoomCleaning: z.coerce
       .number()
-      .min(0, { message: "El precio no puede ser negativo" })
       .transform((val) => (isNaN(val) ? 0 : val)),
-    doubleBedPrice: z.coerce
-      .number()
-      .min(0, { message: "El precio no puede ser negativo" })
-      .transform((val) => (isNaN(val) ? 0 : val)),
-    doubleBedCleaningPrice: z.coerce
-      .number()
-      .min(0, { message: "El precio no puede ser negativo" })
-      .transform((val) => (isNaN(val) ? 0 : val)),
+
+    bedType: z.string(),
+    bedName: z.string(),
 
     // Other fields
     photos: z.array(z.string()).min(1, { message: "Suba al menos 1 foto" }),
-    extraTags: z.array(z.string()).min(1, { message: "Elija al menos un servicio adicional" }),
-    servicesTags: z.array(z.string()).min(1, { message: "Elija al menos un servicio básico" }),
+    extraTags: z
+      .array(z.string())
+      .min(1, { message: "Elija al menos un servicio adicional" }),
+    servicesTags: z
+      .array(z.string())
+      .min(1, { message: "Elija al menos un servicio básico" }),
     descriptionService: z.string(),
   })
   .refine(
     (data) => {
       // Si no hay camas, no validamos precios
       if (data.singleBeds === 0 && data.doubleBeds === 0) {
-        return true
+        return true;
       }
 
-      // Si es habitación privada, validar que los precios sean positivos
-      if (data.isPrivate) {
-        return data.pricePerNight > 0
-      }
-
-      // Si es compartida, validar que cada tipo de cama tenga precio por noche > 0
-      if (data.singleBeds > 0 && data.singleBedPrice <= 0) {
-        return false
-      }
-
-      if (data.doubleBeds > 0 && data.doubleBedPrice <= 0) {
-        return false
-      }
-
-      return true
+      return true;
     },
     {
       message: "Los precios por noche deben ser mayores que 0",
       path: ["pricePerNight"], // Este campo mostrará el error
-    },
-  )
-  .refine(
-    (data) => {
-      // Si es habitación privada, validar que la tarifa de limpieza sea positiva
-      if (data.isPrivate && data.beds > 0) {
-        return data.cleaningFee >= 0
-      }
-      return true
-    },
-    {
-      message: "La tarifa de limpieza no puede ser negativa",
-      path: ["cleaningFee"],
-    },
-  )
-  .refine(
-    (data) => {
-      // Si es compartida con camas individuales, validar que la tarifa de limpieza no sea negativa
-      if (!data.isPrivate && data.singleBeds > 0) {
-        return data.singleBedCleaningPrice >= 0
-      }
-      return true
-    },
-    {
-      message: "La tarifa de limpieza no puede ser negativa",
-      path: ["singleBedCleaningPrice"],
-    },
-  )
-  .refine(
-    (data) => {
-      // Si es compartida con camas dobles, validar que la tarifa de limpieza no sea negativa
-      if (!data.isPrivate && data.doubleBeds > 0) {
-        return data.doubleBedCleaningPrice >= 0
-      }
-      return true
-    },
-    {
-      message: "La tarifa de limpieza no puede ser negativa",
-      path: ["doubleBedCleaningPrice"],
-    },
-  )
+    }
+  );
 
-type FormData = z.infer<typeof formSchema>
+type FormData = z.infer<typeof formSchema>;
 
 interface RoomFormProps {
-  onSubmit: (data: FormData) => void
-  initialValues?: Partial<FormData>
+  onSubmit: (data: FormData) => void;
+  initialValues?: Partial<FormData>;
 }
 
 export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
-  const { toast } = useToast()
+  const { toast } = useToast();
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -177,7 +140,8 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
       description: initialValues?.description || "",
 
       // Room type defaults
-      isPrivate: initialValues?.isPrivate !== undefined ? initialValues.isPrivate : true,
+      isPrivate:
+        initialValues?.isPrivate !== undefined ? initialValues.isPrivate : true,
 
       // Beds configuration
       singleBeds: initialValues?.singleBeds || 0,
@@ -187,15 +151,16 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
       beds: initialValues?.beds || 0,
       capacity: initialValues?.capacity || 0,
 
-      // Pricing for private room
-      pricePerNight: initialValues?.pricePerNight || 0,
-      cleaningFee: initialValues?.cleaningFee || 0,
+      // Pricing for PRIVATE room - 2 campos separados
+      privateRoomPrice: initialValues?.privateRoomPrice || 0,
+      privateRoomCleaning: initialValues?.privateRoomCleaning || 0,
 
-      // Pricing for shared room
-      singleBedPrice: initialValues?.singleBedPrice || 0,
-      singleBedCleaningPrice: initialValues?.singleBedCleaningPrice || 0,
-      doubleBedPrice: initialValues?.doubleBedPrice || 0,
-      doubleBedCleaningPrice: initialValues?.doubleBedCleaningPrice || 0,
+      // Pricing for SHARED room - 2 campos separados
+      sharedRoomPrice: initialValues?.sharedRoomPrice || 0,
+      sharedRoomCleaning: initialValues?.sharedRoomCleaning || 0,
+
+      bedType: initialValues?.bedType || "single",
+      bedName: initialValues?.bedName || "",
 
       // Other fields
       photos: initialValues?.photos || [],
@@ -204,137 +169,132 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
       descriptionService: initialValues?.descriptionService || "",
     },
     mode: "onTouched",
-  })
+  });
 
-  const { extraTags, serviceTags } = useTags("extraTags", "servicesTags", getExtraTags, getServiceTags)
+  const { extraTags, serviceTags } = useTags(
+    "extraTags",
+    "servicesTags",
+    getExtraTags,
+    getServiceTags
+  );
 
   // Get current value of isPrivate
-  const isPrivate = form.watch("isPrivate")
-  const singleBeds = form.watch("singleBeds")
-  const doubleBeds = form.watch("doubleBeds")
+  const isPrivate = form.watch("isPrivate");
+  const singleBeds = form.watch("singleBeds");
+  const doubleBeds = form.watch("doubleBeds");
 
   // Update total beds when single or double beds change
   useEffect(() => {
-    const totalBeds = singleBeds + doubleBeds
-    form.setValue("beds", totalBeds)
+    const totalBeds = singleBeds + doubleBeds;
+    form.setValue("beds", totalBeds);
 
     // Also update capacity based on beds
     // Assuming 1 person per single bed and 2 per double bed
-    const estimatedCapacity = singleBeds + doubleBeds * 2
-    form.setValue("capacity", estimatedCapacity)
+    const estimatedCapacity = singleBeds + doubleBeds * 2;
+    form.setValue("capacity", estimatedCapacity);
+
+    // Limpiar precios en modo privado cuando no hay camas
+    if (isPrivate && totalBeds === 0) {
+      form.setValue("privateRoomPrice", 0);
+      form.setValue("privateRoomCleaning", 0);
+    }
 
     // Limpiar errores cuando se seleccionan camas
     if (totalBeds > 0) {
-      form.clearErrors("beds")
-      form.clearErrors("capacity")
-      form.clearErrors("singleBeds")
-      form.clearErrors("doubleBeds")
+      form.clearErrors("beds");
+      form.clearErrors("capacity");
+      form.clearErrors("singleBeds");
+      form.clearErrors("doubleBeds");
     }
-  }, [singleBeds, doubleBeds, form])
+  }, [singleBeds, doubleBeds, form]);
 
   // Modificar la validación en el handleSubmit para manejar correctamente los precios según el tipo de habitación
   async function handleSubmit(values: FormData) {
+    console.log(values);
     try {
       // Asegurar que todos los campos numéricos sean números
       const processedValues = {
         ...values,
-        singleBeds: Number(values.singleBeds),
-        doubleBeds: Number(values.doubleBeds),
-        beds: Number(values.beds),
-        capacity: Number(values.capacity),
-        pricePerNight: Number(values.pricePerNight),
-        cleaningFee: Number(values.cleaningFee),
-        singleBedPrice: Number(values.singleBedPrice),
-        singleBedCleaningPrice: Number(values.singleBedCleaningPrice),
-        doubleBedPrice: Number(values.doubleBedPrice),
-        doubleBedCleaningPrice: Number(values.doubleBedCleaningPrice),
-      }
-
-      // Validar que haya al menos una cama
-      if (processedValues.singleBeds === 0 && processedValues.doubleBeds === 0) {
-        toast({
-          title: "Error de validación",
-          description: "Debe seleccionar al menos una cama",
-          variant: "destructive",
-        })
-        return
-      }
+        singleBeds: Number(values.singleBeds) || 0,
+        doubleBeds: Number(values.doubleBeds) || 0,
+        beds: Number(values.beds) || 0,
+        capacity: Number(values.capacity) || 0,
+        privateRoomPrice: Number(values.privateRoomPrice) || 0,
+        privateRoomCleaning: Number(values.privateRoomCleaning) || 0,
+        sharedRoomPrice: Number(values.sharedRoomPrice) || 0,
+        sharedRoomCleaning: Number(values.sharedRoomCleaning) || 0,
+      };
 
       // Validación adicional según el tipo de habitación
+
+      // Validación de precios según el tipo de habitación
+      // Validación de precios SOLO para el tipo activo
       if (processedValues.isPrivate) {
-        if (processedValues.pricePerNight <= 0) {
-          form.setError("pricePerNight", {
+        // Validación SOLO para habitación privada
+        if (processedValues.privateRoomPrice <= 0) {
+          form.setError("privateRoomPrice", {
             type: "manual",
             message: "El precio por noche debe ser mayor que 0",
-          })
-          document.getElementById("pricePerNight")?.focus()
-          return
+          });
+          document.getElementById("privateRoomPrice")?.focus();
+          return;
         }
 
-        if (processedValues.cleaningFee < 0) {
-          form.setError("cleaningFee", {
+        // Validar que haya al menos una cama
+        if (
+          processedValues.singleBeds === 0 &&
+          processedValues.doubleBeds === 0
+        ) {
+          toast({
+            title: "Error de validación",
+            description: "Debe seleccionar al menos una cama",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        if (processedValues.privateRoomCleaning < 0) {
+          form.setError("privateRoomCleaning", {
             type: "manual",
             message: "La tarifa de limpieza no puede ser negativa",
-          })
-          document.getElementById("cleaningFee")?.focus()
-          return
+          });
+          document.getElementById("privateRoomCleaning")?.focus();
+          return;
         }
       } else {
-        // Para habitaciones compartidas, validar precios por tipo de cama
-        if (processedValues.singleBeds > 0) {
-          if (processedValues.singleBedPrice <= 0) {
-            form.setError("singleBedPrice", {
-              type: "manual",
-              message: "El precio por noche debe ser mayor que 0",
-            })
-            document.getElementById("singleBedPrice")?.focus()
-            return
-          }
-
-          if (processedValues.singleBedCleaningPrice < 0) {
-            form.setError("singleBedCleaningPrice", {
-              type: "manual",
-              message: "La tarifa de limpieza no puede ser negativa",
-            })
-            document.getElementById("singleBedCleaningPrice")?.focus()
-            return
-          }
+        // Validación SOLO para habitación compartida
+        if (processedValues.sharedRoomPrice <= 0) {
+          form.setError("sharedRoomPrice", {
+            type: "manual",
+            message: "El precio por noche por cama debe ser mayor que 0",
+          });
+          document.getElementById("sharedRoomPrice")?.focus();
+          return;
         }
 
-        if (processedValues.doubleBeds > 0) {
-          if (processedValues.doubleBedPrice <= 0) {
-            form.setError("doubleBedPrice", {
-              type: "manual",
-              message: "El precio por noche debe ser mayor que 0",
-            })
-            document.getElementById("doubleBedPrice")?.focus()
-            return
-          }
-
-          if (processedValues.doubleBedCleaningPrice < 0) {
-            form.setError("doubleBedCleaningPrice", {
-              type: "manual",
-              message: "La tarifa de limpieza no puede ser negativa",
-            })
-            document.getElementById("doubleBedCleaningPrice")?.focus()
-            return
-          }
+        if (processedValues.sharedRoomCleaning < 0) {
+          form.setError("sharedRoomCleaning", {
+            type: "manual",
+            message: "La tarifa de limpieza por cama no puede ser negativa",
+          });
+          document.getElementById("sharedRoomCleaning")?.focus();
+          return;
         }
       }
 
-      await onSubmit(processedValues)
+      await onSubmit(processedValues);
       toast({
         title: "¡Felicidades!",
         description: "La habitación ha sido guardada",
         variant: "default",
-      })
+      });
     } catch (error) {
-      console.log(error)
+      console.log(error);
       toast({
         title: "Error",
         description: "Por favor revise todos los datos",
         variant: "destructive",
-      })
+      });
     }
   }
 
@@ -350,7 +310,10 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
                 <FormItem>
                   <FormLabel>Nombre de la Habitación</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ej. Habitación con Vista al Lago" {...field} />
+                    <Input
+                      placeholder="Ej. Habitación con Vista al Lago"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -382,7 +345,11 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
               <FormItem>
                 <FormLabel>Descripción</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="Ingrese una descripción" {...field} />
+                  <RichTextEditor
+                    content={field.value}
+                    onChange={field.onChange}
+                    error={!!form.formState.errors.description}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -411,8 +378,8 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
                   <GalleryUpload
                     initialIds={field.value}
                     onGalleryChange={(newGallery: string[]) => {
-                      console.log(newGallery)
-                      field.onChange(newGallery)
+                      console.log(newGallery);
+                      field.onChange(newGallery);
                     }}
                   />
                 </FormControl>
@@ -432,8 +399,10 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
                 <FormControl>
                   <CollectionServiceTags
                     onChange={(newTags: string[]) => {
-                      if (JSON.stringify(newTags) !== JSON.stringify(field.value)) {
-                        field.onChange(newTags)
+                      if (
+                        JSON.stringify(newTags) !== JSON.stringify(field.value)
+                      ) {
+                        field.onChange(newTags);
                       }
                     }}
                     servicesTags={serviceTags || []}
@@ -456,8 +425,10 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
                 <FormControl>
                   <CollectionExtraTags
                     onChange={(newTags: string[]) => {
-                      if (JSON.stringify(newTags) !== JSON.stringify(field.value)) {
-                        field.onChange(newTags)
+                      if (
+                        JSON.stringify(newTags) !== JSON.stringify(field.value)
+                      ) {
+                        field.onChange(newTags);
                       }
                     }}
                     extraTags={extraTags || []}
@@ -477,7 +448,10 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
               <FormItem>
                 <FormLabel>Información Adicional de Servicios</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="Si necesita explicar más sobre sus servicios, escriba aquí" {...field} />
+                  <Textarea
+                    placeholder="Si necesita explicar más sobre sus servicios, escriba aquí"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -486,8 +460,15 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
         </div>
 
         <div className="flex gap-4 mt-4 p-4 md:p-0">
-          <Link href={`/propiedades/${initialValues?.propertyId}/`} className="flex-1 w-full">
-            <Button variant="outline" type="button" className="w-full text-sm px-4 py-3 h-full">
+          <Link
+            href={`/propiedades/${initialValues?.propertyId}/`}
+            className="flex-1 w-full"
+          >
+            <Button
+              variant="outline"
+              type="button"
+              className="w-full text-sm px-4 py-3 h-full"
+            >
               Cancelar
             </Button>
           </Link>
@@ -508,5 +489,5 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
         </div>
       </form>
     </Form>
-  )
+  );
 }

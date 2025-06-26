@@ -17,8 +17,15 @@ export interface RoomData {
   beds: number
   capacity: number
   // Precios para habitación o cama
-  pricePerNight: number
-  cleaningFee: number
+  privateRoomPrice: number,
+  privateRoomCleaning: number,
+
+  // Pricing for SHARED room - 2 campos separados
+  sharedRoomPrice: number,
+  sharedRoomCleaning: number,
+
+  bedType: string,
+  bedName: string,
 
   // Otros campos
   photos: string[]
@@ -37,8 +44,10 @@ export const roomService = {
       }
 
       // Normalizar `pricePerNight` y `cleaningFee`
-      const normalizedPricePerNight = String(data.pricePerNight).trim() === "" ? "0" : String(data.pricePerNight);
-      const normalizedCleaningFee = String(data.cleaningFee).trim() === "" ? "0" : String(data.cleaningFee);
+      const normalizedPrivateRoomPrice = String(data.privateRoomPrice).trim() === "" ? "0" : String(data.privateRoomPrice);
+      const normalizedPrivateRoomCleaning = String(data.privateRoomCleaning).trim() === "" ? "0" : String(data.privateRoomCleaning);
+      const normalizedSharedRoomPrice = String(data.sharedRoomPrice).trim() === "" ? "0" : String(data.sharedRoomPrice);
+      const normalizedSharedRoomCleaning = String(data.sharedRoomCleaning).trim() === "" ? "0" : String(data.sharedRoomCleaning);
 
       // Transformar servicesTags a [{ serviceTags_id: string }]
       const formattedServiceTags = data.servicesTags.map(tag => ({
@@ -61,8 +70,11 @@ data.photos.map(photo => ({
       const { id, ...resData } = data; // Excluir id
       const transformedData = {
         ...resData,
-        pricePerNight: normalizedPricePerNight,
-        cleaningFee: normalizedCleaningFee,
+      privateRoomPrice : normalizedPrivateRoomPrice,
+      privateRoomCleaning: normalizedPrivateRoomCleaning,
+      sharedRoomPrice : normalizedSharedRoomPrice,
+      sharedRoomCleaning: normalizedSharedRoomCleaning,
+
         servicesTags: formattedServiceTags,
         extraTags: formattedExtraTags,
         photos: formattedPhotos,
