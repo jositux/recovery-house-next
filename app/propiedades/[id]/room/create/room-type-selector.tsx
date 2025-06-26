@@ -85,7 +85,7 @@ export default function RoomTypeSelector({
         name="isPrivate"
         render={({ field }) => (
           <FormItem className="space-y-3">
-            <FormLabel>Tipo de Habitación</FormLabel>
+            <FormLabel>Tipo de Alojamiento</FormLabel>
             <FormControl>
               <RadioGroup
                 onValueChange={(value) => field.onChange(value === "true")}
@@ -106,7 +106,7 @@ export default function RoomTypeSelector({
                     className="sr-only"
                   />
                   <Home className="h-8 w-8 mb-2" />
-                  <span className="font-medium">Privada</span>
+                  <span className="font-medium">Habitación Privada</span>
                   <span className="text-xs text-muted-foreground">
                     Uso exclusivo, se reserva toda la habitación
                   </span>
@@ -125,9 +125,9 @@ export default function RoomTypeSelector({
                     className="sr-only"
                   />
                   <Users className="h-8 w-8 mb-2" />
-                  <span className="font-medium">Compartida</span>
+                  <span className="font-medium">Cama</span>
                   <span className="text-xs text-muted-foreground">
-                    Múltiples huéspedes, se reserva por cama
+                    Se carga solamente 1 cama
                   </span>
                 </label>
               </RadioGroup>
@@ -138,7 +138,7 @@ export default function RoomTypeSelector({
       />
 
       {/* DEBUG INFO - Mostrar valores actuales */}
-      <div className="mt-4 p-3 bg-gray-100 rounded-lg text-xs">
+      <div className="mt-4 hidden p-3 bg-gray-100 rounded-lg text-xs">
         <strong>DEBUG - Valores en tiempo real:</strong>
         <div className="grid grid-cols-2 gap-4 mt-2">
           <div>
@@ -431,7 +431,7 @@ export default function RoomTypeSelector({
           // SOLO campos para habitación COMPARTIDA - NOMBRES ÚNICOS
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-900">
-              Precios para Habitación Compartida
+              Precios para la Cama
             </h3>
             {noBedTypeSelected && (
               <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-800">
@@ -440,13 +440,13 @@ export default function RoomTypeSelector({
                 </p>
               </div>
             )}
-            <div className="grid grid-cols-2 gap-4 p-4 border rounded-lg bg-green-50">
+            <div className="grid grid-cols-2 gap-4 p-4 border rounded-lg">
               <FormField
                 control={control}
                 name="sharedRoomPrice"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Precio por Cama (Compartida)</FormLabel>
+                    <FormLabel>Precio por Cama</FormLabel>
                     <FormControl>
                       <Input
                         key={`shared-price-${isPrivate}`} // Key único para forzar re-render
@@ -476,9 +476,9 @@ export default function RoomTypeSelector({
                     </FormControl>
                     <FormDescription>
                       {bedType === "single" &&
-                        "Por cada cama simple en habitación compartida"}
+                        "Por 1 cama"}
                       {bedType === "double" &&
-                        "Por cada cama doble en habitación compartida"}
+                        "Por 1 cama"}
                       {!bedType && "Por cada cama en habitación compartida"}
                     </FormDescription>
                     <FormMessage />
@@ -490,7 +490,7 @@ export default function RoomTypeSelector({
                 name="sharedRoomCleaning"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Limpieza por Cama (Compartida)</FormLabel>
+                    <FormLabel>Limpieza por Cama</FormLabel>
                     <FormControl>
                       <Input
                         key={`shared-cleaning-${isPrivate}`} // Key único para forzar re-render
@@ -520,8 +520,8 @@ export default function RoomTypeSelector({
                     </FormControl>
                     <FormDescription>
                       {bedType === "single" &&
-                        "Por cada cama simple - Opcional"}
-                      {bedType === "double" && "Por cada cama doble - Opcional"}
+                        "Opcional"}
+                      {bedType === "double" && "Opcional"}
                       {!bedType && "Opcional para habitación compartida"}
                     </FormDescription>
                     <FormMessage />
