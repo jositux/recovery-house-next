@@ -344,7 +344,7 @@ export default function RoomTypeSelector({
                 </p>
               </div>
             )}
-            <div className="grid grid-cols-2 gap-4 p-4 border rounded-lg bg-blue-50">
+            <div className="grid grid-cols-2 gap-4 p-4 border rounded-lg">
               <FormField
                 control={control}
                 name="privateRoomPrice"
