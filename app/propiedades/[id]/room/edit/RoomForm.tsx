@@ -308,7 +308,7 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nombre de la Habitación</FormLabel>
+                  <FormLabel>Nombre del alojamiento</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Ej. Habitación con Vista al Lago"
@@ -326,7 +326,7 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
               name="roomNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Número de Habitación</FormLabel>
+                  <FormLabel>Número</FormLabel>
                   <FormControl>
                     <Input placeholder="Ej. 1D" {...field} />
                   </FormControl>
@@ -373,7 +373,7 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
             name="photos"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Fotos de la Habitación</FormLabel>
+                <FormLabel>Fotos</FormLabel>
                 <FormControl>
                   <GalleryUpload
                     initialIds={field.value}

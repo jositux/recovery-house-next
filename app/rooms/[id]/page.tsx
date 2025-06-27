@@ -99,6 +99,7 @@ interface Booking {
   room: string;
   singleBeds: number;
   doubleBeds: number;
+  isPrivate: boolean;
 }
 
 interface ServiceProvider {
@@ -524,7 +525,10 @@ export default function RoomPage() {
               <h1
                 className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}
               >
-                {room.isPrivate === false && `${room.bedName} -`} {room.name}
+                {room.isPrivate === false && room.bedName?.trim()
+      ? `${room.bedName} - `
+      : ""}
+    {room.name}
               </h1>
               <p className="text-xl text-[#162F40] mb-4"> {property.name}</p>
               {room.isPrivate === true && (

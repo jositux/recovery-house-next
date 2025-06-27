@@ -38,6 +38,7 @@ const SuccessPageContent = () => {
           patient: parsedBooking.patientId,
           guests: parsedBooking.guests,
           price: parsedBooking.price,
+          isPrivate: parsedBooking.isPrivate,
           cleaning: parsedBooking.cleaning,
           room: parsedBooking.room,
           paymentId,
