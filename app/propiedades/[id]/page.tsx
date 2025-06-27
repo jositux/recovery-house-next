@@ -462,21 +462,26 @@ export default function RoomPage() {
         </div>
 
         <div className="mb-12">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold">Alojamientos disponibles</h2>
-            {isOwner && (
-              <Button asChild>
-                <Link
-                  href={`/propiedades/${property.id}/room/create`}
-                  className="flex items-center gap-2 bg-primary text-white hover:bg-primary-dark"
-                >
-                  <Plus className="h-5 w-5" />
-                  Agregar Habitación o Cama
-                </Link>
-              </Button>
-            )}
-          </div>
-          {property.Rooms && property.Rooms.length > 0 ? (
+        <div className="bg-gradient-to-r from-slate-50 to-blue-50 rounded-xl p-6 mb-8 border border-slate-200/60 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+  <div className="space-y-2">
+    <h2 className="text-3xl font-bold">
+      Alojamientos disponibles
+    </h2>
+    <p className="text-slate-600 text-sm">Descubre las opciones de hospedaje que tenemos para ti</p>
+  </div>
+
+  {isOwner && (
+    <Link href={`/propiedades/${property.id}/room/create`} className="w-full sm:w-auto">
+      <Button className="w-full sm:w-auto flex items-center justify-center gap-2 bg-green-900 text-white hover:bg-green-800 transition">
+        <Plus className="h-5 w-5" />
+        Agregar Habitación o Cama
+      </Button>
+    </Link>
+  )}
+</div>
+
+{property.Rooms && property.Rooms.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {property.Rooms.map((room: Room) => (
                 <div
@@ -635,6 +640,9 @@ export default function RoomPage() {
               )}
             </div>
           )}
+
+    </div>
+         
         </div>
       </div>
 
