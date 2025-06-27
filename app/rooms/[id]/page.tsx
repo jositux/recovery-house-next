@@ -226,7 +226,6 @@ export default function RoomPage() {
       JSON.stringify(formattedBookingData)
     );
 
-
     const formattedBooking = {
       isPrivate: room?.isPrivate,
       name: room?.name,

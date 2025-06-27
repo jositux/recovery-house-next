@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useCallback, useMemo } from "react"
+import { useCallback, useMemo } from "react"
 import { loadStripe } from "@stripe/stripe-js"
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js"
 
@@ -16,6 +16,26 @@ interface CheckoutFormProps {
   }
 }
 
+// Función para limpiar HTML y dejar solo texto plano
+const cleanHtmlDescription = (htmlString: string): string => {
+  if (!htmlString) return "Sin descripción"
+
+  // Crear un elemento temporal para parsear el HTML
+  const tempDiv = document.createElement("div")
+  tempDiv.innerHTML = htmlString
+
+  // Extraer solo el texto, preservando espacios
+  const textContent = tempDiv.textContent || tempDiv.innerText || ""
+
+  // Limpiar espacios extra y saltos de línea múltiples
+  return (
+    textContent
+      .replace(/\s+/g, " ") // Reemplazar múltiples espacios por uno solo
+      .trim() || // Eliminar espacios al inicio y final
+    "Sin descripción"
+  ) // Fallback si queda vacío
+}
+
 export const CheckoutForm = ({ bookingData }: CheckoutFormProps) => {
   // Función para obtener el clientSecret
   const fetchClientSecret = useCallback(async () => {
@@ -24,8 +44,8 @@ export const CheckoutForm = ({ bookingData }: CheckoutFormProps) => {
     }
     try {
       const stripeResponse = await postStripeSession({
-        name: bookingData.name || "Sin nombre", // Valor predeterminado si no existe
-        description: bookingData.description || "Sin descripción", // Valor predeterminado si no existe
+        name: bookingData.name || "Sin nombre",
+        description: cleanHtmlDescription(bookingData.description || ""),
         unit_amount: bookingData.unit_amount,
       })
       return stripeResponse.clientSecret
@@ -52,4 +72,3 @@ export const CheckoutForm = ({ bookingData }: CheckoutFormProps) => {
     </div>
   )
 }
-

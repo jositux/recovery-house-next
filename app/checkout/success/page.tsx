@@ -46,6 +46,7 @@ const SuccessPageContent = () => {
 
         await createBooking(bookingData, accessToken)
         localStorage.removeItem("bookingData") // Fixed: should be "bookingData" not "booking"
+        localStorage.removeItem("booking")
       } catch (error) {
         console.error("Error al enviar la reserva:", error)
       }
