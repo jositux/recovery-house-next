@@ -655,7 +655,7 @@ export default function RoomPage() {
               </>
             ) : updated === "room" ? (
               <>
-                <DialogTitle className="text-xl">🛏️ ¡Felitaciones, Puedes disfrutar de tu habitación!</DialogTitle>
+                <DialogTitle className="text-xl">🛏️ ¡Felitaciones, puedes disfrutar del alojamiento!</DialogTitle>
                 <DialogDescription className="text-md">
                   Puedes seguir agregando más habitaciones / camas o editar las que ya creaste.
                   <br />

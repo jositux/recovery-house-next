@@ -9,7 +9,7 @@ import { format, parseISO, differenceInDays } from "date-fns"
 import { es } from "date-fns/locale"
 import Image from "next/image"
 import ReviewModal from "@/components/ReviewModal"
-import { Calendar, Users, DollarSign, BedSingle, BedDouble, Star, Loader2, Search } from "lucide-react"
+import { Calendar, Users, DollarSign, BedSingle, BedDouble, Star, Loader2, Search, MapPin } from "lucide-react"
 import Link from "next/link"
 
 interface Photo {
@@ -159,7 +159,7 @@ const BookingList: React.FC = () => {
 
     // Si room.isPrivate es false (explícitamente), usar cálculo para habitaciones compartidas
     // Si room.isPrivate es null o true, considerar como habitación privada
-    if (booking.isPrivate === false) {
+    if (booking.room.isPrivate === false) {
       total = nights * Number.parseFloat(booking.price) + Number.parseFloat(booking.cleaning)
     } else {
       // For private rooms (room.isPrivate is true or null), use the original calculation
@@ -322,9 +322,12 @@ const BookingList: React.FC = () => {
                                   <h3 className="text-xl font-semibold text-gray-900 mb-2">
                                     {roomDetails?.name || "Habitación"} - {property?.name || "Propiedad desconocida"}
                                   </h3>
-                                  <p className="text-sm text-gray-500 mb-4">
-                                    {property?.city}, {property?.state}, {property?.country}
-                                  </p>
+                                  <div className="flex items-center text-sm text-gray-500 mb-4">
+                                    <MapPin className="h-4 w-4 mr-1" />
+                                    <span>
+                                      {`${property?.address} ${property?.city}. ${property?.state}. ${property?.country}`}
+                                    </span>
+                                  </div>
                                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
                                     <InfoItem
                                       icon={<Calendar />}
@@ -452,6 +455,12 @@ const BookingList: React.FC = () => {
                                   <h3 className="text-xl font-semibold text-gray-700 mb-2">
                                     {roomDetails?.name || "Habitación"} - {property?.name || "Propiedad desconocida"}
                                   </h3>
+                                  <div className="flex items-center text-sm text-gray-500 mb-4">
+                                    <MapPin className="h-4 w-4 mr-1" />
+                                    <span>
+                                      {`${property?.address} ${property?.city}. ${property?.state}. ${property?.country}`}
+                                    </span>
+                                  </div>
                                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
                                     <InfoItem
                                       icon={<Calendar />}
