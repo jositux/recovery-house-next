@@ -106,8 +106,8 @@ export default function RoomTypeSelector({
                     className="sr-only"
                   />
                   <Home className="h-8 w-8 mb-2" />
-                  <span className="font-medium">Habitación Privada</span>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="font-medium text-center">Habitación Privada</span>
+                  <span className="text-xs text-muted-foreground text-center">
                     Uso exclusivo, se reserva toda la habitación
                   </span>
                 </label>
@@ -125,9 +125,9 @@ export default function RoomTypeSelector({
                     className="sr-only"
                   />
                   <Users className="h-8 w-8 mb-2" />
-                  <span className="font-medium">Cama</span>
-                  <span className="text-xs text-muted-foreground">
-                    Se carga solamente 1 cama
+                  <span className="font-medium text-center">Cama</span>
+                  <span className="text-xs text-muted-foreground text-center">
+                    Se toma 1 cama como unidad de alojamiento
                   </span>
                 </label>
               </RadioGroup>
@@ -292,7 +292,7 @@ export default function RoomTypeSelector({
 
       {/* Capacity and Total Beds (calculated fields) */}
       {isPrivate && (
-        <div className="grid grid-cols-2 md:grid-cols-2 gap-4 pt-4 bg-white rounded-xl">
+        <div className="grid hidden grid-cols-2 md:grid-cols-2 gap-4 pt-4 bg-white rounded-xl">
           <FormField
             control={control}
             name="beds"
@@ -335,7 +335,7 @@ export default function RoomTypeSelector({
           // SOLO campos para habitación PRIVADA - NOMBRES ÚNICOS
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-900">
-              Precios para Habitación Privada
+              Precios para la Habitación (U$D)
             </h3>
             {noBeds && (
               <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-800">
@@ -350,7 +350,7 @@ export default function RoomTypeSelector({
                 name="privateRoomPrice"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Precio por Noche (Privada)</FormLabel>
+                    <FormLabel>Precio x Noche</FormLabel>
                     <FormControl>
                       <Input
                         key={`private-price-${isPrivate}`} // Key único para forzar re-render
@@ -374,7 +374,7 @@ export default function RoomTypeSelector({
                         placeholder={
                           noBeds
                             ? "Seleccione camas primero"
-                            : "Precio habitación completa"
+                            : ""
                         }
                       />
                     </FormControl>
@@ -390,7 +390,7 @@ export default function RoomTypeSelector({
                 name="privateRoomCleaning"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tarifa de Limpieza (Privada)</FormLabel>
+                    <FormLabel>Tarifa de Limpieza</FormLabel>
                     <FormControl>
                       <Input
                         key={`private-cleaning-${isPrivate}`} // Key único para forzar re-render
@@ -414,7 +414,7 @@ export default function RoomTypeSelector({
                         placeholder={
                           noBeds
                             ? "Seleccione camas primero"
-                            : "Limpieza habitación"
+                            : ""
                         }
                       />
                     </FormControl>
@@ -431,7 +431,7 @@ export default function RoomTypeSelector({
           // SOLO campos para habitación COMPARTIDA - NOMBRES ÚNICOS
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-900">
-              Precios para la Cama
+              Precios para la Cama (U$D)
             </h3>
             {noBedTypeSelected && (
               <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-800">
@@ -446,7 +446,7 @@ export default function RoomTypeSelector({
                 name="sharedRoomPrice"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Precio por Cama</FormLabel>
+                    <FormLabel>Precio x Noche</FormLabel>
                     <FormControl>
                       <Input
                         key={`shared-price-${isPrivate}`} // Key único para forzar re-render
@@ -490,7 +490,7 @@ export default function RoomTypeSelector({
                 name="sharedRoomCleaning"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Limpieza por Cama</FormLabel>
+                    <FormLabel>Tarifa de Limpieza</FormLabel>
                     <FormControl>
                       <Input
                         key={`shared-cleaning-${isPrivate}`} // Key único para forzar re-render
