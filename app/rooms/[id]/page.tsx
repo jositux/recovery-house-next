@@ -99,6 +99,7 @@ interface Booking {
   room: string;
   singleBeds: number;
   doubleBeds: number;
+  isPrivate: boolean;
 }
 
 interface ServiceProvider {
