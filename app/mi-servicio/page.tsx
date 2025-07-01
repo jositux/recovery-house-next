@@ -61,9 +61,14 @@ export default function ProviderDataPage() {
             <Card key={provider.id} className="overflow-hidden relative">
               <CardHeader className="bg-gradient-to-r from-blue-500 to-[#39759E] text-white">
                 <CardTitle className="text-xl">{provider.name}</CardTitle>
+                <div className="flex items-center">
+                      <Mail className="w-4 h-4 mr-2 text-white" />
+                      <span>{provider.email}</span>
+                    </div>
               </CardHeader>
               <CardContent className="p-6">
                 <p className="text-gray-600 mb-4">{provider.description}</p>
+               
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div>
                     <p className="font-semibold">Tax ID/EIN: {provider.taxIdEIN}</p>
@@ -84,10 +89,7 @@ export default function ProviderDataPage() {
                       <Phone className="w-4 h-4 mr-2 text-gray-500" />
                       <span>{provider.phone}</span>
                     </div>
-                    <div className="flex items-center">
-                      <Mail className="w-4 h-4 mr-2 text-gray-500" />
-                      <span>{provider.email}</span>
-                    </div>
+                    
                     <div className="flex items-center">
                       <MapPin className="w-4 h-4 mr-2 text-gray-500" />
                       <span>{`${provider.city}, ${provider.state}, ${provider.country}`}</span>

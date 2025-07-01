@@ -149,7 +149,8 @@ function SubscriptionPlans() {
                     //test
                     //"price_1R7cqLGDJ9gekygzcT6RrHD8",
                     //prod
-                    "price_1R7fIeGDJ9gekygzgS7tXPiV",
+                    //1$ "price_1R7fIeGDJ9gekygzgS7tXPiV",
+                    "price_1Rg6C3GDJ9gekygzVoY1umTT",
                     "annual",
                     "$100.00"
                   )
@@ -201,7 +202,8 @@ function SubscriptionPlans() {
                     //test
                     //"price_1R7ctQGDJ9gekygzhq6qw9Eo",
                     //prod
-                    "price_1R7fGXGDJ9gekygzgEmpQf0f",
+                    //2$ "price_1R7fGXGDJ9gekygzgEmpQf0f",
+                    "price_1Rg6AfGDJ9gekygzkrKhcIlU",
                     "quarterly",
                     "$40.00"
                   )
