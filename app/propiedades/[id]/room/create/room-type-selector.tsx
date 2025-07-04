@@ -1,6 +1,6 @@
 "use client";
 
-import { Bed, BedDouble, Home, Users } from "lucide-react";
+import { Bed, BedDouble, Home } from "lucide-react";
 import {
   FormControl,
   FormDescription,
@@ -124,8 +124,8 @@ export default function RoomTypeSelector({
                     id="shared"
                     className="sr-only"
                   />
-                  <Users className="h-8 w-8 mb-2" />
-                  <span className="font-medium text-center">Cama</span>
+                  <Bed className="h-8 w-8 mb-2" />
+                  <span className="font-medium text-center">Cama (Habitación compartida)</span>
                   <span className="text-xs text-muted-foreground text-center">
                     Se toma 1 cama como unidad de alojamiento
                   </span>

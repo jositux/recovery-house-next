@@ -1,55 +1,96 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import L from "leaflet"
-import "leaflet/dist/leaflet.css"
+import { Loader } from "@googlemaps/js-api-loader"
 
-interface OSMMapProps {
+interface GoogleMapProps {
   lat: number
   lng: number
+  apiKey?: string
 }
 
-export function GoogleMap({ lat, lng }: OSMMapProps) {
+export function GoogleMap({ lat, lng, apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }: GoogleMapProps) {
   const mapRef = useRef<HTMLDivElement>(null)
-  const mapInstance = useRef<L.Map | null>(null)
+  const mapInstance = useRef<google.maps.Map | null>(null)
+  const markerInstance = useRef<google.maps.Marker | null>(null)
 
   useEffect(() => {
-    if (!mapRef.current) return
+    if (!mapRef.current || !apiKey) return
 
-    if (!mapInstance.current) {
-      mapInstance.current = L.map(mapRef.current).setView([lat, lng], 15)
+    const initializeMap = async () => {
+      try {
+        const loader = new Loader({
+          apiKey: apiKey,
+          version: "weekly",
+          libraries: ["places"],
+        })
 
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      }).addTo(mapInstance.current)
+        const google = await loader.load()
 
-      // Definir un icono personalizado con sombra
-      const customIcon = L.icon({
-        iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  shadowSize: [41, 41],
-      })
+        if (!mapInstance.current) {
+          // Crear el mapa
+          mapInstance.current = new google.maps.Map(mapRef.current!, {
+            center: { lat, lng },
+            zoom: 15,
+            mapTypeControl: true,
+            streetViewControl: true,
+            fullscreenControl: true,
+            zoomControl: true,
+          })
 
-      // Agregar marcador con icono y sombra
-      L.marker([lat, lng], { icon: customIcon })
-        .addTo(mapInstance.current)
-        .bindPopup("Ubicación seleccionada")
-    } else {
-      mapInstance.current.setView([lat, lng], 15)
+          // Crear el marcador
+          markerInstance.current = new google.maps.Marker({
+            position: { lat, lng },
+            map: mapInstance.current,
+            title: "Ubicación seleccionada",
+            animation: google.maps.Animation.DROP,
+          })
+
+          // Agregar InfoWindow al marcador
+          const infoWindow = new google.maps.InfoWindow({
+            content: "Ubicación seleccionada",
+          })
+
+          markerInstance.current.addListener("click", () => {
+            infoWindow.open(mapInstance.current, markerInstance.current)
+          })
+        } else {
+          // Actualizar posición del mapa y marcador
+          const newPosition = { lat, lng }
+          mapInstance.current.setCenter(newPosition)
+
+          if (markerInstance.current) {
+            markerInstance.current.setPosition(newPosition)
+          }
+        }
+      } catch (error) {
+        console.error("Error loading Google Maps:", error)
+      }
     }
 
+    initializeMap()
+
     return () => {
+      if (markerInstance.current) {
+        markerInstance.current.setMap(null)
+        markerInstance.current = null
+      }
       if (mapInstance.current) {
-        mapInstance.current.remove()
         mapInstance.current = null
       }
     }
-  }, [lat, lng])
+  }, [lat, lng, apiKey])
 
-  return <div ref={mapRef} style={{ width: "100%", height: "300px" }} />
+  if (!apiKey) {
+    return (
+      <div
+        style={{ width: "100%", height: "300px" }}
+        className="flex items-center justify-center bg-gray-100 text-gray-500"
+      >
+        Google Maps API key is required
+      </div>
+    )
+  }
+
+  return <div ref={mapRef} style={{ width: "100%", height: "300px" }} className="rounded-lg overflow-hidden" />
 }
