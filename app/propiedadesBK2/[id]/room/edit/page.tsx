@@ -1,12 +1,12 @@
 "use client";
 
 //import { useState } from "react";
-import RoomForm from "../RoomForm";
+import RoomForm from "./RoomForm";
 //import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   roomUpdateService,
   type RoomUpdateData,
-} from "@/services/RoomUpdateService4";
+} from "@/services/RoomUpdateService3";
 
 //import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
@@ -65,14 +65,6 @@ export default function RoomPage() {
           bedType: parsedData.bedType || "",
           bedName: parsedData.bedName || "",
 
-          checkinTime: parsedData.check_in_hour.substring(0, 5) || "15:00",
-          checkoutTime:parsedData.check_out_hour.substring(0, 5) || "11:00",
-      
-          // Discount fields
-          shortStayDiscount: parseInt(parsedData.discount_percentage_short_stay, 10).toString() || "0",
-          mediumStayDiscount: parseInt(parsedData.discount_percentage_medium_stay, 10).toString() || "0",
-          longStayDiscount: parseInt(parsedData.discount_percentage_long_stay, 10).toString() || "0",
-
           photos: parsedData.photos
             ? parsedData.photos.map(
                 (photo: { directus_files_id: { id: string } }) =>
@@ -115,15 +107,6 @@ export default function RoomPage() {
 
         bedType: "single",
         bedName: "",
-
-        checkinTime:"15:00",
-        checkoutTime:"11:00",
-    
-        // Discount fields
-        shortStayDiscount: "0",
-        mediumStayDiscount: "0",
-        longStayDiscount: "0",
-
         // Otros campos
         photos: [],
         extraTags: [""],
