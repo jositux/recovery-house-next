@@ -529,6 +529,7 @@ export default function RoomPage() {
 
 
   function formatTimeToAMPM(time: string): string {
+    console.log(time)
     const [hourStr, minute] = time.split(":");
     let hour = parseInt(hourStr, 10);
     const ampm = hour >= 12 ? "PM" : "AM";
@@ -697,7 +698,7 @@ export default function RoomPage() {
                           Horario de Entrada
                         </h3>
                         <p className="text-lg font-bold text-blue-600">
-                          {formatTimeToAMPM(room.check_in_hour)}
+                          {formatTimeToAMPM(room.check_in_hour ?? "00:00:00")}
                         </p>
                       </div>
                     </div>
@@ -711,7 +712,7 @@ export default function RoomPage() {
                           Horario de Salida
                         </h3>
                         <p className="text-lg font-bold text-orange-600">
-                          {formatTimeToAMPM(room.check_out_hour)}
+                          {formatTimeToAMPM(room.check_out_hour ?? "00:00:00")}
                         </p>
                       </div>
                     </div>
@@ -731,7 +732,7 @@ export default function RoomPage() {
                             Estadía Media
                           </span>
                           <span className="text-xl font-bold text-green-600">
-                          {formatDiscount(room.discount_percentage_medium_stay)}
+                          {formatDiscount(room.discount_percentage_medium_stay ?? "0")}
                           </span>
                         </div>
                         <p className="text-sm text-slate-600 mt-1">
@@ -745,7 +746,7 @@ export default function RoomPage() {
                             Estadía Larga
                           </span>
                           <span className="text-xl font-bold text-emerald-600">
-                          {formatDiscount(room.discount_percentage_long_stay)}
+                          {formatDiscount(room.discount_percentage_long_stay ?? "0")}
                           </span>
                         </div>
                         <p className="text-sm text-slate-600 mt-1">
@@ -831,7 +832,7 @@ export default function RoomPage() {
                 <h3 className="text-lg font-semibold text-gray-900">
                   Más acerca de los servicios:
                 </h3>
-                <p className="text-[#162F40]">{room.descriptionService}</p>
+                {room.descriptionService}
               </div>
             )}
 
