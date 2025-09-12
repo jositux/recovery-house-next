@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import axios from "axios";
-import { Bed, Users } from "lucide-react";
+import { Bed, Users, Clock, Percent, CreditCard } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 //import { Camera } from 'lucide-react';
 import { BookingWidget } from "@/components/ui/booking-widget-private";
 //import BookingWidgetShared from "@/components/ui/booking-widget-shared"
@@ -23,6 +24,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 
 import { fetchCurrentUser } from "@/services/BookingService";
 import { useRouter } from "next/navigation";
+
+import { fetchStayData, Stay } from "@/services/stayService";
 
 //import { useCheckOwnership } from "@/hooks/isOwner";
 
@@ -63,6 +66,13 @@ interface Room {
 
   bedType: string;
   bedName: string;
+
+  check_in_hour: string;
+  check_out_hour: string;
+  discount_percentage_medium_stay: string;
+  discount_percentage_long_stay: string;
+  prepayment_percentage: string;
+
   photos: ImageRoom[];
   extraTags: RoomTag[];
   servicesTags: { serviceTags_id: string }[];
@@ -132,6 +142,17 @@ interface BookingData {
   totalPrice: number;
 }
 
+interface DiscountData {
+  shortStayDiscounts: string[];
+  mediumStayDiscounts: string[];
+  longStayDiscounts: string[];
+  defaultShortStayDiscount: string;
+  defaultMediumStayDiscount: string;
+  defaultLongStayDiscount: string;
+  shortStayRange: { min: number; max: number | null };
+  mediumStayRange: { min: number; max: number | null };
+  longStayRange: { min: number; max: number | null };
+}
 
 export default function RoomPage() {
   const { id } = useParams();
@@ -197,6 +218,59 @@ export default function RoomPage() {
     fetchUser();
   }, []); // solo se ejecuta una vez al montar el componente
 
+
+
+  const [discountData, setDiscountData] = useState<DiscountData | null>(null);
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem("access_token") ?? "";
+    if (!accessToken) return;
+
+    const loadData = async () => {
+      try {
+        const stays: Stay[] = await fetchStayData(accessToken);
+
+        const shortStay = stays.find((s) => s.type === "corta");
+        const mediumStay = stays.find((s) => s.type === "media");
+        const longStay = stays.find((s) => s.type === "larga");
+
+        setDiscountData({
+          shortStayDiscounts: shortStay?.discounts.map((d) =>
+            d.percentage.toString()
+          ) ?? ["0"],
+          mediumStayDiscounts: mediumStay?.discounts.map((d) =>
+            d.percentage.toString()
+          ) ?? ["0"],
+          longStayDiscounts: longStay?.discounts.map((d) =>
+            d.percentage.toString()
+          ) ?? ["0"],
+          defaultShortStayDiscount:
+            shortStay?.discounts[0]?.percentage.toString() ?? "0",
+          defaultMediumStayDiscount:
+            mediumStay?.discounts[0]?.percentage.toString() ?? "0",
+          defaultLongStayDiscount:
+            longStay?.discounts[0]?.percentage.toString() ?? "0",
+          shortStayRange: {
+            min: shortStay?.minNights ?? 1,
+            max: shortStay?.maxNights ?? 5,
+          },
+          mediumStayRange: {
+            min: mediumStay?.minNights ?? 6,
+            max: mediumStay?.maxNights ?? 9,
+          },
+          longStayRange: {
+            min: longStay?.minNights ?? 10,
+            max: longStay?.maxNights ?? null,
+          },
+        });
+      } catch (err) {
+        console.error("Error cargando descuentos:", err);
+      }
+    };
+
+    loadData();
+  }, []);
+
   // Handle reservation from the BookingWidgetPrivate
   const handleReservation = async (data: BookingData) => {
     // setBookingPrivateData(data);
@@ -221,10 +295,7 @@ export default function RoomPage() {
 
     localStorage.removeItem("bookingData");
 
-    localStorage.setItem(
-      "bookingData",
-      JSON.stringify(formattedBookingData)
-    );
+    localStorage.setItem("bookingData", JSON.stringify(formattedBookingData));
 
     const formattedBooking = {
       isPrivate: room?.isPrivate,
@@ -262,10 +333,7 @@ export default function RoomPage() {
 
     localStorage.removeItem("bookingData");
 
-    localStorage.setItem(
-      "bookingData",
-      JSON.stringify(formattedBookingData)
-    );
+    localStorage.setItem("bookingData", JSON.stringify(formattedBookingData));
 
     const formattedBooking = {
       isPrivate: room?.isPrivate,
@@ -393,20 +461,16 @@ export default function RoomPage() {
   }, [room, getImageSrc]);
 
   type HtmlContentProps = {
-    html?: string | null
-  }
-  
-  const HtmlContent = ({ html }: HtmlContentProps) => {
-    if (!html || html.trim() === "") return null
-  
-    return (
-      <div
-        className="prose"
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
-    )
-  }
+    html?: string | null;
+  };
 
+  const HtmlContent = ({ html }: HtmlContentProps) => {
+    if (!html || html.trim() === "") return null;
+
+    return <div className="prose" dangerouslySetInnerHTML={{ __html: html }} />;
+  };
+
+  /*
   const getAvailableBeds = (
     room: Room,
     bookingsForRoom: Booking[]
@@ -424,17 +488,15 @@ export default function RoomPage() {
       availableSingleBeds: room.singleBeds - reservedSingleBeds,
       availableDoubleBeds: room.doubleBeds - reservedDoubleBeds,
     };
-  };
+  };*/
 
-  const [availableBeds, setAvailableBeds] = useState<{
+  /*const [availableBeds, setAvailableBeds] = useState<{
     availableSingleBeds: number;
     availableDoubleBeds: number;
   }>({
     availableSingleBeds: 0,
     availableDoubleBeds: 0,
   });
-
-  console.log(availableBeds);
 
   useEffect(() => {
     if (room) {
@@ -447,7 +509,7 @@ export default function RoomPage() {
       );
       setAvailableBeds({ availableSingleBeds, availableDoubleBeds });
     }
-  }, [room, filteredBookings]); // Recalcular cuando room o bookings cambien
+  }, [room, filteredBookings]); // Recalcular cuando room o bookings cambien*/
 
   if (isLoading) {
     return (
@@ -463,6 +525,23 @@ export default function RoomPage() {
         {error || "Habitación no encontrada"}
       </div>
     );
+  }
+
+
+  function formatTimeToAMPM(time: string): string {
+    const [hourStr, minute] = time.split(":");
+    let hour = parseInt(hourStr, 10);
+    const ampm = hour >= 12 ? "PM" : "AM";
+    hour = hour % 12 || 12; // convierte 0 => 12
+    return `${hour}:${minute} ${ampm}`;
+  }
+
+  function formatDiscount(discount: string): string {
+    const num = parseFloat(discount);
+    if (isNaN(num) || num === 0) {
+      return "Sin descuento";
+    }
+    return `${Math.round(num)}%`;
   }
 
   return (
@@ -525,9 +604,9 @@ export default function RoomPage() {
                 className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}
               >
                 {room.isPrivate === false && room.bedName?.trim()
-      ? `${room.bedName} - `
-      : ""}
-    {room.name}
+                  ? `${room.bedName} - `
+                  : ""}
+                {room.name}
               </h1>
               <p className="text-xl text-[#162F40] mb-4"> {property.name}</p>
               {room.isPrivate === true && (
@@ -577,10 +656,9 @@ export default function RoomPage() {
                       <p className="text-sm leading-relaxed">
                         Esta cama se alquila de manera individual, lo que
                         significa que reservás un lugar dentro de una habitación
-                        compartida. Esta
-                        modalidad es ideal para quienes buscan una opción
-                        económica y están abiertos a compartir el espacio con
-                        otras personas.
+                        compartida. Esta modalidad es ideal para quienes buscan
+                        una opción económica y están abiertos a compartir el
+                        espacio con otras personas.
                       </p>
                     </div>
                   </div>
@@ -591,9 +669,119 @@ export default function RoomPage() {
             {/* Description */}
             <div className="mb-8">
               <p className="text-[#162F40]">
-              <HtmlContent html={room.description} />
-               
+                <HtmlContent html={room.description} />
               </p>
+            </div>
+
+            <div className="grid gap-6 mt-6 mb-12">
+              {/* Check-in/Check-out Times */}
+              <Card className="w-full max-w-3xl shadow-lg border-0 bg-gradient-to-br from-slate-50 to-white">
+                <CardHeader className="pb-6">
+                  <CardTitle className="text-2xl font-bold text-slate-800">
+                    Políticas del hospedaje
+                  </CardTitle>
+                  <p className="text-slate-600 mt-2">
+                    Información importante sobre horarios, descuentos y pagos
+                  </p>
+                </CardHeader>
+
+                <CardContent className="space-y-6">
+                  {/* Check-in/Check-out Section */}
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                      <div className="flex-shrink-0">
+                        <Clock className="h-6 w-6 text-blue-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-slate-800">
+                          Horario de Entrada
+                        </h3>
+                        <p className="text-lg font-bold text-blue-600">
+                          {formatTimeToAMPM(room.check_in_hour)}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-3 p-4 bg-orange-50 rounded-lg border border-orange-100">
+                      <div className="flex-shrink-0">
+                        <Clock className="h-6 w-6 text-orange-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-slate-800">
+                          Horario de Salida
+                        </h3>
+                        <p className="text-lg font-bold text-orange-600">
+                          {formatTimeToAMPM(room.check_out_hour)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Discounts Section */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-slate-800 flex items-center">
+                      <Percent className="h-5 w-5 mr-2 text-green-600" />
+                      Descuentos por Estadía
+                    </h3>
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="p-4 bg-green-50 rounded-lg border border-green-100">
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-700 font-medium">
+                            Estadía Media
+                          </span>
+                          <span className="text-xl font-bold text-green-600">
+                          {formatDiscount(room.discount_percentage_medium_stay)}
+                          </span>
+                        </div>
+                        <p className="text-sm text-slate-600 mt-1">
+                        {discountData?.mediumStayRange.min} - {discountData?.mediumStayRange.max} noches
+                        </p>
+                      </div>
+
+                      <div className="p-4 bg-emerald-50 rounded-lg border border-emerald-100">
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-700 font-medium">
+                            Estadía Larga
+                          </span>
+                          <span className="text-xl font-bold text-emerald-600">
+                          {formatDiscount(room.discount_percentage_long_stay)}
+                          </span>
+                        </div>
+                        <p className="text-sm text-slate-600 mt-1">
+                          {discountData?.longStayRange.min}+ noches
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Prepayment Section */}
+                  <div className="p-4 bg-purple-50 rounded-lg border border-purple-100">
+                    <div className="flex items-center space-x-3">
+                      <CreditCard className="h-6 w-6 text-purple-600" />
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-slate-800">
+                          Adelanto de Pago
+                        </h3>
+                        <p className="text-slate-600">
+                          Puedes hacer un adelanto del{" "}
+                          <span className="font-bold text-purple-600">
+                          {formatDiscount(room.prepayment_percentage)}
+                          </span>{" "}
+                          del total
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Additional Info */}
+                  <div className="text-center pt-4 border-t border-slate-200">
+                    <p className="text-sm text-slate-500">
+                      Las políticas se aplican solamente a este hospedaje
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Booking Widget for mobile */}
@@ -643,9 +831,7 @@ export default function RoomPage() {
                 <h3 className="text-lg font-semibold text-gray-900">
                   Más acerca de los servicios:
                 </h3>
-                <p className="text-[#162F40]">
-                  {room.descriptionService}
-                </p>
+                <p className="text-[#162F40]">{room.descriptionService}</p>
               </div>
             )}
 
