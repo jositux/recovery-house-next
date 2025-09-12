@@ -1,22 +1,123 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent } from "@/components/ui/card"
 import { CalendarDays, Users, CheckCircle2, AlertCircle } from "lucide-react"
 
+interface BookingData {
+  checkIn: string
+  checkOut: string
+  guests: number
+  nights: number
+  price: number
+  cleaning: number
+  discount_percentage_medium_stay: number
+  discount_percentage_long_stay: number
+  prepayment_percentage: number
+  minMediumStayRange: number
+  maxMediumStayRange: number | null
+  minLongStayRange: number
+  maxLongStayRange: number | null
+  totalPrice: number
+  isPrivate: boolean
+  patientId: string
+  room: string
+  roomName: string
+  ownerId: string
+  ownerName: string
+  propertyName: string
+  description: string
+}
+
 export default function NewConfirmAndPay() {
   const [selectedDiscountOption, setSelectedDiscountOption] = useState("no-discount")
   const [agreedToTerms, setAgreedToTerms] = useState(false)
+  const [bookingData, setBookingData] = useState<BookingData | null>(null)
 
-  // Montos de ejemplo
-  const baseAmount = 1250.75
-  const advancePaymentPercentage = 10
+  useEffect(() => {
+    const storedData = localStorage.getItem("bookingData")
+
+    if (storedData) {
+      try {
+        const data = JSON.parse(storedData)
+        setBookingData(data)
+      } catch (error) {
+        console.error("Error parsing booking data:", error)
+      }
+    }
+  }, [])
+
+  if (!bookingData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">Cargando datos de reserva...</h2>
+          <p className="text-gray-600">No se encontraron datos de reserva en el localStorage.</p>
+        </div>
+      </div>
+    )
+  }
+
+  // --- 🔹 Lógica para calcular días entre checkIn y checkOut ---
+  const getDaysBetween = (checkIn: string, checkOut: string): number => {
+    const start = new Date(checkIn)
+    const end = new Date(checkOut)
+    const diffTime = end.getTime() - start.getTime()
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  }
+
+  // --- 🔹 Cálculo del subtotal ---
+  const subtotal = bookingData.nights * bookingData.guests * bookingData.price
+
+  // --- 🔹 Cálculo del descuento por rango ---
+  const days = getDaysBetween(bookingData.checkIn, bookingData.checkOut)
+
+  let discount = 0
+  // Medium Stay
+  if (
+    days >= bookingData.minMediumStayRange &&
+    (bookingData.maxMediumStayRange === null || days <= bookingData.maxMediumStayRange)
+  ) {
+    discount = subtotal * (bookingData.discount_percentage_medium_stay / 100)
+  }
+
+  // Long Stay (tiene prioridad sobre Medium si cumple)
+  if (
+    days >= bookingData.minLongStayRange &&
+    (bookingData.maxLongStayRange === null || days <= bookingData.maxLongStayRange)
+  ) {
+    discount = subtotal * (bookingData.discount_percentage_long_stay / 100)
+  }
+
+  const baseAmount = subtotal - discount + bookingData.cleaning
+
+  // --- 🔹 Cálculo anticipo ---
+  const advancePaymentPercentage = bookingData.prepayment_percentage
   const advancePaymentAmount = baseAmount * (advancePaymentPercentage / 100)
 
   const getCurrentAmount = () => {
     return selectedDiscountOption === "with-discount" ? advancePaymentAmount : baseAmount
+  }
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString("es-ES", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    })
+  }
+
+  const getPaymentDeadline = () => {
+    const checkInDate = new Date(bookingData.checkIn)
+    checkInDate.setHours(checkInDate.getHours() - 72) // 72 horas antes
+    return checkInDate.toLocaleDateString("es-ES", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    })
   }
 
   return (
@@ -59,7 +160,7 @@ export default function NewConfirmAndPay() {
                     <p className="text-sm text-gray-600">Paga el monto completo ahora</p>
                   </div>
                 </div>
-                <span className="font-semibold text-gray-900">${baseAmount.toFixed(2)}</span>
+                <span className="font-semibold text-gray-900">${baseAmount.toLocaleString("es-CO")}</span>
               </div>
             </div>
 
@@ -85,13 +186,13 @@ export default function NewConfirmAndPay() {
                       Paga solo el {advancePaymentPercentage}% ahora, el resto antes del check-in
                     </p>
                     <p className="text-xs text-blue-600 mt-1">
-                      Saldo restante: ${(baseAmount - advancePaymentAmount).toFixed(2)} (debe pagarse antes del 25 de
-                      julio de 2025)
+                      Saldo restante: ${(baseAmount - advancePaymentAmount).toLocaleString("es-CO")} (debe pagarse antes
+                      del {getPaymentDeadline()})
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="font-semibold text-gray-900">${advancePaymentAmount.toFixed(2)}</span>
+                  <span className="font-semibold text-gray-900">${advancePaymentAmount.toLocaleString("es-CO")}</span>
                   <div className="text-xs text-gray-500">ahora</div>
                 </div>
               </div>
@@ -105,7 +206,6 @@ export default function NewConfirmAndPay() {
               <div className="flex items-start gap-2">
                 <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
                 <div className="text-sm text-amber-800">
-                 
                   <p>
                     Anulación gratuita hasta 72 horas antes del check-in. Después de este período, no hay reembolso
                     disponible.
@@ -144,7 +244,7 @@ export default function NewConfirmAndPay() {
             className="w-full md:w-auto bg-blue-500 hover:bg-blue-500 text-white font-semibold py-6 px-6 rounded-lg text-lg"
             disabled={!agreedToTerms}
           >
-            Confirmar y pagar ${getCurrentAmount().toFixed(2)}
+            Confirmar y pagar ${getCurrentAmount().toLocaleString("es-CO")}
           </Button>
         </div>
 
@@ -154,15 +254,13 @@ export default function NewConfirmAndPay() {
             <CardContent className="p-6 space-y-4">
               <div className="flex items-start gap-4">
                 <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 text-lg leading-tight">
-                    Casa Moderna en <br />
-                    Distrito de Haight
-                  </h3>
-                  <p className="text-sm text-gray-600">Ibagué Tolima Colombia</p>
+                  <h3 className="font-semibold text-gray-900 text-lg leading-tight">{bookingData.roomName}</h3>
+                  <p className="text-sm text-gray-600">{bookingData.propertyName}</p>
+                  <p className="text-xs text-gray-500 mt-1">Propietario: {bookingData.ownerName}</p>
                 </div>
                 <img
-                  src="http://localhost:3000/_next/image?url=%2Fwebapi%2Fassets%2Fb20d1424-efea-4327-b21c-5a298d3eb890%3Fkey%3Dmedium&w=3840&q=75"
-                  alt="Casa Moderna Soleada"
+                  src="/modern-room-interior.png"
+                  alt={bookingData.roomName}
                   className="w-24 h-16 object-cover rounded-md"
                 />
               </div>
@@ -170,11 +268,22 @@ export default function NewConfirmAndPay() {
               <div className="space-y-3 text-sm text-gray-700">
                 <div className="flex items-center gap-2">
                   <CalendarDays className="h-4 w-4 text-gray-500" />
-                  <span>23 de julio de 2025 → 28 de julio de 2025</span>
+                  <span>
+                    {formatDate(bookingData.checkIn)} → {formatDate(bookingData.checkOut)}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4 text-gray-500" />
-                  <span>2 huéspedes</span>
+                  <span>
+                    {bookingData.guests} huésped{bookingData.guests > 1 ? "es" : ""} x {bookingData.nights} noche
+                    {bookingData.nights > 1 ? "s" : ""} = ${subtotal}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4 text-gray-500" />
+                  <span>
+                    Limpieza = ${bookingData.cleaning}
+                  </span>
                 </div>
               </div>
 
@@ -184,19 +293,23 @@ export default function NewConfirmAndPay() {
                     {selectedDiscountOption === "with-discount" ? "Pago Anticipado" : "Total"}
                   </span>
                   <div className="text-right">
-                    <span className="font-bold text-gray-900 text-lg">${getCurrentAmount().toFixed(2)}</span>
+                    <span className="font-bold text-gray-900 text-lg">
+                      ${getCurrentAmount().toLocaleString("es-CO")}
+                    </span>
                   </div>
                 </div>
 
                 {selectedDiscountOption === "with-discount" && (
                   <>
                     <div className="text-sm text-blue-600">
-                      Anticipo: ${advancePaymentAmount.toFixed(2)} ({advancePaymentPercentage}% del total)
+                      Anticipo: ${advancePaymentAmount.toLocaleString("es-CO")} ({advancePaymentPercentage}% del total)
                     </div>
                     <div className="text-sm text-gray-600">
-                      Saldo pendiente: ${(baseAmount - advancePaymentAmount).toFixed(2)}
+                      Saldo pendiente: ${(baseAmount - advancePaymentAmount).toLocaleString("es-CO")}
                     </div>
-                    <div className="text-xs text-gray-500">Total de la reserva: ${baseAmount.toFixed(2)}</div>
+                    <div className="text-xs text-gray-500">
+                      Total de la reserva: ${baseAmount.toLocaleString("es-CO")}
+                    </div>
                   </>
                 )}
               </div>

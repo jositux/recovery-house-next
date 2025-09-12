@@ -306,10 +306,11 @@ export default function RoomPage() {
 
     localStorage.setItem("booking", JSON.stringify(formattedBooking));
 
-    router.push("/checkout");
+    router.push("/confirm-pay");
   };
 
   // Handle reservation from the BookingWidgetPrivate
+  /*
   const handleReservationShared = async (data: BookingData) => {
     // setBookingSharedData(data);
 
@@ -346,6 +347,7 @@ export default function RoomPage() {
 
     router.push("/checkout");
   };
+  */
 
   useEffect(() => {
     const fetchRoomData = async () => {
@@ -732,6 +734,7 @@ export default function RoomPage() {
                             Estadía Media
                           </span>
                           <span className="text-xl font-bold text-green-600">
+                           
                           {formatDiscount(room.discount_percentage_medium_stay ?? "0")}
                           </span>
                         </div>
@@ -767,7 +770,7 @@ export default function RoomPage() {
                         <p className="text-slate-600">
                           Puedes hacer un adelanto del{" "}
                           <span className="font-bold text-purple-600">
-                          {formatDiscount(room.prepayment_percentage)}
+                          {formatDiscount(room.prepayment_percentage ?? "10")}
                           </span>{" "}
                           del total
                         </p>
@@ -794,6 +797,13 @@ export default function RoomPage() {
                 <BookingWidgetBed
                   price={Number.parseInt(room.sharedRoomPrice, 10)}
                   cleaning={Number.parseInt(room.sharedRoomCleaning, 10)}
+                  discount_percentage_medium_stay= {Number.parseInt(room.discount_percentage_medium_stay ?? "0")}
+                  discount_percentage_long_stay= {Number.parseInt(room.discount_percentage_long_stay ?? "0")}
+                  prepayment_percentage= {Number.parseInt(room.prepayment_percentage ?? "10")}
+                  minMediumStayRange= {discountData?.mediumStayRange.min ?? 6}
+                  maxMediumStayRange= {discountData?.mediumStayRange.max ?? 9}
+                  minLongStayRange= {discountData?.longStayRange.min ?? 10}
+                  maxLongStayRange= {discountData?.longStayRange.max ?? 10000}
                   disableDates={room.disableDates}
                   bookings={filteredBookings}
                   onReservation={handleReservation}
@@ -804,6 +814,15 @@ export default function RoomPage() {
                   price={Number.parseInt(room.privateRoomPrice, 10)}
                   cleaning={Number.parseInt(room.privateRoomCleaning, 10)}
                   maxGuests={room.capacity}
+
+                  discount_percentage_medium_stay= {Number.parseInt(formatDiscount(room.discount_percentage_medium_stay ?? "0"))}
+                  discount_percentage_long_stay= {Number.parseInt(formatDiscount(room.discount_percentage_long_stay ?? "0"))}
+                  prepayment_percentage= {Number.parseInt(formatDiscount(room.prepayment_percentage ?? "10"))}
+                  minMediumStayRange= {discountData?.mediumStayRange.min ?? 6}
+                  maxMediumStayRange= {discountData?.mediumStayRange.max ?? 9}
+                  minLongStayRange= {discountData?.longStayRange.min ?? 10}
+                  maxLongStayRange= {discountData?.longStayRange.max ?? 10000}
+
                   disableDates={room.disableDates}
                   bookings={filteredBookings}
                   onReservation={handleReservation}
@@ -919,16 +938,32 @@ export default function RoomPage() {
                 <BookingWidgetBed
                   price={Number.parseInt(room.sharedRoomPrice, 10)}
                   cleaning={Number.parseInt(room.sharedRoomCleaning, 10)}
+                  discount_percentage_medium_stay= {Number.parseInt(room.discount_percentage_medium_stay ?? "0")}
+                  discount_percentage_long_stay= {Number.parseInt(room.discount_percentage_long_stay ?? "0")}
+                  prepayment_percentage= {Number.parseInt(room.prepayment_percentage ?? "10")}
+                  minMediumStayRange= {discountData?.mediumStayRange.min ?? 6}
+                  maxMediumStayRange= {discountData?.mediumStayRange.max ?? 9}
+                  minLongStayRange= {discountData?.longStayRange.min ?? 10}
+                  maxLongStayRange= {discountData?.longStayRange.max ?? 10000}
                   disableDates={room.disableDates}
                   bookings={filteredBookings}
-                  onReservation={handleReservationShared}
+                  onReservation={handleReservation}
                 />
               ) : (
                 // En cualquier otro caso (true, null, undefined, etc.), muestro la versión privada
-                <BookingWidget
-                  price={Number.parseInt(room.pricePerNight, 10)}
-                  cleaning={Number.parseInt(room.cleaningFee, 10)}
+                 <BookingWidget
+                  price={Number.parseInt(room.privateRoomPrice, 10)}
+                  cleaning={Number.parseInt(room.privateRoomCleaning, 10)}
                   maxGuests={room.capacity}
+
+                  discount_percentage_medium_stay= {Number.parseInt(room.discount_percentage_medium_stay ?? "0")}
+                  discount_percentage_long_stay= {Number.parseInt(room.discount_percentage_long_stay ?? "0")}
+                  prepayment_percentage= {Number.parseInt(room.prepayment_percentage ?? "10")}
+                  minMediumStayRange= {discountData?.mediumStayRange.min ?? 6}
+                  maxMediumStayRange= {discountData?.mediumStayRange.max ?? 9}
+                  minLongStayRange= {discountData?.longStayRange.min ?? 10}
+                  maxLongStayRange= {discountData?.longStayRange.max ?? 10000}
+                  
                   disableDates={room.disableDates}
                   bookings={filteredBookings}
                   onReservation={handleReservation}
@@ -945,20 +980,36 @@ export default function RoomPage() {
                 <BookingWidgetBed
                   price={Number.parseInt(room.sharedRoomPrice, 10)}
                   cleaning={Number.parseInt(room.sharedRoomCleaning, 10)}
-                  disableDates={room.disableDates}
-                  bookings={filteredBookings}
-                  onReservation={handleReservationShared}
-                />
-              ) : (
-                // En cualquier otro caso (true, null, undefined, etc.), muestro la versión privada
-                <BookingWidget
-                  price={Number.parseInt(room.privateRoomPrice, 10)}
-                  cleaning={Number.parseInt(room.privateRoomCleaning, 10)}
-                  maxGuests={room.capacity}
+                  discount_percentage_medium_stay= {Number.parseInt(room.discount_percentage_medium_stay ?? "0")}
+                  discount_percentage_long_stay= {Number.parseInt(room.discount_percentage_long_stay ?? "0")}
+                  prepayment_percentage= {Number.parseInt(room.prepayment_percentage ?? "10")}
+                  minMediumStayRange= {discountData?.mediumStayRange.min ?? 6}
+                  maxMediumStayRange= {discountData?.mediumStayRange.max ?? 9}
+                  minLongStayRange= {discountData?.longStayRange.min ?? 10}
+                  maxLongStayRange= {discountData?.longStayRange.max ?? 10000}
                   disableDates={room.disableDates}
                   bookings={filteredBookings}
                   onReservation={handleReservation}
                 />
+              ) : (
+                // En cualquier otro caso (true, null, undefined, etc.), muestro la versión privada
+                <BookingWidget
+                price={Number.parseInt(room.privateRoomPrice, 10)}
+                cleaning={Number.parseInt(room.privateRoomCleaning, 10)}
+                maxGuests={room.capacity}
+
+                discount_percentage_medium_stay= {Number.parseInt(room.discount_percentage_medium_stay ?? "0")}
+                discount_percentage_long_stay= {Number.parseInt(room.discount_percentage_long_stay ?? "0")}
+                prepayment_percentage= {Number.parseInt(room.prepayment_percentage ?? "10")}
+                minMediumStayRange= {discountData?.mediumStayRange.min ?? 6}
+                maxMediumStayRange= {discountData?.mediumStayRange.max ?? 9}
+                minLongStayRange= {discountData?.longStayRange.min ?? 10}
+                maxLongStayRange= {discountData?.longStayRange.max ?? 10000}
+                
+                disableDates={room.disableDates}
+                bookings={filteredBookings}
+                onReservation={handleReservation}
+              />
               )}
             </div>
           </div>
