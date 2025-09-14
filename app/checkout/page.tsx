@@ -22,7 +22,7 @@ const CheckoutPage = () => {
           const parsedBooking = JSON.parse(storedBooking);
           setBookingData({
             ...parsedBooking,
-            unit_amount: parsedBooking.unit_amount * 100 || 0,
+            unit_amount:  parsedBooking.unit_amount * 100 || 0,
           });
         } catch (error) {
           console.error("Error parsing booking data from localStorage:", error);
