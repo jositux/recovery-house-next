@@ -74,6 +74,9 @@ export default function NewConfirmAndPay() {
   // --- 🔹 Cálculo del descuento por rango ---
   const days = getDaysBetween(bookingData.checkIn, bookingData.checkOut)
 
+  // Hardcode
+  bookingData.discount_percentage_medium_stay = 10
+
   let discount = 0
   let discount_label = 0
   // Medium Stay
@@ -97,7 +100,9 @@ export default function NewConfirmAndPay() {
   const baseAmount = subtotal - discount + bookingData.cleaning
 
   // --- 🔹 Cálculo anticipo ---
-  const advancePaymentPercentage = bookingData.prepayment_percentage
+
+  // Hardcode
+  const advancePaymentPercentage = 10 //bookingData.prepayment_percentage
   const advancePaymentAmount = baseAmount * (advancePaymentPercentage / 100)
 
   const getCurrentAmount = () => {
