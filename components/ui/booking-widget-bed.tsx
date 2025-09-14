@@ -206,7 +206,7 @@ export function BookingWidgetBed({
       const formattedBooking: BookingData = {
         checkIn: checkIn?.toISOString().split("T")[0] || "",
         checkOut: checkOut?.toISOString().split("T")[0] || "",
-        guests: 0,
+        guests: 1,
         nights: nights,
         price: price,
         cleaning: cleaning,
@@ -218,7 +218,7 @@ export function BookingWidgetBed({
         maxMediumStayRange,
         minLongStayRange,
         maxLongStayRange,
-        
+
         totalPrice: totalPrice,
       };
 
