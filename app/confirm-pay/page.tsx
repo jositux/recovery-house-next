@@ -75,12 +75,14 @@ export default function NewConfirmAndPay() {
   const days = getDaysBetween(bookingData.checkIn, bookingData.checkOut)
 
   let discount = 0
+  let discount_label = 0
   // Medium Stay
   if (
     days >= bookingData.minMediumStayRange &&
     (bookingData.maxMediumStayRange === null || days <= bookingData.maxMediumStayRange)
   ) {
     discount = subtotal * (bookingData.discount_percentage_medium_stay / 100)
+    discount_label = bookingData.discount_percentage_medium_stay
   }
 
   // Long Stay (tiene prioridad sobre Medium si cumple)
@@ -89,6 +91,7 @@ export default function NewConfirmAndPay() {
     (bookingData.maxLongStayRange === null || days <= bookingData.maxLongStayRange)
   ) {
     discount = subtotal * (bookingData.discount_percentage_long_stay / 100)
+    discount_label = bookingData.discount_percentage_medium_stay
   }
 
   const baseAmount = subtotal - discount + bookingData.cleaning
@@ -118,6 +121,30 @@ export default function NewConfirmAndPay() {
       month: "short",
       year: "numeric",
     })
+  }
+
+  const handleConfirmAndPay = () => {
+    // Read current booking data from localStorage
+    const storedData = localStorage.getItem("booking")
+
+    if (storedData) {
+      try {
+        const data = JSON.parse(storedData)
+
+        const updatedData = {
+          ...data,
+          unit_amount: getCurrentAmount(),
+        }
+
+        // Save updated data back to localStorage
+        localStorage.setItem("booking", JSON.stringify(updatedData))
+
+        // Redirect to checkout
+       window.location.href = "/checkout"
+      } catch (error) {
+        console.error("Error updating booking data:", error)
+      }
+    }
   }
 
   return (
@@ -243,6 +270,7 @@ export default function NewConfirmAndPay() {
           <Button
             className="w-full md:w-auto bg-blue-500 hover:bg-blue-500 text-white font-semibold py-6 px-6 rounded-lg text-lg"
             disabled={!agreedToTerms}
+            onClick={handleConfirmAndPay}
           >
             Confirmar y pagar ${getCurrentAmount().toLocaleString("es-CO")}
           </Button>
@@ -275,15 +303,24 @@ export default function NewConfirmAndPay() {
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4 text-gray-500" />
                   <span>
-                    {bookingData.guests} huésped{bookingData.guests > 1 ? "es" : ""} x {bookingData.nights} noche
+                    {bookingData.guests} huésped
+                    {bookingData.guests > 1 ? "es" : ""} x {bookingData.nights} noche
                     {bookingData.nights > 1 ? "s" : ""} = ${subtotal}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4 text-gray-500" />
                   <span>
-                    Limpieza = ${bookingData.cleaning}
+                    {discount > 0 && (
+                      <div>
+                        Descuento ({discount_label}%) = - ${discount}
+                      </div>
+                    )}
                   </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4 text-gray-500" />
+                  <span>Limpieza = ${bookingData.cleaning}</span>
                 </div>
               </div>
 
