@@ -30,6 +30,9 @@ export const createBooking = async (
     checkIn: string;
     checkOut: string;
     patient: string;
+    patientName: string;
+    ownerId: string;
+    ownerName: string;
     guests: number;
     price: number;
     cleaning: number;

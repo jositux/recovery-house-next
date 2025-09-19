@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { Building, User, BedIcon, LogOut, HandHelping } from "lucide-react"
+import { Building, HomeIcon, User, BedIcon, LogOut, HandHelping } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { logoutUser } from "@/services/LogoutService"
@@ -78,9 +78,15 @@ export function MenuProfile({ name }: ProfileMenuProps) {
             </Link>
           </li>
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-            <Link href="/mis-reservas" className="flex items-center gap-2" onClick={closeMenu}>
+            <Link href="/reservas-recibidas" className="flex items-center gap-2" onClick={closeMenu}>
+              <HomeIcon className="w-4 h-4" />
+              Reservas recibidas
+            </Link>
+          </li>
+          <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+            <Link href="/reservas-realizadas" className="flex items-center gap-2" onClick={closeMenu}>
               <BedIcon className="w-4 h-4" />
-              Mis reservas
+              Reservas realizadas
             </Link>
           </li>
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">

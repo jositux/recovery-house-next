@@ -21,13 +21,17 @@ interface BookingData {
   price: number
   cleaning: number
 
-  discount_percentage_medium_stay: number
+  /*discount_percentage_medium_stay: number
   discount_percentage_long_stay: number
   prepayment_percentage: number
   minMediumStayRange: number
   maxMediumStayRange: number
   minLongStayRange: number
-  maxLongStayRange: number
+  maxLongStayRange: number*/
+
+  discountStayType: string
+  discountPercentageStayApplied: number
+  discountStayAmount: number
 
   totalPrice: number
 }
@@ -136,22 +140,34 @@ export function BookingWidget({
     maxLongStayRange,
   ])
 
-  const getDiscountInfo = () => {
-    if (nights >= minLongStayRange && nights <= maxLongStayRange) {
-      return {
-        type: "long",
-        percentage: discount_percentage_long_stay,
-        range: `${minLongStayRange}-${maxLongStayRange}`,
-      }
+  const getDiscountStayType = useMemo(() => {
+    if (nights < minMediumStayRange) {
+      return "short"
+    } else if (nights >= minLongStayRange && nights <= maxLongStayRange) {
+      return "long"
     } else if (nights >= minMediumStayRange && nights <= maxMediumStayRange) {
-      return {
-        type: "medium",
-        percentage: discount_percentage_medium_stay,
-        range: `${minMediumStayRange}-${maxMediumStayRange}`,
-      }
+      return "medium"
     }
-    return null
-  }
+    return "short"
+  }, [nights, minMediumStayRange, maxMediumStayRange, minLongStayRange, maxLongStayRange])
+
+
+  const calculateDiscount = useMemo(() => {
+    if (nights >= minLongStayRange && nights <= maxLongStayRange) {
+      return discount_percentage_long_stay
+    } else if (nights >= minMediumStayRange && nights <= maxMediumStayRange) {
+      return discount_percentage_medium_stay
+    }
+    return 0
+  }, [
+    nights,
+    minMediumStayRange,
+    maxMediumStayRange,
+    minLongStayRange,
+    maxLongStayRange,
+    discount_percentage_medium_stay,
+    discount_percentage_long_stay,
+  ])
 
   const handleGuestsChange = (increment: number) => {
     setGuests((prevGuests) => Math.max(1, Math.min(prevGuests + increment, maxGuests)))
@@ -237,14 +253,18 @@ export function BookingWidget({
         price: price,
         cleaning: cleaning,
 
-        discount_percentage_medium_stay,
+       /* discount_percentage_medium_stay,
         discount_percentage_long_stay,
         prepayment_percentage,
         minMediumStayRange,
         maxMediumStayRange,
         minLongStayRange,
-        maxLongStayRange,
-        
+        maxLongStayRange,*/
+
+        discountStayType: getDiscountStayType,
+        discountPercentageStayApplied: calculateDiscount,
+        discountStayAmount:  price * nights * guests * (calculateDiscount / 100),
+
         totalPrice: totalPrice,
       }
 
@@ -261,8 +281,10 @@ export function BookingWidget({
   }
 
   const subtotal = price * nights * guests // Added guests back to subtotal calculation
-  const discountInfo = getDiscountInfo()
-  const discountAmount = discountInfo ? subtotal * (discountInfo.percentage / 100) : 0
+  const discountAmount =  subtotal * (calculateDiscount / 100)
+
+  const discountStayType = getDiscountStayType
+  const discountPercentageStayApplied = calculateDiscount
 
   return (
     <div className="border rounded-lg p-6 space-y-6 shadow-md bg-white">
@@ -355,19 +377,19 @@ export function BookingWidget({
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
           <div className="flex items-center space-x-2">
             <p className="text-sm text-blue-800 font-medium">
-              {nights >= minLongStayRange && nights <= maxLongStayRange ? (
+              {discountStayType === "long" ? (
                 <>
                   Elegiste <span className="font-bold">{nights} noches</span> que equivale a una
                   <span className="font-bold text-blue-900"> estadía larga </span>
                   con un descuento del{" "}
-                  <span className="font-bold text-green-600">{discount_percentage_long_stay}%</span>
+                  <span className="font-bold text-green-600">{discountPercentageStayApplied}%</span>
                 </>
-              ) : nights >= minMediumStayRange && nights <= maxMediumStayRange ? (
+              ) : discountStayType === "medium" ? (
                 <>
                   Elegiste <span className="font-bold">{nights} noches</span> que equivale a una
                   <span className="font-bold text-blue-900"> estadía media </span>
                   con un descuento del{" "}
-                  <span className="font-bold text-green-600">{discount_percentage_medium_stay}%</span>
+                  <span className="font-bold text-green-600">{discountPercentageStayApplied}%</span>
                 </>
               ) : (
                 <>
@@ -409,7 +431,7 @@ export function BookingWidget({
           <div className="space-y-2 bg-gray-50 p-4 rounded-md">
             <div className="flex justify-between items-center text-sm">
               <span className="text-[#162F40]">
-                ${price.toLocaleString("es-CO")} x {nights} noche(s) x {guests} 
+                ${price.toLocaleString("es-CO")} x {nights} noche(s) x {guests}
               </span>
               <span className="font-semibold">
                 ${(price * nights * guests).toLocaleString("es-CO")}{" "}
@@ -419,9 +441,9 @@ export function BookingWidget({
             {discountAmount > 0 && (
               <div className="flex justify-between items-center text-sm">
                 <span className="text-green-600">
-                  {discountInfo?.type === "long"
-                    ? `Estadía larga (-${discountInfo.percentage}%)`
-                    : `Estadía media (-${discountInfo?.percentage}%)`}
+                  {discountStayType === "long"
+                    ? `Estadía larga (-${discountPercentageStayApplied}%)`
+                    : `Estadía media (-${discountPercentageStayApplied}%)`}
                 </span>
                 <span className="font-semibold text-green-600">-${discountAmount.toLocaleString("es-CO")} USD</span>
               </div>
