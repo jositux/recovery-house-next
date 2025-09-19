@@ -27,7 +27,7 @@ export const createBooking = async (
     room: string;
     roomName: string;
     roomDescription: string;
-   // ownerId: string;
+   ownerId: string;
     ownerName: string;
     isPrivate: boolean;
     singleBeds: number;

@@ -23,6 +23,7 @@ import { Calendar } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 import { fetchCurrentUser } from "@/services/BookingService";
+import { fetchUserById } from "@/services/UserById";
 import { useRouter } from "next/navigation";
 
 import { fetchStayData, Stay } from "@/services/stayService";
@@ -103,6 +104,7 @@ interface Booking {
   checkIn: string;
   checkOut: string;
   patient: string;
+  ownerId: string;
   guests: number;
   price: number;
   cleaning: number;
@@ -140,6 +142,9 @@ interface BookingData {
   price: number;
   cleaning: number;
   totalPrice: number;
+  discountStayType: string,    
+  discountPercentageStayApplied: number,
+  discountStayAmount: number,
 }
 
 interface DiscountData {
@@ -159,6 +164,8 @@ export default function RoomPage() {
 
   const [room, setRoom] = useState<Room | null>(null);
   const [property, setProperty] = useState<Property | null>(null);
+  //const [user, setUser] = useState<User | null>(null);
+
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [serviceProviders, setServiceProviders] = useState<ServiceProvider[]>(
     []
@@ -185,6 +192,7 @@ export default function RoomPage() {
   }
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  //const [ownerUser, setOwnerUser] = useState<User | null>(null);
 
   // Filter bookings to only include those with checkout dates in the future
   const filterCurrentBookings = (bookings: Booking[]) => {
@@ -216,6 +224,8 @@ export default function RoomPage() {
     };
 
     fetchUser();
+
+    
   }, []); // solo se ejecuta una vez al montar el componente
 
 
@@ -273,41 +283,51 @@ export default function RoomPage() {
 
   // Handle reservation from the BookingWidgetPrivate
   const handleReservation = async (data: BookingData) => {
-    // setBookingPrivateData(data);
-
     if (!currentUser) {
       console.error("User not loaded");
       router.push("/login");
       return;
     }
-
-    const formattedBookingData = {
-      ...data,
-      isPrivate: room?.isPrivate,
-      patientId: currentUser.id,
-      room: room?.id,
-      roomName: room?.name,
-      ownerId: property?.id,
-      ownerName: property?.name,
-      propertyName: property?.name,
-      description: room?.description,
-    };
-
-    localStorage.removeItem("bookingData");
-
-    localStorage.setItem("bookingData", JSON.stringify(formattedBookingData));
-
-    const formattedBooking = {
-      isPrivate: room?.isPrivate,
-      name: room?.name,
-      description: room?.description,
-      unit_amount: data.totalPrice,
-    };
-
-    localStorage.setItem("booking", JSON.stringify(formattedBooking));
-
-    router.push("/confirm-pay");
+  
+    try {
+      const accessToken = localStorage.getItem("access_token");
+      if (!accessToken) throw new Error("Missing token");
+  
+      // 🔹 obtengo al owner directamente
+      const owner = await fetchUserById(accessToken, property?.userId ?? "");
+  
+      const formattedBookingData = {
+        ...data,
+        isPrivate: room?.isPrivate,
+        patientId: currentUser.id,
+        patientName: currentUser.first_name + " " + currentUser.last_name,
+        ownerId: property?.userId,
+        room: room?.id,
+        roomName: room?.name,
+        ownerName: owner.first_name + " - " + owner.last_name, // 👈 uso la variable, no el state
+        propertyName: property?.name,
+        description: room?.description,
+      };
+  
+      localStorage.removeItem("bookingData");
+      localStorage.setItem("bookingData", JSON.stringify(formattedBookingData));
+  
+      const formattedBooking = {
+        isPrivate: room?.isPrivate,
+        name: room?.name,
+        description: room?.description,
+        unit_amount: data.totalPrice,
+      };
+  
+      localStorage.setItem("booking", JSON.stringify(formattedBooking));
+  
+      router.push("/confirm-pay");
+    } catch (error) {
+      console.error( "Error fetching usuario", error);
+      setError("Error al buscar el usuario");
+    }
   };
+  
 
   // Handle reservation from the BookingWidgetPrivate
   /*
@@ -411,6 +431,7 @@ export default function RoomPage() {
 
         setRoom(roomData);
         setProperty(propertyData);
+
         setServiceProviders(providerResponse.data.data);
         setBookings(bookingsResponse.data.data);
       } catch (error) {
