@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckoutForm } from "@/app/checkout/CheckoutForm";
+import { CheckoutForm } from "@/app/checkout-balanced/CheckoutForm";
 import React, { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -15,13 +15,15 @@ const CheckoutPage = () => {
 
   useEffect(() => {
     const fetchBookingData = () => {
-      const storedBooking = localStorage.getItem("booking");
+      const storedBooking = localStorage.getItem("bookingBalanced");
 
       if (storedBooking) {
         try {
           const parsedBooking = JSON.parse(storedBooking);
+          console.log(parsedBooking)
           setBookingData({
             ...parsedBooking,
+            name: "Pago de Saldo Pendiente",
             unit_amount:  Math.round(Number(parsedBooking.paymentAmount) * 100) || 0,
           });
         } catch (error) {

@@ -62,7 +62,6 @@ export function BookingWidgetBed({
   cleaning,
   discount_percentage_medium_stay,
   discount_percentage_long_stay,
-  prepayment_percentage,
   minMediumStayRange,
   maxMediumStayRange,
   minLongStayRange,
@@ -74,7 +73,6 @@ export function BookingWidgetBed({
   const searchParams = useSearchParams()
   const router = useRouter()
 
-  console.log(prepayment_percentage)
   const [checkIn, setCheckIn] = useState<Date | undefined>(() => {
     const checkInParam = searchParams.get("checkIn")
     return checkInParam ? parseISO(checkInParam) : undefined
@@ -85,7 +83,6 @@ export function BookingWidgetBed({
   })
 
   const [nights, setNights] = useState(0)
-  const totalPrice = 0
   const [loading, setLoading] = useState(false)
   //const [disabledDates, setDisabledDates] = useState<string[]>([])
   const bookings = initialBookings
@@ -136,6 +133,8 @@ export function BookingWidgetBed({
   const discountStayType = getDiscountStayType
   const discountPercentageStayApplied = calculateDiscount
   const discountAmount = (price * nights * calculateDiscount) / 100
+  const totalPrice = (price * nights) - discountAmount + cleaning
+  
 
   const isDateReserved = useMemo(() => {
     const reservedDates: string[] = []
