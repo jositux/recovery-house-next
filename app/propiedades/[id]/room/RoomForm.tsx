@@ -201,9 +201,9 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
       try {
         const stays: Stay[] = await fetchStayData(accessToken);
 
-        const shortStay = stays.find((s) => s.type === "corta");
-        const mediumStay = stays.find((s) => s.type === "media");
-        const longStay = stays.find((s) => s.type === "larga");
+        const shortStay = stays.find((s) => s.type === "short");
+        const mediumStay = stays.find((s) => s.type === "medium");
+        const longStay = stays.find((s) => s.type === "long");
 
         setDiscountData({
           shortStayDiscounts: shortStay?.discounts.map((d) =>

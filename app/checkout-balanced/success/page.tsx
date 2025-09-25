@@ -14,27 +14,14 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { createBooking } from "@/services/BookingService3";
+import { createBookingBalanced } from "@/services/BookingBalancedService";
 
-interface Booking {
-  room: string;
-  patient: string;
-  ownerId: string;
-  guests: number;
-  checkInDateHour: string;
-  checkOutDateHour: string;
-  finalPrice: number;
-  price: number;
-  cleaning: number;
-  discountStayType: string;
-  discountPercentageStayApplied: number;
-  discountStayAmount: number;
-  prepaymentPercentage: number;
-  paymentAmount: number;
-  paymentBalance: number;
-  paymentDate: string;
-  paymentId: string;
-  paymentType: string;
+interface BookingBalanced {
+  bookingId: string,
+  paymentAmount: number,
+  paymentDate: string,
+  paymentId: string,
+  paymentType: string
 }
 
 const SuccessPageContent = () => {
@@ -42,55 +29,39 @@ const SuccessPageContent = () => {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const sendBooking = async () => {
+    const sendBookingBalanced = async () => {
       const accessToken = localStorage.getItem("access_token");
       if (!accessToken) {
         router.push("/login");
         return;
       }
 
-      const bookingRaw = localStorage.getItem("booking")!;
-      const parsedBooking: Booking = JSON.parse(bookingRaw) as Booking;
+      const bookingRaw = localStorage.getItem("bookingBalanced")!;
+      const parsedBookingBalanced: BookingBalanced = JSON.parse(bookingRaw) as BookingBalanced;
 
-      const currentDateTime: string =
-        new Date().toISOString().split(".")[0] + "Z";
 
       if (!bookingRaw) return;
 
       try {
         const paymentId = searchParams.get("rel");
 
-        const bookingData: Booking = {
-          room: parsedBooking.room,
-          patient: parsedBooking.patient,
-          ownerId: parsedBooking.ownerId,
-          guests: parsedBooking.guests,
-          checkInDateHour: parsedBooking.checkInDateHour,
-          checkOutDateHour: parsedBooking.checkOutDateHour,
-          finalPrice: parsedBooking.finalPrice,
-          price: parsedBooking.price,
-          cleaning: parsedBooking.cleaning,
-          discountStayType: parsedBooking.discountStayType,
-          discountPercentageStayApplied:
-            parsedBooking.discountPercentageStayApplied,
-          discountStayAmount: parsedBooking.discountStayAmount,
-          prepaymentPercentage: 10,
-          paymentAmount: parsedBooking.paymentAmount,
-          paymentBalance: parsedBooking.paymentBalance,
-          paymentDate: currentDateTime,
+        const data: BookingBalanced = {
+          bookingId: parsedBookingBalanced.bookingId,
+          paymentAmount: parsedBookingBalanced.paymentAmount,
+          paymentDate: parsedBookingBalanced.paymentDate,
           paymentId: paymentId ?? "",
-          paymentType: parsedBooking.paymentType,
+          paymentType: parsedBookingBalanced.paymentType
         };
 
-        await createBooking(bookingData, accessToken);
-        localStorage.removeItem("bookingData"); // Fixed: should be "bookingData" not "booking"
+        await createBookingBalanced(data, accessToken);
+        localStorage.removeItem("bookingBalanced"); // Fixed: should be "bookingData" not "booking"
         localStorage.removeItem("booking");
       } catch (error) {
         console.error("Error al enviar la reserva:", error);
       }
     };
 
-    sendBooking();
+    sendBookingBalanced();
   }, [router, searchParams]);
 
   return (
@@ -115,7 +86,7 @@ const SuccessPageContent = () => {
           </CardHeader>
           <CardContent className="p-6">
             <p className="text-center text-gray-600 mb-6">
-              Se ha procesado el pago correctamente. Tu reserva está confirmada
+              Se ha procesado el pago de lo pendiente. Tu reserva está confirmada
               y lista para que disfrutes de una experiencia inolvidable.
             </p>
             <div className="flex justify-center space-x-4 mb-6">
@@ -131,7 +102,7 @@ const SuccessPageContent = () => {
           </CardContent>
           <CardFooter className="bg-gray-50 p-6">
             <div className="w-full space-y-3">
-              <Link href="/reservas-realizadas" passHref className="block w-full">
+              <Link href="/mis-reservas" passHref className="block w-full">
                 <Button className="w-full bg-[#39759E] hover:bg-blue-600 text-white transition duration-300">
                   Ver tus reservas
                 </Button>

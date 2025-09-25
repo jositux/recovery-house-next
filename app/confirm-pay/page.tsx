@@ -23,14 +23,17 @@ interface BookingData {
   totalPrice: number;
   isPrivate: boolean;
   patientId: string;
+  patienName: string;
   ownerId: string;
+  ownerName: string;
   room: string;
   roomName: string;
 
-  ownerName: string;
   propertyName: string;
   description: string;
 }
+
+type PaymentType = "fullpayment" | "prepayment";
 
 export default function NewConfirmAndPay() {
   const [selectedDiscountOption, setSelectedDiscountOption] =
@@ -38,12 +41,55 @@ export default function NewConfirmAndPay() {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [bookingData, setBookingData] = useState<BookingData | null>(null);
 
+  // 🔹 Helpers
+  const formatCurrency = (value: number) =>
+    value.toLocaleString("es-CO", { style: "currency", currency: "COP" });
+
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString("es-ES", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+
+  const getCurrentIsoTime = () =>
+    new Date().toISOString().split("T")[1].split(".")[0] + "Z";
+
+  // 🔹 Calcular montos
+  const getSubtotal = (b: BookingData) => b.nights * b.guests * b.price;
+
+  const getBaseAmount = (b: BookingData) =>
+    getSubtotal(b) - b.discountStayAmount + b.cleaning;
+
+  const getPrepaymentAmount = (b: BookingData) =>
+    getBaseAmount(b) * (b.prepayment_percentage / 100);
+
+  const getPaymentDeadline = (b: BookingData) => {
+    const checkInDate = new Date(b.checkIn);
+    checkInDate.setHours(checkInDate.getHours() - 72); // 72 horas antes
+    return checkInDate.toLocaleDateString("es-ES", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  // 🔹 Calcular el monto actual según opción seleccionada
+  const getCurrentAmount = (b: BookingData) => {
+    return selectedDiscountOption === "with-discount"
+      ? getPrepaymentAmount(b)
+      : getBaseAmount(b);
+  };
+
   useEffect(() => {
     const storedData = localStorage.getItem("bookingData");
-
     if (storedData) {
       try {
         const data = JSON.parse(storedData);
+        // Asegurar que siempre tenga el % definido
+        if (!data.prepayment_percentage) {
+          data.prepayment_percentage = 10;
+        }
         setBookingData(data);
       } catch (error) {
         console.error("Error parsing booking data:", error);
@@ -66,63 +112,21 @@ export default function NewConfirmAndPay() {
     );
   }
 
-  // --- 🔹 Lógica para calcular días entre checkIn y checkOut ---
-  /*const getDaysBetween = (checkIn: string, checkOut: string): number => {
-    const start = new Date(checkIn);
-    const end = new Date(checkOut);
-    const diffTime = end.getTime() - start.getTime();
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  };*/
+  // 🔹 Variables derivadas
+  const subtotal = getSubtotal(bookingData);
+  const baseAmount = getBaseAmount(bookingData);
+  const prepaymentAmount = getPrepaymentAmount(bookingData);
+  const currentAmount = getCurrentAmount(bookingData);
+  const paymentBalance =
+    selectedDiscountOption === "with-discount"
+      ? bookingData.totalPrice - prepaymentAmount
+      : 0;
 
-  // --- 🔹 Cálculo del subtotal ---
-  const subtotal = bookingData.nights * bookingData.guests * bookingData.price;
-
-  // --- 🔹 Cálculo del descuento por rango ---
-  //const days = getDaysBetween(bookingData.checkIn, bookingData.checkOut);
-
-  // Hardcode
-  bookingData.prepayment_percentage = 10;
-
-  const discount = bookingData.discountStayAmount;
-
-  const discount_label = bookingData.discountPercentageStayApplied;
-
-  const baseAmount = subtotal - discount + bookingData.cleaning;
-
-  // --- 🔹 Cálculo anticipo ---
-
-  // Hardcode
-  const advancePaymentPercentage = 10; //bookingData.prepayment_percentage
-  const advancePaymentAmount = baseAmount * (advancePaymentPercentage / 100);
-
-  const getCurrentAmount = () => {
-    return selectedDiscountOption === "with-discount"
-      ? advancePaymentAmount
-      : baseAmount;
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("es-ES", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-  };
-
-  const getPaymentDeadline = () => {
-    const checkInDate = new Date(bookingData.checkIn);
-    checkInDate.setHours(checkInDate.getHours() - 72); // 72 horas antes
-    return checkInDate.toLocaleDateString("es-ES", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-  };
-
+  // 🔹 Guardar y continuar
   const handleConfirmAndPay = () => {
-    // Read current booking data from localStorage
     const storedData = localStorage.getItem("booking");
+    const paymentType: PaymentType =
+      selectedDiscountOption === "with-discount" ? "prepayment" : "fullpayment";
 
     if (storedData) {
       try {
@@ -130,13 +134,27 @@ export default function NewConfirmAndPay() {
 
         const updatedData = {
           ...data,
-          unit_amount: getCurrentAmount(),
+          room: bookingData.room,
+          patient: bookingData.patientId,
+          ownerId: bookingData.ownerId,
+          guests: bookingData.guests,
+          checkInDateHour: bookingData.checkIn + "T" + getCurrentIsoTime(),
+          checkOutDateHour: bookingData.checkOut + "T" + getCurrentIsoTime(),
+          price: bookingData.price,
+          cleaning: bookingData.cleaning,
+          discountStayType: bookingData.discountStayType,
+          discountPercentageStayApplied:
+            bookingData.discountPercentageStayApplied,
+          discountStayAmount: bookingData.discountStayAmount,
+          prepaymentPercentage: bookingData.prepayment_percentage,
+          paymentAmount: currentAmount,
+          paymentBalance,
+          paymentType,
+          unit_amount: bookingData.totalPrice,
+          finalPrice: bookingData.totalPrice
         };
 
-        // Save updated data back to localStorage
         localStorage.setItem("booking", JSON.stringify(updatedData));
-
-        // Redirect to checkout
         window.location.href = "/checkout";
       } catch (error) {
         console.error("Error updating booking data:", error);
@@ -147,9 +165,9 @@ export default function NewConfirmAndPay() {
   return (
     <div className="min-h-screen bg-gray-50 p-6 md:p-10">
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Sección Izquierda: Opciones de Pago */}
+        {/* Opciones de pago */}
         <div className="lg:col-span-2 space-y-8">
-          {/* Migas de pan */}
+          {/* Migas */}
           <div className="text-sm text-gray-500">
             <span className="font-medium">1. Revisar detalles del viaje</span>
             <span className="mx-2">&gt;</span>
@@ -158,118 +176,44 @@ export default function NewConfirmAndPay() {
             </span>
           </div>
 
-          {/* Título */}
-          <h1 className="text-3xl font-bold text-gray-900">
-            Confirmar y pagar
-          </h1>
+          <h1 className="text-3xl font-bold text-gray-900">Confirmar y pagar</h1>
 
-          {/* Selección de Opciones de Pago */}
+          {/* Opciones */}
           <div className="space-y-4">
             <h2 className="text-xl font-semibold text-gray-800">
               Opciones de Pago
             </h2>
 
-            {/* Opción Tarifa Estándar - Pago Total */}
-            <div
-              className={`p-4 rounded-lg border-2 cursor-pointer transition-colors duration-200 ${
-                selectedDiscountOption === "no-discount"
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-200 hover:border-gray-300"
-              }`}
+            {/* Pago Total */}
+            <PaymentOption
+              selected={selectedDiscountOption === "no-discount"}
               onClick={() => setSelectedDiscountOption("no-discount")}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  {selectedDiscountOption === "no-discount" ? (
-                    <CheckCircle2 className="h-5 w-5 text-blue-600" />
-                  ) : (
-                    <div className="h-5 w-5 rounded-full border-2 border-gray-300" />
-                  )}
-                  <div className="flex flex-col">
-                    <span className="font-medium text-gray-800">
-                      Pago Total
-                    </span>
-                    <p className="text-sm text-gray-600">
-                      Paga el monto completo ahora
-                    </p>
-                  </div>
-                </div>
-                <span className="font-semibold text-gray-900">
-                  ${baseAmount.toLocaleString("es-CO")}
-                </span>
-              </div>
-            </div>
+              label="Pago Total"
+              description="Paga el monto completo ahora"
+              amount={baseAmount}
+              color="blue"
+            />
 
-            {/* Opción Pago Anticipado */}
-            <div
-              className={`p-4 rounded-lg border-2 cursor-pointer transition-colors duration-200 ${
-                selectedDiscountOption === "with-discount"
-                  ? "border-green-500 bg-green-50"
-                  : "border-gray-200 hover:border-gray-300"
-              }`}
+            {/* Anticipo */}
+            <PaymentOption
+              selected={selectedDiscountOption === "with-discount"}
               onClick={() => setSelectedDiscountOption("with-discount")}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  {selectedDiscountOption === "with-discount" ? (
-                    <CheckCircle2 className="h-5 w-5 text-green-600" />
-                  ) : (
-                    <div className="h-5 w-5 rounded-full border-2 border-gray-300" />
-                  )}
-                  <div className="flex flex-col">
-                    <span className="font-medium text-gray-800">
-                      Pago Anticipado ({advancePaymentPercentage}%)
-                    </span>
-                    <p className="text-sm text-gray-600">
-                      Paga solo el {advancePaymentPercentage}% ahora, el resto
-                      antes del check-in
-                    </p>
-                    <p className="text-xs text-blue-600 mt-1">
-                      Saldo restante: $
-                      {(baseAmount - advancePaymentAmount).toLocaleString(
-                        "es-CO"
-                      )}{" "}
-                      (debe pagarse antes del {getPaymentDeadline()})
-                    </p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <span className="font-semibold text-gray-900">
-                    ${advancePaymentAmount.toLocaleString("es-CO")}
-                  </span>
-                  <div className="text-xs text-gray-500">ahora</div>
-                </div>
-              </div>
-            </div>
+              label={`Pago Anticipado (${bookingData.prepayment_percentage}%)`}
+              description={`Paga solo el ${bookingData.prepayment_percentage}% ahora, el resto antes del check-in`}
+              extraInfo={`Saldo restante: ${formatCurrency(
+                baseAmount - prepaymentAmount
+              )} (debe pagarse antes del ${getPaymentDeadline(bookingData)})`}
+              amount={prepaymentAmount}
+              color="green"
+            />
           </div>
 
-          {/* Política de Cancelación */}
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-gray-800">
-              Política de anulación de reserva:
-            </h2>
-            <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-              <div className="flex items-start gap-2">
-                <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
-                <div className="text-sm text-amber-800">
-                  <p>
-                    Anulación gratuita hasta 72 horas antes del check-in.
-                    Después de este período, no hay reembolso disponible.
-                  </p>
-                  {selectedDiscountOption === "with-discount" && (
-                    <p className="mt-2 text-blue-800">
-                      <strong>Pago Anticipado:</strong> Si cancelas después de
-                      las 72 horas, se reembolsa el monto pagado menos el
-                      anticipo. Si no completas el pago del saldo antes de las
-                      72 horas del check-in, pierdes el anticipo.
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Política de cancelación */}
+          <CancellationPolicy
+            showPrepayment={selectedDiscountOption === "with-discount"}
+          />
 
-          {/* Acuerdo de Términos */}
+          {/* Aceptar términos */}
           <div className="flex items-start space-x-2">
             <Checkbox
               id="terms"
@@ -289,108 +233,214 @@ export default function NewConfirmAndPay() {
             </label>
           </div>
 
-          {/* Botón Confirmar y Pagar */}
+          {/* Botón */}
           <Button
             className="w-full md:w-auto bg-blue-500 hover:bg-blue-500 text-white font-semibold py-6 px-6 rounded-lg text-lg"
             disabled={!agreedToTerms}
             onClick={handleConfirmAndPay}
           >
-            Confirmar y pagar ${getCurrentAmount().toLocaleString("es-CO")}
+            Confirmar y pagar {formatCurrency(currentAmount)}
           </Button>
         </div>
 
-        {/* Sección Derecha: Resumen */}
-        <div className="lg:col-span-1">
-          <Card className="sticky top-6 shadow-lg rounded-xl overflow-hidden">
-            <CardContent className="p-6 space-y-4">
-              <div className="flex items-start gap-4">
-                <div className="flex-1">
-                  <h3 className="font-semibold text-gray-900 text-lg leading-tight">
-                    {bookingData.roomName}
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    {bookingData.propertyName}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Propietario: {bookingData.ownerName}
-                  </p>
-                </div>
-                <img
-                  src="/modern-room-interior.png"
-                  alt={bookingData.roomName}
-                  className="w-24 h-16 object-cover rounded-md"
-                />
-              </div>
+        {/* Resumen */}
+        <BookingSummary
+          bookingData={bookingData}
+          subtotal={subtotal}
+          discount={bookingData.discountStayAmount}
+          discountLabel={bookingData.discountPercentageStayApplied}
+          baseAmount={baseAmount}
+          prepaymentAmount={prepaymentAmount}
+          currentAmount={currentAmount}
+          selectedDiscountOption={selectedDiscountOption}
+          formatCurrency={formatCurrency}
+          formatDate={formatDate}
+        />
+      </div>
+    </div>
+  );
+}
 
-              <div className="space-y-3 text-sm text-gray-700">
-                <div className="flex items-center gap-2">
-                  <CalendarDays className="h-4 w-4 text-gray-500" />
-                  <span>
-                    {formatDate(bookingData.checkIn)} →{" "}
-                    {formatDate(bookingData.checkOut)}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-gray-500" />
-                  <span>
-                    {bookingData.guests} huésped
-                    {bookingData.guests > 1 ? "es" : ""} x {bookingData.nights}{" "}
-                    noche
-                    {bookingData.nights > 1 ? "s" : ""} = ${subtotal}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-gray-500" />
-                  <span>
-                    {discount > 0 && (
-                      <div>
-                        Descuento ({discount_label}%) = - ${discount}
-                      </div>
-                    )}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-gray-500" />
-                  <span>Limpieza = ${bookingData.cleaning}</span>
-                </div>
-              </div>
+/* 🔹 Componente Opción de Pago */
+function PaymentOption({
+  selected,
+  onClick,
+  label,
+  description,
+  extraInfo,
+  amount,
+  color,
+}: {
+  selected: boolean;
+  onClick: () => void;
+  label: string;
+  description: string;
+  extraInfo?: string;
+  amount: number;
+  color: "blue" | "green";
+}) {
+  const border = selected ? `border-${color}-500 bg-${color}-50` : "border-gray-200 hover:border-gray-300";
+  const icon = selected ? (
+    <CheckCircle2 className={`h-5 w-5 text-${color}-600`} />
+  ) : (
+    <div className="h-5 w-5 rounded-full border-2 border-gray-300" />
+  );
 
-              <div className="border-t border-gray-200 pt-4 space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="font-semibold text-gray-800">
-                    {selectedDiscountOption === "with-discount"
-                      ? "Pago Anticipado"
-                      : "Total"}
-                  </span>
-                  <div className="text-right">
-                    <span className="font-bold text-gray-900 text-lg">
-                      ${getCurrentAmount().toLocaleString("es-CO")}
-                    </span>
-                  </div>
-                </div>
+  return (
+    <div
+      className={`p-4 rounded-lg border-2 cursor-pointer transition-colors duration-200 ${border}`}
+      onClick={onClick}
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          {icon}
+          <div className="flex flex-col">
+            <span className="font-medium text-gray-800">{label}</span>
+            <p className="text-sm text-gray-600">{description}</p>
+            {extraInfo && <p className="text-xs text-blue-600 mt-1">{extraInfo}</p>}
+          </div>
+        </div>
+        <span className="font-semibold text-gray-900">{amount.toLocaleString("es-CO")}</span>
+      </div>
+    </div>
+  );
+}
 
-                {selectedDiscountOption === "with-discount" && (
-                  <>
-                    <div className="text-sm text-blue-600">
-                      Anticipo: ${advancePaymentAmount.toLocaleString("es-CO")}{" "}
-                      ({advancePaymentPercentage}% del total)
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      Saldo pendiente: $
-                      {(baseAmount - advancePaymentAmount).toLocaleString(
-                        "es-CO"
-                      )}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      Total de la reserva: ${baseAmount.toLocaleString("es-CO")}
-                    </div>
-                  </>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+/* 🔹 Componente Política de Cancelación */
+function CancellationPolicy({ showPrepayment }: { showPrepayment: boolean }) {
+  return (
+    <div className="space-y-4">
+      <h2 className="text-xl font-semibold text-gray-800">
+        Política de anulación de reserva:
+      </h2>
+      <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+        <div className="flex items-start gap-2">
+          <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
+          <div className="text-sm text-amber-800">
+            <p>
+              Anulación gratuita hasta 72 horas antes del check-in. Después de este
+              período, no hay reembolso disponible.
+            </p>
+            {showPrepayment && (
+              <p className="mt-2 text-blue-800">
+                <strong>Pago Anticipado:</strong> Si cancelas después de las 72
+                horas, se reembolsa el monto pagado menos el anticipo. Si no completas
+                el pago del saldo antes de las 72 horas del check-in, pierdes el
+                anticipo.
+              </p>
+            )}
+          </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+/* 🔹 Componente Resumen */
+function BookingSummary({
+  bookingData,
+  subtotal,
+  discount,
+  discountLabel,
+  baseAmount,
+  prepaymentAmount,
+  currentAmount,
+  selectedDiscountOption,
+  formatCurrency,
+  formatDate,
+}: {
+  bookingData: BookingData;
+  subtotal: number;
+  discount: number;
+  discountLabel: number;
+  baseAmount: number;
+  prepaymentAmount: number;
+  currentAmount: number;
+  selectedDiscountOption: string;
+  formatCurrency: (value: number) => string;
+  formatDate: (value: string) => string;
+}) {
+  return (
+    <div className="lg:col-span-1">
+      <Card className="sticky top-6 shadow-lg rounded-xl overflow-hidden">
+        <CardContent className="p-6 space-y-4">
+          <div className="flex items-start gap-4">
+            <div className="flex-1">
+              <h3 className="font-semibold text-gray-900 text-lg leading-tight">
+                {bookingData.roomName}
+              </h3>
+              <p className="text-sm text-gray-600">{bookingData.propertyName}</p>
+              <p className="text-xs text-gray-500 mt-1">
+                Propietario: {bookingData.ownerName}
+              </p>
+            </div>
+            <img
+              src="/modern-room-interior.png"
+              alt={bookingData.roomName}
+              className="w-24 h-16 object-cover rounded-md"
+            />
+          </div>
+
+          <div className="space-y-3 text-sm text-gray-700">
+            <div className="flex items-center gap-2">
+              <CalendarDays className="h-4 w-4 text-gray-500" />
+              <span>
+                {formatDate(bookingData.checkIn)} → {formatDate(bookingData.checkOut)}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-gray-500" />
+              <span>
+                {bookingData.guests} huésped
+                {bookingData.guests > 1 ? "es" : ""} x {bookingData.nights} noche
+                {bookingData.nights > 1 ? "s" : ""} = {formatCurrency(subtotal)}
+              </span>
+            </div>
+            {discount > 0 && (
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4 text-gray-500" />
+                <span>
+                  Descuento ({discountLabel}%) = - {formatCurrency(discount)}
+                </span>
+              </div>
+            )}
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-gray-500" />
+              <span>Limpieza = {formatCurrency(bookingData.cleaning)}</span>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-200 pt-4 space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="font-semibold text-gray-800">
+                {selectedDiscountOption === "with-discount"
+                  ? "Pago Anticipado"
+                  : "Total"}
+              </span>
+              <div className="text-right">
+                <span className="font-bold text-gray-900 text-lg">
+                  {formatCurrency(currentAmount)}
+                </span>
+              </div>
+            </div>
+
+            {selectedDiscountOption === "with-discount" && (
+              <>
+                <div className="text-sm text-blue-600">
+                  Anticipo: {formatCurrency(prepaymentAmount)} (
+                  {bookingData.prepayment_percentage}% del total)
+                </div>
+                <div className="text-sm text-gray-600">
+                  Saldo pendiente: {formatCurrency(baseAmount - prepaymentAmount)}
+                </div>
+                <div className="text-xs text-gray-500">
+                  Total de la reserva: {formatCurrency(baseAmount)}
+                </div>
+              </>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

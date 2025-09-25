@@ -65,8 +65,9 @@ export default function RoomPage() {
           bedType: parsedData.bedType || "",
           bedName: parsedData.bedName || "",
 
-          checkinTime: parsedData.check_in_hour.substring(0, 5) || "15:00",
-          checkoutTime:parsedData.check_out_hour.substring(0, 5) || "11:00",
+          checkinTime: parsedData.check_in_hour?.substring(0, 5) ?? "15:00",
+          checkoutTime: parsedData.check_out_hour?.substring(0, 5) ?? "11:00",
+
       
           // Discount fields
           shortStayDiscount: parseInt(parsedData.discount_percentage_short_stay, 10).toString() || "0",
