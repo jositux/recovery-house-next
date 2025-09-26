@@ -92,17 +92,14 @@ const SuccessPageContent = () => {
             <div className="flex justify-center space-x-4 mb-6">
               <div className="text-center">
                 <Calendar className="h-8 w-8 mx-auto text-blue-500 mb-2" />
-                <p className="text-sm text-gray-600">Reserva Confirmada</p>
+                <p className="text-sm text-gray-600">Pago pendiente realizado</p>
               </div>
-              <div className="text-center">
-                <Home className="h-8 w-8 mx-auto text-green-500 mb-2" />
-                <p className="text-sm text-gray-600">Alojamiento Listo</p>
-              </div>
+              
             </div>
           </CardContent>
           <CardFooter className="bg-gray-50 p-6">
             <div className="w-full space-y-3">
-              <Link href="/mis-reservas" passHref className="block w-full">
+              <Link href="/reservas-realizadas" passHref className="block w-full">
                 <Button className="w-full bg-[#39759E] hover:bg-blue-600 text-white transition duration-300">
                   Ver tus reservas
                 </Button>
