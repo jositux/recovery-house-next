@@ -17,6 +17,7 @@ interface Booking {
   price: number
   cleaning: number
   room: string
+  bookingState: string
 }
 
 interface BookedDay {
@@ -47,12 +48,22 @@ export default function CalendarPage() {
         })
 
         // Transformar los datos a la estructura deseada
-        const transformedData: BookedDay[] = response.data.data.map((booking) => ({
-          start: booking.checkIn,
-          end: booking.checkOut,
-        }))
+const transformedData: BookedDay[] = response.data.data
+.filter((booking: Booking) => {
+
+  return (
+
+    booking.bookingState !== "cancelled_by_patient" &&
+    booking.bookingState !== "cancelled_by_owner"
+  );
+})
+.map((booking: Booking) => ({
+  start: booking.checkIn,
+  end: booking.checkOut,
+}));
 
         setBookedDays(transformedData)
+
       } catch (err) {
         setError("Error al obtener las reservas")
         console.error("Error fetching bookings:", err)
