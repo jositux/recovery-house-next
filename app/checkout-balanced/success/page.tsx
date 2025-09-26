@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
-import { CheckCircle, Calendar, Home } from "lucide-react";
+import { CheckCircle, Calendar } from "lucide-react";
 import {
   Card,
   CardContent,
