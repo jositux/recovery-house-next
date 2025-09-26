@@ -112,6 +112,7 @@ interface Booking {
   singleBeds: number;
   doubleBeds: number;
   isPrivate: boolean;
+  bookingState: string;
 }
 
 interface ServiceProvider {
@@ -195,15 +196,20 @@ export default function RoomPage() {
   //const [ownerUser, setOwnerUser] = useState<User | null>(null);
 
   // Filter bookings to only include those with checkout dates in the future
-  const filterCurrentBookings = (bookings: Booking[]) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set to beginning of day for accurate comparison
+// and exclude cancelled bookings
+const filterCurrentBookings = (bookings: Booking[]) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Set to beginning of day for accurate comparison
 
-    return bookings.filter((booking) => {
-      const checkOutDate = new Date(booking.checkOut);
-      return checkOutDate >= today;
-    });
-  };
+  return bookings.filter((booking) => {
+    const checkOutDate = new Date(booking.checkOut);
+    return (
+      checkOutDate >= today &&
+      booking.bookingState !== "cancelled_by_patient" &&
+      booking.bookingState !== "cancelled_by_owner"
+    );
+  });
+};
 
   const [filteredBookings, setFilteredBookings] = useState<Booking[]>([]);
 
