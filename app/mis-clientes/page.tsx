@@ -8,7 +8,7 @@ import { getCurrentUser } from "@/services/userService"
 import { format, parseISO, differenceInDays } from "date-fns"
 import { es } from "date-fns/locale"
 import Image from "next/image"
-import ReviewModal from "@/components/ReviewModal"
+import ReviewModal from "@/components/booking-list/ReviewModal"
 import { Calendar, Users, DollarSign, Home, Star, Loader2, Search } from "lucide-react"
 import Link from "next/link"
 
