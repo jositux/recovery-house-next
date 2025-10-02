@@ -1,0 +1,49 @@
+
+.invisible {
+  visibility: hidden;
+}
+
+.calendarContainer {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.calendarContainer table {
+  width: 100% !important;
+  table-layout: fixed !important;
+}
+
+.calendarContainer thead {
+  width: 100% !important;
+}
+
+.calendarContainer tbody {
+  width: 100% !important;
+}
+
+.calendarContainer tr {
+  width: 100% !important;
+  display: flex !important;
+}
+
+.calendarContainer th {
+  flex: 1 !important;
+  width: 100% !important;
+  text-align: center !important;
+}
+
+.calendarContainer td {
+  flex: 1 !important;
+  width: 100% !important;
+  padding: 0 !important;
+  aspect-ratio: 1 !important;
+}
+
+.calendarDay {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 36px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
