@@ -72,25 +72,25 @@ export function MenuProfile({ name }: ProfileMenuProps) {
       >
         <ul className="text-sm text-[#162F40]">
           <li className="px-4 py-2 hover:bg-gray-100 rounded-lg cursor-pointer">
-            <Link href="/mis-propiedades" className="flex items-center gap-2" onClick={closeMenu}>
+            <Link href="/mi-panel/mis-propiedades" className="flex items-center gap-2" onClick={closeMenu}>
               <Building className="w-4 h-4" />
               Mis propiedades
             </Link>
           </li>
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-            <Link href="/reservas-recibidas" className="flex items-center gap-2" onClick={closeMenu}>
+            <Link href="/mi-panel/reservas-recibidas" className="flex items-center gap-2" onClick={closeMenu}>
               <HomeIcon className="w-4 h-4" />
               Reservas recibidas
             </Link>
           </li>
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-            <Link href="/reservas-realizadas" className="flex items-center gap-2" onClick={closeMenu}>
+            <Link href="/mi-panel/reservas-realizadas" className="flex items-center gap-2" onClick={closeMenu}>
               <BedIcon className="w-4 h-4" />
               Reservas realizadas
             </Link>
           </li>
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-            <Link href="/mi-servicio" className="flex items-center gap-2" onClick={closeMenu}>
+            <Link href="/mi-panel/mi-servicio" className="flex items-center gap-2" onClick={closeMenu}>
               <HandHelping className="w-4 h-4" />
               Mi Servicio
             </Link>

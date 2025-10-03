@@ -4,7 +4,7 @@ import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutGrid, Building2, CalendarArrowDown, CalendarArrowUp, PlusCircle, Menu, X } from "lucide-react"
+import { LayoutGrid, Building2, CalendarArrowDown, CalendarArrowUp, PlusCircle, Menu, Pencil, LogOut, X } from "lucide-react"
 
 export default function DashboardLayout({
   children,
@@ -17,7 +17,7 @@ export default function DashboardLayout({
     <div className="flex min-h-screen bg-gray-50">
       <button
         onClick={() => setIsSidebarOpen(true)}
-        className="fixed top-4 left-4 z-40 lg:hidden bg-white p-2 rounded-lg shadow-md border border-gray-200"
+        className="fixed top-4 right-16 z-40 lg:hidden bg-white p-2 rounded-lg shadow-md border border-gray-200"
         aria-label="Abrir menú"
       >
         <Menu className="w-6 h-6 text-gray-700" />
@@ -76,6 +76,11 @@ function DashboardSidebar({
     },
   ]
 
+  const handleLogout = () => {
+    // Aquí puedes agregar la lógica de logout (ej: limpiar sesión, redirigir, etc.)
+    console.log("Cerrando sesión...")
+  }
+
   return (
     <aside
       className={`
@@ -83,6 +88,7 @@ function DashboardSidebar({
         w-64 bg-white border-r border-gray-200 p-4
         transform transition-transform duration-300 ease-in-out
         ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+        flex flex-col
       `}
     >
       <button
@@ -113,6 +119,31 @@ function DashboardSidebar({
           )
         })}
       </nav>
+
+      <div className="border-t border-gray-200 pt-4 mt-4 space-y-2">
+        <Link
+          href="/mi-panel/mi-perfil"
+          onClick={onClose}
+          className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-gray-100 transition-colors group"
+        >
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-red-400 to-pink-500 flex items-center justify-center text-white font-semibold flex-shrink-0">
+            JD
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-gray-900 truncate">Juan Pérez</p>
+            <p className="text-xs text-gray-500 truncate">juan@example.com</p>
+          </div>
+          <Pencil className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors flex-shrink-0" />
+        </Link>
+
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+        >
+          <LogOut className="w-5 h-5" />
+          <span className="font-medium">Cerrar sesión</span>
+        </button>
+      </div>
     </aside>
   )
 }
