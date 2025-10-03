@@ -44,13 +44,13 @@ export function MenuActions() {
       >
         <ul className="text-sm text-[#162F40]">
           <li className="px-4 py-2 hover:bg-gray-100 rounded-lg cursor-pointer">
-            <Link href="/registrar-propiedad" className="flex items-center gap-2" onClick={closeMenu}>
+            <Link href="/mi-panel/registrar-propiedad" className="flex items-center gap-2" onClick={closeMenu}>
               <Building className="w-4 h-4" />
               Agregar Propiedad
             </Link>
           </li>
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-            <Link href="/registrar-servicio" className="flex items-center gap-2" onClick={closeMenu}>
+            <Link href="/mi-panel/registrar-servicio" className="flex items-center gap-2" onClick={closeMenu}>
               <HandHeart className="w-4 h-4" />
               Agregar Servicio
             </Link>
