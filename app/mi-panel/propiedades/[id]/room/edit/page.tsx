@@ -136,7 +136,7 @@ export default function RoomPage() {
 
   return (
     <div className="min-h-screen bg-[#F8F8F7]">
-      <div className="container mx-auto max-w-2xl py-16 px-4">
+      <div className="container mx-auto max-w-2xl py-4 px-4">
         <h1 className="text-2xl font-bold mb-6">Editar Habitación / Cama</h1>
         <div className="grid gap-6 mx-auto">
           <div className="container">

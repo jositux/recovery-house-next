@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 
 export default function ServiceLoadedPage() {
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+    <div className="flex items-center p-4">
       <Card className="bg-white rounded-xl shadow-lg max-w-md mx-auto overflow-hidden">
         <CardHeader className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white p-6">
           <CardTitle className="text-2xl font-bold flex items-center justify-center">
