@@ -914,6 +914,8 @@ localStorage.setItem("bookingBalanced", JSON.stringify(newEntry))
                                       )}
                                     </div>
                                   </div>
+
+                                
                                 </CardContent>
                               </div>
                             </Card>
