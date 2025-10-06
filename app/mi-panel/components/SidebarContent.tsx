@@ -25,7 +25,7 @@ export function SidebarContent({ userName, onLogout, onNavigate }: SidebarConten
 
   const navItems = [
     {
-      name: "Dashboard",
+      name: "Mi Panel",
       href: "/mi-panel",
       icon: LayoutGrid,
     },
