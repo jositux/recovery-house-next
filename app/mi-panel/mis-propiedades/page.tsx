@@ -76,7 +76,7 @@ const PropertiesPage: React.FC = () => {
       </div>
 
       {properties.length === 0 ? (
-        <Card className="p-8 text-center bg-gradient-to-br from-blue-50 to-indigo-100 border-none shadow-lg">
+        <Card className="p-8 text-center bg-gradient-to-br from-blue-50 to-indigo-100 border-none shadow-sm">
           <CardContent className="flex flex-col items-center">
             <Home className="h-24 w-24 text-[#39759E] mb-6" />
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">¡Comienza tu viaje como anfitrión!</h2>

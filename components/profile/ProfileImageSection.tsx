@@ -104,7 +104,7 @@ export function ProfileImageSection({
   };
 
   return (
-    <div className="bg-white">
+    <div className="">
       <h2 className="text-xl font-semibold mb-4 text-center">
         Actualizar imagen de perfil
       </h2>

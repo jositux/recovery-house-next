@@ -131,7 +131,7 @@ const SuccessPageContent = () => {
           </CardContent>
           <CardFooter className="bg-gray-50 p-6">
             <div className="w-full space-y-3">
-              <Link href="/reservas-realizadas" passHref className="block w-full">
+              <Link href="/mi-panel/reservas-realizadas" passHref className="block w-full">
                 <Button className="w-full bg-[#39759E] hover:bg-blue-600 text-white transition duration-300">
                   Ver tus reservas
                 </Button>

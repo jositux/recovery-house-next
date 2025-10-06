@@ -392,7 +392,7 @@ const BookingList: React.FC = () => {
         name = user.first_name
 
         const bookingsResponse = await fetch(
-          `/webapi/items/Booking?filter[patient][_eq]=${user.id}&fields=*, +room.*, +room.photos.directus_files_id.id, +room.propertyId.*&sort=-bookingDateCreated`,
+          `/webapi/items/Booking?filter[ownerId][_eq]=${user.id}&fields=*, +room.*, +room.photos.directus_files_id.id, +room.propertyId.*&sort=-bookingDateCreated`,
         )
         const bookingsData = await bookingsResponse.json()
         setBookings(bookingsData.data)

@@ -1,10 +1,12 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutGrid, Building2, CalendarArrowDown, CalendarArrowUp, PlusCircle, Menu, Pencil, LogOut, X } from "lucide-react"
+import { User, LayoutGrid, Building2, CalendarArrowDown, CalendarArrowUp, PlusCircle, Menu, Pencil, LogOut, X } from "lucide-react"
+import { logoutUser } from "@/services/LogoutService"
 
 export default function DashboardLayout({
   children,
@@ -12,6 +14,38 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+
+  const [userName, setUserName] = useState("")
+
+
+
+  useEffect(() => {
+    // Función para verificar autenticación y obtener nombre
+    const checkAuth = () => {
+      const token = localStorage.getItem("access_token")
+      
+      const rawName = localStorage.getItem("nombre");
+      const name = (
+        rawName && 
+        rawName !== "null" &&
+        rawName.trim() !== ""
+      ) ? rawName : "Usuario sin nombre";
+
+      //setIsLoggedIn(!!token)
+      setUserName(name)
+    }
+
+    // Verificar en el montaje
+    checkAuth()
+
+    // Escuchar cambios en localStorage
+    window.addEventListener("storage", checkAuth)
+
+    // Cleanup del evento al desmontar
+    return () => {
+      window.removeEventListener("storage", checkAuth)
+    }
+  }, [])
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -27,8 +61,11 @@ export default function DashboardLayout({
         <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setIsSidebarOpen(false)} />
       )}
 
-      <DashboardSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-
+<DashboardSidebar 
+  isOpen={isSidebarOpen} 
+  onClose={() => setIsSidebarOpen(false)} 
+  userName={userName}
+/>
       <main className="flex-1 p-4 pt-16 lg:p-8 lg:pt-8">{children}</main>
     </div>
   )
@@ -37,9 +74,11 @@ export default function DashboardLayout({
 function DashboardSidebar({
   isOpen,
   onClose,
+  userName,
 }: {
   isOpen: boolean
   onClose: () => void
+  userName: string
 }) {
   const pathname = usePathname()
 
@@ -76,10 +115,29 @@ function DashboardSidebar({
     },
   ]
 
-  const handleLogout = () => {
-    // Aquí puedes agregar la lógica de logout (ej: limpiar sesión, redirigir, etc.)
-    console.log("Cerrando sesión...")
+  const router = useRouter()
+
+ // Logout utilizando el servicio
+ const handleLogout = async () => {
+  try {
+    // Obtén el refreshToken desde localStorage
+    const refreshToken = localStorage.getItem("refresh_token")
+    if (!refreshToken) {
+      console.error("No se encontró el token de refresco")
+      return
+    }
+
+    // Llama al servicio de logout
+    await logoutUser(refreshToken)
+
+    window.dispatchEvent(new Event("storage"))
+
+    router.push("/login")
+  } catch (error) {
+    console.error("Error al cerrar sesión:", error)
   }
+
+}
 
   return (
     <aside
@@ -120,6 +178,9 @@ function DashboardSidebar({
         })}
       </nav>
 
+    
+             
+        
       <div className="border-t border-gray-200 pt-4 mt-4 space-y-2">
         <Link
           href="/mi-panel/mi-perfil"
@@ -127,11 +188,11 @@ function DashboardSidebar({
           className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-gray-100 transition-colors group"
         >
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-red-400 to-pink-500 flex items-center justify-center text-white font-semibold flex-shrink-0">
-            JD
+          <User className="w-5 h-5" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">Juan Pérez</p>
-            <p className="text-xs text-gray-500 truncate">juan@example.com</p>
+            <p className="text-sm font-medium text-gray-900 truncate">{userName}</p>
+            
           </div>
           <Pencil className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors flex-shrink-0" />
         </Link>
@@ -144,6 +205,7 @@ function DashboardSidebar({
           <span className="font-medium">Cerrar sesión</span>
         </button>
       </div>
+         
     </aside>
   )
 }
