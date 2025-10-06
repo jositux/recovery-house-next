@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import axios from "axios";
-import { Bed, Users, Clock, Percent, CreditCard } from "lucide-react";
+import { Edit, AlertCircle, Bed, Users, Clock, Percent, CreditCard } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 //import { Camera } from 'lucide-react';
 import { BookingWidget } from "@/components/ui/booking-widget-private";
@@ -31,6 +31,19 @@ import { fetchStayData, Stay } from "@/services/stayService";
 import { HostProfile } from "@/components/rating/HostProfile"
 import { ReviewsModal } from "@/components/rating/ReviewsModal"
 import { Button } from "@/components/ui/button"
+
+import { CancellationPolicyDialogContent } from "./components/cancellation-policy-dialog-content";
+import { ModificationPolicyDialogContent } from "./components/modification-policy-dialog-content";
+
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 
 //import { useCheckOwnership } from "@/hooks/isOwner";
@@ -865,6 +878,53 @@ const filterCurrentBookings = (bookings: Booking[]) => {
                 </CardContent>
               </Card>
             </div>
+
+         
+          {/* Contenedor para los botones de políticas */}
+          <div className="flex flex-col md:flex-row gap-3 mb-16 w-full">
+            {/* Botón para Políticas de Anulación */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="flex-1 bg-transparent">
+                  <AlertCircle className="h-4 w-4 mr-2" />
+                  Ver Políticas de Anulación
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Políticas de Anulación de Reserva</DialogTitle>
+                  <DialogDescription>
+                    Detalles sobre las condiciones de cancelación para
+                    diferentes tipos de estadía.
+                  </DialogDescription>
+                </DialogHeader>
+                <CancellationPolicyDialogContent />
+              </DialogContent>
+            </Dialog>
+
+            {/* Botón para Políticas de Modificación */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="flex-1 bg-transparent">
+                  <Edit className="h-4 w-4 mr-2" />
+                  Ver Políticas de Modificación
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>
+                    Políticas de Modificación de Reserva
+                  </DialogTitle>
+                  <DialogDescription>
+                    Detalles sobre las condiciones para modificar una reserva
+                    existente.
+                  </DialogDescription>
+                </DialogHeader>
+                <ModificationPolicyDialogContent />
+              </DialogContent>
+            </Dialog>
+          </div>
+      
 
             {/* Booking Widget for mobile */}
             <div className="mb-4 lg:hidden">
