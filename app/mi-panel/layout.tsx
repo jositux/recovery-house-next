@@ -22,7 +22,7 @@ export default function DashboardLayout({
   useEffect(() => {
     // Función para verificar autenticación y obtener nombre
     const checkAuth = () => {
-      const token = localStorage.getItem("access_token")
+     // const token = localStorage.getItem("access_token")
       
       const rawName = localStorage.getItem("nombre");
       const name = (
