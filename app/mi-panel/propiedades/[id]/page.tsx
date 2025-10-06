@@ -378,7 +378,7 @@ export default function RoomPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Property Image */}
-      <div className="relative h-[70vh] w-full">
+      <div className="relative h-[50vh] w-full rounded-full">
         <Image
           src={getImageSrc(property.mainImage) || "/assets/empty.jpg"}
           alt={property.name}
@@ -389,7 +389,7 @@ export default function RoomPage() {
         <div className="absolute inset-0 bg-black bg-opacity-30" />
 
         <div className="absolute bottom-8 left-0 right-0 text-white">
-          <div className="container mx-auto px-4 lg:px-20">
+          <div className="container mx-auto px-4 lg:px-4">
             {isOwner && property.mainImage.isModerated !== undefined && (
               <div className="">
                 {property.mainImage.isModerated ? (
@@ -420,7 +420,7 @@ export default function RoomPage() {
         </div>
         {isOwner && (
           <div>
-            <div className="absolute z-100 top-0 right-4">
+            <div className="absolute z-100 top-4 right-12">
               <Button
                 variant="secondary"
                 onClick={() => handleEditBanner(property)}
@@ -446,7 +446,7 @@ export default function RoomPage() {
       </div>
 
       {/* Content */}
-      <div className="container mx-auto px-4 lg:px-20 py-8">
+      <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
           <div className="md:col-span-2">
             <h2 className="text-2xl font-semibold mb-4">Acerca de esta propiedad</h2>
