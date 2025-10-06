@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { CalendarClock, SquareArrowDown, Building,  User,  LogOut, HandHelping } from "lucide-react"
+import { LayoutGrid, CalendarClock, SquareArrowDown, Building,  User,  LogOut, HandHelping } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { logoutUser } from "@/services/LogoutService"
@@ -71,6 +71,14 @@ export function MenuProfile({ name }: ProfileMenuProps) {
         }`}
       >
         <ul className="text-sm text-[#162F40]">
+
+        <li className="px-4 py-2 hover:bg-gray-100 rounded-lg cursor-pointer">
+            <Link href="/mi-panel/" className="flex items-center gap-2" onClick={closeMenu}>
+              <LayoutGrid className="w-4 h-4" />
+              Mi Panel
+            </Link>
+          </li>
+
           <li className="px-4 py-2 hover:bg-gray-100 rounded-lg cursor-pointer">
             <Link href="/mi-panel/mis-propiedades" className="flex items-center gap-2" onClick={closeMenu}>
               <Building className="w-4 h-4" />
