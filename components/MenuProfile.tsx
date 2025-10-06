@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { Building, HomeIcon, User, BedIcon, LogOut, HandHelping } from "lucide-react"
+import { CalendarClock, SquareArrowDown, Building,  User,  LogOut, HandHelping } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { logoutUser } from "@/services/LogoutService"
@@ -77,16 +77,17 @@ export function MenuProfile({ name }: ProfileMenuProps) {
               Mis propiedades
             </Link>
           </li>
+         
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-            <Link href="/mi-panel/reservas-recibidas" className="flex items-center gap-2" onClick={closeMenu}>
-              <HomeIcon className="w-4 h-4" />
-              Reservas recibidas
+            <Link href="/mi-panel/reservas-realizadas" className="flex items-center gap-2" onClick={closeMenu}>
+              <CalendarClock className="w-4 h-4" />
+              Reservas realizadas
             </Link>
           </li>
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-            <Link href="/mi-panel/reservas-realizadas" className="flex items-center gap-2" onClick={closeMenu}>
-              <BedIcon className="w-4 h-4" />
-              Reservas realizadas
+            <Link href="/mi-panel/reservas-recibidas" className="flex items-center gap-2" onClick={closeMenu}>
+              <SquareArrowDown className="w-4 h-4" />
+              Reservas recibidas
             </Link>
           </li>
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
@@ -96,7 +97,7 @@ export function MenuProfile({ name }: ProfileMenuProps) {
             </Link>
           </li>
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-            <Link href="/mi-perfil" className="flex items-center gap-2" onClick={closeMenu}>
+            <Link href="/mi-panel/mi-perfil" className="flex items-center gap-2" onClick={closeMenu}>
               <User className="w-4 h-4" />
               Editar Perfil
             </Link>

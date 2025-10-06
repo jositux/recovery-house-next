@@ -114,7 +114,7 @@ export default function ProviderDataPage() {
                   variant="outline" 
                   className="absolute bottom-4 right-4"
                   onClick={() => {
-                    router.push("/editar-servicio")
+                    router.push("/mi-panel/editar-servicio")
                   }}
                 >
                   <Pencil className="h-4 w-4 mr-2" />

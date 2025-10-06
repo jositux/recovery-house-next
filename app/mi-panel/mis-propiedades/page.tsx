@@ -7,7 +7,7 @@ import { getCurrentUser, type User } from "@/services/userService"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { MapPin, Plus, /*Star,*/ Loader2, BedDouble, Home, ArrowRight, CheckCircle, AlertCircle } from "lucide-react"
+import { MapPin, Plus, Loader2, BedDouble, Home, ArrowRight, CheckCircle, AlertCircle } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -65,11 +65,11 @@ const PropertiesPage: React.FC = () => {
   }
 
   return (
-    <div className="container min-h-screen mx-auto py-16 px-4 md:px-6 lg:px-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Mis Propiedades</h1>
-        <Link href="/mi-panel/registrar-propiedad">
-          <Button className="bg-[#39759E] text-white hover:bg-[#2c5a7a] transition-colors duration-300">
+    <div className="container min-h-screen mx-auto py-4 px-4 md:px-6 lg:px-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Mis Propiedades</h1>
+        <Link href="/mi-panel/registrar-propiedad" className="w-full sm:w-auto">
+          <Button className="w-full sm:w-auto bg-[#39759E] text-white hover:bg-[#2c5a7a] transition-colors duration-300">
             <Plus className="mr-2 h-5 w-5" /> Nueva Propiedad
           </Button>
         </Link>
@@ -167,4 +167,3 @@ const PropertiesPage: React.FC = () => {
 }
 
 export default PropertiesPage
-
