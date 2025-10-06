@@ -87,11 +87,12 @@ export const formSchema = z
       .min(0)
       .max(99, { message: "Máximo 99 camas" })
       .transform((val) => (isNaN(val) ? 0 : val)),
+
     capacity: z.coerce
       .number()
       .min(0)
       .max(99, { message: "Capacidad máxima 99" })
-      .transform((val) => (isNaN(val) ? 0 : val)),
+      .transform((val) => (isNaN(val) ? 1 : val)),
 
     // Pricing for PRIVATE room - CAMPOS COMPLETAMENTE INDEPENDIENTES
     privateRoomPrice: z.coerce
@@ -261,7 +262,7 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
 
       // Total beds and capacity
       beds: initialValues?.beds || 0,
-      capacity: initialValues?.capacity || 0,
+      capacity: initialValues?.capacity || 1,
 
       // Pricing for PRIVATE room - 2 campos separados
       privateRoomPrice: initialValues?.privateRoomPrice || 0,
@@ -357,7 +358,7 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
         singleBeds: Number(values.singleBeds) || 0,
         doubleBeds: Number(values.doubleBeds) || 0,
         beds: Number(values.beds) || 0,
-        capacity: Number(values.capacity) || 0,
+        capacity: Number(values.capacity) || 1,
         privateRoomPrice: Number(values.privateRoomPrice) || 0,
         privateRoomCleaning: Number(values.privateRoomCleaning) || 0,
         sharedRoomPrice: Number(values.sharedRoomPrice) || 0,
