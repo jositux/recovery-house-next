@@ -20,6 +20,7 @@ import { InfoItem } from "./info-item"
 import { useState, useEffect } from "react"
 import { ReviewModal } from "./ReviewModal"
 import { ReviewCard } from "./ReviewCard"
+import { useRouter } from "next/navigation";
 
 interface Photo {
   directus_files_id: {
@@ -220,6 +221,8 @@ export const BookingCardPast = ({
     }
   }
 
+  const router = useRouter();
+
   return (
     <>
       <Card
@@ -251,47 +254,51 @@ export const BookingCardPast = ({
         )}
 
         <div className="flex flex-col md:flex-row">
-          <div className="relative w-full md:w-1/3 h-64 md:h-auto">
-            <Image
-              src={
-                roomDetails?.photos[0]?.directus_files_id.id
-                  ? `/webapi/assets/${roomDetails.photos[0]?.directus_files_id.id}?key=medium`
-                  : "/placeholder.svg?height=400&width=600"
-              }
-              alt={roomDetails?.name || "Room image"}
-              layout="fill"
-              objectFit="cover"
-              className={`rounded-t-lg md:rounded-l-lg md:rounded-t-none ${
-                isPast ? "grayscale-[20%]" : ""
-              }`}
-            />
+        <div className="relative w-full md:w-1/3 h-48 md:h-auto">
+  <Image
+    src={
+      roomDetails?.photos[0]?.directus_files_id.id
+        ? `/webapi/assets/${roomDetails.photos[0]?.directus_files_id.id}?key=medium`
+        : "/placeholder.svg?height=400&width=600"
+    }
+    alt={roomDetails?.name || "Room image"}
+    layout="fill"
+    objectFit="cover"
+    className="rounded-t-lg md:rounded-l-lg md:rounded-t-none"
+  />
 
-            <div
-              className={`absolute top-4 left-4 px-3 py-1 rounded-full text-sm font-medium ${
-                roomDetails?.isPrivate === false
-                  ? "bg-amber-500 text-white"
-                  : "bg-emerald-500 text-white"
-              }`}
-            >
-              {roomDetails?.isPrivate === false ? (
-                <div className="flex items-center space-x-1">
-                  {roomDetails?.bedType === "double" ? (
-                    <>
-                      <BedDouble size={16} color="white" />
-                      <span>1 cama doble</span>
-                    </>
-                  ) : (
-                    <>
-                      <BedSingle size={16} color="white" />
-                      <span>1 cama simple</span>
-                    </>
-                  )}
-                </div>
-              ) : (
-                <span>Habitación Privada</span>
-              )}
-            </div>
-          </div>
+  {/* Badge */}
+  <div
+    className={`absolute top-3 left-3 px-2 py-0.5 rounded-full text-xs font-medium ${
+      roomDetails?.isPrivate === false ? "bg-amber-500 text-white" : "bg-emerald-500 text-white"
+    }`}
+  >
+    {roomDetails?.isPrivate === false ? (
+      <div className="flex items-center space-x-1">
+        {roomDetails?.bedType === "double" ? (
+          <>
+            <BedDouble size={14} color="white" />
+            <span>1 cama doble</span>
+          </>
+        ) : (
+          <>
+            <BedSingle size={14} color="white" />
+            <span>1 cama simple</span>
+          </>
+        )}
+      </div>
+    ) : (
+      <span>Habitación Privada</span>
+    )}
+  </div>
+
+  {/* Overlay clickeable */}
+  <div
+    className="absolute inset-0 cursor-pointer"
+    onClick={() => router.push(`/rooms/${booking.room.id}`)}
+  />
+</div>
+
 
           <CardContent className="flex-1 p-4 md:w-2/3">
             <h3
