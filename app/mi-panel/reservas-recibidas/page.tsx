@@ -16,7 +16,6 @@ import {
   DollarSign,
   BedSingle,
   BedDouble,
-  Star,
   Loader2,
   Search,
   MapPin,
@@ -127,9 +126,9 @@ const BookingList: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   //const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
-  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null)
-  const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null)
-  let name = ""
+  //const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null)
+  //const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null)
+  //let name = ""
 
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false)
   const [cancelReason, setCancelReason] = useState("")
@@ -382,14 +381,14 @@ const BookingList: React.FC = () => {
             },
           ]
 
-          name = "Usuario Demo"
+         // name = "Usuario Demo"
           setBookings(mockBookings)
           setIsLoading(false)
           return
         }
 
         const user = await getCurrentUser(token)
-        name = user.first_name
+       // name = user.first_name
 
         const bookingsResponse = await fetch(
           `/webapi/items/Booking?filter[ownerId][_eq]=${user.id}&fields=*, +room.*, +room.photos.directus_files_id.id, +room.propertyId.*&sort=-bookingDateCreated`,
