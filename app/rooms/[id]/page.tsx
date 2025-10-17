@@ -1,41 +1,32 @@
-"use client";
+"use client"
 
-import { useState, useEffect, useCallback } from "react";
-import { useParams } from "next/navigation";
-import axios from "axios";
-import { Edit, AlertCircle, Bed, Users, Clock, Percent, CreditCard } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-//import { Camera } from 'lucide-react';
-import { BookingWidget } from "@/components/ui/booking-widget-private";
-//import BookingWidgetShared from "@/components/ui/booking-widget-shared"
-import { BookingWidgetBed } from "@/components/ui/booking-widget-bed";
-import { ServiceProviderCard } from "@/components/ui/service-provider-card";
-import { GoogleMap } from "@/components/ui/google-map";
-import { Fraunces } from "next/font/google";
-//import { PhotoGallery } from "@/components/ui/photo-gallery";
-import { getExtraTags } from "@/services/extraTagsService";
-import useTags from "@/hooks/useExtraTags";
-import { CollectionExtraTags } from "@/components/collectionExtraTagsRoom";
-import { MagicBackButton } from "@/components/ui/magic-back-button";
-import { PopupSwiperGallery } from "./popup-swiper-gallery";
-import { BedSingle, BedDouble } from "lucide-react";
-import { Calendar } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-
-import { fetchCurrentUser } from "@/services/BookingService";
-import { fetchUserById } from "@/services/UserById";
-import { useRouter } from "next/navigation";
-
-import { fetchStayData, Stay } from "@/services/stayService";
-
+import { useState, useEffect, useCallback } from "react"
+import { useParams } from "next/navigation"
+import axios from "axios"
+import { Edit, AlertCircle, Bed, Users, Clock, Percent, CreditCard } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { BookingWidget } from "@/components/ui/booking-widget-private"
+import { BookingWidgetBed } from "@/components/ui/booking-widget-bed"
+import { ServiceProviderCard } from "@/components/ui/service-provider-card"
+import { GoogleMap } from "@/components/ui/google-map"
+import { Fraunces } from "next/font/google"
+import { getExtraTags } from "@/services/extraTagsService"
+import useTags from "@/hooks/useExtraTags"
+import { CollectionExtraTags } from "@/components/collectionExtraTagsRoom"
+import { MagicBackButton } from "@/components/ui/magic-back-button"
+import { PopupSwiperGallery } from "./popup-swiper-gallery"
+import { BedSingle, BedDouble } from "lucide-react"
+import { Calendar } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { fetchCurrentUser } from "@/services/BookingService"
+import { fetchUserById } from "@/services/UserById"
+import { useRouter } from "next/navigation"
+import { fetchStayData, type Stay } from "@/services/stayService"
 import { HostProfile } from "@/components/rating/HostProfile"
 import { ReviewsModal } from "@/components/rating/ReviewsModal"
 import { Button } from "@/components/ui/button"
-
-import { CancellationPolicyDialogContent } from "./components/cancellation-policy-dialog-content";
-import { ModificationPolicyDialogContent } from "./components/modification-policy-dialog-content";
-
-
+import { CancellationPolicyDialogContent } from "./components/cancellation-policy-dialog-content"
+import { ModificationPolicyDialogContent } from "./components/modification-policy-dialog-content"
 import {
   Dialog,
   DialogContent,
@@ -43,293 +34,256 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@/components/ui/dialog"
 
+const fraunces = Fraunces({ subsets: ["latin"] })
 
-//import { useCheckOwnership } from "@/hooks/isOwner";
-
-const fraunces = Fraunces({ subsets: ["latin"] });
-
-interface RoomTag {
-  id: string;
-  Room_id: string;
-  ExtraTags_id: string;
+interface Ranking {
+  limpieza: number
+  atención: number
+  comodidad: number
 }
 
-type ImageRoom = {
-  directus_files_id: {
-    id: string;
-    isModerated: boolean;
-  };
-};
-
-interface Room {
-  id: string;
-  name: string;
-  description: string;
-  pricePerNight: string;
-  cleaningFee: string;
-  beds: number;
-  capacity: number; // Added capacity field
-  isPrivate: boolean;
-  // Configuración de camas
-  singleBeds: number;
-  doubleBeds: number;
-  // Precios para habitación privada o cama
-  privateRoomPrice: string;
-  privateRoomCleaning: string;
-
-  // Pricing for SHARED room - 2 campos separados
-  sharedRoomPrice: string;
-  sharedRoomCleaning: string;
-
-  bedType: string;
-  bedName: string;
-
-  check_in_hour: string;
-  check_out_hour: string;
-  discount_percentage_medium_stay: string;
-  discount_percentage_long_stay: string;
-  prepayment_percentage: string;
-
-  photos: ImageRoom[];
-  extraTags: RoomTag[];
-  servicesTags: { serviceTags_id: string }[];
-  descriptionService: string;
-  Property_id: string;
-  disableDates: string;
-}
-
-interface Property {
-  id: string;
-  name: string;
-  country: string;
-  region: string;
-  state: string;
-  city: string;
-  place: {
-    type: string;
-    coordinates: [number, number];
-  };
-  userId: string;
-  hostName: string;
-  guestComments: string;
-}
-
-interface Booking {
-  id: string;
-  status: string;
-  checkIn: string;
-  checkOut: string;
-  patient: string;
-  ownerId: string;
-  guests: number;
-  price: number;
-  cleaning: number;
-  room: string;
-  singleBeds: number;
-  doubleBeds: number;
-  isPrivate: boolean;
-  bookingState: string;
-}
-
-interface ServiceProvider {
-  id: string;
-  date_created: string;
-  taxIdEIN: string;
-  taxIdEINFile: string;
-  RNTFile: string;
-  taxIdApproved: boolean;
-  membership: string;
-  userId: string;
-  phone: string;
-  email: string;
-  name: string;
-  description: string;
-  country: string;
-  state: string;
-  city: string;
-  extraTags: number[];
-  serviceTags: number[];
-}
-
-interface BookingData {
-  checkIn: string;
-  checkOut: string;
-  guests: number;
-  nights: number;
-  price: number;
-  cleaning: number;
-  totalPrice: number;
-  discountStayType: string,    
-  discountPercentageStayApplied: number,
-  discountStayAmount: number,
-}
-
-interface DiscountData {
-  shortStayDiscounts: string[];
-  mediumStayDiscounts: string[];
-  longStayDiscounts: string[];
-  defaultShortStayDiscount: string;
-  defaultMediumStayDiscount: string;
-  defaultLongStayDiscount: string;
-  shortStayRange: { min: number; max: number | null };
-  mediumStayRange: { min: number; max: number | null };
-  longStayRange: { min: number; max: number | null };
+interface ReviewReply {
+  id: string
+  userCreated: string
+  dateCreated: string
+  userUpdated: string | null
+  dateUpdated: string | null
+  reviewId: string
+  ownerId: string
+  reply: string
 }
 
 interface Review {
   id: string
-  userName: string
-  userLocation: string
-  rating: number
-  date: string
-  stayType: string
+  bookingId: string
+  roomId: string
+  name: string
   comment: string
-  avatar: string
+  ranking: Ranking
+  status: string
+  dateCreated: string
+  review_replies: ReviewReply[]
+}
+
+interface RoomTag {
+  id: string
+  Room_id: string
+  ExtraTags_id: string
+}
+
+type ImageRoom = {
+  directus_files_id: {
+    id: string
+    isModerated: boolean
+  }
+}
+
+interface Room {
+  id: string
+  name: string
+  description: string
+  pricePerNight: string
+  cleaningFee: string
+  beds: number
+  capacity: number
+  isPrivate: boolean
+  singleBeds: number
+  doubleBeds: number
+  privateRoomPrice: string
+  privateRoomCleaning: string
+  sharedRoomPrice: string
+  sharedRoomCleaning: string
+  bedType: string
+  bedName: string
+  check_in_hour: string
+  check_out_hour: string
+  discount_percentage_medium_stay: string
+  discount_percentage_long_stay: string
+  prepayment_percentage: string
+  photos: ImageRoom[]
+  extraTags: RoomTag[]
+  servicesTags: { serviceTags_id: string }[]
+  descriptionService: string
+  Property_id: string
+  disableDates: string
+}
+
+interface Property {
+  id: string
+  name: string
+  country: string
+  region: string
+  state: string
+  city: string
+  place: {
+    type: string
+    coordinates: [number, number]
+  }
+  userId: string
+  hostName: string
+  guestComments: string
+}
+
+interface Booking {
+  id: string
+  status: string
+  checkIn: string
+  checkOut: string
+  patient: string
+  ownerId: string
+  guests: number
+  price: number
+  cleaning: number
+  room: string
+  singleBeds: number
+  doubleBeds: number
+  isPrivate: boolean
+  bookingState: string
+}
+
+interface ServiceProvider {
+  id: string
+  date_created: string
+  taxIdEIN: string
+  taxIdEINFile: string
+  RNTFile: string
+  taxIdApproved: boolean
+  membership: string
+  userId: string
+  phone: string
+  email: string
+  name: string
+  description: string
+  country: string
+  state: string
+  city: string
+  extraTags: number[]
+  serviceTags: number[]
+}
+
+interface BookingData {
+  checkIn: string
+  checkOut: string
+  guests: number
+  nights: number
+  price: number
+  cleaning: number
+  totalPrice: number
+  discountStayType: string
+  discountPercentageStayApplied: number
+  discountStayAmount: number
+}
+
+interface DiscountData {
+  shortStayDiscounts: string[]
+  mediumStayDiscounts: string[]
+  longStayDiscounts: string[]
+  defaultShortStayDiscount: string
+  defaultMediumStayDiscount: string
+  defaultLongStayDiscount: string
+  shortStayRange: { min: number; max: number | null }
+  mediumStayRange: { min: number; max: number | null }
+  longStayRange: { min: number; max: number | null }
+}
+
+const calculateAverage = (ranking: Ranking): number => {
+  const values = Object.values(ranking).filter((rating) => rating > 0)
+  if (values.length === 0) return 0
+  return values.reduce((sum, rating) => sum + rating, 0) / values.length
 }
 
 export default function RoomPage() {
-  const { id } = useParams();
+  const { id } = useParams()
 
-  const [room, setRoom] = useState<Room | null>(null);
-  const [property, setProperty] = useState<Property | null>(null);
-  //const [user, setUser] = useState<User | null>(null);
+  const [room, setRoom] = useState<Room | null>(null)
+  const [property, setProperty] = useState<Property | null>(null)
+  const [bookings, setBookings] = useState<Booking[]>([])
+  const [serviceProviders, setServiceProviders] = useState<ServiceProvider[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [serviceProviders, setServiceProviders] = useState<ServiceProvider[]>(
-    []
-  );
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  //const [photoIds, setPhotoIds] = useState<string[]>([]);
-  //const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [reviews, setReviews] = useState<Review[]>([])
+  //const [isLoadingReviews, setIsLoadingReviews] = useState(false)
 
-  const { extraTags } = useTags("extraTags", getExtraTags);
+  const { extraTags } = useTags("extraTags", getExtraTags)
 
-  /*const [bookingPrivateData, setBookingPrivateData] =
-    useState<BookingPrivateData | null>(null);
-
-  const [bookingSharedData, setBookingSharedData] =
-    useState<BookingSharedData | null>(null);*/
-
-  const router = useRouter();
+  const router = useRouter()
 
   interface User {
-    id: string;
-    first_name: string;
-    last_name: string;
+    id: string
+    first_name: string
+    last_name: string
   }
 
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null)
 
-/* Profile */
-const [showReviews, setShowReviews] = useState(false)
+  const [showReviews, setShowReviews] = useState(false)
 
-  const averageRating = 4.98
-  const totalReviews = 51
-  const hostName = "Valentino"
+  const averageRating =
+    reviews.length > 0 ? reviews.reduce((sum, review) => sum + calculateAverage(review.ranking), 0) / reviews.length : 0
+
+  const totalReviews = reviews.length
+  //const hostName = "Valentino"
   const hostExperience = "4 meses de experiencia como anfitrión"
 
-  const mockReviews: Review[] = [
-    {
-      id: "1",
-      userName: "Julio Cesar",
-      userLocation: "Jalpa de Méndez, México",
-      rating: 5,
-      date: "agosto de 2025",
-      stayType: "Estadía de algunas noches",
-      comment:
-        "Fue de nuestro agrado en todos los sentidos, una hermosa vista desde el balcón y es tal como se describe. Muy céntrico y cerca de lugares importantes de la ciudad. Valentino se portó muy amable, con regresaríamos de nuevo.",
-      avatar:
-        "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screen%20Shot%202025-09-26%20at%2010.40.04-2M7A9s8ARIFr8uXeBtstQNJk8dG46v.png",
-    },
-    {
-      id: "2",
-      userName: "Loreley",
-      userLocation: "Bahía Blanca, Argentina",
-      rating: 5,
-      date: "julio de 2025",
-      stayType: "Estadía con niños",
-      comment:
-        "El departamento es hermoso, está muy bien ubicado y cuenta con todas las comodidades. Valentino fue claro en las instrucciones. Tuvimos la mala suerte de que se rompiera el ascensor y mandó a alguien a ayudarnos a bajar las maletas. Sin dudas súper recomendable! Lo único a tener en cuenta es que hay una disco cerca y se escucha bastante el ruido. nosotras estábamos cansadas de un vuelo de 13 horas y con jet lag así que dormimos igual, lo más bien. La terraza también es hermosa para tomarse unos mates con el solcito.",
-      avatar:
-        "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screen%20Shot%202025-09-26%20at%2010.40.04-2M7A9s8ARIFr8uXeBtstQNJk8dG46v.png",
-    },
-  ]
-  //const [ownerUser, setOwnerUser] = useState<User | null>(null);
+  const filterCurrentBookings = (bookings: Booking[]) => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
 
-  // Filter bookings to only include those with checkout dates in the future
-// and exclude cancelled bookings
-const filterCurrentBookings = (bookings: Booking[]) => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0); // Set to beginning of day for accurate comparison
+    return bookings.filter((booking) => {
+      const checkOutDate = new Date(booking.checkOut)
+      return (
+        checkOutDate >= today &&
+        booking.bookingState !== "cancelled_by_patient" &&
+        booking.bookingState !== "cancelled_by_owner"
+      )
+    })
+  }
 
-  return bookings.filter((booking) => {
-    const checkOutDate = new Date(booking.checkOut);
-    return (
-      checkOutDate >= today &&
-      booking.bookingState !== "cancelled_by_patient" &&
-      booking.bookingState !== "cancelled_by_owner"
-    );
-  });
-};
-
-  const [filteredBookings, setFilteredBookings] = useState<Booking[]>([]);
+  const [filteredBookings, setFilteredBookings] = useState<Booking[]>([])
 
   useEffect(() => {
-    setFilteredBookings(filterCurrentBookings(bookings));
-  }, [bookings]);
+    setFilteredBookings(filterCurrentBookings(bookings))
+  }, [bookings])
 
   useEffect(() => {
     const fetchUser = async () => {
-      const accessToken = localStorage.getItem("access_token");
+      const accessToken = localStorage.getItem("access_token")
       if (!accessToken) {
-        return;
+        return
       }
 
-      const user = await fetchCurrentUser(accessToken);
-      console.log(user);
-      setCurrentUser(user);
-    };
+      const user = await fetchCurrentUser(accessToken)
+      console.log(user)
+      setCurrentUser(user)
+    }
 
-    fetchUser();
+    fetchUser()
+  }, [])
 
-    
-  }, []); // solo se ejecuta una vez al montar el componente
-
-
-
-  const [discountData, setDiscountData] = useState<DiscountData | null>(null);
+  const [discountData, setDiscountData] = useState<DiscountData | null>(null)
 
   useEffect(() => {
-    const accessToken = localStorage.getItem("access_token") ?? "";
-    if (!accessToken) return;
+    const accessToken = localStorage.getItem("access_token") ?? ""
+    if (!accessToken) return
 
     const loadData = async () => {
       try {
-        const stays: Stay[] = await fetchStayData(accessToken);
+        const stays: Stay[] = await fetchStayData(accessToken)
 
-        const shortStay = stays.find((s) => s.type === "corta");
-        const mediumStay = stays.find((s) => s.type === "media");
-        const longStay = stays.find((s) => s.type === "larga");
+        const shortStay = stays.find((s) => s.type === "corta")
+        const mediumStay = stays.find((s) => s.type === "media")
+        const longStay = stays.find((s) => s.type === "larga")
 
         setDiscountData({
-          shortStayDiscounts: shortStay?.discounts.map((d) =>
-            d.percentage.toString()
-          ) ?? ["0"],
-          mediumStayDiscounts: mediumStay?.discounts.map((d) =>
-            d.percentage.toString()
-          ) ?? ["0"],
-          longStayDiscounts: longStay?.discounts.map((d) =>
-            d.percentage.toString()
-          ) ?? ["0"],
-          defaultShortStayDiscount:
-            shortStay?.discounts[0]?.percentage.toString() ?? "0",
-          defaultMediumStayDiscount:
-            mediumStay?.discounts[0]?.percentage.toString() ?? "0",
-          defaultLongStayDiscount:
-            longStay?.discounts[0]?.percentage.toString() ?? "0",
+          shortStayDiscounts: shortStay?.discounts.map((d) => d.percentage.toString()) ?? ["0"],
+          mediumStayDiscounts: mediumStay?.discounts.map((d) => d.percentage.toString()) ?? ["0"],
+          longStayDiscounts: longStay?.discounts.map((d) => d.percentage.toString()) ?? ["0"],
+          defaultShortStayDiscount: shortStay?.discounts[0]?.percentage.toString() ?? "0",
+          defaultMediumStayDiscount: mediumStay?.discounts[0]?.percentage.toString() ?? "0",
+          defaultLongStayDiscount: longStay?.discounts[0]?.percentage.toString() ?? "0",
           shortStayRange: {
             min: shortStay?.minNights ?? 1,
             max: shortStay?.maxNights ?? 5,
@@ -342,30 +296,28 @@ const filterCurrentBookings = (bookings: Booking[]) => {
             min: longStay?.minNights ?? 10,
             max: longStay?.maxNights ?? null,
           },
-        });
+        })
       } catch (err) {
-        console.error("Error cargando descuentos:", err);
+        console.error("Error cargando descuentos:", err)
       }
-    };
+    }
 
-    loadData();
-  }, []);
+    loadData()
+  }, [])
 
-  // Handle reservation from the BookingWidgetPrivate
   const handleReservation = async (data: BookingData) => {
     if (!currentUser) {
-      console.error("User not loaded");
-      router.push("/login");
-      return;
+      console.error("User not loaded")
+      router.push("/login")
+      return
     }
-  
+
     try {
-      const accessToken = localStorage.getItem("access_token");
-      if (!accessToken) throw new Error("Missing token");
-  
-      // 🔹 obtengo al owner directamente
-      const owner = await fetchUserById(accessToken, property?.userId ?? "");
-  
+      const accessToken = localStorage.getItem("access_token")
+      if (!accessToken) throw new Error("Missing token")
+
+      const owner = await fetchUserById(accessToken, property?.userId ?? "")
+
       const formattedBookingData = {
         ...data,
         isPrivate: room?.isPrivate,
@@ -374,77 +326,36 @@ const filterCurrentBookings = (bookings: Booking[]) => {
         ownerId: property?.userId,
         room: room?.id,
         roomName: room?.name,
-        ownerName: owner.first_name + " - " + owner.last_name, // 👈 uso la variable, no el state
+        ownerName: owner.first_name + " - " + owner.last_name,
         propertyName: property?.name,
         description: room?.description,
-      };
-  
-      localStorage.removeItem("bookingData");
-      localStorage.setItem("bookingData", JSON.stringify(formattedBookingData));
-  
+        photo: room?.photos[0].directus_files_id.id
+      }
+
+      localStorage.removeItem("bookingData")
+      localStorage.setItem("bookingData", JSON.stringify(formattedBookingData))
+
       const formattedBooking = {
         isPrivate: room?.isPrivate,
         name: room?.name,
         description: room?.description,
         unit_amount: data.totalPrice,
-      };
-  
-      localStorage.setItem("booking", JSON.stringify(formattedBooking));
-  
-      router.push("/confirm-pay");
+      }
+
+      localStorage.setItem("booking", JSON.stringify(formattedBooking))
+
+      router.push("/confirm-pay")
     } catch (error) {
-      console.error( "Error fetching usuario", error);
-      setError("Error al buscar el usuario");
+      console.error("Error fetching usuario", error)
+      setError("Error al buscar el usuario")
     }
-  };
-  
-
-  // Handle reservation from the BookingWidgetPrivate
-  /*
-  const handleReservationShared = async (data: BookingData) => {
-    // setBookingSharedData(data);
-
-    if (!currentUser) {
-      console.error("User not loaded");
-      router.push("/login");
-      return;
-    }
-
-    const formattedBookingData = {
-      ...data,
-      isPrivate: room?.isPrivate,
-      patientId: currentUser.id,
-      room: room?.id,
-      roomName: room?.name,
-      ownerId: property?.id,
-      ownerName: property?.name,
-      propertyName: property?.name,
-      description: room?.description,
-    };
-
-    localStorage.removeItem("bookingData");
-
-    localStorage.setItem("bookingData", JSON.stringify(formattedBookingData));
-
-    const formattedBooking = {
-      isPrivate: room?.isPrivate,
-      name: room?.name,
-      description: room?.description,
-      unit_amount: data.totalPrice,
-    };
-
-    localStorage.setItem("booking", JSON.stringify(formattedBooking));
-
-    router.push("/checkout");
-  };
-  */
+  }
 
   useEffect(() => {
     const fetchRoomData = async () => {
-      setIsLoading(true);
-      setError(null);
+      setIsLoading(true)
+      setError(null)
       try {
-        // Primero obtenemos los datos de la habitación
         const roomResponse = await axios.get("/webapi/items/Room", {
           params: {
             fields:
@@ -454,162 +365,133 @@ const filterCurrentBookings = (bookings: Booking[]) => {
           headers: {
             "Access-Control-Allow-Origin": "*",
           },
-        });
+        })
 
-        const roomData = roomResponse.data.data?.[0];
+        const roomData = roomResponse.data.data?.[0]
 
         if (!roomData) {
-          setError("Habitación no encontrada");
-          return;
+          setError("Habitación no encontrada")
+          return
         }
 
-        const today = new Date().toISOString().split("T")[0];
+        const today = new Date().toISOString().split("T")[0]
 
-        // Usamos el Property_id de la habitación para obtener la propiedad específica
-        const [propertyResponse, bookingsResponse, providerResponse] =
-          await Promise.all([
-            axios.get("/webapi/items/Property", {
-              params: {
-                fields: "*",
-                "filter[id][_eq]": roomData.propertyId,
-              },
-              headers: {
-                "Access-Control-Allow-Origin": "*",
-              },
-            }),
-            axios.get(`/webapi/items/Booking`, {
-              params: {
-                "filter[room][_eq]": id,
-                "filter[checkOut][_gt]": today,
-              },
-              headers: {
-                "Access-Control-Allow-Origin": "*",
-              },
-            }),
-            axios.get("/webapi/items/Provider", {
-              headers: {
-                "Access-Control-Allow-Origin": "*",
-              },
-            }),
-          ]);
+        const [propertyResponse, bookingsResponse, providerResponse] = await Promise.all([
+          axios.get("/webapi/items/Property", {
+            params: {
+              fields: "*",
+              "filter[id][_eq]": roomData.propertyId,
+            },
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+            },
+          }),
+          axios.get(`/webapi/items/Booking`, {
+            params: {
+              "filter[room][_eq]": id,
+              "filter[checkOut][_gt]": today,
+            },
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+            },
+          }),
+          axios.get("/webapi/items/Provider", {
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+            },
+          }),
+        ])
 
-        const propertyData = propertyResponse.data.data?.[0];
+        const propertyData = propertyResponse.data.data?.[0]
         if (!propertyData) {
-          setError("Propiedad no encontrada");
-          return;
+          setError("Propiedad no encontrada")
+          return
         }
 
-        setRoom(roomData);
-        setProperty(propertyData);
-
-        setServiceProviders(providerResponse.data.data);
-        setBookings(bookingsResponse.data.data);
+        setRoom(roomData)
+        setProperty(propertyData)
+        setServiceProviders(providerResponse.data.data)
+        setBookings(bookingsResponse.data.data)
       } catch (error) {
-        console.error("Error fetching room data:", error);
-        setError(
-          "Error al cargar los datos de la habitación. Por favor, intenta de nuevo más tarde."
-        );
+        console.error("Error fetching room data:", error)
+        setError("Error al cargar los datos de la habitación. Por favor, intenta de nuevo más tarde.")
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
+    }
 
     if (id) {
-      fetchRoomData();
+      fetchRoomData()
     }
-  }, [id]);
+  }, [id])
 
-  //const { isOwner } = useCheckOwnership(String(property?.id));
+  useEffect(() => {
+    const fetchReviews = async () => {
+      if (!id) return
+
+      const accessToken = localStorage.getItem("access_token")
+      if (!accessToken) {
+        console.warn("No access token found, skipping reviews fetch")
+        return
+      }
+
+      //setIsLoadingReviews(true)
+      try {
+        const response = await axios.get("/webapi/items/Reviews", {
+          params: {
+            "filter[roomId][_eq]": id,
+            "sort[]": "-dateCreated",
+            fields: "*,review_replies.*",
+            "deep[review_replies][sort]": "-dateCreated",
+          },
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+
+        setReviews(response.data.data || [])
+      } catch (error) {
+        console.error("Error fetching reviews:", error)
+      } finally {
+        //setIsLoadingReviews(false)
+      }
+    }
+
+    fetchReviews()
+  }, [id])
 
   const getImageSrc = useCallback((image: ImageRoom) => {
     return image.directus_files_id.isModerated
       ? "/assets/empty.jpg"
-      : `/webapi/assets/${image.directus_files_id.id}?key=full`;
-  }, []);
+      : `/webapi/assets/${image.directus_files_id.id}?key=full`
+  }, [])
 
-  /*useEffect(() => {
-    if (room && room.photos) {
-      setPhotoIds(room.photos.map((photo) => getImageSrc(photo)));
-    }
-  }, [room, getImageSrc]);*/
+  const [imagesSwiper, setImagesSwiper] = useState<{ src: string; alt: string }[]>([])
 
-  const [imagesSwiper, setImagesSwiper] = useState<
-    { src: string; alt: string }[]
-  >([]);
-
-  // Modificar el useEffect para transformar las fotos al formato requerido
   useEffect(() => {
     if (room && room.photos) {
-      // Transformar el array de fotos al formato que espera el componente Swiper
       const swiperImages = room.photos.map((photo) => ({
         src: getImageSrc(photo),
         alt: "Imagen de Habitación",
-      }));
+      }))
 
-      setImagesSwiper(swiperImages);
-
-      // Mantener también el array original de URLs si lo necesitas para otros componentes
-      //setPhotoIds(room.photos.map((photo) => getImageSrc(photo)));
+      setImagesSwiper(swiperImages)
     }
-  }, [room, getImageSrc]);
+  }, [room, getImageSrc])
 
   type HtmlContentProps = {
-    html?: string | null;
-  };
+    html?: string | null
+  }
 
   const HtmlContent = ({ html }: HtmlContentProps) => {
-    if (!html || html.trim() === "") return null;
+    if (!html || html.trim() === "") return null
 
-    return <div className="prose" dangerouslySetInnerHTML={{ __html: html }} />;
-  };
-
-  /*
-  const getAvailableBeds = (
-    room: Room,
-    bookingsForRoom: Booking[]
-  ): { availableSingleBeds: number; availableDoubleBeds: number } => {
-    const reservedSingleBeds = bookingsForRoom.reduce(
-      (sum, b) => sum + (b.singleBeds || 0),
-      0
-    );
-    const reservedDoubleBeds = bookingsForRoom.reduce(
-      (sum, b) => sum + (b.doubleBeds || 0),
-      0
-    );
-
-    return {
-      availableSingleBeds: room.singleBeds - reservedSingleBeds,
-      availableDoubleBeds: room.doubleBeds - reservedDoubleBeds,
-    };
-  };*/
-
-  /*const [availableBeds, setAvailableBeds] = useState<{
-    availableSingleBeds: number;
-    availableDoubleBeds: number;
-  }>({
-    availableSingleBeds: 0,
-    availableDoubleBeds: 0,
-  });
-
-  useEffect(() => {
-    if (room) {
-      const bookingsForRoom = filteredBookings.filter(
-        (b) => b.room === room.id
-      );
-      const { availableSingleBeds, availableDoubleBeds } = getAvailableBeds(
-        room,
-        bookingsForRoom
-      );
-      setAvailableBeds({ availableSingleBeds, availableDoubleBeds });
-    }
-  }, [room, filteredBookings]); // Recalcular cuando room o bookings cambien*/
+    return <div className="prose" dangerouslySetInnerHTML={{ __html: html }} />
+  }
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        Cargando...
-      </div>
-    );
+    return <div className="flex justify-center items-center h-screen">Cargando...</div>
   }
 
   if (error || !room || !property) {
@@ -617,25 +499,23 @@ const filterCurrentBookings = (bookings: Booking[]) => {
       <div className="flex justify-center items-center h-screen text-red-500">
         {error || "Habitación no encontrada"}
       </div>
-    );
+    )
   }
 
-
   function formatTimeToAMPM(time: string): string {
-    console.log(time)
-    const [hourStr, minute] = time.split(":");
-    let hour = parseInt(hourStr, 10);
-    const ampm = hour >= 12 ? "PM" : "AM";
-    hour = hour % 12 || 12; // convierte 0 => 12
-    return `${hour}:${minute} ${ampm}`;
+    const [hourStr, minute] = time.split(":")
+    let hour = Number.parseInt(hourStr, 10)
+    const ampm = hour >= 12 ? "PM" : "AM"
+    hour = hour % 12 || 12
+    return `${hour}:${minute} ${ampm}`
   }
 
   function formatDiscount(discount: string): string {
-    const num = parseFloat(discount);
+    const num = Number.parseFloat(discount)
     if (isNaN(num) || num === 0) {
-      return "Sin descuento";
+      return "Sin descuento"
     }
-    return `${Math.round(num)}%`;
+    return `${Math.round(num)}%`
   }
 
   return (
@@ -655,34 +535,10 @@ const filterCurrentBookings = (bookings: Booking[]) => {
         </div>
       </div>
 
-      {/*photoIds.length > 1 && (
-        <div className="container relative mx-auto px-4 lg:px-20">
-          <button
-            className="absolute left-20 bottom-8 bg-white px-4 py-2 rounded-md text-[#162F40] flex items-center gap-2"
-            onClick={() => setIsGalleryOpen(true)}
-          >
-            <Camera className="w-5 h-5" />
-            Ver todas las fotos
-          </button>
-        </div>
-      )*/}
-
-      {/* Photo Gallery
-
-      <PhotoGallery
-        photos={photoIds}
-        isOpen={isGalleryOpen}
-        onClose={() => setIsGalleryOpen(false)}
-      /> */}
-
       {imagesSwiper.length > 1 && (
         <div className="container relative mx-auto px-4 lg:px-20">
           <div className="absolute left-20 bottom-8">
-            <PopupSwiperGallery
-              images={imagesSwiper}
-              buttonText="Ver todas las fotos"
-              autoplay={true}
-            />
+            <PopupSwiperGallery images={imagesSwiper} buttonText="Ver todas las fotos" autoplay={true} />
           </div>
         </div>
       )}
@@ -694,12 +550,8 @@ const filterCurrentBookings = (bookings: Booking[]) => {
           <div className="lg:col-span-2">
             {/* Title and Stats */}
             <div className="mb-6">
-              <h1
-                className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}
-              >
-                {room.isPrivate === false && room.bedName?.trim()
-                  ? `${room.bedName} - `
-                  : ""}
+              <h1 className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}>
+                {room.isPrivate === false && room.bedName?.trim() ? `${room.bedName} - ` : ""}
                 {room.name}
               </h1>
               <p className="text-xl text-[#162F40] mb-4"> {property.name}</p>
@@ -708,15 +560,13 @@ const filterCurrentBookings = (bookings: Booking[]) => {
                   <div className="flex items-center">
                     <Bed className="w-5 h-5 mr-2" />
                     <span>
-                      {room.beds}{" "}
-                      {room.beds === 1 ? "cama en total" : "camas en total"}
+                      {room.beds} {room.beds === 1 ? "cama en total" : "camas en total"}
                     </span>
                   </div>
                   <div className="flex items-center">
                     <Users className="w-5 h-5 mr-2" />
                     <span>
-                      Capacidad: {room.capacity}{" "}
-                      {room.capacity === 1 ? "persona" : "personas"}
+                      Capacidad: {room.capacity} {room.capacity === 1 ? "persona" : "personas"}
                     </span>
                   </div>
                 </div>
@@ -738,6 +588,7 @@ const filterCurrentBookings = (bookings: Booking[]) => {
                 </div>
               )}
             </div>
+
             {room.isPrivate === false && (
               <Alert className="border-blue-200 bg-white/50 backdrop-blur-sm mb-6">
                 <AlertDescription className="text-gray-700 font-medium">
@@ -748,11 +599,9 @@ const filterCurrentBookings = (bookings: Booking[]) => {
                         NOTA:
                       </h3>
                       <p className="text-sm leading-relaxed">
-                        Esta cama se alquila de manera individual, lo que
-                        significa que reservás un lugar dentro de una habitación
-                        compartida. Esta modalidad es ideal para quienes buscan
-                        una opción económica y están abiertos a compartir el
-                        espacio con otras personas.
+                        Esta cama se alquila de manera individual, lo que significa que reservás un lugar dentro de una
+                        habitación compartida. Esta modalidad es ideal para quienes buscan una opción económica y están
+                        abiertos a compartir el espacio con otras personas.
                       </p>
                     </div>
                   </div>
@@ -771,12 +620,8 @@ const filterCurrentBookings = (bookings: Booking[]) => {
               {/* Check-in/Check-out Times */}
               <Card className="w-full max-w-3xl shadow-lg border-0 bg-gradient-to-br from-slate-50 to-white">
                 <CardHeader className="pb-6">
-                  <CardTitle className="text-2xl font-bold text-slate-800">
-                    Políticas del hospedaje
-                  </CardTitle>
-                  <p className="text-slate-600 mt-2">
-                    Información importante sobre horarios, descuentos y pagos
-                  </p>
+                  <CardTitle className="text-2xl font-bold text-slate-800">Políticas del hospedaje</CardTitle>
+                  <p className="text-slate-600 mt-2">Información importante sobre horarios, descuentos y pagos</p>
                 </CardHeader>
 
                 <CardContent className="space-y-6">
@@ -787,9 +632,7 @@ const filterCurrentBookings = (bookings: Booking[]) => {
                         <Clock className="h-6 w-6 text-blue-600" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-slate-800">
-                          Horario de Entrada
-                        </h3>
+                        <h3 className="font-semibold text-slate-800">Horario de Entrada</h3>
                         <p className="text-lg font-bold text-blue-600">
                           {formatTimeToAMPM(room.check_in_hour ?? "00:00:00")}
                         </p>
@@ -801,9 +644,7 @@ const filterCurrentBookings = (bookings: Booking[]) => {
                         <Clock className="h-6 w-6 text-orange-600" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-slate-800">
-                          Horario de Salida
-                        </h3>
+                        <h3 className="font-semibold text-slate-800">Horario de Salida</h3>
                         <p className="text-lg font-bold text-orange-600">
                           {formatTimeToAMPM(room.check_out_hour ?? "00:00:00")}
                         </p>
@@ -821,31 +662,24 @@ const filterCurrentBookings = (bookings: Booking[]) => {
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="p-4 bg-green-50 rounded-lg border border-green-100">
                         <div className="flex items-center justify-between">
-                          <span className="text-slate-700 font-medium">
-                            Estadía Media
-                          </span>
+                          <span className="text-slate-700 font-medium">Estadía Media</span>
                           <span className="text-xl font-bold text-green-600">
-                           
-                          {formatDiscount(room.discount_percentage_medium_stay ?? "0")}
+                            {formatDiscount(room.discount_percentage_medium_stay ?? "0")}
                           </span>
                         </div>
                         <p className="text-sm text-slate-600 mt-1">
-                        {discountData?.mediumStayRange.min} - {discountData?.mediumStayRange.max} noches
+                          {discountData?.mediumStayRange.min} - {discountData?.mediumStayRange.max} noches
                         </p>
                       </div>
 
                       <div className="p-4 bg-emerald-50 rounded-lg border border-emerald-100">
                         <div className="flex items-center justify-between">
-                          <span className="text-slate-700 font-medium">
-                            Estadía Larga
-                          </span>
+                          <span className="text-slate-700 font-medium">Estadía Larga</span>
                           <span className="text-xl font-bold text-emerald-600">
-                          {formatDiscount(room.discount_percentage_long_stay ?? "0")}
+                            {formatDiscount(room.discount_percentage_long_stay ?? "0")}
                           </span>
                         </div>
-                        <p className="text-sm text-slate-600 mt-1">
-                          {discountData?.longStayRange.min}+ noches
-                        </p>
+                        <p className="text-sm text-slate-600 mt-1">{discountData?.longStayRange.min}+ noches</p>
                       </div>
                     </div>
                   </div>
@@ -855,13 +689,11 @@ const filterCurrentBookings = (bookings: Booking[]) => {
                     <div className="flex items-center space-x-3">
                       <CreditCard className="h-6 w-6 text-purple-600" />
                       <div className="flex-1">
-                        <h3 className="font-semibold text-slate-800">
-                          Adelanto de Pago
-                        </h3>
+                        <h3 className="font-semibold text-slate-800">Adelanto de Pago</h3>
                         <p className="text-slate-600">
                           Puedes hacer un adelanto del{" "}
                           <span className="font-bold text-purple-600">
-                          {formatDiscount(room.prepayment_percentage ?? "10")}
+                            {formatDiscount(room.prepayment_percentage ?? "10")}
                           </span>{" "}
                           del total
                         </p>
@@ -871,96 +703,82 @@ const filterCurrentBookings = (bookings: Booking[]) => {
 
                   {/* Additional Info */}
                   <div className="text-center pt-4 border-t border-slate-200">
-                    <p className="text-sm text-slate-500">
-                      Las políticas se aplican solamente a este hospedaje
-                    </p>
+                    <p className="text-sm text-slate-500">Las políticas se aplican solamente a este hospedaje</p>
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-         
-          {/* Contenedor para los botones de políticas */}
-          <div className="flex flex-col md:flex-row gap-3 mb-16 w-full">
-            {/* Botón para Políticas de Anulación */}
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline" className="flex-1 bg-transparent">
-                  <AlertCircle className="h-4 w-4 mr-2" />
-                  Ver Políticas de Anulación
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Políticas de Anulación de Reserva</DialogTitle>
-                  <DialogDescription>
-                    Detalles sobre las condiciones de cancelación para
-                    diferentes tipos de estadía.
-                  </DialogDescription>
-                </DialogHeader>
-                <CancellationPolicyDialogContent />
-              </DialogContent>
-            </Dialog>
+            {/* Contenedor para los botones de políticas */}
+            <div className="flex flex-col md:flex-row gap-3 mb-16 w-full">
+              {/* Botón para Políticas de Anulación */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="flex-1 bg-transparent">
+                    <AlertCircle className="h-4 w-4 mr-2" />
+                    Ver Políticas de Anulación
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Políticas de Anulación de Reserva</DialogTitle>
+                    <DialogDescription>
+                      Detalles sobre las condiciones de cancelación para diferentes tipos de estadía.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <CancellationPolicyDialogContent />
+                </DialogContent>
+              </Dialog>
 
-            {/* Botón para Políticas de Modificación */}
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant="outline" className="flex-1 bg-transparent">
-                  <Edit className="h-4 w-4 mr-2" />
-                  Ver Políticas de Modificación
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>
-                    Políticas de Modificación de Reserva
-                  </DialogTitle>
-                  <DialogDescription>
-                    Detalles sobre las condiciones para modificar una reserva
-                    existente.
-                  </DialogDescription>
-                </DialogHeader>
-                <ModificationPolicyDialogContent />
-              </DialogContent>
-            </Dialog>
-          </div>
-      
+              {/* Botón para Políticas de Modificación */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="flex-1 bg-transparent">
+                    <Edit className="h-4 w-4 mr-2" />
+                    Ver Políticas de Modificación
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Políticas de Modificación de Reserva</DialogTitle>
+                    <DialogDescription>
+                      Detalles sobre las condiciones para modificar una reserva existente.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <ModificationPolicyDialogContent />
+                </DialogContent>
+              </Dialog>
+            </div>
 
             {/* Booking Widget for mobile */}
             <div className="mb-4 lg:hidden">
-              {" "}
-              {/* Modified margin */}
               {room.isPrivate === false ? (
-                // Si es exactamente false, muestro la versión compartida
                 <BookingWidgetBed
                   price={Number.parseInt(room.sharedRoomPrice, 10)}
                   cleaning={Number.parseInt(room.sharedRoomCleaning, 10)}
-                  discount_percentage_medium_stay= {Number.parseInt(room.discount_percentage_medium_stay ?? "0")}
-                  discount_percentage_long_stay= {Number.parseInt(room.discount_percentage_long_stay ?? "0")}
-                  prepayment_percentage= {Number.parseInt(room.prepayment_percentage ?? "10")}
-                  minMediumStayRange= {discountData?.mediumStayRange.min ?? 6}
-                  maxMediumStayRange= {discountData?.mediumStayRange.max ?? 9}
-                  minLongStayRange= {discountData?.longStayRange.min ?? 10}
-                  maxLongStayRange= {discountData?.longStayRange.max ?? 10000}
+                  discount_percentage_medium_stay={Number.parseInt(room.discount_percentage_medium_stay ?? "0")}
+                  discount_percentage_long_stay={Number.parseInt(room.discount_percentage_long_stay ?? "0")}
+                  prepayment_percentage={Number.parseInt(room.prepayment_percentage ?? "10")}
+                  minMediumStayRange={discountData?.mediumStayRange.min ?? 6}
+                  maxMediumStayRange={discountData?.mediumStayRange.max ?? 9}
+                  minLongStayRange={discountData?.longStayRange.min ?? 10}
+                  maxLongStayRange={discountData?.longStayRange.max ?? 10000}
                   disableDates={room.disableDates}
                   bookings={filteredBookings}
                   onReservation={handleReservation}
                 />
               ) : (
-                // En cualquier otro caso (true, null, undefined, etc.), muestro la versión privada
                 <BookingWidget
                   price={Number.parseInt(room.privateRoomPrice, 10)}
                   cleaning={Number.parseInt(room.privateRoomCleaning, 10)}
                   maxGuests={room.capacity}
-
-                  discount_percentage_medium_stay= {Number.parseInt(formatDiscount(room.discount_percentage_medium_stay ?? "0"))}
-                  discount_percentage_long_stay= {Number.parseInt(formatDiscount(room.discount_percentage_long_stay ?? "0"))}
-                  prepayment_percentage= {Number.parseInt(formatDiscount(room.prepayment_percentage ?? "10"))}
-                  minMediumStayRange= {discountData?.mediumStayRange.min ?? 6}
-                  maxMediumStayRange= {discountData?.mediumStayRange.max ?? 9}
-                  minLongStayRange= {discountData?.longStayRange.min ?? 10}
-                  maxLongStayRange= {discountData?.longStayRange.max ?? 10000}
-
+                  discount_percentage_medium_stay={Number.parseInt(room.discount_percentage_medium_stay ?? "0")}
+                  discount_percentage_long_stay={Number.parseInt(room.discount_percentage_long_stay ?? "0")}
+                  prepayment_percentage={Number.parseInt(room.prepayment_percentage ?? "10")}
+                  minMediumStayRange={discountData?.mediumStayRange.min ?? 6}
+                  maxMediumStayRange={discountData?.mediumStayRange.max ?? 9}
+                  minLongStayRange={discountData?.longStayRange.min ?? 10}
+                  maxLongStayRange={discountData?.longStayRange.max ?? 10000}
                   disableDates={room.disableDates}
                   bookings={filteredBookings}
                   onReservation={handleReservation}
@@ -970,25 +788,17 @@ const filterCurrentBookings = (bookings: Booking[]) => {
 
             {/* Amenities */}
             <div className="mb-8">
-              <h2
-                className={`${fraunces.className} text-2xl font-normal text-[#162F40] mb-4`}
-              >
+              <h2 className={`${fraunces.className} text-2xl font-normal text-[#162F40] mb-4`}>
                 Amenidades / Servicios
               </h2>
 
-              <CollectionExtraTags
-                extraTags={extraTags}
-                enable="property"
-                roomTags={room.extraTags}
-              />
+              <CollectionExtraTags extraTags={extraTags} enable="property" roomTags={room.extraTags} />
             </div>
 
             {/* Description */}
             {room.descriptionService && (
               <div className="mb-8">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Más acerca de los servicios:
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-900">Más acerca de los servicios:</h3>
                 {room.descriptionService}
               </div>
             )}
@@ -1001,9 +811,7 @@ const filterCurrentBookings = (bookings: Booking[]) => {
                     {property.hostName.charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      Anfitrión:
-                    </h3>
+                    <h3 className="text-lg font-semibold text-gray-900">Anfitrión:</h3>
                     <p className="text-gray-700">{property.hostName}</p>
                   </div>
                 </div>
@@ -1013,46 +821,32 @@ const filterCurrentBookings = (bookings: Booking[]) => {
             {/* Sección de Comentarios */}
             {property.guestComments && (
               <div className="mb-8">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Comentarios para el huésped:
-                </h3>
+                <h3 className="text-lg font-semibold text-gray-900">Comentarios para el huésped:</h3>
                 <p className="text-gray-700">{property.guestComments}</p>
               </div>
             )}
 
             {/* Map */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#162F40] mb-4">
-                El vecindario
-              </h2>
+              <h2 className="text-2xl font-bold text-[#162F40] mb-4">El vecindario</h2>
               <div className="h-[300px] w-full relative rounded-lg overflow-hidden">
-                <GoogleMap
-                  lat={property.place.coordinates[0]}
-                  lng={property.place.coordinates[1]}
-                />
+                <GoogleMap lat={property.place.coordinates[0]} lng={property.place.coordinates[1]} />
               </div>
             </div>
 
             {/* Service Providers */}
             <div>
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#162F40]">
-                  Proveedores de servicios
-                </h2>
-                <button className="hidden text-[#39759E]">Filtrar</button>
+                <h2 className="text-2xl font-bold text-[#162F40]">Proveedores de servicios</h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {(() => {
-                  const stateProviders = serviceProviders.filter(
-                    (provider) => provider.state === property.state
-                  );
+                  const stateProviders = serviceProviders.filter((provider) => provider.state === property.state)
 
                   const providersToShow =
                     stateProviders.length > 0
                       ? stateProviders
-                      : serviceProviders.filter(
-                          (provider) => provider.country === property.country
-                        );
+                      : serviceProviders.filter((provider) => provider.country === property.country)
 
                   return providersToShow.map((provider) => (
                     <ServiceProviderCard
@@ -1064,88 +858,44 @@ const filterCurrentBookings = (bookings: Booking[]) => {
                       phone={provider.phone}
                       email={provider.email}
                     />
-                  ));
+                  ))
                 })()}
               </div>
             </div>
 
-
             {/* User Profile Section */}
-
             <div className="min-h-screen bg-background py-8">
-      <div className="">
-        <div className="mb-4">
-          <h2 className="text-2xl font-bold text-[#162F40]">Evaluaciones</h2>
-          <p className="text-muted-foreground">Conoce lo que dicen nuestros huéspedes</p>
-        </div>
+              <div className="">
+                <div className="mb-4">
+                  <h2 className="text-2xl font-bold text-[#162F40]">Evaluaciones</h2>
+                  <p className="text-muted-foreground">Conoce lo que dicen nuestros huéspedes</p>
+                </div>
 
-        {/*<RatingOverview averageRating={averageRating} totalReviews={totalReviews} />*/}
-
-        <HostProfile
-          hostName={hostName}
-          hostExperience={hostExperience}
-          averageRating={averageRating}
-          totalReviews={totalReviews}
-        />
-
-        <div className="text-center">
-          <Button
-            onClick={() => setShowReviews(true)}
-            size="lg"
-            className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 text-lg font-medium rounded-lg"
-          >
-            Ver todas las evaluaciones ({totalReviews})
-          </Button>
-        </div>
-
-        <ReviewsModal
-          isOpen={showReviews}
-          onClose={setShowReviews}
-          reviews={mockReviews}
-          averageRating={averageRating}
-          totalReviews={totalReviews}
-        />
-      </div>
-    </div>
-
-            {/* Booking Widget for mobile (at the bottom) */}
-            <div className="mt-8 hidden lg:hidden">
-              {room.isPrivate === false ? (
-                // Si es exactamente false, muestro la versión compartida
-                <BookingWidgetBed
-                  price={Number.parseInt(room.sharedRoomPrice, 10)}
-                  cleaning={Number.parseInt(room.sharedRoomCleaning, 10)}
-                  discount_percentage_medium_stay= {Number.parseInt(room.discount_percentage_medium_stay ?? "0")}
-                  discount_percentage_long_stay= {Number.parseInt(room.discount_percentage_long_stay ?? "0")}
-                  prepayment_percentage= {Number.parseInt(room.prepayment_percentage ?? "10")}
-                  minMediumStayRange= {discountData?.mediumStayRange.min ?? 6}
-                  maxMediumStayRange= {discountData?.mediumStayRange.max ?? 9}
-                  minLongStayRange= {discountData?.longStayRange.min ?? 10}
-                  maxLongStayRange= {discountData?.longStayRange.max ?? 10000}
-                  disableDates={room.disableDates}
-                  bookings={filteredBookings}
-                  onReservation={handleReservation}
+                <HostProfile
+                  hostName={property.hostName}
+                  hostExperience={hostExperience}
+                  averageRating={averageRating}
+                  totalReviews={totalReviews}
                 />
-              ) : (
-                // En cualquier otro caso (true, null, undefined, etc.), muestro la versión privada
-                 <BookingWidget
-                  price={Number.parseInt(room.privateRoomPrice, 10)}
-                  cleaning={Number.parseInt(room.privateRoomCleaning, 10)}
-                  maxGuests={room.capacity}
 
-                  discount_percentage_medium_stay= {Number.parseInt(room.discount_percentage_medium_stay ?? "0")}
-                  discount_percentage_long_stay= {Number.parseInt(room.discount_percentage_long_stay ?? "0")}
-                  prepayment_percentage= {Number.parseInt(room.prepayment_percentage ?? "10")}
-                  minMediumStayRange= {discountData?.mediumStayRange.min ?? 6}
-                  maxMediumStayRange= {discountData?.mediumStayRange.max ?? 9}
-                  minLongStayRange= {discountData?.longStayRange.min ?? 10}
-                  maxLongStayRange= {discountData?.longStayRange.max ?? 10000}
-                  
-                  disableDates={room.disableDates}
-                  bookings={filteredBookings}
-                  onReservation={handleReservation}
+                <div className="text-center">
+                  <Button
+                    onClick={() => setShowReviews(true)}
+                    size="lg"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 text-lg font-medium rounded-lg"
+                  >
+                    Ver todas las evaluaciones ({totalReviews})
+                  </Button>
+                </div>
+
+                <ReviewsModal
+                  isOpen={showReviews}
+                  onClose={() => setShowReviews(false)}
+                  reviews={reviews}
+                  averageRating={averageRating}
+                  totalReviews={totalReviews}
                 />
-              )}
+              </div>
             </div>
           </div>
 
@@ -1153,45 +903,41 @@ const filterCurrentBookings = (bookings: Booking[]) => {
           <div className="hidden lg:block lg:col-span-1">
             <div className="sticky top-4">
               {room.isPrivate === false ? (
-                // Si es exactamente false, muestro la versión compartida
                 <BookingWidgetBed
                   price={Number.parseInt(room.sharedRoomPrice, 10)}
                   cleaning={Number.parseInt(room.sharedRoomCleaning, 10)}
-                  discount_percentage_medium_stay= {Number.parseInt(room.discount_percentage_medium_stay ?? "0")}
-                  discount_percentage_long_stay= {Number.parseInt(room.discount_percentage_long_stay ?? "0")}
-                  prepayment_percentage= {Number.parseInt(room.prepayment_percentage ?? "10")}
-                  minMediumStayRange= {discountData?.mediumStayRange.min ?? 6}
-                  maxMediumStayRange= {discountData?.mediumStayRange.max ?? 9}
-                  minLongStayRange= {discountData?.longStayRange.min ?? 10}
-                  maxLongStayRange= {discountData?.longStayRange.max ?? 10000}
+                  discount_percentage_medium_stay={Number.parseInt(room.discount_percentage_medium_stay ?? "0")}
+                  discount_percentage_long_stay={Number.parseInt(room.discount_percentage_long_stay ?? "0")}
+                  prepayment_percentage={Number.parseInt(room.prepayment_percentage ?? "10")}
+                  minMediumStayRange={discountData?.mediumStayRange.min ?? 6}
+                  maxMediumStayRange={discountData?.mediumStayRange.max ?? 9}
+                  minLongStayRange={discountData?.longStayRange.min ?? 10}
+                  maxLongStayRange={discountData?.longStayRange.max ?? 10000}
                   disableDates={room.disableDates}
                   bookings={filteredBookings}
                   onReservation={handleReservation}
                 />
               ) : (
-                // En cualquier otro caso (true, null, undefined, etc.), muestro la versión privada
                 <BookingWidget
-                price={Number.parseInt(room.privateRoomPrice, 10)}
-                cleaning={Number.parseInt(room.privateRoomCleaning, 10)}
-                maxGuests={room.capacity}
-
-                discount_percentage_medium_stay= {Number.parseInt(room.discount_percentage_medium_stay ?? "0")}
-                discount_percentage_long_stay= {Number.parseInt(room.discount_percentage_long_stay ?? "0")}
-                prepayment_percentage= {Number.parseInt(room.prepayment_percentage ?? "10")}
-                minMediumStayRange= {discountData?.mediumStayRange.min ?? 6}
-                maxMediumStayRange= {discountData?.mediumStayRange.max ?? 9}
-                minLongStayRange= {discountData?.longStayRange.min ?? 10}
-                maxLongStayRange= {discountData?.longStayRange.max ?? 10000}
-                
-                disableDates={room.disableDates}
-                bookings={filteredBookings}
-                onReservation={handleReservation}
-              />
+                  price={Number.parseInt(room.privateRoomPrice, 10)}
+                  cleaning={Number.parseInt(room.privateRoomCleaning, 10)}
+                  maxGuests={room.capacity}
+                  discount_percentage_medium_stay={Number.parseInt(room.discount_percentage_medium_stay ?? "0")}
+                  discount_percentage_long_stay={Number.parseInt(room.discount_percentage_long_stay ?? "0")}
+                  prepayment_percentage={Number.parseInt(room.prepayment_percentage ?? "10")}
+                  minMediumStayRange={discountData?.mediumStayRange.min ?? 6}
+                  maxMediumStayRange={discountData?.mediumStayRange.max ?? 9}
+                  minLongStayRange={discountData?.longStayRange.min ?? 10}
+                  maxLongStayRange={discountData?.longStayRange.max ?? 10000}
+                  disableDates={room.disableDates}
+                  bookings={filteredBookings}
+                  onReservation={handleReservation}
+                />
               )}
             </div>
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }

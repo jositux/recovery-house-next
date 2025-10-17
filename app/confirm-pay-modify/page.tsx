@@ -8,8 +8,8 @@ import { CalendarDays, Users, CheckCircle2, AlertCircle } from "lucide-react";
 import Image from "next/image"
 
 interface BookingData {
-  checkIn: string;
-  checkOut: string;
+  checkInDateHour: string;
+  checkOutDateHour: string;
   guests: number;
   nights: number;
   price: number;
@@ -54,8 +54,7 @@ export default function NewConfirmAndPay() {
       year: "numeric",
     });
 
-  const getCurrentIsoTime = () =>
-    new Date().toISOString().split("T")[1].split(".")[0] + "Z";
+
 
   // 🔹 Calcular montos
   const getSubtotal = (b: BookingData) => b.nights * b.guests * b.price;
@@ -67,7 +66,7 @@ export default function NewConfirmAndPay() {
     getBaseAmount(b) * (b.prepayment_percentage / 100);
 
   const getPaymentDeadline = (b: BookingData) => {
-    const checkInDate = new Date(b.checkIn);
+    const checkInDate = new Date(b.checkInDateHour);
     checkInDate.setHours(checkInDate.getHours() - 72); // 72 horas antes
     return checkInDate.toLocaleDateString("es-ES", {
       day: "numeric",
@@ -84,7 +83,7 @@ export default function NewConfirmAndPay() {
   };
 
   useEffect(() => {
-    const storedData = localStorage.getItem("bookingData");
+    const storedData = localStorage.getItem("booking");
     if (storedData) {
       try {
         const data = JSON.parse(storedData);
@@ -119,9 +118,11 @@ export default function NewConfirmAndPay() {
   const baseAmount = getBaseAmount(bookingData);
   const prepaymentAmount = getPrepaymentAmount(bookingData);
   const currentAmount = getCurrentAmount(bookingData);
+
+  console.log(bookingData.totalPrice)
   const paymentBalance =
     selectedDiscountOption === "with-discount"
-      ? bookingData.totalPrice - prepaymentAmount
+      ? baseAmount - prepaymentAmount
       : 0;
 
   // 🔹 Guardar y continuar
@@ -140,8 +141,8 @@ export default function NewConfirmAndPay() {
           patient: bookingData.patientId,
           ownerId: bookingData.ownerId,
           guests: bookingData.guests,
-          checkInDateHour: bookingData.checkIn + "T" + getCurrentIsoTime(),
-          checkOutDateHour: bookingData.checkOut + "T" + getCurrentIsoTime(),
+          checkInDateHour: bookingData.checkInDateHour,
+          checkOutDateHour: bookingData.checkOutDateHour,
           price: bookingData.price,
           cleaning: bookingData.cleaning,
           discountStayType: bookingData.discountStayType,
@@ -150,14 +151,14 @@ export default function NewConfirmAndPay() {
           discountStayAmount: bookingData.discountStayAmount,
           prepaymentPercentage: bookingData.prepayment_percentage,
           paymentAmount: currentAmount,
-          paymentBalance,
+          paymentBalance: paymentBalance,
           paymentType,
-          unit_amount: bookingData.totalPrice,
-          finalPrice: bookingData.totalPrice
+          unit_amount: currentAmount,
+          finalPrice: baseAmount
         };
 
         localStorage.setItem("booking", JSON.stringify(updatedData));
-        window.location.href = "/checkout";
+        window.location.href = "/checkout-modify";
       } catch (error) {
         console.error("Error updating booking data:", error);
       }
@@ -394,7 +395,7 @@ function BookingSummary({
             <div className="flex items-center gap-2">
               <CalendarDays className="h-4 w-4 text-gray-500" />
               <span>
-                {formatDate(bookingData.checkIn)} → {formatDate(bookingData.checkOut)}
+                {formatDate(bookingData.checkInDateHour)} → {formatDate(bookingData.checkOutDateHour)}
               </span>
             </div>
             <div className="flex items-center gap-2">

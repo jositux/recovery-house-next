@@ -7,10 +7,8 @@ import { Fraunces } from 'next/font/google'
 const fraunces = Fraunces({ subsets: ['latin'] })
 
 const assistanceLinks = [
-  { title: "Centro de ayuda", href: "#" },
-  { title: "Preguntas frecuentes", href: "#" },
-  { title: "Reportar un problema", href: "#" },
-  { title: "Protección a la privacidad", href: "#" },
+  { title: "Términos y condiciones", href: "/terms" },
+  { title: "Política de privacidad", href: "/privacidad" },
 ]
 
 const hostLinks = [
@@ -45,15 +43,7 @@ const socialLinks = [
       </svg>
     )
   },
-  { 
-    title: "YouTube", 
-    href: "#", 
-    icon: (
-      <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current">
-        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-      </svg>
-    )
-  },
+ 
 ]
 
 export function Footer() {
@@ -78,7 +68,7 @@ export function Footer() {
               entorno ideal para una recuperación cómoda y efectiva.
             </p>
             <p className="text-[#162F40]">
-              Contáctenos: <Link href="mailto:info@marca.com" className="hover:text-[#39759E]">info@marca.com</Link>
+              Contáctenos: <Link href="mailto:info@recoverycaresolutions.com" className="hover:text-[#39759E]">info@recoverycaresolutions.com</Link>
             </p>
           </div>
 
@@ -136,15 +126,14 @@ export function Footer() {
               © 2025 Recovery Care Solutions. Todos los derechos reservados.
             </p>
             <div className="flex flex-wrap justify-center gap-4 text-sm items-center">
-              <Link href="#" className="text-[#162F40] hover:text-[#39759E]">
+             
+              <Link href="/terms" className="text-[#162F40] hover:text-[#39759E]">
+                Términos y condiciones
+              </Link>
+              <Link href="/privacidad" className="text-[#162F40] hover:text-[#39759E]">
                 Política de Privacidad
               </Link>
-              <Link href="#" className="text-[#162F40] hover:text-[#39759E]">
-                Términos de Servicio
-              </Link>
-              <Link href="#" className="text-[#162F40] hover:text-[#39759E]">
-                Configuración de Cookies
-              </Link>
+              
               {/*<LanguageSelector />*/}
             </div>
           </div>
