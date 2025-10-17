@@ -135,7 +135,7 @@ export default function DashboardPage() {
   const recentBookings = bookings.slice(0, 5).map((booking) => {
     let price = `$${booking.finalPrice}`
     let status = "Pendiente"
-    let roomName = booking.roomName
+    const roomName = booking.roomName
   
     if (booking.paymentState === "prepayment") {
       status = "Reservada con adelanto"
