@@ -156,7 +156,7 @@ const BookingList: React.FC = () => {
         const selectedBooking = bookings.find((booking) => booking.id === selectedCancelBookingId)
 
         const payload = {
-          cancelledById: selectedBooking?.patient || "", // Use ownerId from selected booking instead of hardcoded value
+          cancelledById: selectedBooking?.ownerId || "", // Use ownerId from selected booking instead of hardcoded value
           cancelledDate: new Date().toISOString(),
           cancelledMessage: cancelReason,
         }
@@ -169,8 +169,8 @@ const BookingList: React.FC = () => {
             booking.id === selectedCancelBookingId
               ? {
                   ...booking,
-                  cancelledById: selectedBooking?.patient || "",
-                  bookingState: "cancelled_by_patient",
+                  cancelledById: selectedBooking?.ownerId || "",
+                  bookingState: "cancelled_by_owner",
                   cancelledDate: new Date().toISOString(),
                   cancelledMessage: cancelReason,
                 }

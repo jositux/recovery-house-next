@@ -81,7 +81,7 @@ export default function RegistrationPage() {
           <>
           <div className="sm:mx-auto sm:w-full sm:max-w-md">
             <h1 className={`${fraunces.className} text-2xl sm:mx-auto font-medium mb-6`}>
-            Registrate en RecoverCare Solutions
+            Registrate en Recovery Care Solutions
             </h1>
             <p className="mb-4">
             Solo necesitás un correo y una contraseña. Después puedes continuar configurando tu perfil.

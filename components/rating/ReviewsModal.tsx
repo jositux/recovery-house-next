@@ -2,15 +2,33 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { StarRating } from "./StarRating"
 import { ReviewCard } from "./ReviewCard"
 
+interface Ranking {
+  limpieza: number
+  atención: number
+  comodidad: number
+}
+
+interface ReviewReply {
+  id: string
+  userCreated: string
+  dateCreated: string
+  userUpdated: string | null
+  dateUpdated: string | null
+  reviewId: string
+  ownerId: string
+  reply: string
+}
+
 interface Review {
   id: string
-  userName: string
-  userLocation: string
-  rating: number
-  date: string
-  stayType: string
+  bookingId: string
+  roomId: string
+  name: string
   comment: string
-  avatar: string
+  ranking: Ranking
+  status: string
+  dateCreated: string
+  review_replies: ReviewReply[]
 }
 
 interface ReviewsModalProps {

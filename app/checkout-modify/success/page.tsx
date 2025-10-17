@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
-import { CheckCircle, Calendar } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -14,15 +14,8 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { createBookingBalanced } from "@/services/BookingBalancedService";
+import { createBookingModify, ModifyBookingPayload } from "@/services/BookingModifyService"; 
 
-interface BookingBalanced {
-  bookingId: string,
-  paymentAmount: number,
-  paymentDate: string,
-  paymentId: string,
-  paymentType: string
-}
 
 const SuccessPageContent = () => {
   const router = useRouter();
@@ -36,37 +29,56 @@ const SuccessPageContent = () => {
         return;
       }
 
-      const bookingRaw = localStorage.getItem("bookingBalanced")!;
-      const parsedBookingBalanced: BookingBalanced = JSON.parse(bookingRaw) as BookingBalanced;
+      const bookingRaw = localStorage.getItem("booking")!;
+      const parsedBooking: ModifyBookingPayload = JSON.parse(bookingRaw) as ModifyBookingPayload;
 
 
       if (!bookingRaw) return;
 
       try {
         const paymentId = searchParams.get("rel");
-
-        const data: BookingBalanced = {
-          bookingId: parsedBookingBalanced.bookingId,
-          paymentAmount: parsedBookingBalanced.paymentAmount,
-          paymentDate: parsedBookingBalanced.paymentDate,
-          paymentId: paymentId ?? "",
-          paymentType: parsedBookingBalanced.paymentType
-        };
-
-        await createBookingBalanced(data, accessToken);
-        localStorage.removeItem("bookingBalanced"); // Fixed: should be "bookingData" not "booking"
-        localStorage.removeItem("booking");
-      } catch (error) {
-        console.error("Error al enviar la reserva:", error);
-      }
+        
+      
+          const accessToken = localStorage.getItem("access_token");
+          if (!accessToken) throw new Error("Missing token");
+      
+        
+    
+          const payload: ModifyBookingPayload = {
+            bookingId: parsedBooking.bookingId,
+            guests: parsedBooking.guests,
+            checkInDateHour: parsedBooking.checkInDateHour,
+            checkOutDateHour: parsedBooking.checkOutDateHour,
+            price: parsedBooking.price,
+            cleaning: parsedBooking.cleaning,
+            finalPrice: parsedBooking.finalPrice,
+            discountStayType: parsedBooking.discountStayType,
+            discountPercentageStayApplied: parsedBooking.discountPercentageStayApplied,
+            discountStayAmount: parsedBooking.discountStayAmount,
+            prepaymentPercentage: Number(parsedBooking.prepaymentPercentage) || 0,
+            paymentAmount: parsedBooking.paymentAmount,
+            paymentDate: new Date().toISOString().split(".")[0] + "Z",
+            paymentBalance: parsedBooking.paymentBalance,
+            paymentId: paymentId,
+            paymentType: parsedBooking?.paymentType === "prepayment" ? "prepayment" : "fullpayment",
+          };
+      
+          await createBookingModify(payload, accessToken);
+      
+        } catch (error) {
+          console.error("Error modificando reserva", error);
+          //setError("Error al modificar la reserva");
+        } finally {
+         // setLoading(false);
+        }
     };
 
     sendBookingBalanced();
   }, [router, searchParams]);
 
   return (
-    <div className="min-h-screen flex pt-8 justify-center p-4">      
-    <motion.div
+    <div className="min-h-screen flex pt-8 justify-center p-4">
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -81,21 +93,14 @@ const SuccessPageContent = () => {
               <CheckCircle className="h-20 w-20 mx-auto mb-4" />
             </motion.div>
             <CardTitle className="text-center text-2xl font-bold">
-              ¡Te esperamos para tu estadía!
+              ¡Modificación exitosa!
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6">
             <p className="text-center text-gray-600 mb-6">
-              Se ha procesado el pago de lo pendiente. Tu reserva está confirmada
-              y lista para que disfrutes de una experiencia inolvidable.
+              Se ha procesado el pago por la modificación. Te esperamos en el alojamiento.
             </p>
-            <div className="flex justify-center space-x-4 mb-6">
-              <div className="text-center">
-                <Calendar className="h-8 w-8 mx-auto text-blue-500 mb-2" />
-                <p className="text-sm text-gray-600">Pago pendiente realizado</p>
-              </div>
-              
-            </div>
+           
           </CardContent>
           <CardFooter className="bg-gray-50 p-6">
             <div className="w-full space-y-3">

@@ -17,7 +17,7 @@ export function HostProfile({ hostName, hostExperience, averageRating, totalRevi
               <span className="text-white text-2xl font-bold">V</span>
             </div>
             <div>
-              <h3 className="text-xl font-semibold text-foreground mb-1">Anfitrión: {hostName}</h3>
+              <h3 className="text-xl font-semibold text-foreground mb-1">{hostName}</h3>
               <p className="text-muted-foreground text-sm">{hostExperience}</p>
             </div>
           </div>

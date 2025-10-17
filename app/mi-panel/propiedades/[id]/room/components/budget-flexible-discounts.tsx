@@ -49,7 +49,7 @@ export function BudgetFlexibleDiscounts({
   longStayRange = { min: 10, max: null },
 }: BudgetFlexibleDiscountsProps) {
   const formatNightRange = (range: StayRange): string => {
-    if (range.max === null) {
+    if (range.max === null || range.max === 1000000) {
       return `+${range.min} noches`;
     }
     if (range.min === range.max) {

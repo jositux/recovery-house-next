@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
-import { CheckCircle, Calendar, Home } from "lucide-react";
+import { CheckCircle, Calendar } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -94,7 +94,8 @@ const SuccessPageContent = () => {
   }, [router, searchParams]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen flex pt-8 justify-center p-4">
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -123,10 +124,7 @@ const SuccessPageContent = () => {
                 <Calendar className="h-8 w-8 mx-auto text-blue-500 mb-2" />
                 <p className="text-sm text-gray-600">Reserva Confirmada</p>
               </div>
-              <div className="text-center">
-                <Home className="h-8 w-8 mx-auto text-green-500 mb-2" />
-                <p className="text-sm text-gray-600">Alojamiento Listo</p>
-              </div>
+              
             </div>
           </CardContent>
           <CardFooter className="bg-gray-50 p-6">
