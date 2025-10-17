@@ -9,7 +9,7 @@ import { cancelBooking } from "@/services/BookingCancelService"
 import { format, parseISO, differenceInDays } from "date-fns"
 import { es } from "date-fns/locale"
 import Image from "next/image"
-import ReviewModal from "@/components/booking-list/ReviewModal"
+//import ReviewModal from "@/components/booking-list/ReviewModal"
 import {
   Calendar,
   Users,
@@ -126,7 +126,7 @@ const BookingList: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
+  //const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null)
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null)
   let name = ""
@@ -407,15 +407,15 @@ const BookingList: React.FC = () => {
     fetchData()
   }, [])
 
-  const handleReviewClick = (bookingId: string, roomId: string) => {
+ /* const handleReviewClick = (bookingId: string, roomId: string) => {
     setSelectedBookingId(bookingId)
     setSelectedRoomId(roomId)
     setIsReviewModalOpen(true)
-  }
+  }*/
 
   
 
-  const handleReviewSubmit = async (ranking: number, comment: string) => {
+  /*const handleReviewSubmit = async (ranking: number, comment: string) => {
     if (selectedBookingId) {
       try {
         const response = await fetch("/webapi/items/Reviews", {
@@ -438,7 +438,7 @@ const BookingList: React.FC = () => {
         setIsReviewModalOpen(false)
       }
     }
-  }
+  }*/
 
   if (isLoading) {
     return (
@@ -933,6 +933,7 @@ const BookingList: React.FC = () => {
                                     )}
                                   </div>
 
+                                  {/*
                                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-4">
                                     <Button
                                       onClick={() => handleReviewClick(booking.id, booking.room.id)}
@@ -942,6 +943,7 @@ const BookingList: React.FC = () => {
                                       Comentar
                                     </Button>
                                   </div>
+                                    */}
                                 </CardContent>
                               </div>
                             </Card>
@@ -956,12 +958,12 @@ const BookingList: React.FC = () => {
           })()}
         </div>
       )}
-      <ReviewModal
+      {/*<ReviewModal
         isOpen={isReviewModalOpen}
         onClose={() => setIsReviewModalOpen(false)}
         onSubmit={handleReviewSubmit}
         bookingId={selectedBookingId || ""}
-      />
+        />*/}
     </div>
   )
 }
