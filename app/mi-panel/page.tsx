@@ -24,6 +24,7 @@ interface Booking {
   prepaymentAmount: string
   balanceAmount: string
   finalPrice: string
+  ownerId: string
   bookingDateCreated: string
   room: {
     name: string
@@ -50,6 +51,8 @@ export default function DashboardPage() {
 
       try {
         const user = await getCurrentUser(token)
+
+        console.log(user.id)
 
         const bookingsResponse = await fetch(
           `/webapi/items/Booking?filter[ownerId][_eq]=${user.id}&fields=*, +room.*, +room.photos.directus_files_id.id, +room.propertyId.*&sort=-bookingDateCreated`,
@@ -132,6 +135,7 @@ export default function DashboardPage() {
   const recentBookings = bookings.slice(0, 5).map((booking) => {
     let price = `$${booking.finalPrice}`
     let status = "Pendiente"
+    let roomName = booking.roomName
   
     if (booking.paymentState === "prepayment") {
       status = "Reservada con adelanto"
@@ -153,6 +157,7 @@ export default function DashboardPage() {
       })}`,
       price,
       status,
+      roomName,
     }
   })
   
@@ -212,7 +217,7 @@ export default function DashboardPage() {
                 className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors"
               >
                 <div>
-                  <h3 className="font-semibold text-gray-900">{booking.property}</h3>
+                  <h3 className="font-semibold text-gray-900">{booking.roomName} - {booking.property}</h3>
                   <p className="text-sm text-gray-600">
                     {booking.guest} • {booking.dates}
                   </p>
