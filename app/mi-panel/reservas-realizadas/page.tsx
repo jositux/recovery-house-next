@@ -113,6 +113,7 @@ interface Booking {
   review?: Review | null
   outstandingBalanceAmount: string | null
   refundAmount: string | null
+  paymentReceivedAmount: string | null
 }
 
 interface Ratings {
@@ -375,7 +376,7 @@ const BookingList = () => {
 
   const calculatePaymentDisplay = (booking: Booking): PaymentDisplayValues => {
     const prepayment = Number(booking.prepaymentAmount)
-    const prepaymentMod = Number(booking.prepaymentModificationAmount)
+    //const prepaymentMod = Number(booking.prepaymentModificationAmount)
    // const balance = Number(booking.balanceAmount)
     const fullAmount = Number(booking.fullAmount)
     const finalPrice = Number(booking.finalPrice)
@@ -390,8 +391,8 @@ const BookingList = () => {
     }
 
     if (booking.paymentState === "prepayment" && booking.modificationCount === 1) {
-      const isReduced = prepaymentMod < prepayment
-      const shownAnticipo = isReduced ? prepayment : prepaymentMod
+      
+      const shownAnticipo = Number(booking.paymentReceivedAmount)
       const shownPendiente = Number(booking.outstandingBalanceAmount)
 
       return {
