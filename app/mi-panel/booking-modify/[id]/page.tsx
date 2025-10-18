@@ -328,6 +328,7 @@ export default function BookingModifyPage() {
         paymentDifference: paymentDifference,
         paymentState: booking.paymentState,
         prepaymentPercentage: room.prepayment_percentage,
+        prepaymentAmount: booking.prepaymentAmount,
         name: room.name,
         unit_amount: paymentDifference,
         paymentAmount: paymentDifference,
@@ -936,6 +937,7 @@ export default function BookingModifyPage() {
                   </div>
                 </div>
 
+                {booking?.paymentState !== "prepayment" && (                
                 <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <p className="text-sm text-yellow-800 font-medium text-center">
                     El nuevo monto es mayor por la modificación de la reserva. Por favor, abona la diferencia de{" "}
@@ -943,6 +945,20 @@ export default function BookingModifyPage() {
                     la actualización.
                   </p>
                 </div>
+                 )}
+
+
+{booking?.paymentState === "prepayment" && (                
+  <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+    <p className="text-sm text-yellow-800 font-medium text-center">
+      El nuevo monto es mayor debido a la modificación. Se te abonará el valor del anticipo ya pagado {" "}
+      <span className="font-bold">
+        ${(booking?.prepaymentAmount ?? 0).toLocaleString("es-CO")} USD
+      </span>{" "}
+    </p>
+  </div>
+)}
+
               </div>
             )}
           </div>

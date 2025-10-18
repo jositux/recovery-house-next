@@ -364,7 +364,7 @@ export const BookingCard = ({
                 {booking.paymentState === "prepayment" &&
                   booking.modificationCount === 1 && (
                     <p>
-                      Anticipo Inicial:{" "}
+                      Anticipo:{" "}
                       {new Intl.NumberFormat("en-US", {
                         style: "currency",
                         currency: "USD",
