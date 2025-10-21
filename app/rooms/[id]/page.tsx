@@ -461,11 +461,16 @@ export default function RoomPage() {
     fetchReviews()
   }, [id])
 
-  const getImageSrc = useCallback((image: ImageRoom) => {
+  const getImageSrc = useCallback((image?: ImageRoom) => {
+    if (!image || !image.directus_files_id) {
+      return "/assets/empty.jpg"
+    }
+  
     return image.directus_files_id.isModerated
       ? "/assets/empty.jpg"
       : `/webapi/assets/${image.directus_files_id.id}?key=full`
   }, [])
+  
 
   const [imagesSwiper, setImagesSwiper] = useState<{ src: string; alt: string }[]>([])
 
