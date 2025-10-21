@@ -670,14 +670,60 @@ export default function BookingModifyPage() {
                   </div>
                 </CardContent>
               </Card>
-              <Alert className="mb-6 border-blue-200 bg-blue-50">
-                <AlertCircle className="h-4 w-4 text-blue-600" />
-                <AlertDescription className="text-blue-900">
-                  <p className="font-semibold mb-1">Importante:</p>
-                  Solo podés modificar esta reserva una vez. Te mostraremos si hay una diferencia a pagar o un monto a
-                  tu favor antes de confirmar.
-                </AlertDescription>
-              </Alert>
+
+              <div className="flex flex-col lg:contents">
+                {/* Widget section - appears first on mobile (order-1), in sidebar on desktop */}
+                <div className="order-1 lg:hidden mb-6">
+                  {room.isPrivate === false ? (
+                    <BookingWidgetBed
+                      price={Number.parseInt(room.sharedRoomPrice, 10)}
+                      cleaning={Number.parseInt(room.sharedRoomCleaning, 10)}
+                      discount_percentage_medium_stay={Number.parseInt(room.discount_percentage_medium_stay ?? "0")}
+                      discount_percentage_long_stay={Number.parseInt(room.discount_percentage_long_stay ?? "0")}
+                      prepayment_percentage={Number.parseInt(room.prepayment_percentage ?? "10")}
+                      minMediumStayRange={discountData?.mediumStayRange.min ?? 6}
+                      maxMediumStayRange={discountData?.mediumStayRange.max ?? 9}
+                      minLongStayRange={discountData?.longStayRange.min ?? 10}
+                      maxLongStayRange={discountData?.longStayRange.max ?? 10000}
+                      disableDates={room.disableDates}
+                      bookings={filteredBookings}
+                      onSubmit={handleWidgetSubmit}
+                      defaultCheckIn={booking.checkIn}
+                      defaultCheckOut={booking.checkOut}
+                    />
+                  ) : (
+                    <BookingWidget
+                      price={Number.parseInt(room.privateRoomPrice, 10)}
+                      cleaning={Number.parseInt(room.privateRoomCleaning, 10)}
+                      maxGuests={room.capacity}
+                      discount_percentage_medium_stay={Number.parseInt(room.discount_percentage_medium_stay ?? "0")}
+                      discount_percentage_long_stay={Number.parseInt(room.discount_percentage_long_stay ?? "0")}
+                      prepayment_percentage={Number.parseInt(room.prepayment_percentage ?? "10")}
+                      minMediumStayRange={discountData?.mediumStayRange.min ?? 6}
+                      maxMediumStayRange={discountData?.mediumStayRange.max ?? 9}
+                      minLongStayRange={discountData?.longStayRange.min ?? 10}
+                      maxLongStayRange={discountData?.longStayRange.max ?? 10000}
+                      disableDates={room.disableDates}
+                      bookings={filteredBookings}
+                      onSubmit={handleWidgetSubmit}
+                      defaultCheckIn={booking.checkIn}
+                      defaultCheckOut={booking.checkOut}
+                      defaultGuests={booking.guests}
+                    />
+                  )}
+                </div>
+
+                {/* Alert - appears second on mobile (order-2) */}
+                <Alert className="order-2 mb-6 border-blue-200 bg-blue-50">
+                  <AlertCircle className="h-4 w-4 text-blue-600" />
+                  <AlertDescription className="text-blue-900">
+                    <p className="font-semibold mb-1">Importante:</p>
+                    Solo podés modificar esta reserva una vez. Te mostraremos si hay una diferencia a pagar o un monto a
+                    tu favor antes de confirmar.
+                  </AlertDescription>
+                </Alert>
+              </div>
+
               {room.isPrivate === true && (
                 <div className="flex items-center space-x-4 text-[#162F40]">
                   <div className="flex items-center">

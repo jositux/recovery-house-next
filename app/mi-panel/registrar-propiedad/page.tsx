@@ -24,7 +24,6 @@ const OpenStreetMapSelector = dynamic(() => import("@/components/OSMSelector").t
 
 import GoogleMapsSelector, { type LocationDetails } from "@/components/google-maps-selector"
 
-
 import { propertyService, type PropertyData } from "@/services/propertyService"
 //import { roomService, type RoomData } from "@/services/RoomService";
 
@@ -53,13 +52,14 @@ const formSchema = z.object({
   hostName: z.string().min(1, "El nombre es obligatorio."),
   guestComments: z.string().min(1, "El campo es obligatorio."),
   patology: z.array(z.string()).min(1, "Selecciona al menos una patología."),
+  acceptTerms: z.boolean().refine((val) => val === true, {
+    message: "Debes aceptar los términos y condiciones para continuar.",
+  }),
 })
 
 type FormValues = z.infer<typeof formSchema>
 
 export default function RegisterPropertyBasePage() {
-
-
   const handleLocationSelected = (details: LocationDetails) => {
     console.log("Detalles de la ubicación seleccionada:", details)
     form.setValue("address", details.address)
@@ -116,6 +116,7 @@ export default function RegisterPropertyBasePage() {
       patology: [],
       hostName: "",
       guestComments: "",
+      acceptTerms: false,
     },
   })
 
@@ -167,8 +168,7 @@ export default function RegisterPropertyBasePage() {
         <h1 className="text-3xl font-bold mb-6">Registra tu propiedad</h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-
-          <div className="space-y-4 p-4 bg-white rounded-xl">
+            <div className="space-y-4 p-4 bg-white rounded-xl">
               <h2 className="text-lg">Documentos Legales</h2>
               <FormField
                 control={form.control}
@@ -234,7 +234,7 @@ export default function RegisterPropertyBasePage() {
                 />
               </div>
             </div>
-            
+
             <div className="space-y-4 p-4 bg-white rounded-xl">
               <FormField
                 control={form.control}
@@ -300,8 +300,7 @@ export default function RegisterPropertyBasePage() {
                   <FormItem>
                     <FormLabel>Tratamientos en que se especializa</FormLabel>
                     <FormControl>
-                    <MultiSelectCase value={field.value} onChange={field.onChange} />
-     
+                      <MultiSelectCase value={field.value} onChange={field.onChange} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -451,7 +450,6 @@ export default function RegisterPropertyBasePage() {
                 )}
               />
             </div>
-           
 
             {/* <div className="container mx-auto py-12 hidden">
               <h1 className="text-2xl font-bold mb-8">
@@ -501,6 +499,41 @@ export default function RegisterPropertyBasePage() {
               </div>
             </div>
 
+            <div className="space-y-4 p-6 bg-white rounded-xl border-2 border-muted">
+              <FormField
+                control={form.control}
+                name="acceptTerms"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex flex-row items-start space-x-3">
+                      <FormControl>
+                        <input
+                          type="checkbox"
+                          checked={field.value}
+                          onChange={field.onChange}
+                          className="h-5 w-5 rounded border-gray-300 text-[#39759E] focus:ring-[#39759E] focus:ring-2 cursor-pointer mt-0.5"
+                        />
+                      </FormControl>
+                      <div className="flex-1 space-y-1 leading-none">
+                        <FormLabel className="text-sm font-normal cursor-pointer">
+                          He leído y acepto los{" "}
+                          <a
+                            href="/terms"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[#39759E] hover:text-[#3a5a77] underline font-medium"
+                          >
+                            términos y condiciones de la plataforma
+                          </a>
+                        </FormLabel>
+                      </div>
+                    </div>
+                    <FormMessage className="mt-2" />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <Button
               type="submit"
               className="w-full mx-auto bg-[#39759E] px-6 py-5 rounded-lg text-white font-medium hover:bg-[#3a5a77] transition-colors flex items-center justify-center gap-2"
@@ -524,4 +557,3 @@ export default function RegisterPropertyBasePage() {
     </div>
   )
 }
-
