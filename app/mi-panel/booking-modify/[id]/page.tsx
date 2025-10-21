@@ -14,9 +14,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { fetchCurrentUser } from "@/services/BookingService"
 import { useRouter } from "next/navigation"
 import { fetchStayData, type Stay } from "@/services/stayService"
-import { createBookingModify, ModifyBookingPayload } from "@/services/BookingModifyNoPaymentService"; 
-//import { createBookingModifyNoPayment, ModifyBookingPayloadNoPayment } from "@/services/BookingModifyNoPaymentService"; 
-
+import { createBookingModify, type ModifyBookingPayload } from "@/services/BookingModifyNoPaymentService"
+//import { createBookingModifyNoPayment, ModifyBookingPayloadNoPayment } from "@/services/BookingModifyNoPaymentService";
 
 import {
   Dialog,
@@ -193,6 +192,7 @@ export default function BookingModifyPage() {
     return bookings.filter((booking) => {
       const checkOutDate = new Date(booking.checkOut)
       return (
+        booking.id !== bookingId && // Exclude the current booking being modified
         checkOutDate >= today &&
         booking.bookingState !== "cancelled_by_patient" &&
         booking.bookingState !== "cancelled_by_owner"
@@ -334,17 +334,14 @@ export default function BookingModifyPage() {
         paymentAmount: paymentDifference,
       }
 
-    
-
       localStorage.removeItem("booking")
       localStorage.setItem("booking", JSON.stringify(formattedBookingModify))
 
       if (booking?.paymentState === "prepayment") {
-        router.push("/confirm-pay-modify");
+        router.push("/confirm-pay-modify")
       } else {
-        router.push("/checkout-modify");
+        router.push("/checkout-modify")
       }
-
     } catch (error) {
       console.error("Error guardando datos de modificación", error)
       setError("Error al guardar los datos de modificación")
@@ -353,18 +350,16 @@ export default function BookingModifyPage() {
 
   const handleConfirmNoPayment = async () => {
     if (!pendingBookingData || !currentUser) {
-      router.push("/login");
-      return;
+      router.push("/login")
+      return
     }
-  
+
     try {
-      setLoading(true);
-      setShowConfirmDialog(false);
-  
-      const accessToken = localStorage.getItem("access_token");
-      if (!accessToken) throw new Error("Missing token");
-  
-     
+      setLoading(true)
+      setShowConfirmDialog(false)
+
+      const accessToken = localStorage.getItem("access_token")
+      if (!accessToken) throw new Error("Missing token")
 
       const payload: ModifyBookingPayload = {
         bookingId: booking?.id as string,
@@ -379,21 +374,24 @@ export default function BookingModifyPage() {
         discountStayAmount: pendingBookingData.discountStayAmount,
         prepaymentPercentage: Number(room?.prepayment_percentage) || 0,
         paymentAmount: 0,
-        paymentBalance: booking?.paymentState === "prepayment" ? pendingBookingData.totalPrice - Number(booking?.paymentReceivedAmount) : 0,
+        paymentBalance:
+          booking?.paymentState === "prepayment"
+            ? pendingBookingData.totalPrice - Number(booking?.paymentReceivedAmount)
+            : 0,
         paymentType: booking?.paymentState === "prepayment" ? "prepayment" : "fullpayment",
-      };
-  
-      await createBookingModify(payload, accessToken);
-  
-      router.push("/mi-panel/reservas-realizadas?rel=modify");
-      setShowSuccessDialog(true);
+      }
+
+      await createBookingModify(payload, accessToken)
+
+      router.push("/mi-panel/reservas-realizadas?rel=modify")
+      setShowSuccessDialog(true)
     } catch (error) {
-      console.error("Error modificando reserva", error);
-      setError("Error al modificar la reserva");
+      console.error("Error modificando reserva", error)
+      setError("Error al modificar la reserva")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
     const fetchBookingAndRoomData = async () => {
@@ -937,28 +935,26 @@ export default function BookingModifyPage() {
                   </div>
                 </div>
 
-                {booking?.paymentState !== "prepayment" && (                
-                <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <p className="text-sm text-yellow-800 font-medium text-center">
-                    El nuevo monto es mayor por la modificación de la reserva. Por favor, abona la diferencia de{" "}
-                    <span className="font-bold">${paymentDifference.toLocaleString("es-CO")} USD</span> para completar
-                    la actualización.
-                  </p>
-                </div>
-                 )}
+                {booking?.paymentState !== "prepayment" && (
+                  <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <p className="text-sm text-yellow-800 font-medium text-center">
+                      El nuevo monto es mayor por la modificación de la reserva. Por favor, abona la diferencia de{" "}
+                      <span className="font-bold">${paymentDifference.toLocaleString("es-CO")} USD</span> para completar
+                      la actualización.
+                    </p>
+                  </div>
+                )}
 
-
-{booking?.paymentState === "prepayment" && (                
-  <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-    <p className="text-sm text-yellow-800 font-medium text-center">
-      El nuevo monto es mayor debido a la modificación. Se te abonará el valor del anticipo ya pagado {" "}
-      <span className="font-bold">
-        ${(booking?.prepaymentAmount ?? 0).toLocaleString("es-CO")} USD
-      </span>{" "}
-    </p>
-  </div>
-)}
-
+                {booking?.paymentState === "prepayment" && (
+                  <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <p className="text-sm text-yellow-800 font-medium text-center">
+                      El nuevo monto es mayor debido a la modificación. Se te abonará el valor del anticipo ya pagado{" "}
+                      <span className="font-bold">
+                        ${(booking?.prepaymentAmount ?? 0).toLocaleString("es-CO")} USD
+                      </span>{" "}
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -1022,21 +1018,22 @@ export default function BookingModifyPage() {
                 </div>
 
                 {paymentDifference > 0 && (
-                <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                  <p className="text-sm text-green-800 font-medium text-center">
-                    El nuevo monto es menor por la modificación de la reserva. Tienes un saldo a favor de{" "}
-                    <span className="font-bold">${paymentDifference.toLocaleString("es-CO")} USD</span>, que puedes
-                    utilizar en futuras reservas o solicitar su devolución.
-                  </p>
-                </div>
-                 )}
+                  <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-sm text-green-800 font-medium text-center">
+                      El nuevo monto es menor por la modificación de la reserva. Tienes un saldo a favor de{" "}
+                      <span className="font-bold">${paymentDifference.toLocaleString("es-CO")} USD</span> para esta
+                      reserva.
+                    </p>
+                  </div>
+                )}
 
-{paymentDifference === 0 && (
-                <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                  <p className="text-sm text-green-800 font-medium text-center">
-Los cambios en la reserva no han afectado al monto                  </p>
-                </div>
-                 )}
+                {paymentDifference === 0 && (
+                  <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-sm text-green-800 font-medium text-center">
+                      Los cambios en la reserva no han afectado al monto{" "}
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>
