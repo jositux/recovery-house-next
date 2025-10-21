@@ -304,8 +304,6 @@ function RoomsPageContent() {
       return true
     })
 
-    console.log("Filtered rooms count:", filteredRooms.length)
-    console.log("=== END DEBUGGING ===")
   }, [allRooms, searchParams, bookings, isRoomAvailable, properties])
 
   useEffect(() => {
