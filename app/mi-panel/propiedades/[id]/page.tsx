@@ -491,12 +491,18 @@ export default function RoomPage() {
                   <div className="relative w-full h-48">
                     <Link href={`/rooms/${room.id}`} passHref>
                       <div className="relative w-full h-full">
-                        <Image
-                          src={getImageSrc(transformImageRoomToImage(room.photos[0])) || "/assets/empty.jpg"}
-                          alt={property.name}
-                          layout="fill"
-                          objectFit="cover"
-                        />
+                      <Image
+  src={
+    room.photos && room.photos.length > 0
+      ? getImageSrc(transformImageRoomToImage(room.photos[0]))
+      : "/assets/empty.jpg"
+  }
+  alt={property.name}
+  fill
+  style={{ objectFit: "cover" }}
+/>
+
+                       
 
                         {isOwner && room.photos[0]?.directus_files_id.isModerated !== undefined && (
                           <div className="absolute left-4 top-4">
