@@ -235,7 +235,7 @@ export default function RoomPage() {
       console.log(`🏠 Propiedad ${property.id} eliminada`)
 
       // 4️⃣ Redireccionar a la lista de propiedades
-      router.push("/mis-propiedades")
+      router.push("/mi-panel/mis-propiedades")
     } catch (error) {
       console.error("❌ Error al eliminar la propiedad:", error)
     }
