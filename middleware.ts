@@ -50,7 +50,8 @@ export function middleware(request: NextRequest) {
   path === '/' ||
     path === '/login' ||
     path === '/registro' ||
-    path === '/user' ||    
+    path === '/user' ||  
+    path === '/terms' ||    
     path === '/webapi/auth/login' ||
     path === '/webapi/users' ||    
     path.startsWith('/admin/users/') ||
