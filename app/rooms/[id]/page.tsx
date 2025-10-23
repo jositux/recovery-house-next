@@ -344,7 +344,8 @@ export default function RoomPage() {
 
       localStorage.setItem("booking", JSON.stringify(formattedBooking))
 
-      router.push("/confirm-pay")
+      router.push(`/confirm-pay?rel=${room?.id}`)
+
     } catch (error) {
       console.error("Error fetching usuario", error)
       setError("Error al buscar el usuario")

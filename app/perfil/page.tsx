@@ -2,54 +2,114 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
-// Import the new form and schema
-import ComplementaryRegisterForm, {
-  complementaryFormSchema,
-} from "@/components/forms/ComplementaryRegisterForm";
-// Import the ProfileImageSection component
-import { ProfileImageSection } from "@/components/profile/ProfileImageSection";
-// Import getCurrentUser from userService
-import { getCurrentUser, type User } from "@/services/userService";
-// Removed LoginForm import
+import { useRouter, useSearchParams } from "next/navigation";
 import { Fraunces } from "next/font/google";
 import Image from "next/image";
+import type { z } from "zod";
+
+// Import components
+import PerfilRegisterForm, {
+  type complementaryFormSchema,
+} from "@/components/forms/PerfilRegisterForm";
+import { ProfileImageSection } from "@/components/profile/ProfileImageSection";
+import { getCurrentUser, type User } from "@/services/userService";
+import {
+  complementaryRegisterService,
+  type ComplementaryRegisterCredentials,
+} from "@/services/complementaryRegisterService";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { AlertCircle } from "lucide-react";
 
 const fraunces = Fraunces({ subsets: ["latin"] });
 
-//import { VerificationCodeInput } from "@/components/ui/verification-code-input"
-import { z } from "zod";
-
-// Import the new service and credentials type
-import {
-  complementaryRegisterService,
-  ComplementaryRegisterCredentials,
-} from "@/services/complementaryRegisterService";
-import { useRouter } from "next/navigation";
-// Removed verification service import
-
-// Updated registration steps - removed verification and login
-type RegistrationStep = "details" | "terms" | "success";
-
-// Updated registration data type
+type RegistrationStep = "details" | "success";
 type RegistrationData = z.infer<typeof complementaryFormSchema>;
 
 export default function RegistrationPage() {
   const [currentStep, setCurrentStep] = useState<RegistrationStep>("details");
   const [registrationData, setRegistrationData] =
     useState<RegistrationData | null>(null);
-
-  // Changed successMessage state to reflect completion
   const [completionMessage, setCompletionMessage] = useState<string | null>(
     null
   );
-
-  const router = useRouter();
-
-  // States for user data and token
   const [user, setUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const [showRelDialog, setShowRelDialog] = useState(false);
+  const [relDialogConfig, setRelDialogConfig] = useState<{
+    message: string;
+    cancelRoute: string;
+  } | null>(null);
+
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const relParam = searchParams.get("rel");
+
+    if (relParam) {
+      // Definimos el tipo de las claves que puede tener "relParam"
+      type RelParamType =
+        | "registrar-propiedad"
+        | "registrar-servicio"
+        | "checkout"
+        | string;
+
+      interface RelDialogConfig {
+        message: string;
+        cancelRoute: string;
+      }
+
+      const getUserCompletionMessage = (
+        relParam: RelParamType
+      ): RelDialogConfig => {
+        const routes: Record<string, RelDialogConfig> = {
+          "registrar-propiedad": {
+            message:
+              "Si desea registrar la propiedad debe completar los datos de usuario obligatoriamente",
+            cancelRoute: "/mi-panel/mis-propiedades",
+          },
+          "registrar-servicio": {
+            message:
+              "Si desea registrar un servicio debe completar los datos de usuario obligatoriamente",
+            cancelRoute: "/mi-panel/mi-servicio",
+          },
+          checkout: {
+            message:
+              "Si desea pagar la reserva debe completar los datos de usuario obligatoriamente",
+            cancelRoute: "/checkout",
+          },
+          "mi-perfil": {
+            message:
+              "Debe completar los datos de usuario obligatoriamente antes de modificar",
+            cancelRoute: "/rooms",
+          },
+        };
+
+        return (
+          routes[relParam] || {
+            message:
+              "Si desea reservar la habitación debe completar los datos de usuario obligatoriamente",
+            cancelRoute: `/rooms/${relParam}`,
+          }
+        );
+      };
+
+      const { message, cancelRoute } = getUserCompletionMessage(relParam);
+      setRelDialogConfig({ message, cancelRoute });
+      setShowRelDialog(true);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const token = localStorage.getItem("access_token");
@@ -61,7 +121,6 @@ export default function RegistrationPage() {
     setAccessToken(token);
     setIsLoading(true);
 
-    // Fetch the current user data using the imported service
     const fetchUserData = async () => {
       try {
         const userData = await getCurrentUser(token);
@@ -82,44 +141,26 @@ export default function RegistrationPage() {
     fetchUserData();
   }, [router]);
 
-  useEffect(() => {
-    if (currentStep === "terms") {
-      setTimeout(() => {
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth",
-        });
-      }, 100);
-    }
-  }, [currentStep]);
-
-  // Updated function signature
   const handleRegisterSubmit = (
     values: z.infer<typeof complementaryFormSchema>
   ) => {
-    setRegistrationData(values); // Actualizar datos de registro
+    setRegistrationData(values);
   };
 
   useEffect(() => {
-    // Verificar si registrationData ha sido actualizado
     if (registrationData) {
-      // Solo ejecutar handleTermsAccept si registrationData ya está disponible
       handleTermsAccept();
     }
-  }, [registrationData]); // Este useEffect se ejecuta cuando registrationData cambia
+  }, [registrationData]);
 
-  // Create initial values based on user data or fallback to registrationData
   const getInitialValues = () => {
-    // If user data exists, use it for the specified fields
     if (user) {
       return {
-        // Use user data for the specified fields
         first_name: user.first_name || "",
         last_name: user.last_name || "",
         address: user.address || "",
         phone: user.phone || "",
         emergencyPhone: user.emergencyPhone || "",
-        // Keep other fields from registrationData if they exist
         ...(registrationData && {
           birthDate: registrationData.birthDate || "",
           initialRole: registrationData.initialRole || "Patient",
@@ -127,7 +168,6 @@ export default function RegistrationPage() {
       };
     }
 
-    // Otherwise, use existing registrationData or undefined
     return registrationData || undefined;
   };
 
@@ -136,10 +176,8 @@ export default function RegistrationPage() {
       return;
     }
 
-    // Clear previous completion message
     setCompletionMessage(null);
 
-    // Check for session and access token
     const token = localStorage.getItem("access_token");
     if (!token) {
       setCompletionMessage(
@@ -150,7 +188,6 @@ export default function RegistrationPage() {
     }
 
     try {
-      // Use credentials type
       const updateData: ComplementaryRegisterCredentials = {
         first_name: registrationData.first_name,
         last_name: registrationData.last_name,
@@ -161,7 +198,6 @@ export default function RegistrationPage() {
         initialRole: registrationData.initialRole,
       };
 
-      // Call the updated service function with credentials and access token
       const updatedUser = await complementaryRegisterService.updateUser(
         updateData,
         token
@@ -173,46 +209,111 @@ export default function RegistrationPage() {
         " " +
         (updatedUser.last_name || "")
       ).trim();
-      console.log(nombre);
       localStorage.setItem("nombre", nombre);
       document.cookie = `nombre=${encodeURIComponent(
         nombre
-      )}; path=/; max-age=${60 * 60 * 24 * 7}`; //7 days
+      )}; path=/; max-age=${60 * 60 * 24 * 7}`;
 
       window.dispatchEvent(new Event("storage"));
 
-      // Set success message and move to success step
       setCompletionMessage("¡Información actualizada con éxito!");
       setCurrentStep("success");
     } catch (error) {
-      // Set a generic error message from the service or a default one
       const errorMessage =
         error instanceof Error
           ? error.message
           : "Ocurrió un error al actualizar la información. Por favor, inténtalo de nuevo.";
       setCompletionMessage(errorMessage);
-      console.error("User update error:", error); // Log the error
+      console.error("User update error:", error);
     }
   };
 
-  const handleBack = () => {
-    console.log(registrationData?.birthDate);
-    setCurrentStep("details");
+  const handleDialogAccept = () => {
+    setShowRelDialog(false);
+  };
+
+  const handleDialogCancel = () => {
+    if (relDialogConfig) {
+      router.push(relDialogConfig.cancelRoute);
+    }
+  };
+
+  const getActionButtonText = () => {
+    const relParam = searchParams.get("rel");
+
+    if (!relParam) return "Ver habitaciones disponible";
+
+    if (relParam === "registrar-propiedad") return "Agregar Propiedad";
+    if (relParam === "registrar-servicio") return "Agregar Servicio";
+    if (relParam === "mi-perfil") return "Ver mi Perfil";
+    if (relParam === "checkout" || relParam.includes("pay"))
+      return "Seguir con el pago";
+
+    return "Seguir con la reserva";
+  };
+
+  const handleActionButtonClick = () => {
+    const relParam = searchParams.get("rel");
+
+    // Si no hay parámetro, redirige por defecto a /rooms
+    if (!relParam) {
+      router.push("/rooms");
+      return;
+    }
+
+    const routes: Record<string, string> = {
+      "registrar-propiedad": "/mi-panel/registrar-propiedad",
+      "registrar-servicio": "/mi-panel/registrar-servicio",
+      checkout: "/checkout",
+      "mi-perfil": "/mi-panel/mi-perfil",
+    };
+
+    // Usa la ruta definida o una dinámica según el parámetro
+    const targetRoute = routes[relParam] || `/rooms/${relParam}`;
+    router.push(targetRoute);
   };
 
   return (
     <div className="min-h-screen bg-[#F8F8F7]">
+      <Dialog open={showRelDialog} onOpenChange={setShowRelDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex items-center gap-2 mb-2">
+              <AlertCircle className="h-5 w-5 text-amber-600" />
+              <DialogTitle>Completar Datos de Usuario</DialogTitle>
+            </div>
+            <DialogDescription className="text-base pt-2">
+              {relDialogConfig?.message}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex-row gap-2 sm:justify-center">
+            <Button
+              variant="outline"
+              onClick={handleDialogCancel}
+              className="flex-1 bg-transparent"
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={handleDialogAccept}
+              className="flex-1 bg-[#39759E] hover:bg-[#2d5f7f]"
+            >
+              Aceptar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <div className="container mx-auto max-w-2xl py-16 px-4">
         <AnimatePresence mode="wait">
-        {currentStep === "details" && (
-          <motion.div
-            key="title"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-          >
-          
+          {currentStep === "details" && (
+            <motion.div
+              key="title"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
               <div>
                 <h1
                   className={`${fraunces.className} text-2xl font-medium mb-6`}
@@ -225,9 +326,9 @@ export default function RegistrationPage() {
                   información en el futuro para poder operar.
                 </p>
               </div>
-           
-          </motion.div>
- )}
+            </motion.div>
+          )}
+
           {currentStep === "details" && (
             <motion.div
               key="details"
@@ -236,9 +337,8 @@ export default function RegistrationPage() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              {/* Profile Image Section */}
               {user && accessToken && (
-                <div className="bg-white p-6 rounded-lg shadow-sm">
+                <div className="p-6 rounded-lg">
                   <ProfileImageSection
                     userId={user.id}
                     accessToken={accessToken}
@@ -246,17 +346,13 @@ export default function RegistrationPage() {
                   />
                 </div>
               )}
-              <h2
-                className={`${fraunces.className} text-xl font-medium mb-6`}
-              ></h2>
 
-              {/* Display loading state or form when ready */}
               {isLoading ? (
                 <div className="flex justify-center items-center p-10 bg-white rounded-lg">
                   <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#39759E]"></div>
                 </div>
               ) : (
-                <ComplementaryRegisterForm
+                <PerfilRegisterForm
                   onSubmit={handleRegisterSubmit}
                   initialValues={getInitialValues()}
                 />
@@ -264,46 +360,6 @@ export default function RegistrationPage() {
             </motion.div>
           )}
 
-          {currentStep === "terms" && (
-            <motion.div
-              key="terms"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              <h1 className="text-2xl font-bold mb-6">
-                Recovery Care Solutions es una plataforma a la que cualquiera
-                puede pertenecer
-              </h1>
-              <p className="mb-8 text-[#162F40]">
-                Para garantizar esto, le pedimos que se comprometa a lo
-                siguiente: Acepto tratar a todos los miembros de la comunidad
-                independientemente de su raza, religión, origen nacional, etnia,
-                color de piel, discapacidad, sexo, identidad de género,
-                orientación sexual o edad, con respeto y sin juicios ni
-                prejuicios.
-              </p>
-              <div className="flex gap-4">
-                <Button
-                  variant="ghost"
-                  onClick={handleBack}
-                  className="text-[#39759E] hover:text-[#39759E] hover:bg-[#39759E]/10"
-                >
-                  VOLVER
-                </Button>
-                <Button
-                  onClick={handleTermsAccept}
-                  className="flex-1 bg-[#39759E] hover:bg-[#39759E]"
-                >
-                  DE ACUERDO Y CONTINÚO
-                </Button>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Removed verification and login steps */}
-          {/* Added success step */}
           {currentStep === "success" && (
             <motion.div
               key="success"
@@ -321,7 +377,20 @@ export default function RegistrationPage() {
                 <p className="mb-4">
                   {completionMessage || "Tu información ha sido actualizada."}
                 </p>
-                <div className="flex justify-center">
+
+                {getActionButtonText() && (
+                  <div className="flex justify-center mt-16">
+                    <Button
+                      onClick={handleActionButtonClick}
+                      className="px-16 py-6 text-base font-medium"
+                      style={{ backgroundColor: "#39759E" }}
+                    >
+                      {getActionButtonText()}
+                    </Button>
+                  </div>
+                )}
+
+                <div className="flex justify-center pt-6">
                   <Image
                     src="/assets/logo2.svg"
                     alt="Recovery Care Solutions"
@@ -329,15 +398,10 @@ export default function RegistrationPage() {
                     height={80}
                   />
                 </div>
-                {/* Optionally add a button to navigate away */}
-                {/* <Button onClick={() => router.push('/dashboard')} className="mt-6 bg-[#39759E] hover:bg-[#39759E]">
-                  Ir al Panel
-                </Button> */}
               </div>
             </motion.div>
           )}
 
-          {/* Display completion message (could be success or error) */}
           {completionMessage && currentStep !== "success" && (
             <div
               className={`border-l-4 p-4 mt-4 mb-4 rounded ${

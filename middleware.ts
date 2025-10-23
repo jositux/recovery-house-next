@@ -14,7 +14,7 @@ function esNombreValido(nombre: string | null | undefined): boolean {
   }
 
   // Verifica si contiene la palabra "null" (independiente de los espacios alrededor)
-  if (typeof nombre === 'string' && nombre.toLowerCase().includes("null")) {
+  if (typeof nombre === 'string' && nombre.trim().toLowerCase() === "null") {
     return false;
   }
 
@@ -22,10 +22,28 @@ function esNombreValido(nombre: string | null | undefined): boolean {
   return true;
 }
 
+function getRelValue(pathname: string, searchParams: URLSearchParams): string {
+  const segments = pathname.split('/').filter(Boolean);
+  
+  if (segments[0] === 'mi-panel') return segments[1] ?? 'complete-profile';
+
+  if (segments[0]?.startsWith('confirm-pay')) {
+    const queryRel = searchParams.get('rel');
+    if (queryRel) return queryRel;
+    return segments[1] ?? 'complete-profile';
+  }
+  
+  if (segments[0]?.startsWith('checkout')) return segments[0];
+  
+  return 'complete-profile';
+}
+
 // This middleware will run on routes defined in matcher
 export function middleware(request: NextRequest) {
   // Get the path of the request
   const path = request.nextUrl.pathname;
+
+  console.log("request", request);
 
   // Define public routes that don't require authentication
   const isPublicRoute = 
@@ -56,18 +74,19 @@ export function middleware(request: NextRequest) {
   const nombre = request.cookies.get('nombre')?.value ? decodeURIComponent(request.cookies.get('nombre')?.value || '').trim() : '';
 
   // Define routes that require the user to have completed their profile (have their name set)
-  const requiresCompletedProfile = 
-    /*path === '/registrar-propiedad' ||
-    path === '/registrar-servicio' ||
-    path === '/editar-servicio' ||*/
-    path.match(/^\/mi-perfil\/.*$/) !== null ||
-    path.match(/^\/propiedades\/[^/]+\/room\/create$/) !== null ||
-    path.match(/^\/propiedades\/[^/]+\/room\/agregar$/) !== null ||
-    path.match(/^\/propiedades\/[^/]+\/room\/edit$/) !== null ||
-    path.match(/^\/propiedades\/[^/]+\/room\/editar$/) !== null ||
-    path.match(/^\/editar-propiedad\/.*$/) !== null ||
-    path.match(/^\/calendario\/.*$/) !== null;
-
+const requiresCompletedProfile =
+  path.match(/^\/mi-panel(?:\/[^/]+)?\/propiedades\/[^/]+\/servicios\/[^/]+\/rooms\/[^/]+\/bookings\/[^/]+\/edit$/) !== null ||
+  path.match(/^\/mi-panel(?:\/[^/]+)?\/propiedades\/[^/]+\/room\/(create|agregar|edit|editar)$/) !== null ||
+  path.match(/^\/mi-panel(?:\/[^/]+)?\/editar-propiedad(?:\/.*)?$/) !== null ||
+  path.match(/^\/mi-panel(?:\/[^/]+)?\/registrar-propiedad(?:\/.*)?$/) !== null ||
+  path.match(/^\/mi-panel(?:\/[^/]+)?\/registrar-servicio(?:\/.*)?$/) !== null ||
+  path.match(/^\/mi-panel(?:\/[^/]+)?\/editar-servicio(?:\/.*)?$/) !== null ||
+  path.match(/^\/mi-panel(?:\/[^/]+)?\/booking-modify(?:\/.*)?$/) !== null ||  
+  path.match(/^\/mi-panel(?:\/[^/]+)?\/calendario(?:\/.*)?$/) !== null ||
+  path.match(/^\/mi-panel(?:\/[^/]+)?\/mi-perfil(?:\/.*)?$/) !== null ||
+  path.match(/^\/confirm-pay(?:-modify)?(?:\/.*)?$/) !== null ||
+  path.match(/^\/checkout(?:-modify|-balanced)?(?:\/.*)?$/) !== null;
+  
   // Redirect logic
   if (!isPublicRoute && !token) {
     // If not on a public route and no token, redirect to login
@@ -76,16 +95,16 @@ export function middleware(request: NextRequest) {
   }
 
   // If route requires completed profile but user doesn't have their name set
-  if (token && requiresCompletedProfile && (esNombreValido(nombre) === false)) {
-    // Redirect to profile completion page
-    const url = new URL('/perfil', request.url);
+  if (token && requiresCompletedProfile && !esNombreValido(nombre)) {
+    const rel = getRelValue(path, request.nextUrl.searchParams);
+    const url = new URL(`/perfil?rel=${encodeURIComponent(rel)}`, request.url);
     return NextResponse.redirect(url);
   }
 
   //si intenta acceder a perfil con datos ya cargados
   if (token && (path.startsWith('/perfil')) && (esNombreValido(nombre) === true)) {
     // Redirect to profile completion page
-    const url = new URL('/mi-perfil', request.url);
+    const url = new URL('/mi-panel/mi-perfil', request.url);
     return NextResponse.redirect(url);
   }  
 

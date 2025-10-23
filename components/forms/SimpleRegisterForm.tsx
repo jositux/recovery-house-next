@@ -27,6 +27,9 @@ export const formSchema = z.object({
     .refine((val) => val.trim().length >= 8, {
       message: "La contraseña debe tener al menos 8 caracteres no vacíos.",
     }),
+    acceptTerms: z.boolean().refine((val) => val === true, {
+      message: "Debes aceptar los términos y condiciones para continuar.",
+    }),
 })
 
 // Renamed props type
@@ -152,7 +155,46 @@ export default function SimpleRegisterForm({ onSubmit, initialValues }: SimpleRe
               )}
             />
           </div>
+
+
+          <div className="mt-8 mb-2 bg-white">
+              <FormField
+                control={form.control}
+                name="acceptTerms"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex flex-row items-start space-x-3">
+                      <FormControl>
+                        <input
+                          type="checkbox"
+                          checked={field.value}
+                          onChange={field.onChange}
+                          className="h-5 w-5 rounded border-gray-300 text-[#39759E] focus:ring-[#39759E] focus:ring-2 cursor-pointer mt-0.5"
+                        />
+                      </FormControl>
+                      <div className="flex-1 space-y-1 leading-none">
+                        <FormLabel className="text-sm font-normal cursor-pointer">
+                          Acepto los{" "}
+                          <a
+                            href="/terms"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[#39759E] hover:text-[#3a5a77] underline font-medium"
+                          >
+                            Términos y Condiciones de la Plataforma
+                          </a>
+                        </FormLabel>
+                      </div>
+                    </div>
+                    <FormMessage className="mt-2" />
+                  </FormItem>
+                )}
+              />
+            </div>
+
         </div>
+
+
 
         {/* Removed User Type section */}
         {/* Removed Terms Checkbox section */}
