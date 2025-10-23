@@ -5,8 +5,7 @@ import { Button } from "@/components/ui/button"
 import { getCurrentUser } from "@/services/userService"
 import { cancelBooking } from "@/services/BookingCancelService"
 import { useRouter, useSearchParams } from "next/navigation"
-import { Loader2, Search, CheckCircle2 } from "lucide-react"
-import Link from "next/link"
+import { Loader2, Home, Search, CheckCircle2 } from "lucide-react"
 import { BookingCard } from "./components/booking-card"
 import { BookingCardPast } from "./components/booking-card-past"
 import { CancelBookingModal } from "./components/cancel-booking-modal"
@@ -154,9 +153,7 @@ const BookingList = () => {
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false)
   const [selectedPaymentBookingId, setSelectedPaymentBookingId] = useState<string | null>(null)
   const [selectedBalanceAmount, setSelectedBalanceAmount] = useState<string>("")
-
   const [showModifySuccessDialog, setShowModifySuccessDialog] = useState(false)
-
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -517,8 +514,7 @@ const BookingList = () => {
 
   return (
     <div className="container mx-auto py-4 px-4 sm:px-4 lg:px-0">
-      <h1 className="text-3xl font-bold mb-6 text-gray-900">Reservas Realizadas</h1>
-
+   
       <SuccessModal isOpen={showSuccessModal} onClose={handleSuccessModalClose} />
 
       <CancelBookingModal
@@ -559,27 +555,40 @@ const BookingList = () => {
 
       {bookings.length === 0 ? (
         <main className="flex-grow flex items-center justify-center px-4">
-          <div className="text-center max-w-2xl">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              ¡Encuentra tu espacio ideal para una recuperación tranquila!
-            </h2>
-            <p className="text-lg text-gray-600 mb-8">
-              Aún no tienes reservas, pero estamos aquí para ayudarte a encontrar la casa de recuperación perfecta para
-              tu proceso de sanación y bienestar.
-            </p>
-            <Button
-              className="inline-flex items-center px-6 py-3 text-white bg-[#4A90E2] hover:bg-[#3A7BC8] transition-colors duration-300"
-              asChild
-            >
-              <Link href="/rooms">
-                <Search className="mr-2 h-5 w-5" />
+             <div className="container min-h-screen mx-auto p-4 py-16">
+            <div className="max-w-xl mx-auto">
+              <div className="flex flex-col items-center justify-center text-center space-y-8 py-16">
+                <div className="w-20 h-20 rounded-full bg-[#39759E]/10 flex items-center justify-center">
+                  <Home className="w-10 h-10 text-[#39759E]" />
+                </div>
+    
+                <div className="space-y-3">
+                  <h1 className="text-2xl md:text-3xl font-semibold text-gray-900">
+                  ¡Encuentra tu espacio ideal para una recuperación tranquila!
+                  </h1>
+                  <p className="text-base text-gray-600 max-w-md mx-auto">
+                  Aún no tienes reservas, pero estamos aquí para ayudarte a encontrar la casa de recuperación perfecta para
+              tu proceso de sanación y bienestar.  </p>              </div>
+    
+                <Button
+                  size="lg"
+                  className="mt-4 px-8 hover:opacity-90 transition-opacity"
+                  style={{ backgroundColor: "#39759E" }}
+                  onClick={() => router.push("/rooms")}
+                >
+                  <Search className="mr-2 h-5 w-5" />
                 Buscar casa de recuperación
-              </Link>
-            </Button>
+                </Button>
+              </div>
+            </div>
           </div>
+         
         </main>
       ) : (
+       
         <div className="space-y-12">
+           <h1 className="text-3xl font-bold mb-6 text-gray-900">Reservas Realizadas</h1>
+
           {(() => {
             const { upcoming, past } = separateBookingsByDate(bookings)
 

@@ -1,7 +1,6 @@
 "use client"
 
 import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { format, parseISO, differenceInDays } from "date-fns"
 import { es } from "date-fns/locale"
 import Image from "next/image"
@@ -11,15 +10,11 @@ import {
   DollarSign,
   BedSingle,
   BedDouble,
-  Star,
   MapPin,
   User,
   Info,
 } from "lucide-react"
 import { InfoItem } from "./info-item"
-import { useState, useEffect } from "react"
-import { ReviewModal } from "./ReviewModal"
-import { ReviewCard } from "./ReviewCard"
 import { useRouter } from "next/navigation";
 
 interface Photo {
@@ -109,6 +104,7 @@ interface Booking {
   cancelledMessage: string | null
   bookingState: string | null
   paymentState: string | null
+  modificationCount: number
 }
 
 interface Ratings {
@@ -130,14 +126,17 @@ interface ReviewFromAPI {
   //review_replies: any[]
 }
 
-interface Review {
-  ratings: Ratings
-  comment: string
+
+interface PaymentDisplayValues {
+  shownAnticipo: number;
+  shownPendiente: number;
+  modificationDiff: number | null;
 }
 
 interface BookingCardProps {
   booking: Booking
   review?: ReviewFromAPI | null
+  paymentDisplay: PaymentDisplayValues
   isPast?: boolean
   onCancelBooking?: (bookingId: string) => void
   onPayBalance?: (bookingId: string, balanceAmount: string) => void
@@ -153,12 +152,10 @@ interface BookingCardProps {
 
 export const BookingCardPast = ({
   booking,
-  review,
+  paymentDisplay,
   isPast = false,
   //onCancelBooking,
   //onPayBalance,
-  onReviewSubmit,
-  onReviewDelete,
 }: BookingCardProps) => {
   const roomDetails = booking.room
   const property = booking.room.propertyId
@@ -173,53 +170,6 @@ export const BookingCardPast = ({
     booking.bookingState === "cancelled_by_patient" ||
     booking.bookingState === "cancelled_by_owner"
 
-  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
-  const [hasReview, setHasReview] = useState(false)
-  const [reviewData, setReviewData] = useState<Review | null>(null)
-
-  // ✅ Inicializa reviewData sin provocar re-render infinito
-  useEffect(() => {
-    if (review) {
-      const formattedReview: Review = {
-        ratings: {
-          cleanliness: review?.ranking?.cleanliness ?? 0,
-          attention: review?.ranking?.attention ?? 0,
-          location: review?.ranking?.location ?? 0,
-          accuracy: review?.ranking?.accuracy ?? 0,
-        },
-        comment: review?.comment ?? "",
-      }
-
-      setReviewData(formattedReview)
-      setHasReview(true)
-    } else {
-      setReviewData(null)
-      setHasReview(false)
-    }
-  }, [review])
-
-  const handleReviewSubmit = async (ratings: Ratings, comment: string) => {
-    if (onReviewSubmit) {
-      await onReviewSubmit(
-        booking.id,
-        booking.room.id,
-        booking.patientName || "",
-        ratings,
-        comment
-      )
-      setHasReview(true)
-      setReviewData({ ratings, comment })
-      setIsReviewModalOpen(false)
-    }
-  }
-
-  const handleDeleteReview = async () => {
-    if (onReviewDelete) {
-      await onReviewDelete(booking.id)
-      setHasReview(false)
-      setReviewData(null)
-    }
-  }
 
   const router = useRouter();
 
@@ -295,7 +245,7 @@ export const BookingCardPast = ({
   {/* Overlay clickeable */}
   <div
     className="absolute inset-0 cursor-pointer"
-    onClick={() => router.push(`/room/${booking.room.id}`)}
+    onClick={() => router.push(`/rooms/${booking.room.id}`)}
   />
 </div>
 
@@ -312,7 +262,7 @@ export const BookingCardPast = ({
 
             <div className="flex items-center text-sm text-gray-500 mb-4">
               <User className="h-4 w-4 mr-1" />
-              <span>Propietario: {booking.ownerName}</span>
+              <span>Paciente: {booking.patientName}</span>
             </div>
 
             <div className="flex items-center text-sm text-gray-500 mb-4">
@@ -352,38 +302,74 @@ export const BookingCardPast = ({
                 </>
               )}
             </div>
+            <div className="flex-1">
+              <p className="text-lg font-semibold text-gray-900 mb-0.5">
+                Total:{" "}
+                {new Intl.NumberFormat("en-US", {
+                  style: "currency",
+                  currency: "USD",
+                }).format(Number(booking.finalPrice))}
+              </p>
 
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-4">
-              {isPast && !hasReview && (
-                <Button
-                  onClick={() => setIsReviewModalOpen(true)}
-                  className="bg-[#39759E] text-white hover:bg-[#2c5a7a] rounded-lg px-4 py-2 transition-colors duration-300 flex items-center text-sm"
-                >
-                  <Star className="mr-1 h-4 w-4" />
-                  Comentar
-                </Button>
-              )}
+              <div className="text-xs text-gray-500">
+                {booking.paymentState === "balancepayment" ||
+                  (booking.paymentState === "pendingRefund" && (
+                    <p>Pagó anticipo: ${booking.prepaymentAmount}</p>
+                  ))}
 
-              {isPast && hasReview && reviewData && (
-                <ReviewCard
-                  ratings={reviewData.ratings}
-                  comment={reviewData.comment}
-                  onDelete={handleDeleteReview}
-                />
-              )}
+                {booking.paymentState === "fullpayment" &&
+                  booking.modificationCount === 1 &&
+                  paymentDisplay.modificationDiff !== null && (
+                    <p>
+                      {paymentDisplay.modificationDiff < 0
+                        ? "Pagó por modificación: "
+                        : "Crédito por modificación: "}
+                      {new Intl.NumberFormat("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                      }).format(Math.abs(paymentDisplay.modificationDiff))}
+                    </p>
+                  )}
+
+                {booking.paymentState === "prepayment" &&
+                  booking.modificationCount === 0 && (
+                    <p>
+                      Anticipo:{" "}
+                      {new Intl.NumberFormat("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                      }).format(paymentDisplay.shownAnticipo)}{" "}
+                      | Pendiente:{" "}
+                      {new Intl.NumberFormat("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                      }).format(paymentDisplay.shownPendiente)}
+                    </p>
+                  )}
+
+                {booking.paymentState === "prepayment" &&
+                  booking.modificationCount === 1 && (
+                    <p>
+                      Anticipo:{" "}
+                      {new Intl.NumberFormat("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                      }).format(paymentDisplay.shownAnticipo)}{" "}
+                      | Pendiente:{" "}
+                      {new Intl.NumberFormat("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                      }).format(paymentDisplay.shownPendiente)}
+                    </p>
+                  )}
+              </div>
             </div>
+            
           </CardContent>
         </div>
       </Card>
 
-      {isPast && (
-        <ReviewModal
-          isOpen={isReviewModalOpen}
-          onClose={() => setIsReviewModalOpen(false)}
-          onSubmit={handleReviewSubmit}
-          bookingId={booking.id}
-        />
-      )}
+     
     </>
   )
 }

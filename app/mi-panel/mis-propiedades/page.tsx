@@ -7,11 +7,14 @@ import { getCurrentUser, type User } from "@/services/userService"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { MapPin, Plus, Loader2, BedDouble, Home, ArrowRight, CheckCircle, AlertCircle } from "lucide-react"
+import { MapPin, Plus, Loader2, BedDouble, Building2, CheckCircle, AlertCircle } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+
 
 const PropertiesPage: React.FC = () => {
+  const router = useRouter()
   const [properties, setProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
@@ -66,7 +69,40 @@ const PropertiesPage: React.FC = () => {
 
   return (
     <div className="container min-h-screen mx-auto py-4 px-4 md:px-6 lg:px-8">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
+      
+
+      {properties.length === 0 ? (
+       
+          <div className="container min-h-screen mx-auto p-4 py-16">
+            <div className="max-w-xl mx-auto">
+              <div className="flex flex-col items-center justify-center text-center space-y-8 py-16">
+                <div className="w-20 h-20 rounded-full bg-[#39759E]/10 flex items-center justify-center">
+                  <Building2 className="w-10 h-10 text-[#39759E]" />
+                </div>
+    
+                <div className="space-y-3">
+                  <h1 className="text-2xl md:text-3xl font-semibold text-gray-900">
+                    Aún no has registrado una propiedad
+                  </h1>
+                  <p className="text-base text-gray-600 max-w-md mx-auto">
+                  Dar el primer paso para convertirte en anfitrión puede ser el comienzo de una experiencia increíble.                  </p>
+                </div>
+    
+                <Button
+                  size="lg"
+                  className="mt-4 px-8 hover:opacity-90 transition-opacity"
+                  style={{ backgroundColor: "#39759E" }}
+                  onClick={() => router.push("/mi-panel/registrar-propiedad")}
+                >
+                 <Plus className="mr-2 h-5 w-5" /> Agregar Propiedad
+                </Button>
+              </div>
+            </div>
+          </div>
+        
+      ) : (
+        <div>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Mis Propiedades</h1>
         <Link href="/mi-panel/registrar-propiedad" className="w-full sm:w-auto">
           <Button className="w-full sm:w-auto bg-[#39759E] text-white hover:bg-[#2c5a7a] transition-colors duration-300">
@@ -74,33 +110,8 @@ const PropertiesPage: React.FC = () => {
           </Button>
         </Link>
       </div>
-
-      {properties.length === 0 ? (
-        <Card className="p-8 text-center bg-gradient-to-br from-blue-50 to-indigo-100 border-none shadow-sm">
-          <CardContent className="flex flex-col items-center">
-            <Home className="h-24 w-24 text-[#39759E] mb-6" />
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">¡Comienza tu viaje como anfitrión!</h2>
-            <p className="text-lg text-gray-600 mb-8 max-w-2xl">
-              Aún no tienes propiedades registradas. Dar el primer paso para convertirte en anfitrión puede ser el
-              comienzo de una experiencia increíble.
-            </p>
-            <div className="grid gap-6 md:grid-cols-1 max-w-2xl w-full">
-              <Card className="p-6 bg-white shadow-md hover:shadow-lg transition-shadow duration-300">
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">Registra tu primera propiedad</h3>
-                <p className="text-gray-600 mb-4">
-                  Comienza compartiendo los detalles de tu espacio único con potenciales huéspedes.
-                </p>
-                <Link href="/mi-panel/registrar-propiedad">
-                  <Button className="w-full bg-[#39759E] text-white hover:bg-[#2c5a7a] transition-colors duration-300">
-                    Empezar ahora <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-              </Card>
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        
           {properties.map((property) => (
             <Card key={property.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
               <div className="flex flex-col sm:flex-row">
@@ -160,6 +171,7 @@ const PropertiesPage: React.FC = () => {
               </div>
             </Card>
           ))}
+        </div>
         </div>
       )}
     </div>
