@@ -10,12 +10,15 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import FileUpload from "@/components/FileUpload"
 import { LocationSelector } from "@/components/ui/location-selector"
-import { ProviderData } from "@/services/providerService"
+import type { ProviderData } from "@/services/providerService"
 import { CollectionExtraTags } from "@/components/collectionExtraTags"
 import { getExtraTags } from "@/services/extraTagsService"
 import { useRouter } from "next/navigation"
-import { getProvidersByUserId } from "@/services/providerCollectionService";
-import { getCurrentUser } from "@/services/userService";
+import { getProvidersByUserId } from "@/services/providerCollectionService"
+import { getCurrentUser } from "@/services/userService"
+import { Loader2, Check, X, Edit } from "lucide-react"
+import Link from "next/link"
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 
 const formSchema = z.object({
   name: z.string().min(1, "El nombre es requerido."),
@@ -40,10 +43,11 @@ const formSchema = z.object({
   price: z.string().default(""),
 })
 
-
 type FormValues = z.infer<typeof formSchema>
 
-export default function RegisterPropertyBasePage() {
+export default function RegisterServicePage() {
+  const [isCheckingServices, setIsCheckingServices] = useState(true)
+  const [hasExistingService, setHasExistingService] = useState(false)
   const [extraTags, setExtraTags] = useState<
     {
       id: string
@@ -53,6 +57,33 @@ export default function RegisterPropertyBasePage() {
       enable_services: boolean
     }[]
   >([])
+
+  const router = useRouter()
+
+  useEffect(() => {
+    const checkAuthAndFetchData = async () => {
+      const token = localStorage.getItem("access_token")
+      if (!token) {
+        router.push("/login")
+        return
+      }
+
+      try {
+        const currentUser = await getCurrentUser(token)
+        const data = await getProvidersByUserId(currentUser.id, token)
+
+        if (data.length > 0) {
+          setHasExistingService(true)
+        }
+      } catch (error) {
+        console.error("Error al cargar los datos del proveedor:", error)
+      } finally {
+        setIsCheckingServices(false)
+      }
+    }
+
+    checkAuthAndFetchData()
+  }, [router])
 
   useEffect(() => {
     const loadTags = async () => {
@@ -102,50 +133,10 @@ export default function RegisterPropertyBasePage() {
     }
   }
 
-  /*useEffect(() => {
-    const subscriptionData = localStorage.getItem("subscription")
-    if (subscriptionData) {
-      const { subscriptionPrice, subscriptionType, price } = JSON.parse(subscriptionData)
-      form.setValue("subscriptionPrice", subscriptionPrice)
-      form.setValue("subscriptionType", subscriptionType)
-      form.setValue("price", price)
-    }
-  }, [form.setValue])*/
-
-
-
   const selectedExtraTags = useWatch({
     control: form.control,
     name: "extraTags",
   })
-
-
-  const router = useRouter();
-
-useEffect(() => {
-  const checkAuthAndFetchData = async () => {
-    const token = localStorage.getItem("access_token");
-    if (!token) {
-      router.push("/login");
-      return;
-    }
-
-    try {
-      const currentUser = await getCurrentUser(token);
-      const data = await getProvidersByUserId(currentUser.id, token);
-
-      if (data.length > 0) {
-        router.push("/mi-panel/servicio-cargado");
-      }
-    } catch (error) {
-      console.error("Error al cargar los datos del proveedor:", error);
-    }
-  };
-
-  checkAuthAndFetchData();
-}, [router]);
-
-
 
   const onSubmit = async (values: FormValues) => {
     if (!values.RNTFile || !values.taxIdEINFile) {
@@ -174,7 +165,6 @@ useEffect(() => {
         subscriptionType: values.subscriptionType || "",
         price: values.price || "",
       }
-      //const response = await providerService.createProperty(providerData);
 
       localStorage.setItem("new_service", JSON.stringify(providerData))
       router.push(`/subscriptions`)
@@ -185,19 +175,13 @@ useEffect(() => {
     }
   }
 
-  const handleRNTFileUpload = (response: {
-    id: string
-    filename_download: string
-  }) => {
+  const handleRNTFileUpload = (response: { id: string; filename_download: string }) => {
     setRNTFileData(response)
     form.setValue("RNTFile", response.id)
     form.clearErrors("RNTFile")
   }
 
-  const handleTaxFileUpload = (response: {
-    id: string
-    filename_download: string
-  }) => {
+  const handleTaxFileUpload = (response: { id: string; filename_download: string }) => {
     setTaxFileData(response)
     form.setValue("taxIdEINFile", response.id)
     form.clearErrors("taxIdEINFile")
@@ -211,6 +195,71 @@ useEffect(() => {
   const handleTaxFileClear = () => {
     setTaxFileData({ id: "", filename_download: "" })
     form.setValue("taxIdEINFile", "")
+  }
+
+  if (isCheckingServices) {
+    return (
+      <div className="min-h-screen bg-[#F8F8F7] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-[#39759E]" />
+          <p className="text-muted-foreground">Verificando servicios...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (hasExistingService) {
+    return (
+      <div className="min-h-screen bg-[#F8F8F7] flex items-center justify-center p-4">
+        <Card className="bg-white rounded-xl shadow-lg max-w-md mx-auto overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white p-6">
+            <CardTitle className="text-2xl font-bold flex items-center justify-center">
+              <Check className="mr-2" size={24} />
+              Servicio Cargado
+            </CardTitle>
+            <CardDescription className="text-blue-100"></CardDescription>
+          </CardHeader>
+          <CardContent className="p-6">
+            <p className="text-gray-600 mb-4">
+              Has completado exitosamente el registro de tu servicio. Ahora puedes editarlo según tus necesidades.
+            </p>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h3 className="font-semibold text-blue-700 mb-2">Próximos pasos:</h3>
+              <ul className="text-sm text-gray-600 space-y-2">
+                <li className="flex items-start">
+                  <Check className="text-green-500 mr-2 mt-1 flex-shrink-0" size={16} />
+                  Revisa la información de tu servicio
+                </li>
+                <li className="flex items-start">
+                  <Check className="text-green-500 mr-2 mt-1 flex-shrink-0" size={16} />
+                  Actualiza tus detalles si es necesario
+                </li>
+                <li className="flex items-start">
+                  <Check className="text-green-500 mr-2 mt-1 flex-shrink-0" size={16} />
+                  Mantén tu perfil actualizado para atraer más clientes
+                </li>
+              </ul>
+            </div>
+          </CardContent>
+          <CardFooter className="bg-gray-50 p-6">
+            <div className="grid grid-cols-2 gap-4 w-full">
+              <Link href="/mi-panel" passHref className="w-full">
+                <Button variant="outline" className="w-full bg-transparent">
+                  <X className="mr-2" size={16} />
+                  Salir
+                </Button>
+              </Link>
+              <Link href="/mi-panel/editar-servicio" passHref className="w-full">
+                <Button variant="default" className="w-full">
+                  <Edit className="mr-2" size={16} />
+                  Editar Servicio
+                </Button>
+              </Link>
+            </div>
+          </CardFooter>
+        </Card>
+      </div>
+    )
   }
 
   return (
@@ -377,4 +426,3 @@ useEffect(() => {
     </div>
   )
 }
-

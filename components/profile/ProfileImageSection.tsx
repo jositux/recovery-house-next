@@ -105,9 +105,7 @@ export function ProfileImageSection({
 
   return (
     <div className="">
-      <h2 className="text-xl font-semibold mb-4 text-center">
-        Actualizar imagen de perfil
-      </h2>
+      
       <div className="max-w-xs mx-auto">
         <ProfileImageUploader
           onImageCropped={handleCroppedImage}

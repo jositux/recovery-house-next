@@ -9,6 +9,9 @@ import { Loader2, Home, Search } from "lucide-react";
 import { BookingCard } from "./components/booking-card";
 import { BookingCardPast } from "./components/booking-card-past";
 import { CancelBookingModal } from "./components/cancel-booking-modal";
+import { Fraunces } from "next/font/google";
+
+const fraunces = Fraunces({ subsets: ["latin"] });
 
 
 interface Photo {
@@ -439,9 +442,9 @@ const BookingList = () => {
         </main>
       ) : (
         <div className="space-y-12">
-          <h1 className="text-3xl font-bold mb-6 text-gray-900">
-            Reservas Recibidas
-          </h1>
+          <h1 className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}>
+          Reservas Recibidas
+              </h1>
 
           {(() => {
             const { upcoming, past } = separateBookingsByDate(bookings);
@@ -455,9 +458,9 @@ const BookingList = () => {
                         <div className="w-3 h-8 bg-gradient-to-b from-emerald-500 to-emerald-600 rounded-full"></div>
                       </div>
                       <div className="ml-4">
-                        <h2 className="text-2xl font-bold text-gray-900">
-                          Próximas Reservas
-                        </h2>
+                      <h2 className={`${fraunces.className} text-2xl font-normal text-[#162F40]`}>
+          Próximas Reservas
+              </h2>
                         <p className="text-gray-600">
                           Reservas activas y futuras ({upcoming.length})
                         </p>
@@ -488,9 +491,9 @@ const BookingList = () => {
                         <div className="w-3 h-8 bg-gradient-to-b from-gray-400 to-gray-500 rounded-full"></div>
                       </div>
                       <div className="ml-4">
-                        <h2 className="text-2xl font-bold text-gray-700">
-                          Reservas Pasadas
-                        </h2>
+                      <h2 className={`${fraunces.className} text-2xl font-normal text-[#162F40]`}>
+          Reservas Pasadas
+              </h2>
                         <p className="text-gray-500">
                           Historial de estadías completadas ({past.length})
                         </p>

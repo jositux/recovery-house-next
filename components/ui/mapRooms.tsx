@@ -116,7 +116,7 @@ export function MapRooms({ markers }: MapProps) {
               <X size={16} />
             </button>
 
-            <Link href={`/propiedades/${selectedMarker.id}`} className="block">
+            <Link href={`/mi-panel/propiedades/${selectedMarker.id}`} className="block">
               {selectedMarker.image && (
                 <div className="w-full aspect-[16/9]">
                   <Image

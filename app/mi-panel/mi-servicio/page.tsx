@@ -7,13 +7,26 @@ import { getCurrentUser } from "@/services/userService"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle, AlertCircle, Phone, Mail, MapPin, FileText, Pencil, Building2 } from "lucide-react"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { CheckCircle, AlertCircle, Phone, Mail, MapPin, FileText, Pencil, Building2/*, Trash2*/ } from "lucide-react"
+import { Fraunces } from "next/font/google"
 
+const fraunces = Fraunces({ subsets: ["latin"] })
 export default function ProviderDataPage() {
   const router = useRouter()
   const [providers, setProviders] = useState<Provider[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [providerToDelete, setProviderToDelete] = useState<string | null>(null)
+
 
   useEffect(() => {
     const checkAuthAndFetchData = async () => {
@@ -39,6 +52,32 @@ export default function ProviderDataPage() {
     checkAuthAndFetchData()
   }, [router])
 
+ {/* const handleDeleteService = (providerId: string) => {
+    setProviderToDelete(providerId)
+    setShowDeleteDialog(true)
+  }*/}
+
+  const confirmDelete = async () => {
+    if (!providerToDelete) return
+
+    try {
+      // TODO: Implement actual delete API call
+      console.log("Deleting provider:", providerToDelete)
+      // After successful deletion, refresh the providers list
+      setShowDeleteDialog(false)
+      setProviderToDelete(null)
+      // Refresh data
+      const token = localStorage.getItem("access_token")
+      if (token) {
+        const currentUser = await getCurrentUser(token)
+        const data = await getProvidersByUserId(currentUser.id, token)
+        setProviders(data)
+      }
+    } catch (error) {
+      console.error("Error al eliminar el servicio:", error)
+    }
+  }
+
   if (loading) {
     return <div className="flex justify-center items-center h-screen">Cargando...</div>
   }
@@ -61,7 +100,7 @@ export default function ProviderDataPage() {
                 Aún no has registrado ningún servicio
               </h1>
               <p className="text-base text-gray-600 max-w-md mx-auto">
-              Registra tu servicio y comienza a brindar apoyo a quienes lo necesitan.
+                Registra tu servicio para pacientes y comienza a recibir reservas.
               </p>
             </div>
 
@@ -80,24 +119,32 @@ export default function ProviderDataPage() {
   }
 
   return (
-    <div className="container min-h-screen mx-auto p-4 py-16">
-      <h1 className="text-3xl font-bold mb-6">Mi Servicio</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="container min-h-screen mx-auto p-4 py-8">
+       <h1 className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}>
+                    Mi Servicio
+              </h1>
+      <div className="space-y-6">
         {providers.map((provider) => (
-          <Card key={provider.id} className="overflow-hidden relative">
-            <CardHeader className="bg-gradient-to-r from-blue-500 to-[#39759E] text-white">
-              <CardTitle className="text-xl">{provider.name}</CardTitle>
-              <div className="flex items-center">
-                <Mail className="w-4 h-4 mr-2 text-white" />
-                <span>{provider.email}</span>
+          <Card key={provider.id} className="overflow-hidden border-gray-200">
+            <CardHeader className="bg-gray-50 border-b">
+              <div className="flex items-start justify-between">
+                <div className="space-y-2">
+                  <CardTitle className={`${fraunces.className} text-2xl font-normal text-[#162F40] mb-4`}>{provider.name}</CardTitle>
+                  <div className="flex items-center text-gray-600">
+                    <Mail className="w-4 h-4 mr-2" />
+                    <span>{provider.email}</span>
+                  </div>
+                </div>
+             
               </div>
             </CardHeader>
             <CardContent className="p-6">
-              <p className="text-gray-600 mb-4">{provider.description}</p>
+              <p className="text-gray-600 mb-6">{provider.description}</p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <p className="font-semibold">Tax ID/EIN: {provider.taxIdEIN}</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-gray-500">Tax ID/EIN</p>
+                  <p className="font-semibold text-gray-900">{provider.taxIdEIN}</p>
                   {provider.taxIdApproved ? (
                     <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
                       <CheckCircle className="w-3 h-3 mr-1" />
@@ -110,48 +157,84 @@ export default function ProviderDataPage() {
                     </Badge>
                   )}
                 </div>
-                <div className="space-y-2">
-                  <div className="flex items-center">
-                    <Phone className="w-4 h-4 mr-2 text-gray-500" />
-                    <span>{provider.phone}</span>
-                  </div>
 
-                  <div className="flex items-center">
-                    <MapPin className="w-4 h-4 mr-2 text-gray-500" />
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500 mb-1">Teléfono</p>
+                    <div className="flex items-center text-gray-900">
+                      <Phone className="w-4 h-4 mr-2 text-gray-400" />
+                      <span>{provider.phone}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm font-medium text-gray-500 mb-1">Ubicación</p>
+                  <div className="flex items-center text-gray-900">
+                    <MapPin className="w-4 h-4 mr-2 text-gray-400" />
                     <span>{`${provider.city}, ${provider.state}, ${provider.country}`}</span>
                   </div>
                 </div>
               </div>
 
-              <div>
-                <p className="font-semibold mb-2">Archivos cargados:</p>
-                <div className="space-y-2">
-                  <div className="flex items-center">
-                    <FileText className="w-4 h-4 mr-2 text-gray-500" />
-                    <span>RNT: {provider.RNTFile ? provider.RNTFile.filename_download : "No cargado"}</span>
+              <div className="border-t pt-6">
+                <p className="text-sm font-medium text-gray-500 mb-3">Archivos cargados</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+                    <FileText className="w-4 h-4 mr-2 text-gray-400" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">RNT</p>
+                      <p className="text-xs text-gray-500">
+                        {provider.RNTFile ? provider.RNTFile.filename_download : "No cargado"}
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex items-center">
-                    <FileText className="w-4 h-4 mr-2 text-gray-500" />
-                    <span>
-                      Tax ID/EIN: {provider.taxIdEINFile ? provider.taxIdEINFile.filename_download : "No cargado"}
-                    </span>
+                  <div className="flex items-center p-3 bg-gray-50 rounded-lg">
+                    <FileText className="w-4 h-4 mr-2 text-gray-400" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">Tax ID/EIN</p>
+                      <p className="text-xs text-gray-500">
+                        {provider.taxIdEINFile ? provider.taxIdEINFile.filename_download : "No cargado"}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-              <Button
-                variant="outline"
-                className="absolute bottom-4 right-4 bg-transparent"
-                onClick={() => {
-                  router.push("/editar-servicio")
-                }}
-              >
-                <Pencil className="h-4 w-4 mr-2" />
-                Editar
-              </Button>
+
+              <div className="flex justify-end mt-8 gap-2">
+                  <Button variant="outline" size="sm" onClick={() => router.push("/mi-panel/editar-servicio")}>
+                    <Pencil className="h-4 w-4 mr-2" />
+                    Editar
+                  </Button>
+                  {/*<Button variant="destructive" size="sm" onClick={() => handleDeleteService(provider.id)}>
+                    <Trash2 className="h-4 w-4" />
+                    
+                  </Button>*/}
+                </div>
             </CardContent>
           </Card>
         ))}
       </div>
+
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>¿Eliminar servicio?</DialogTitle>
+            <DialogDescription>
+              Esta acción eliminará permanentemente tu servicio y cancelará cualquier suscripción activa. Esta acción no
+              se puede deshacer.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete}>
+              Eliminar servicio
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

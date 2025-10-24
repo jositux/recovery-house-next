@@ -65,7 +65,7 @@ const PropertiesPage: React.FC = () => {
   }
 
   return (
-    <div className="container min-h-screen mx-auto py-16 px-4 md:px-6 lg:px-8">
+    <div className="container min-h-screen mx-auto py-16 md:px-6 lg:px-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Mis Propiedades</h1>
         <Link href="/registrar-propiedad">

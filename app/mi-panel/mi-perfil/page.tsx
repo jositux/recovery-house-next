@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
+import { Fraunces } from "next/font/google"
+
+const fraunces = Fraunces({ subsets: ["latin"] })
 
 // Import the new ProfileImageSection component
 import { ProfileImageSection } from "@/components/profile/ProfileImageSection";
@@ -189,8 +192,12 @@ export default function CombinedProfilePage() {
   }
 
   return (
-    <div className="container mx-auto max-w-2xl py-16 px-4">
+    <div className="container mx-auto max-w-2xl py-4 px-4">
+      <h1 className={`${fraunces.className} text-3xl font-normal text-center text-[#162F40] mb-8`}>
+                   Mi perfil
+              </h1>
       <div className="flex flex-col gap-8 max-w-3xl mx-auto">
+      
         {/* Profile Image Section - Using our new reusable component */}
         {user && accessToken && (
           <ProfileImageSection 

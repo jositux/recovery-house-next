@@ -22,6 +22,9 @@ import {
   propertyUpdateService,
   type PropertyData,
 } from "@/services/propertyUpdateService";
+import { Fraunces } from "next/font/google"
+
+const fraunces = Fraunces({ subsets: ["latin"] })
 
 
 
@@ -241,8 +244,10 @@ export default function EditPropertyPage({
 
   return (
     <div className="min-h-screen bg-[#F8F8F7]">
-      <div className="container mx-auto max-w-2xl py-16 px-4">
-        <h1 className="text-3xl font-bold mb-6">Edita tu propiedad</h1>
+      <div className="container mx-auto max-w-2xl py-4 px-4">
+      <h1 className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}>
+                   Editar Propiedad
+              </h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <div className="space-y-4 p-4 bg-white rounded-xl">
