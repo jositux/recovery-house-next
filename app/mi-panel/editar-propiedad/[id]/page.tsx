@@ -626,7 +626,7 @@ export default function EditPropertyPage({
                 ) : (
                   <>
                     <Save />
-                    GUARDAR PROPIEDAD
+                    GUARDAR
                   </>
                 )}
               </Button>
