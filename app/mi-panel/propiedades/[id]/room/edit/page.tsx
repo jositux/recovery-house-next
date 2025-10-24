@@ -7,6 +7,9 @@ import {
   roomUpdateService,
   type RoomUpdateData,
 } from "@/services/RoomUpdateService4";
+import { Fraunces } from "next/font/google"
+
+const fraunces = Fraunces({ subsets: ["latin"] })
 
 //import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
@@ -137,7 +140,10 @@ export default function RoomPage() {
   return (
     <div className="min-h-screen bg-[#F8F8F7]">
       <div className="container mx-auto max-w-2xl py-4 px-4">
-        <h1 className="text-2xl font-bold mb-6">Editar Habitación / Cama</h1>
+      <h1 className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}>
+      Editar Habitación / Cama
+              </h1>
+       
         <div className="grid gap-6 mx-auto">
           <div className="container">
             <RoomForm

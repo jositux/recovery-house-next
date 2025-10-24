@@ -28,7 +28,7 @@ const fraunces = Fraunces({ subsets: ["latin"] })
 
 
 
-import { Building2, Home, Save } from "lucide-react";
+import { Building2, Home, Save, X } from "lucide-react";
 
 import { MultiSelectCase } from "@/components/MultiSelectCase";
 
@@ -233,6 +233,12 @@ export default function EditPropertyPage({
       setIsSubmitting(false);
     }
   };
+
+  const handleCancel = () => {
+    if (property) {
+      router.push(`/mi-panel/propiedades/${property.id}`)
+    }
+  }
 
   if (loading) {
     return <p className="text-center p-4">Cargando datos de la propiedad...</p>;
@@ -597,24 +603,34 @@ export default function EditPropertyPage({
 
            
 
-            <Button
-              type="submit"
-              className="w-full mx-auto bg-[#39759E] px-6 py-5 rounded-lg text-white font-medium hover:bg-[#3a5a77] transition-colors flex items-center justify-center gap-2"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <>
-                  <Save className="animate-spin" />{" "}
-                  {/* Icono de guardar con animación de giro */}
-                  GUARDANDO...
-                </>
-              ) : (
-                <>
-                  <Save /> {/* Icono de guardar */}
-                  GUARDAR PROPIEDAD
-                </>
-              )}
-            </Button>
+            <div className="flex gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1 px-6 py-5 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 bg-transparent"
+                onClick={handleCancel}
+              >
+                <X />
+                CANCELAR
+              </Button>
+              <Button
+                type="submit"
+                className="flex-1 bg-[#39759E] px-6 py-5 rounded-lg text-white font-medium hover:bg-[#3a5a77] transition-colors flex items-center justify-center gap-2"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Save className="animate-spin" />
+                    GUARDANDO...
+                  </>
+                ) : (
+                  <>
+                    <Save />
+                    GUARDAR PROPIEDAD
+                  </>
+                )}
+              </Button>
+            </div>
           </form>
         </Form>
       </div>
