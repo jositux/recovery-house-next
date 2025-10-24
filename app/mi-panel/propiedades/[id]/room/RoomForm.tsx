@@ -761,7 +761,7 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
 
         <div className="flex gap-4 mt-4 p-4 md:p-0">
           <Link
-            href={`/propiedades/${initialValues?.propertyId}/`}
+            href={`/mi-panel/propiedades/${initialValues?.propertyId}/`}
             className="flex-1 w-full"
           >
             <Button
