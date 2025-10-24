@@ -117,55 +117,69 @@ export function ProfileImageCropper({
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTitle></DialogTitle>
-      <DialogContent className="p-0 gap-0 max-w-[90vw] max-h-[90vh] w-auto h-auto">
-        <div className="p-6 w-full h-full flex items-center justify-center overflow-auto">
-          <ReactCrop
-            crop={crop}
-            onChange={(_, percentCrop) => setCrop(percentCrop)}
-            onComplete={(c) => onCropComplete(c)}
-            aspect={aspect}
-            className="max-w-full max-h-full"
-          >
-            <img
-              ref={imgRef}
-              alt="Image Cropper"
-              src={selectedFile?.preview || "/placeholder.svg"}
-              onLoad={onImageLoad}
-              style={{
-                maxWidth: "100%",
-                maxHeight: "70vh",
-                width: "auto",
-                height: "auto",
-              }}
-            />
-          </ReactCrop>
-        </div>
-        <DialogFooter className="p-6 pt-0 justify-center">
-          <DialogClose asChild>
-            <Button
-              size={"sm"}
-              type="reset"
-              className="w-fit"
-              variant={"outline"}
-              onClick={handleCancel}
-            >
-              <Trash2Icon className="mr-1.5 size-4" />
-              Cancelar
-            </Button>
-          </DialogClose>
-          <Button
-            type="submit"
-            size={"sm"}
-            className="w-fit"
-            onClick={handleCrop}
-          >
-            <CropIcon className="mr-1.5 size-4" />
-            Recortar
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+  <DialogTitle></DialogTitle>
+  <DialogContent
+    className="
+      p-0 gap-0 
+      w-full h-auto 
+      max-w-[90vw] max-h-[90vh] 
+      sm:max-w-[600px] md:max-w-[800px] lg:max-w-[900px]
+      rounded-lg
+    "
+  >
+    <div className="p-4 sm:p-6 w-full h-full flex items-center justify-center overflow-auto">
+      <ReactCrop
+        crop={crop}
+        onChange={(_, percentCrop) => setCrop(percentCrop)}
+        onComplete={(c) => onCropComplete(c)}
+        aspect={aspect}
+        className="max-w-full max-h-full"
+      >
+        <img
+          ref={imgRef}
+          alt="Image Cropper"
+          src={selectedFile?.preview || "/placeholder.svg"}
+          onLoad={onImageLoad}
+          style={{
+            maxWidth: "100%",
+            maxHeight: "70vh",
+            width: "auto",
+            height: "auto",
+          }}
+        />
+      </ReactCrop>
+    </div>
+    <DialogFooter
+  className="
+  flex flex-row justify-end gap-2 p-4 sm:p-6 pt-0
+  "
+>
+  <DialogClose asChild>
+    <Button
+      size="sm"
+      type="reset"
+      className="w-fit"
+      variant="outline"
+      onClick={handleCancel}
+    >
+      <Trash2Icon className="mr-1.5 size-4" />
+      Cancelar
+    </Button>
+  </DialogClose>
+  <Button
+    type="submit"
+    size="sm"
+    className="w-fit"
+    onClick={handleCrop}
+  >
+    <CropIcon className="mr-1.5 size-4" />
+    Recortar
+  </Button>
+</DialogFooter>
+
+  </DialogContent>
+</Dialog>
+
   );
 }
 

@@ -11,13 +11,16 @@ import { MapPin, Plus, Loader2, BedDouble, Building2, CheckCircle, AlertCircle }
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { Fraunces } from "next/font/google"
 
+const fraunces = Fraunces({ subsets: ["latin"] })
 
 const PropertiesPage: React.FC = () => {
   const router = useRouter()
   const [properties, setProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
+ 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -68,7 +71,7 @@ const PropertiesPage: React.FC = () => {
   }
 
   return (
-    <div className="container min-h-screen mx-auto py-4 px-4 md:px-6 lg:px-8">
+    <div className="container min-h-screen mx-auto py-4 md:px-6 lg:px-8">
       
 
       {properties.length === 0 ? (
@@ -103,7 +106,9 @@ const PropertiesPage: React.FC = () => {
       ) : (
         <div>
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Mis Propiedades</h1>
+        <h1 className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}>
+                    Mis Propiedades
+              </h1>
         <Link href="/mi-panel/registrar-propiedad" className="w-full sm:w-auto">
           <Button className="w-full sm:w-auto bg-[#39759E] text-white hover:bg-[#2c5a7a] transition-colors duration-300">
             <Plus className="mr-2 h-5 w-5" /> Nueva Propiedad
@@ -129,11 +134,10 @@ const PropertiesPage: React.FC = () => {
                 <CardContent className="flex-1 p-4 flex flex-col justify-between">
                   <div>
                     <div className="flex justify-between items-start mb-2">
-                      <h2 className="text-xl font-semibold text-gray-900 line-clamp-1">{property.name}</h2>
-                      {/*<div className="flex items-center">
-                        <Star className="h-4 w-4 text-yellow-400 mr-1" />
-                        <span className="text-sm font-medium">4.9</span>
-          </div>*/}
+                    <h2 className={`${fraunces.className} text-2xl font-normal text-[#162F40] mb-4`}>
+                    {property.name}
+              </h2>
+                 
                     </div>
                     <p className="text-sm text-gray-500 mb-2 flex items-center">
                       <MapPin className="h-4 w-4 mr-1" />

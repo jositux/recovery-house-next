@@ -65,12 +65,15 @@ export function MultiSelectCase({ value, onChange }: MultiSelectButtonsProps) {
               <h3 className="font-normal text-sm py-2">{procedure.name}</h3>
             </div>
             <div
-              className={`flex-shrink-0 w-5 h-5 rounded-full border-[1px] flex items-center mt-2 justify-center ${
-                safeValue.includes(procedure.name) ? "border-[#39759E] bg-[#39759E]" : "border-gray-300"
-              }`}
-            >
-              {safeValue.includes(procedure.name) && <Check className="w-3 h-3 text-white" />}
-            </div>
+  className={`
+    hidden sm:flex 
+    flex-shrink-0 w-5 h-5 rounded-full border-[1px] flex items-center mt-2 justify-center 
+    ${safeValue.includes(procedure.name) ? "border-[#39759E] bg-[#39759E]" : "border-gray-300"}
+  `}
+>
+  {safeValue.includes(procedure.name) && <Check className="w-3 h-3 text-white" />}
+</div>
+
           </div>
         </button>
       ))}

@@ -62,7 +62,7 @@ export default function WelcomePage() {
 
         <CardFooter className="flex flex-col sm:flex-row gap-4 p-6 bg-gray-50">
           <Button asChild className="w-full sm:w-auto bg-[#39759E] hover:bg-blue-600 text-white">
-            <Link href="/registrar-propiedad" className="flex items-center justify-center">
+            <Link href="/mi-panel/registrar-propiedad" className="flex items-center justify-center">
               Registrar mi propiedad
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>

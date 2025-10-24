@@ -58,7 +58,7 @@ export default function DashboardLayout({
       <DesktopSidebar userName={userName} onLogout={handleLogout} />
 
       {/* Contenido principal */}
-      <main className="flex-1 p-4 pt-16 lg:p-8 lg:pt-8">{children}</main>
+      <main className="flex-1 p-4 pt-4 md:pt-16 lg:p-8 lg:pt-8">{children}</main>
     </div>
   )
 }

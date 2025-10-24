@@ -13,6 +13,9 @@ import ImageUpload from "@/components/CoverPhotoUpload"
 import { LocationSelector } from "@/components/ui/location-selector"
 import { UserTypeCard } from "@/components/ui/user-type-card"
 import { useRouter } from "next/navigation"
+import { Fraunces } from "next/font/google"
+
+const fraunces = Fraunces({ subsets: ["latin"] })
 
 //import type { LocationDetails } from "@/components/OSMSelector"
 //import dynamic from "next/dynamic"
@@ -165,7 +168,11 @@ export default function RegisterPropertyBasePage() {
   return (
     <div className="min-h-screen bg-[#F8F8F7]">
       <div className="container mx-auto max-w-2xl py-4 px-4">
-        <h1 className="text-3xl font-bold mb-6">Registra tu propiedad</h1>
+      <h1
+            className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-8`}
+          >
+            Registra tu propiedad
+          </h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="space-y-4 p-4 bg-white rounded-xl">
@@ -523,7 +530,7 @@ export default function RegisterPropertyBasePage() {
                             rel="noopener noreferrer"
                             className="text-[#39759E] hover:text-[#3a5a77] underline font-medium"
                           >
-                            términos y condiciones de la plataforma
+                            Términos y Condiciones de la Plataforma
                           </a>
                         </FormLabel>
                       </div>
