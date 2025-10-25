@@ -647,7 +647,7 @@ const BookingList = () => {
           <h1
             className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}
           >
-            Reservas Realizadas
+            Mis Reservas
           </h1>
 
           {(() => {

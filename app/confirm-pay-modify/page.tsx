@@ -57,9 +57,6 @@ export default function NewConfirmAndPay() {
   };
   
 
-  const getCurrentIsoTime = () =>
-    new Date().toISOString().split("T")[1].split(".")[0] + "Z";
-
   // 🔹 Montos
   const getSubtotal = (b: BookingData) => b.nights * b.guests * b.price;
   const getBaseAmount = (b: BookingData) =>

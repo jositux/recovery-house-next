@@ -89,7 +89,7 @@ export function MenuProfile({ name }: ProfileMenuProps) {
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
             <Link href="/mi-panel/reservas-realizadas" className="flex items-center gap-2" onClick={closeMenu}>
               <CalendarClock className="w-4 h-4" />
-              Reservas realizadas
+              Mis Reservas
             </Link>
           </li>
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
