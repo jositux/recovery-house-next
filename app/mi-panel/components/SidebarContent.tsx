@@ -35,7 +35,7 @@ export function SidebarContent({ userName, onLogout, onNavigate }: SidebarConten
       icon: Building2,
     },
     {
-      name: "Reservas realizadas",
+      name: "Mis Reservas",
       href: "/mi-panel/reservas-realizadas",
       icon: CalendarArrowUp,
     },
