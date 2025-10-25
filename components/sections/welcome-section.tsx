@@ -8,7 +8,7 @@ export function WelcomeSection() {
     <div className="container mx-auto py-16 px-4">
       <div className="flex flex-col sm:flex-row w-full">
         <div className={styles.pWelcome}>
-          <h2 className={`${fraunces.className} text-3xl text-[#162F40]`}>
+          <h2 className={`${fraunces.className} text-4xl text-[#162F40]`}>
             ¡Bienvenido a Recovery Care Solutions!
           </h2>
         </div>

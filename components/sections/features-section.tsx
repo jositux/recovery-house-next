@@ -31,12 +31,18 @@ export function FeaturesSection() {
   return (
     <section className="py-16 bg-white">
       <div className="container mx-auto px-4 lg:px-0">
-        <div className="max-w-3xl mx-auto text-center mb-12">
-          <h2
-            className={`${fraunces.className} text-3xl md:text-4xl text-[#162F40] mb-4`}
-          >
-            Encuentra la mejor opción para tu recuperación
-          </h2>
+        <div className="max-w-3xl mx-auto md:text-center mb-12">
+        <h2
+  className={`${fraunces.className} text-3xl sm:text-6xl md:hidden text-[#162F40] mb-4`}
+>
+  Encuentra la mejor<br/> opción para tu<br/> recuperación
+</h2>
+
+<h2
+  className={`${fraunces.className} hidden md:block text-4xl sm:text-4xl text-[#162F40] mb-4`}
+>
+  Encuentra la mejor opción<br />para tu recuperación
+</h2>
           <p className="text-[#162F40]">
             En Recovery Care Solutions, te ofrecemos una plataforma fácil de
             usar donde podrás encontrar una amplia variedad de opciones de

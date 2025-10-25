@@ -13,7 +13,7 @@ interface FeatureCardProps {
 export function FeatureCard({ title, description, imageSrc }: FeatureCardProps) {
   return (
     <div className="flex flex-col gap-4">
-      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
+      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg mt-4">
         <Image
           src={imageSrc}
           alt={title}
@@ -21,7 +21,7 @@ export function FeatureCard({ title, description, imageSrc }: FeatureCardProps) 
           className="object-cover"
         />
       </div>
-      <h3 className={`${fraunces.className} text-2xl text-[#162F40]`}>{title}</h3>
+      <h3 className={`${fraunces.className} text-3xl md:text-xl text-[#162F40]`}>{title}</h3>
       <p className="text-[#162F40]">{description}</p>
     </div>
   )

@@ -277,7 +277,7 @@ export function BookingWidgetBed({
               selected={checkIn}
               onSelect={handleCheckInSelect}
               disabled={(date) => {
-                const isBeforeToday = date < today
+                const isBeforeToday = date <= today
                 return isBeforeToday || isDateReserved(date)
               }}
               defaultMonth={checkIn || today}
