@@ -248,8 +248,7 @@ export default function TermsAndConditionsPage() {
               <ul className="space-y-2 list-disc list-inside">
                 <li className="leading-relaxed">
                   Las anulaciones deben realizarse exclusivamente a través de la
-                  plataforma Recovery Care Solutions o mediante contacto directo
-                  con el equipo de soporte autorizado.
+                  plataforma.
                 </li>
                 <li className="leading-relaxed">
                   Los reembolsos aplicables se procesarán en un plazo máximo de
