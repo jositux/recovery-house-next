@@ -749,7 +749,7 @@ localStorage.setItem("bookingBalanced", JSON.stringify(newEntry))
                                         ) : (
                                           <>
                                             <BedSingle size={16} color="white" />
-                                            <span>1 cama simple</span>
+                                            <span>1 cama sencilla</span>
                                           </>
                                         )}
                                       </div>
@@ -976,7 +976,7 @@ localStorage.setItem("bookingBalanced", JSON.stringify(newEntry))
                                         ) : (
                                           <>
                                             <BedSingle size={16} color="white" />
-                                            <span>1 cama simple</span>
+                                            <span>1 cama sencilla</span>
                                           </>
                                         )}
                                       </div>

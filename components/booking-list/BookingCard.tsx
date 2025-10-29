@@ -149,7 +149,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
                 ) : (
                   <>
                     <BedSingle size={16} color="white" />
-                    <span>1 cama simple</span>
+                    <span>1 cama sencilla</span>
                   </>
                 )}
               </div>

@@ -60,7 +60,7 @@ export function RoomCardShared({
           {singleBedPrice > 0 && (
             <div className="text-base font-bold flex items-center space-x-1">
               <BedSingle size={16} />
-              <span>${singleBedPrice} <span className="text-sm font-normal">USD / noche (simple)</span></span>
+              <span>${singleBedPrice} <span className="text-sm font-normal">USD / noche (sencilla)</span></span>
               
             </div>
           )}

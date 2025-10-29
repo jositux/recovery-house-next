@@ -16,7 +16,7 @@ import { getExtraTags } from "@/services/extraTagsService"
 import { useRouter } from "next/navigation"
 import { getProvidersByUserId } from "@/services/providerCollectionService"
 import { getCurrentUser } from "@/services/userService"
-import { Loader2, Check, X, Edit } from "lucide-react"
+import { Loader2, Check, Eye, Edit } from "lucide-react"
 import Link from "next/link"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 
@@ -36,7 +36,7 @@ const formSchema = z.object({
   taxIdEINFile: z.string().refine((val) => val.length > 0, {
     message: "El archivo TAX ID es obligatorio.",
   }),
-  extraTags: z.array(z.string()).min(1, "Selecciona al menos un servicio."),
+  extraTags: z.array(z.string()),
   serviceTags: z.array(z.string()).default([]),
   subscriptionPrice: z.string().default(""),
   subscriptionType: z.string().default(""),
@@ -74,6 +74,7 @@ export default function RegisterServicePage() {
 
         if (data.length > 0) {
           setHasExistingService(true)
+         // router.push(`/mi-panel/mi-servicio`)
         }
       } catch (error) {
         console.error("Error al cargar los datos del proveedor:", error)
@@ -167,7 +168,7 @@ export default function RegisterServicePage() {
       }
 
       localStorage.setItem("new_service", JSON.stringify(providerData))
-      router.push(`/subscriptions`)
+      router.push(`/mi-panel/mi-servicio`)
     } catch (error) {
       console.error("Error al registrar el servicio:", error)
     } finally {
@@ -243,16 +244,16 @@ export default function RegisterServicePage() {
           </CardContent>
           <CardFooter className="bg-gray-50 p-6">
             <div className="grid grid-cols-2 gap-4 w-full">
-              <Link href="/mi-panel" passHref className="w-full">
+              <Link href="/mi-panel/mi-servicio" passHref className="w-full">
                 <Button variant="outline" className="w-full bg-transparent">
-                  <X className="mr-2" size={16} />
-                  Salir
+                  <Eye className="mr-2" size={16} />
+                 Ver
                 </Button>
               </Link>
               <Link href="/mi-panel/editar-servicio" passHref className="w-full">
                 <Button variant="default" className="w-full">
                   <Edit className="mr-2" size={16} />
-                  Editar Servicio
+                  Editar
                 </Button>
               </Link>
             </div>

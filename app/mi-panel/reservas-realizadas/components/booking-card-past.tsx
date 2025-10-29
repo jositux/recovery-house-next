@@ -283,7 +283,7 @@ export const BookingCardPast = ({
         ) : (
           <>
             <BedSingle size={14} color="white" />
-            <span>1 cama simple</span>
+            <span>1 cama sencilla</span>
           </>
         )}
       </div>

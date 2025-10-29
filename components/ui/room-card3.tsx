@@ -51,7 +51,7 @@ export function RoomCardShared({
     <BedDouble size={16} color="#333" />
   )}
   <span className="text-sm text-gray-800">
-    1 Cama {bedType === "single" ? "Simple" : "Doble"}
+    1 Cama {bedType === "single" ? "Sencilla" : "Doble"}
   </span>
 </div>
         </div>
