@@ -115,7 +115,7 @@ export default function CalendarPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-4 flex flex-col items-center">
+    <main className="min-h-screen py-4 flex flex-col items-center">
       {loading ? (
         <div className="flex justify-center items-center h-screen">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />

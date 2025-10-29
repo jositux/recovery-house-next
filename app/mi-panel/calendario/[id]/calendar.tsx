@@ -739,7 +739,7 @@ export default function CalendarView({
                   disabled={isLoading}
                 >
                   <Save className="h-5 w-5" />
-                  {isLoading ? "Guardando Calendario..." : "Guardar Calendario"}
+                  {isLoading ? "Guardando..." : "Guardar"}
                 </Button>
               </div>
             </CardContent>
