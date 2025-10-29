@@ -49,7 +49,7 @@ export function RoomHeader({ roomName, propertyName, isPrivate, bedName, beds, c
           ) : (
             <div className="flex items-center">
               <BedSingle className="w-5 h-5 mr-2" />
-              <span>1 cama simple</span>
+              <span>1 cama sencilla</span>
             </div>
           )}
         </div>

@@ -298,7 +298,7 @@ export default function BookingCompartidaAirbnb({
 
         {checkIn && checkOut && (
           <span className="text-sm text-blue-600 mb-2">
-            Disponibles: {getAvailableBedsInRange.singleBeds - singleBeds} simple
+            Disponibles: {getAvailableBedsInRange.singleBeds - singleBeds} sencilla
             {getAvailableBedsInRange.singleBeds - singleBeds !== 1 ? "s" : ""},{" "}
             {getAvailableBedsInRange.doubleBeds - doubleBeds} doble
             {getAvailableBedsInRange.doubleBeds - doubleBeds !== 1 ? "s" : ""}
@@ -313,7 +313,7 @@ export default function BookingCompartidaAirbnb({
               <div className="flex-1">
                 <Label className="flex items-center gap-2 text-[#162F40]">
                   <Bed className="h-4 w-4 text-[#39759E]" />
-                  <span className="font-medium text-sm">Camas simples</span>
+                  <span className="font-medium text-sm">Camas sencillas</span>
                 </Label>
                 <div className="text-xs text-muted-foreground pl-6">
                   ${Math.floor(singleBedPrice).toLocaleString("es-CO")}/noche + $
@@ -396,7 +396,7 @@ export default function BookingCompartidaAirbnb({
               <div className="flex justify-between items-center text-sm">
                 <span className="text-[#162F40]">
                   {singleBeds} cama
-                  {singleBeds > 1 ? "s" : ""} simple{singleBeds > 1 ? "s" : ""} × {nights} noche
+                  {singleBeds > 1 ? "s" : ""} sencilla{singleBeds > 1 ? "s" : ""} × {nights} noche
                   {nights > 1 ? "s" : ""}
                 </span>
                 <span className="font-semibold">

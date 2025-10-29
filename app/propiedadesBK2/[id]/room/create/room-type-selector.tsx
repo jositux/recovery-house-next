@@ -261,7 +261,7 @@ export default function RoomTypeSelector({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="single">Cama Simple</SelectItem>
+                      <SelectItem value="single">Cama Sencilla</SelectItem>
                       <SelectItem value="double">Cama Doble</SelectItem>
                     </SelectContent>
                   </Select>
