@@ -1,31 +1,40 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { useParams, useRouter } from "next/navigation"
+import { useParams } from "next/navigation"
 import axios from "axios"
+import { Edit, AlertCircle, Bed, Users, Clock, Percent, CreditCard } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { BookingWidget } from "@/components/ui/booking-widget-private"
 import { BookingWidgetBed } from "@/components/ui/booking-widget-bed"
+import { ServiceProviderCard } from "@/components/ui/service-provider-card"
+import { GoogleMap } from "@/components/ui/google-map"
+import { Fraunces } from "next/font/google"
 import { getExtraTags } from "@/services/extraTagsService"
 import useTags from "@/hooks/useExtraTags"
+import { CollectionExtraTags } from "@/components/collectionExtraTagsRoom"
+import { MagicBackButton } from "@/components/ui/magic-back-button"
+import { PopupSwiperGallery } from "./popup-swiper-gallery"
+import { BedSingle, BedDouble } from "lucide-react"
+import { Calendar } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { fetchCurrentUser } from "@/services/BookingService"
 import { fetchUserById } from "@/services/UserById"
+import { useRouter } from "next/navigation"
 import { fetchStayData, type Stay } from "@/services/stayService"
-
-import { RoomHero } from "./components/room-hero"
-import { RoomHeader } from "./components/room-header"
-import { SharedBedAlert } from "./components/shared-bed-alert"
-import { RoomDescription } from "./components/room-description"
-import { PoliciesCard } from "./components/policies-card"
-import { PolicyDialogButtons } from "./components/policy-dialog-buttons"
-import { HostInfoSection } from "./components/host-info-section"
-import { LocationSection } from "./components/location-section"
-import { ServiceProvidersSection } from "./components/service-providers-section"
 import { HostProfile } from "@/components/rating/HostProfile"
 import { ReviewsModal } from "@/components/rating/ReviewsModal"
 import { Button } from "@/components/ui/button"
-
-import { Fraunces } from "next/font/google"
-import { CollectionExtraTags } from "@/components/collectionExtraTagsRoom"
+import { CancellationPolicyDialogContent } from "./components/cancellation-policy-dialog-content"
+import { ModificationPolicyDialogContent } from "./components/modification-policy-dialog-content"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 
 const fraunces = Fraunces({ subsets: ["latin"] })
 
@@ -63,7 +72,6 @@ interface RoomTag {
   Room_id: string
   ExtraTags_id: string
 }
-
 
 type ImageRoom = {
   directus_files_id: {
@@ -188,7 +196,6 @@ const calculateAverage = (ranking: Ranking): number => {
 
 export default function RoomPage() {
   const { id } = useParams()
-  const router = useRouter()
 
   const [room, setRoom] = useState<Room | null>(null)
   const [property, setProperty] = useState<Property | null>(null)
@@ -196,21 +203,29 @@ export default function RoomPage() {
   const [serviceProviders, setServiceProviders] = useState<ServiceProvider[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [showReviews, setShowReviews] = useState(false)
-  const [currentUser, setCurrentUser] = useState<{ id: string; first_name: string; last_name: string } | null>(null)
-  const [discountData, setDiscountData] = useState<DiscountData | null>(null)
-  const [filteredBookings, setFilteredBookings] = useState<Booking[]>([])
-  const [imagesSwiper, setImagesSwiper] = useState<{ src: string; alt: string }[]>([])
+
+  const [reviews, setReviews] = useState<Review[]>([])
+  //const [isLoadingReviews, setIsLoadingReviews] = useState(false)
 
   const { extraTags } = useTags("extraTags", getExtraTags)
 
+  const router = useRouter()
 
-    const [reviews, setReviews] = useState<Review[]>([])
+  interface User {
+    id: string
+    first_name: string
+    last_name: string
+  }
 
-    const averageRating =
+  const [currentUser, setCurrentUser] = useState<User | null>(null)
+
+  const [showReviews, setShowReviews] = useState(false)
+
+  const averageRating =
     reviews.length > 0 ? reviews.reduce((sum, review) => sum + calculateAverage(review.ranking), 0) / reviews.length : 0
 
   const totalReviews = reviews.length
+  //const hostName = "Valentino"
   const hostExperience = "4 meses de experiencia como anfitrión"
 
   const filterCurrentBookings = (bookings: Booking[]) => {
@@ -227,6 +242,8 @@ export default function RoomPage() {
     })
   }
 
+  const [filteredBookings, setFilteredBookings] = useState<Booking[]>([])
+
   useEffect(() => {
     setFilteredBookings(filterCurrentBookings(bookings))
   }, [bookings])
@@ -234,14 +251,19 @@ export default function RoomPage() {
   useEffect(() => {
     const fetchUser = async () => {
       const accessToken = localStorage.getItem("access_token")
-      if (!accessToken) return
+      if (!accessToken) {
+        return
+      }
 
       const user = await fetchCurrentUser(accessToken)
+      console.log(user)
       setCurrentUser(user)
     }
 
     fetchUser()
   }, [])
+
+  const [discountData, setDiscountData] = useState<DiscountData | null>(null)
 
   useEffect(() => {
     const accessToken = localStorage.getItem("access_token") ?? ""
@@ -283,74 +305,11 @@ export default function RoomPage() {
     loadData()
   }, [])
 
-  const getCurrentIsoTime = () =>
-  new Date().toISOString().split("T")[1].split(".")[0] + "Z";
-
   const handleReservation = async (data: BookingData) => {
     if (!currentUser) {
       console.error("User not loaded")
       router.push("/login")
       return
-    }
-
-    const checkInDate = new Date(data.checkIn)
-    const currentDate = new Date()
-    const diffTime = checkInDate.getTime() - currentDate.getTime()
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-
-    if (diffDays < 3) {
-      // If check-in is less than 3 days away, go directly to checkout
-      try {
-        const accessToken = localStorage.getItem("access_token")
-        if (!accessToken) throw new Error("Missing token")
-
-        const owner = await fetchUserById(accessToken, property?.userId ?? "")
-
-    
-
-        localStorage.removeItem("bookingData")
-       // localStorage.setItem("bookingData", JSON.stringify(formattedBookingData))
-
-        const formattedBooking = {
-          isPrivate: room?.isPrivate,
-          name: room?.name,
-          description: room?.description,
-          unit_amount: data.totalPrice,
-
-        room: room?.id,
-          patient: currentUser.id,
-          patientName: currentUser.first_name + " " + currentUser.last_name,
-          ownerId: property?.userId,
-          guests: data?.guests,
-          roomName: room?.name,
-          ownerName: owner.first_name + " - " + owner.last_name,
-          propertyName: property?.name,
-          photo: room?.photos[0].directus_files_id.id,
-          
-          checkInDateHour: data?.checkIn + "T" + getCurrentIsoTime(),
-          checkOutDateHour: data?.checkOut + "T" + getCurrentIsoTime(),
-          price: data?.price,
-          cleaning: data?.cleaning,
-          discountStayType: "short",
-          discountPercentageStayApplied: data?.discountPercentageStayApplied,
-          discountStayAmount: data?.discountStayAmount,
-          prepaymentPercentage: 10,
-          paymentAmount: data?.totalPrice,
-          paymentBalance: 0,
-          paymentType: "fullpayment",
-          finalPrice: data?.totalPrice,
-        }
-
-        localStorage.setItem("booking", JSON.stringify(formattedBooking))
-
-        // Redirect directly to checkout for urgent bookings
-        router.push(`/checkout`)
-        return
-      } catch (error) {
-        console.error("Error fetching usuario", error)
-        setError("Error al buscar el usuario")
-        return
-      }
     }
 
     try {
@@ -370,7 +329,7 @@ export default function RoomPage() {
         ownerName: owner.first_name + " - " + owner.last_name,
         propertyName: property?.name,
         description: room?.description,
-        photo: room?.photos[0].directus_files_id.id,
+        photo: room?.photos[0].directus_files_id.id
       }
 
       localStorage.removeItem("bookingData")
@@ -386,6 +345,7 @@ export default function RoomPage() {
       localStorage.setItem("booking", JSON.stringify(formattedBooking))
 
       router.push(`/confirm-pay?rel=${room?.id}`)
+
     } catch (error) {
       console.error("Error fetching usuario", error)
       setError("Error al buscar el usuario")
@@ -476,6 +436,7 @@ export default function RoomPage() {
         return
       }
 
+      //setIsLoadingReviews(true)
       try {
         const response = await axios.get("/webapi/items/Reviews", {
           params: {
@@ -493,6 +454,8 @@ export default function RoomPage() {
         setReviews(response.data.data || [])
       } catch (error) {
         console.error("Error fetching reviews:", error)
+      } finally {
+        //setIsLoadingReviews(false)
       }
     }
 
@@ -503,11 +466,14 @@ export default function RoomPage() {
     if (!image || !image.directus_files_id) {
       return "/assets/empty.jpg"
     }
-
+  
     return image.directus_files_id.isModerated
       ? "/assets/empty.jpg"
       : `/webapi/assets/${image.directus_files_id.id}?key=full`
   }, [])
+  
+
+  const [imagesSwiper, setImagesSwiper] = useState<{ src: string; alt: string }[]>([])
 
   useEffect(() => {
     if (room && room.photos) {
@@ -519,6 +485,16 @@ export default function RoomPage() {
       setImagesSwiper(swiperImages)
     }
   }, [room, getImageSrc])
+
+  type HtmlContentProps = {
+    html?: string | null
+  }
+
+  const HtmlContent = ({ html }: HtmlContentProps) => {
+    if (!html || html.trim() === "") return null
+
+    return <div className="prose" dangerouslySetInnerHTML={{ __html: html }} />
+  }
 
   if (isLoading) {
     return <div className="flex justify-center items-center h-screen">Cargando...</div>
@@ -532,46 +508,253 @@ export default function RoomPage() {
     )
   }
 
+  function formatTimeToAMPM(time: string): string {
+    const [hourStr, minute] = time.split(":")
+    let hour = Number.parseInt(hourStr, 10)
+    const ampm = hour >= 12 ? "PM" : "AM"
+    hour = hour % 12 || 12
+    return `${hour}:${minute} ${ampm}`
+  }
+
+  function formatDiscount(discount: string): string {
+    const num = Number.parseFloat(discount)
+    if (isNaN(num) || num === 0) {
+      return "Sin descuento"
+    }
+    return `${Math.round(num)}%`
+  }
+
   return (
     <div className="min-h-screen bg-white">
-      <RoomHero
-        imageSrc={getImageSrc(room.photos[0]) || "/assets/empty.jpg"}
-        propertyName={property.name}
-        images={imagesSwiper}
-      />
+      {/* Hero Image */}
+      <div className="relative h-[500px] w-full">
+        <img
+          src={getImageSrc(room.photos[0]) || "/assets/empty.jpg"}
+          alt={property.name}
+          className="w-full h-full object-cover"
+        />
+
+        <div className="absolute top-8 left-0 right-0 z-10">
+          <div className="container mx-auto px-4 lg:px-20">
+            <MagicBackButton />
+          </div>
+        </div>
+      </div>
+
+      {imagesSwiper.length > 1 && (
+        <div className="container relative mx-auto px-4 lg:px-20">
+          <div className="absolute left-20 bottom-8">
+            <PopupSwiperGallery images={imagesSwiper} buttonText="Ver todas las fotos" autoplay={true} />
+          </div>
+        </div>
+      )}
 
       {/* Content */}
       <div className="container mx-auto px-4 lg:px-20 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
-            <RoomHeader
-              roomName={room.name}
-              propertyName={property.name}
-              isPrivate={room.isPrivate}
-              bedName={room.bedName}
-              beds={room.beds}
-              capacity={room.capacity}
-              bedType={room.bedType}
-            />
+            {/* Title and Stats */}
+            <div className="mb-6">
+              <h1 className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}>
+                {room.isPrivate === false && room.bedName?.trim() ? `${room.bedName} - ` : ""}
+                {room.name}
+              </h1>
+              <p className="text-xl text-[#162F40] mb-4"> {property.name}</p>
+              {room.isPrivate === true && (
+                <div className="flex items-center space-x-4 text-[#162F40]">
+                  <div className="flex items-center">
+                    <Bed className="w-5 h-5 mr-2" />
+                    <span>
+                      {room.beds} {room.beds === 1 ? "cama en total" : "camas en total"}
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <Users className="w-5 h-5 mr-2" />
+                    <span>
+                      Capacidad: {room.capacity} {room.capacity === 1 ? "persona" : "personas"}
+                    </span>
+                  </div>
+                </div>
+              )}
 
-            {room.isPrivate === false && <SharedBedAlert />}
-
-            <RoomDescription description={room.description} />
-
-            <div className="grid gap-6 mt-6 mb-12">
-              <PoliciesCard
-                checkInHour={room.check_in_hour ?? "00:00:00"}
-                checkOutHour={room.check_out_hour ?? "00:00:00"}
-                mediumStayDiscount={room.discount_percentage_medium_stay ?? "0"}
-                longStayDiscount={room.discount_percentage_long_stay ?? "0"}
-                prepaymentPercentage={room.prepayment_percentage ?? "10"}
-                mediumStayRange={discountData?.mediumStayRange ?? { min: 6, max: 9 }}
-                longStayRange={discountData?.longStayRange ?? { min: 10, max: null }}
-              />
+              {room.isPrivate === false && (
+                <div className="flex items-center mt-4 space-x-4 text-[#162F40]">
+                  {room.bedType === "double" ? (
+                    <div className="flex items-center">
+                      <BedDouble className="w-5 h-5 mr-2" />
+                      <span>1 cama doble</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center">
+                      <BedSingle className="w-5 h-5 mr-2" />
+                      <span>1 cama simple</span>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
-            <PolicyDialogButtons />
+            {room.isPrivate === false && (
+              <Alert className="border-blue-200 bg-white/50 backdrop-blur-sm mb-6">
+                <AlertDescription className="text-gray-700 font-medium">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-blue-600" />
+                        NOTA:
+                      </h3>
+                      <p className="text-sm leading-relaxed">
+                        Esta cama se alquila de manera individual, lo que significa que reservás un lugar dentro de una
+                        habitación compartida. Esta modalidad es ideal para quienes buscan una opción económica y están
+                        abiertos a compartir el espacio con otras personas.
+                      </p>
+                    </div>
+                  </div>
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Description */}
+            <div className="mb-8">
+              <p className="text-[#162F40]">
+                <HtmlContent html={room.description} />
+              </p>
+            </div>
+
+            <div className="grid gap-6 mt-6 mb-12">
+              {/* Check-in/Check-out Times */}
+              <Card className="w-full max-w-3xl shadow-lg border-0 bg-gradient-to-br from-slate-50 to-white">
+                <CardHeader className="pb-6">
+                  <CardTitle className="text-2xl font-bold text-slate-800">Políticas del hospedaje</CardTitle>
+                  <p className="text-slate-600 mt-2">Información importante sobre horarios, descuentos y pagos</p>
+                </CardHeader>
+
+                <CardContent className="space-y-6">
+                  {/* Check-in/Check-out Section */}
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                      <div className="flex-shrink-0">
+                        <Clock className="h-6 w-6 text-blue-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-slate-800">Horario de Entrada</h3>
+                        <p className="text-lg font-bold text-blue-600">
+                          {formatTimeToAMPM(room.check_in_hour ?? "00:00:00")}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-3 p-4 bg-orange-50 rounded-lg border border-orange-100">
+                      <div className="flex-shrink-0">
+                        <Clock className="h-6 w-6 text-orange-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-slate-800">Horario de Salida</h3>
+                        <p className="text-lg font-bold text-orange-600">
+                          {formatTimeToAMPM(room.check_out_hour ?? "00:00:00")}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Discounts Section */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-slate-800 flex items-center">
+                      <Percent className="h-5 w-5 mr-2 text-green-600" />
+                      Descuentos por Estadía
+                    </h3>
+
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="p-4 bg-green-50 rounded-lg border border-green-100">
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-700 font-medium">Estadía Media</span>
+                          <span className="text-xl font-bold text-green-600">
+                            {formatDiscount(room.discount_percentage_medium_stay ?? "0")}
+                          </span>
+                        </div>
+                        <p className="text-sm text-slate-600 mt-1">
+                          {discountData?.mediumStayRange.min} - {discountData?.mediumStayRange.max} noches
+                        </p>
+                      </div>
+
+                      <div className="p-4 bg-emerald-50 rounded-lg border border-emerald-100">
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-700 font-medium">Estadía Larga</span>
+                          <span className="text-xl font-bold text-emerald-600">
+                            {formatDiscount(room.discount_percentage_long_stay ?? "0")}
+                          </span>
+                        </div>
+                        <p className="text-sm text-slate-600 mt-1">{discountData?.longStayRange.min}+ noches</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Prepayment Section */}
+                  <div className="p-4 bg-purple-50 rounded-lg border border-purple-100">
+                    <div className="flex items-center space-x-3">
+                      <CreditCard className="h-6 w-6 text-purple-600" />
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-slate-800">Adelanto de Pago</h3>
+                        <p className="text-slate-600">
+                          Puedes hacer un adelanto del{" "}
+                          <span className="font-bold text-purple-600">
+                            {formatDiscount(room.prepayment_percentage ?? "10")}
+                          </span>{" "}
+                          del total
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Additional Info */}
+                  <div className="text-center pt-4 border-t border-slate-200">
+                    <p className="text-sm text-slate-500">Las políticas se aplican solamente a este hospedaje</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Contenedor para los botones de políticas */}
+            <div className="flex flex-col md:flex-row gap-3 mb-16 w-full">
+              {/* Botón para Políticas de Anulación */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="flex-1 bg-transparent">
+                    <AlertCircle className="h-4 w-4 mr-2" />
+                    Ver Políticas de Anulación
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Políticas de Anulación de Reserva</DialogTitle>
+                    <DialogDescription>
+                      Detalles sobre las condiciones de cancelación para diferentes tipos de estadía.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <CancellationPolicyDialogContent />
+                </DialogContent>
+              </Dialog>
+
+              {/* Botón para Políticas de Modificación */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="flex-1 bg-transparent">
+                    <Edit className="h-4 w-4 mr-2" />
+                    Ver Políticas de Modificación
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Políticas de Modificación de Reserva</DialogTitle>
+                    <DialogDescription>
+                      Detalles sobre las condiciones para modificar una reserva existente.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <ModificationPolicyDialogContent />
+                </DialogContent>
+              </Dialog>
+            </div>
 
             {/* Booking Widget for mobile */}
             <div className="mb-4 lg:hidden">
@@ -618,19 +801,76 @@ export default function RoomPage() {
               <CollectionExtraTags extraTags={extraTags} enable="property" roomTags={room.extraTags} />
             </div>
 
+            {/* Description */}
+            {room.descriptionService && (
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-gray-900">Más acerca de los servicios:</h3>
+                {room.descriptionService}
+              </div>
+            )}
 
-            <HostInfoSection hostName={property.hostName} guestComments={property.guestComments} />
+            {/* Sección de Anfitrión */}
+            {property.hostName && (
+              <div className="mb-8">
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                    {property.hostName.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Anfitrión:</h3>
+                    <p className="text-gray-700">{property.hostName}</p>
+                  </div>
+                </div>
+              </div>
+            )}
 
-            <LocationSection latitude={property.place.coordinates[0]} longitude={property.place.coordinates[1]} />
+            {/* Sección de Comentarios */}
+            {property.guestComments && (
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-gray-900">Comentarios para el huésped:</h3>
+                <p className="text-gray-700">{property.guestComments}</p>
+              </div>
+            )}
 
-            <ServiceProvidersSection
-              serviceProviders={serviceProviders}
-              propertyState={property.state}
-              propertyCountry={property.country}
-            />
+            {/* Map */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-[#162F40] mb-4">El vecindario</h2>
+              <div className="h-[300px] w-full relative rounded-lg overflow-hidden">
+                <GoogleMap lat={property.place.coordinates[0]} lng={property.place.coordinates[1]} />
+              </div>
+            </div>
 
-             {/* User Profile Section */}
-             <div className="min-h-screen bg-background py-8">
+            {/* Service Providers */}
+            <div>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold text-[#162F40]">Proveedores de servicios</h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {(() => {
+                  const stateProviders = serviceProviders.filter((provider) => provider.state === property.state)
+
+                  const providersToShow =
+                    stateProviders.length > 0
+                      ? stateProviders
+                      : serviceProviders.filter((provider) => provider.country === property.country)
+
+                  return providersToShow.map((provider) => (
+                    <ServiceProviderCard
+                      key={provider.id}
+                      name={provider.name}
+                      service={provider.description}
+                      treatment={provider.serviceTags.join(", ")}
+                      description={provider.description}
+                      phone={provider.phone}
+                      email={provider.email}
+                    />
+                  ))
+                })()}
+              </div>
+            </div>
+
+            {/* User Profile Section */}
+            <div className="min-h-screen bg-background py-8">
               <div className="">
                 <div className="mb-4">
                   <h2 className="text-2xl font-bold text-[#162F40]">Evaluaciones</h2>
@@ -640,7 +880,7 @@ export default function RoomPage() {
                 <HostProfile
                   hostName={property.hostName}
                   hostExperience={hostExperience}
-                  averageRating={Number(averageRating.toFixed(1))}
+                  averageRating={averageRating}
                   totalReviews={totalReviews}
                 />
 
@@ -658,7 +898,7 @@ export default function RoomPage() {
                   isOpen={showReviews}
                   onClose={() => setShowReviews(false)}
                   reviews={reviews}
-                  averageRating={Number(averageRating.toFixed(1))}
+                  averageRating={averageRating}
                   totalReviews={totalReviews}
                 />
               </div>

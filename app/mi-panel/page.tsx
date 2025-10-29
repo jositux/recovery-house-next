@@ -34,9 +34,19 @@ interface Booking {
   }
 }
 
+interface Statistics {
+  propertyQuantity: number
+  roomQuantity: number
+  bookingQuantity: number
+  paymentReceivedAmountSum: number
+  reviewQuantity: number
+  currentMonthBookings: number
+}
+
 export default function DashboardPage() {
   const router = useRouter()
   const [bookings, setBookings] = useState<Booking[]>([])
+  const [statistics, setStatistics] = useState<Statistics | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -52,20 +62,32 @@ export default function DashboardPage() {
       try {
         const user = await getCurrentUser(token)
 
-        console.log(user.id)
-
-        const bookingsResponse = await fetch(
-          `/webapi/items/Booking?filter[ownerId][_eq]=${user.id}&fields=*, +room.*, +room.photos.directus_files_id.id, +room.propertyId.*&sort=-bookingDateCreated`,
-          {
+        const [statisticsResponse, bookingsResponse] = await Promise.all([
+          fetch(`/webapi/api/v1/owner/statistics`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
-          },
-        )
+          }),
+          fetch(
+            `/webapi/items/Booking?filter[ownerId][_eq]=${user.id}&fields=*,+room.*,+room.propertyId.*&sort=-bookingDateCreated&limit=5`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          ),
+        ])
+
+        if (statisticsResponse.ok) {
+          const statsData = await statisticsResponse.json()
+          setStatistics(statsData.data || statsData)
+        } else {
+          setError("Error al cargar las estadísticas")
+        }
 
         if (bookingsResponse.ok) {
-          const data = await bookingsResponse.json()
-          setBookings(data.data || [])
+          const bookingsData = await bookingsResponse.json()
+          setBookings(bookingsData.data || [])
         } else {
           setError("Error al cargar las reservas")
         }
@@ -80,63 +102,46 @@ export default function DashboardPage() {
     loadDashboardData()
   }, [router])
 
-  const uniqueProperties = new Set(bookings.map((b) => b.propertyId))
-  //const confirmedBookings = bookings.filter((b) => b.bookingState === "confirmed")
-  
-  const totalIncome = bookings
-  .filter((b) => b.paymentState === "fullpayment" || b.paymentState === "prepayment")
-  .reduce((sum, b) => {
-    const amount =
-      b.paymentState === "fullpayment"
-        ? Number.parseFloat(b.finalPrice || "0")
-        : Number.parseFloat(b.prepaymentAmount || "0")
-    return sum + amount
-  }, 0)
-
-  const currentMonth = new Date().getMonth()
-  const currentYear = new Date().getFullYear()
-  const currentMonthBookings = bookings.filter((b) => {
-    const bookingDate = new Date(b.bookingDateCreated)
-    return bookingDate.getMonth() === currentMonth && bookingDate.getFullYear() === currentYear
-  })
-
   const stats = [
     {
       label: "Propiedades",
-      value: uniqueProperties.size.toString(),
+      value: statistics?.propertyQuantity?.toString() || "0",
       icon: Building2,
       bgColor: "bg-blue-50",
       iconColor: "text-blue-500",
     },
     {
       label: "Reservas Recibidas",
-      value: bookings.length.toString(),
-      change: currentMonthBookings.length > 0 ? `+${currentMonthBookings.length} este mes` : undefined,
+      value: statistics?.bookingQuantity?.toString() || "0",
+      change:
+        statistics?.currentMonthBookings && statistics.currentMonthBookings > 0
+          ? `+${statistics.currentMonthBookings} este mes`
+          : undefined,
       icon: Calendar,
       bgColor: "bg-red-50",
       iconColor: "text-red-500",
     },
     {
       label: "Ingresos Totales",
-      value: `$${totalIncome.toFixed(0)}`,
+      value: `$${statistics?.paymentReceivedAmountSum?.toFixed(0) || "0"}`,
       icon: DollarSign,
       bgColor: "bg-green-50",
       iconColor: "text-green-500",
     },
     {
       label: "Opiniones",
-      value: 0,
+      value: statistics?.reviewQuantity?.toString() || "0",
       icon: Users,
       bgColor: "bg-purple-50",
       iconColor: "text-purple-500",
     },
   ]
 
-  const recentBookings = bookings.slice(0, 5).map((booking) => {
+  const recentBookings = bookings.map((booking) => {
     let price = `$${booking.finalPrice}`
     let status = "Pendiente"
     const roomName = booking.roomName
-  
+
     if (booking.paymentState === "prepayment") {
       status = "Reservada con adelanto"
       price = `$${booking.prepaymentAmount}`
@@ -144,7 +149,7 @@ export default function DashboardPage() {
       status = "Reservada pago total"
       price = `$${booking.finalPrice}`
     }
-  
+
     return {
       property: booking.room?.propertyId?.name || booking.propertyName || "Propiedad no encontrada",
       guest: booking.patientName || "Huésped",
@@ -160,7 +165,6 @@ export default function DashboardPage() {
       roomName,
     }
   })
-  
 
   if (loading) {
     return (
@@ -217,7 +221,9 @@ export default function DashboardPage() {
                 className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors"
               >
                 <div>
-                  <h3 className="font-semibold text-gray-900">{booking.roomName} - {booking.property}</h3>
+                  <h3 className="font-semibold text-gray-900">
+                    {booking.roomName} - {booking.property}
+                  </h3>
                   <p className="text-sm text-gray-600">
                     {booking.guest} • {booking.dates}
                   </p>

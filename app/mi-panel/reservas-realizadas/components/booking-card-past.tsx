@@ -295,7 +295,7 @@ export const BookingCardPast = ({
   {/* Overlay clickeable */}
   <div
     className="absolute inset-0 cursor-pointer"
-    onClick={() => router.push(`/room/${booking.room.id}`)}
+    onClick={() => router.push(`/rooms/${booking.room.id}`)}
   />
 </div>
 

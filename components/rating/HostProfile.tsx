@@ -24,7 +24,7 @@ export function HostProfile({ hostName, hostExperience, averageRating, totalRevi
 
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center p-4 bg-muted/30 rounded-lg">
-              <div className="text-2xl font-bold text-foreground">{averageRating}</div>
+              <div className="text-2xl font-bold text-foreground">{Number(averageRating.toFixed(1))}</div>
               <div className="text-sm text-muted-foreground">Calificación</div>
               <div className="flex justify-center mt-1">
                 {[1, 2, 3, 4, 5].map((star) => (
