@@ -22,18 +22,15 @@ import {
   propertyUpdateService,
   type PropertyData,
 } from "@/services/propertyUpdateService";
-import { Fraunces } from "next/font/google"
+import { Fraunces } from "next/font/google";
 
-const fraunces = Fraunces({ subsets: ["latin"] })
-
-
+const fraunces = Fraunces({ subsets: ["latin"] });
 
 import { Building2, Home, Save, X } from "lucide-react";
 
 import { MultiSelectCase } from "@/components/MultiSelectCase";
 
 import { useRouter } from "next/navigation";
-
 
 import {
   formSchema,
@@ -44,7 +41,9 @@ import {
   type Property,
 } from "../types";
 
-import GoogleMapsSelector, { type LocationDetails } from "@/components/google-maps-selector"
+import GoogleMapsSelector, {
+  type LocationDetails,
+} from "@/components/google-maps-selector";
 
 /*
 import OpenStreetMapSelector, {
@@ -119,11 +118,11 @@ export default function EditPropertyPage({
   }, [params]);
 
   const decodeHtmlAndRemoveTags = (html: string): string => {
-    const textWithoutTags = html.replace(/<\/?[^>]+(>|$)/g, "")
-    const txt = document.createElement("textarea")
-    txt.innerHTML = textWithoutTags
-    return txt.value
-  }
+    const textWithoutTags = html.replace(/<\/?[^>]+(>|$)/g, "");
+    const txt = document.createElement("textarea");
+    txt.innerHTML = textWithoutTags;
+    return txt.value;
+  };
 
   const fetchProperty = useCallback(async () => {
     if (!paramId) return;
@@ -132,7 +131,7 @@ export default function EditPropertyPage({
     try {
       const storedProperty = localStorage.getItem("selected_property");
 
-      console.log(JSON.stringify(storedProperty))
+      console.log(JSON.stringify(storedProperty));
       if (storedProperty) {
         const selectedProperty: Property = JSON.parse(storedProperty);
 
@@ -161,7 +160,9 @@ export default function EditPropertyPage({
             address: selectedProperty.address,
             patology: selectedProperty.patology,
             hostName: selectedProperty.hostName,
-            guestComments: decodeHtmlAndRemoveTags(selectedProperty.guestComments),
+            guestComments: decodeHtmlAndRemoveTags(
+              selectedProperty.guestComments
+            ),
           });
 
           // Actualizar defaultLocation con los datos de la propiedad
@@ -172,14 +173,14 @@ export default function EditPropertyPage({
             postalCode: selectedProperty.postalCode || "",
           });
 
-          console.log("ID = ", selectedProperty.RNTFile)
+          console.log("ID = ", selectedProperty.RNTFile);
           setRNTFileData(selectedProperty.RNTFile);
           setTaxFileData(selectedProperty.taxIdEINFile);
 
-         
-          form.setValue("patology", JSON.parse(String(selectedProperty.patology)))
-
-
+          form.setValue(
+            "patology",
+            JSON.parse(String(selectedProperty.patology))
+          );
         } else {
           throw new Error("Propiedad no encontrada");
         }
@@ -224,8 +225,6 @@ export default function EditPropertyPage({
         localStorage.removeItem("selected_property");
 
         router.push(`/mi-panel/propiedades/${property.id}`);
-
-
       }
     } catch (error) {
       console.error("Error al registrar la propiedad:", error);
@@ -236,9 +235,9 @@ export default function EditPropertyPage({
 
   const handleCancel = () => {
     if (property) {
-      router.push(`/mi-panel/propiedades/${property.id}`)
+      router.push(`/mi-panel/propiedades/${property.id}`);
     }
-  }
+  };
 
   if (loading) {
     return <p className="text-center p-4">Cargando datos de la propiedad...</p>;
@@ -251,12 +250,14 @@ export default function EditPropertyPage({
   return (
     <div className="min-h-screen bg-[#F8F8F7]">
       <div className="container mx-auto max-w-2xl py-4 px-4">
-      <h1 className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}>
-                   Editar Propiedad
-              </h1>
+        <h1
+          className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}
+        >
+          Editar Propiedad
+        </h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <div className="space-y-4 p-4 bg-white rounded-xl">
+            <div className="space-y-4 p-4 bg-white rounded-xl">
               <h2 className="text-lg">Documentos Legales</h2>
               <FormField
                 control={form.control}
@@ -387,7 +388,10 @@ export default function EditPropertyPage({
                   <FormItem>
                     <FormLabel>Tratamientos en que se especializa</FormLabel>
                     <FormControl>
-                    <MultiSelectCase value={field.value} onChange={field.onChange} />
+                      <MultiSelectCase
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -555,8 +559,6 @@ export default function EditPropertyPage({
               />
             </div>
 
-            
-
             <div className="space-y-4 p-4 bg-white rounded-xl">
               <h2 className="text-lg">Información para el huésped</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -600,8 +602,6 @@ export default function EditPropertyPage({
                 />
               </div>
             </div>
-
-           
 
             <div className="flex gap-3">
               <Button
