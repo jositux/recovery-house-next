@@ -397,7 +397,7 @@ const BookingList = () => {
   }
 
   return (
-    <div className="container mx-auto py-4 px-4 sm:px-4 lg:px-0">
+    <div className="container mx-auto py-4">
      
 
       <CancelBookingModal
@@ -410,7 +410,7 @@ const BookingList = () => {
 
       {bookings.length === 0 ? (
         <main className="flex-grow flex items-center justify-center px-4">
-          <div className="container min-h-screen mx-auto p-4 py-16">
+          <div className="container min-h-screen mx-auto py-16">
             <div className="max-w-xl mx-auto">
               <div className="flex flex-col items-center justify-center text-center space-y-8 py-16">
                 <div className="w-20 h-20 rounded-full bg-[#39759E]/10 flex items-center justify-center">
@@ -442,7 +442,7 @@ const BookingList = () => {
         </main>
       ) : (
         <div className="space-y-12">
-          <h1 className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}>
+          <h1 className={`${fraunces.className} text-3xl font-normal text-[#162F40]`}>
           Reservas Recibidas
               </h1>
 

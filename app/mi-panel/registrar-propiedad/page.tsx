@@ -167,7 +167,7 @@ export default function RegisterPropertyBasePage() {
 
   return (
     <div className="min-h-screen bg-[#F8F8F7]">
-      <div className="container mx-auto max-w-2xl py-4 px-4">
+      <div className="container mx-auto max-w-2xl py-4">
       <h1
             className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-8`}
           >

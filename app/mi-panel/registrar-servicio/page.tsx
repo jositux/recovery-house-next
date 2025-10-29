@@ -265,7 +265,7 @@ export default function RegisterServicePage() {
 
   return (
     <div className="min-h-screen bg-[#F8F8F7]">
-      <div className="container mx-auto max-w-2xl py-4 px-4">
+      <div className="container mx-auto max-w-2xl py-4">
         <h1 className="text-3xl font-bold mb-6">Registra tu servicio</h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">

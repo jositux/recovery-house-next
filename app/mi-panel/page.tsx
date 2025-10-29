@@ -23,6 +23,7 @@ interface Booking {
   paymentState: string
   prepaymentAmount: string
   balanceAmount: string
+  fullAmount: string
   finalPrice: string
   ownerId: string
   bookingDateCreated: string
@@ -87,6 +88,7 @@ export default function DashboardPage() {
 
         if (bookingsResponse.ok) {
           const bookingsData = await bookingsResponse.json()
+     
           setBookings(bookingsData.data || [])
         } else {
           setError("Error al cargar las reservas")
@@ -142,11 +144,11 @@ export default function DashboardPage() {
     let status = "Pendiente"
     const roomName = booking.roomName
 
-    if (booking.paymentState === "prepayment") {
-      status = "Reservada con adelanto"
+    if (booking.paymentState === "pendingRefund") {
+      status = "Pagado 10%"
       price = `$${booking.prepaymentAmount}`
-    } else if (booking.paymentState === "fullpayment") {
-      status = "Reservada pago total"
+    } else if (booking.paymentState === "fullpayment" || booking.paymentState === "balancepayment") {
+      status = "Pago total"
       price = `$${booking.finalPrice}`
     }
 
@@ -212,33 +214,34 @@ export default function DashboardPage() {
 
       {/* Recent Bookings */}
       <div className="bg-white rounded-xl p-6 shadow-sm">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Reservas Recientes</h2>
-        {recentBookings.length > 0 ? (
-          <div className="space-y-4">
-            {recentBookings.map((booking, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg transition-colors"
-              >
-                <div>
-                  <h3 className="font-semibold text-gray-900">
-                    {booking.roomName} - {booking.property}
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    {booking.guest} • {booking.dates}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-lg font-bold text-red-500">{booking.price}</p>
-                  <p className="text-sm text-gray-600">{booking.status}</p>
-                </div>
-              </div>
-            ))}
+  <h2 className="text-xl font-bold text-gray-900 mb-6">Reservas Recientes</h2>
+  {recentBookings.length > 0 ? (
+    <div className="space-y-4">
+      {recentBookings.map((booking, index) => (
+        <div
+          key={index}
+          className="flex flex-col md:flex-row md:justify-between transition-colors border-b border-gray-200 last:border-0 pb-4"
+        >
+          <div>
+            <h3 className="font-semibold text-gray-900">
+              {booking.roomName} - {booking.property}
+            </h3>
+            <p className="text-sm text-gray-600">
+              {booking.guest} • {booking.dates}
+            </p>
           </div>
-        ) : (
-          <p className="text-gray-500 text-center py-8">No hay reservas recientes</p>
-        )}
-      </div>
+          <div className="md:text-right">
+            <p className="text-lg font-bold text-green-500">{booking.price}</p>
+            <p className="text-sm text-gray-600">{booking.status}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p className="text-gray-500 text-center py-8">No hay reservas recientes</p>
+  )}
+</div>
+
     </div>
   )
 }

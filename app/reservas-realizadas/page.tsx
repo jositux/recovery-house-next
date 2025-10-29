@@ -543,7 +543,7 @@ localStorage.setItem("bookingBalanced", JSON.stringify(newEntry))
   }
 
   return (
-    <div className="container mx-auto py-16 px-4 sm:px-4 lg:px-0">
+    <div className="container mx-auto py-16 lg:px-0">
       <h1 className="text-3xl font-bold mb-6 text-gray-900">Reservas Realizadas</h1>
 
       {showSuccessModal && (

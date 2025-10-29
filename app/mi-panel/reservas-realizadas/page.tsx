@@ -558,7 +558,7 @@ const BookingList = () => {
   }
 
   return (
-    <div className="container mx-auto py-4 px-4 sm:px-4 lg:px-0">
+    <div className="container mx-auto py-4">
       <SuccessModal
         isOpen={showSuccessModal}
         onClose={handleSuccessModalClose}
@@ -645,7 +645,7 @@ const BookingList = () => {
       ) : (
         <div className="space-y-12">
           <h1
-            className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}
+            className={`${fraunces.className} text-3xl font-normal text-[#162F40]`}
           >
             Mis Reservas
           </h1>

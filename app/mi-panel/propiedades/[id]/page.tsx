@@ -34,9 +34,9 @@ import {
 } from "@/components/ui/dialog";
 import { CannotDeleteDialog } from "./cannot-delete-dialog";
 import { ConfirmDeleteDialog } from "./confirm-delete-dialog";
-import { Fraunces } from "next/font/google"
+import { Fraunces } from "next/font/google";
 
-const fraunces = Fraunces({ subsets: ["latin"] })
+const fraunces = Fraunces({ subsets: ["latin"] });
 
 interface ImageType {
   id: string;
@@ -481,10 +481,11 @@ export default function RoomPage() {
               </div>
             )}
 
-           
-            <h1 className={`${fraunces.className} lg:text-5xl text-3xl mt-4 font-bold mb-2`}>
-            {property.name}
-              </h1>
+            <h1
+              className={`${fraunces.className} lg:text-5xl text-3xl mt-4 font-bold mb-2`}
+            >
+              {property.name}
+            </h1>
             <p className="text-1xl lg:text-1xl">
               {property.city}, {property.state}, {property.country}
             </p>
@@ -496,9 +497,11 @@ export default function RoomPage() {
       <div className="container mx-auto py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
           <div className="md:col-span-2">
-          <h2 className={`${fraunces.className} text-2xl font-normal text-[#162F40] mb-4`}>
-                   Acerca de esta propiedad
-              </h2>
+            <h2
+              className={`${fraunces.className} text-2xl font-normal text-[#162F40] mb-4`}
+            >
+              Acerca de esta propiedad
+            </h2>
             <p className="text-lg text-gray-700 mb-6">
               {decodeHtmlAndRemoveTags(property.description)}
             </p>
@@ -519,8 +522,11 @@ export default function RoomPage() {
           <div className="rounded-xl mb-8">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
               <div className="space-y-2">
-                <h2 className="text-3xl font-bold">Alojamientos disponibles</h2>
-                
+              <h2
+              className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}
+            >
+              Habitaciones / camas
+            </h2>
               </div>
 
               {isOwner && (
@@ -608,11 +614,12 @@ export default function RoomPage() {
                     </div>
 
                     <div className="p-6">
-                    <h1 className={`${fraunces.className} text-xl font-normal text-[#162F40] mb-4`}>
-                    {room.isPrivate === false && `${room.bedName} -`}{" "}
+                      <h1
+                        className={`${fraunces.className} text-xl font-normal text-[#162F40] mb-4`}
+                      >
+                        {room.isPrivate === false && `${room.bedName} -`}{" "}
                         {room.name}
-              </h1>
-                     
+                      </h1>
 
                       {room.isPrivate === true || room.isPrivate === null ? (
                         <>
