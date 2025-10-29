@@ -52,7 +52,6 @@ export function CheckinCheckoutSection({
             <SelectItem value="16:00">4:00 PM</SelectItem>
             <SelectItem value="17:00">5:00 PM</SelectItem>
             <SelectItem value="18:00">6:00 PM</SelectItem>
-            <SelectItem value="flexible">Flexible</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -74,7 +73,6 @@ export function CheckinCheckoutSection({
             <SelectItem value="12:00">12:00 PM (Mediodía)</SelectItem>
             <SelectItem value="13:00">1:00 PM</SelectItem>
             <SelectItem value="14:00">2:00 PM</SelectItem>
-            <SelectItem value="flexible">Flexible</SelectItem>
           </SelectContent>
         </Select>
       </div>

@@ -681,6 +681,7 @@ localStorage.setItem("bookingBalanced", JSON.stringify(newEntry))
                         const roomDetails = booking.room
                         const property = booking.room.propertyId
                         const nights = differenceInDays(new Date(booking.checkOut), new Date(booking.checkIn))
+                        console.log(new Date())
                         const isCurrentStay =
                           new Date() >= new Date(booking.checkIn) && new Date() <= new Date(booking.checkOut)
 
