@@ -147,7 +147,7 @@ export default function ProviderDataPage() {
   }
 
   return (
-    <div className="container min-h-screen mx-auto p-4 py-8">
+    <div className="container min-h-screen mx-auto py-4">
       <h1
         className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}
       >
@@ -224,7 +224,7 @@ export default function ProviderDataPage() {
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-col md:flex-row flex-wrap gap-4">
                 <div className="flex items-center flex-1 p-3 bg-gray-50 rounded-lg">
                   <FileText className="w-4 h-4 mr-2 text-gray-400" />
                   <div>

@@ -308,7 +308,7 @@ useEffect(() => {
 
   return (
     <div className="min-h-screen bg-[#F8F8F7]">
-      <div className="container mx-auto max-w-2xl py-4 px-4">
+      <div className="container mx-auto max-w-2xl py-4">
       <h1 className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}>
                    Actualizar Servicio
               </h1>
@@ -543,8 +543,8 @@ useEffect(() => {
               <p>{successMessage}</p>
             </div>
           )}
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Actualizando..." : "Actualizar Proveedor"}
+          <Button type="submit" className="w-full bg-[#39759E]" disabled={isSubmitting}>
+            {isSubmitting ? "Actualizando..." : "Guardar"}
           </Button>
         </form>
       </Form>

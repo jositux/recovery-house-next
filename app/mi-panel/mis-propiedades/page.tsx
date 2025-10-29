@@ -71,12 +71,11 @@ const PropertiesPage: React.FC = () => {
   }
 
   return (
-    <div className="container min-h-screen mx-auto py-4 md:px-6 lg:px-8">
+    <div className="container min-h-screen mx-auto py-4">
       
-
       {properties.length === 0 ? (
        
-          <div className="container min-h-screen mx-auto p-4 py-16">
+          <div className="container min-h-screen mx-auto p-4 py-8">
             <div className="max-w-xl mx-auto">
               <div className="flex flex-col items-center justify-center text-center space-y-8 py-16">
                 <div className="w-20 h-20 rounded-full bg-[#39759E]/10 flex items-center justify-center">

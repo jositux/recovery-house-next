@@ -108,7 +108,7 @@ export default function UpdateUserForm({ onSubmit, initialValues, formSchema: cu
       )}
       <form onSubmit={form.handleSubmit(handleRegisterSubmit)} className="space-y-8">
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
               name="first_name"
@@ -153,7 +153,7 @@ export default function UpdateUserForm({ onSubmit, initialValues, formSchema: cu
               </FormItem>
             )}
           />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
               name="phone"

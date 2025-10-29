@@ -658,38 +658,38 @@ export default function CalendarView({
                     Calendario de Disponibilidad
                   </CardTitle>
                   <CardDescription className="text-xs sm:text-sm mt-1">
-                    Visualiza y gestiona los días disponibles para reservas
+                    Gestiona los días disponibles para reservas
                   </CardDescription>
                 </div>
                 <Button
                   onClick={handleSaveChanges}
-                  className="flex items-center gap-2 bg-[#39759E] hover:bg-primary/90 transition-all duration-300"
+                  className="hidden sm:flex items-center sm:hide gap-2 bg-[#39759E] hover:bg-primary/90 transition-all duration-300"
                   disabled={isLoading}
                 >
                   <Save className="h-4 w-4" />
-                  {isLoading ? "Guardando..." : "Guardar Calendario"}
+                  {isLoading ? "Guardando..." : "Guardar"}
                 </Button>
               </div>
             </CardHeader>
 
             <CardContent className="space-y-6">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 bg-slate-50 rounded-lg border border-slate-100">
+              <div className="hidden sm:flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 bg-slate-50 rounded-lg border border-slate-100">
                 <div className="space-y-1 text-xs sm:text-sm text-slate-600">
                   <p className="flex items-center gap-2">
                     <span className="inline-block w-3 h-3 rounded-full bg-green-500"></span>
-                    Haz clic para marcar o desmarcar días como no disponibles
+                    Clic para marcar o desmarcar días como no disponibles
                   </p>
                   <p className="flex items-center gap-2">
                     <span className="inline-block w-3 h-3 rounded-full bg-blue-500"></span>
-                    Haz clic y arrastra para seleccionar múltiples días
+                    Clic y arrastra para seleccionar múltiples días
                   </p>
                   <p className="flex items-center gap-2">
                     <span className="inline-block w-3 h-3 rounded-full bg-gray-400"></span>
-                    Los días en gris ya están reservados y no se pueden modificar
+                    Los días en gris tienen reservas y no se pueden modificar
                   </p>
                 </div>
 
-                <div className="flex flex-wrap gap-2">
+                <div className="hidden sm:flex flex-wrap gap-2">
                   <Badge variant="outline" className="text-xs bg-green-100 text-green-600 border-green-200 px-3 py-1">
                     Disponible: {stats.availableDays}
                   </Badge>
@@ -700,6 +700,18 @@ export default function CalendarView({
                     Reservado: {stats.bookedDays}
                   </Badge>
                 </div>
+              </div>
+
+              <div className="sm:hidden flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-4 bg-slate-50 rounded-lg border border-slate-100">
+                <div className="space-y-1 text-xs sm:text-sm text-slate-600">
+                  <p className="flex items-center gap-2">
+                    <span className="inline-block w-3 h-3 rounded-full bg-red-500"></span>
+                    Presione para marcar o desmarcar las fechas
+                  </p>
+                  
+                </div>
+
+                
               </div>
 
               <div className="flex justify-center w-full">
