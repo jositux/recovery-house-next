@@ -74,7 +74,7 @@ export default function RegisterServicePage() {
 
         if (data.length > 0) {
           setHasExistingService(true)
-         // router.push(`/mi-panel/mi-servicio`)
+          router.push(`/mi-panel/mi-servicio`)
         }
       } catch (error) {
         console.error("Error al cargar los datos del proveedor:", error)
@@ -168,7 +168,8 @@ export default function RegisterServicePage() {
       }
 
       localStorage.setItem("new_service", JSON.stringify(providerData))
-      router.push(`/mi-panel/mi-servicio`)
+      //router.push(`/mi-panel/mi-servicio`)
+      router.push(`/subscriptions`)
     } catch (error) {
       console.error("Error al registrar el servicio:", error)
     } finally {
