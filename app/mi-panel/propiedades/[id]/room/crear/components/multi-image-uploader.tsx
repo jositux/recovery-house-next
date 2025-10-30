@@ -92,10 +92,10 @@ export function MultiImageUploader({ maxImages = 6, onImagesChange, defaultImage
             onClick={() => document.getElementById("image-upload")?.click()}
           >
             <Upload className="mr-2 h-4 w-4" />
-            Subir Imágenes
+            Subir Fotos
           </Button>
           <span className="text-sm text-muted-foreground">
-            {totalImages} / {maxImages} imágenes
+            {totalImages} / {maxImages} fotos
           </span>
           <input
             id="image-upload"
@@ -121,7 +121,7 @@ export function MultiImageUploader({ maxImages = 6, onImagesChange, defaultImage
                 type="button"
                 onClick={() => handleRemoveImage(index)}
                 className="absolute top-2 right-2 bg-white text-gray-700 rounded-full p-1.5 transition-colors hover:bg-gray-100 shadow-md"
-                aria-label="Eliminar imagen"
+                aria-label="Eliminar foto"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -134,8 +134,8 @@ export function MultiImageUploader({ maxImages = 6, onImagesChange, defaultImage
           onClick={() => document.getElementById("image-upload")?.click()}
         >
           <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-          <p className="text-sm text-muted-foreground mb-2">No hay imágenes subidas</p>
-          <p className="text-xs text-muted-foreground">Puedes subir hasta {maxImages} imágenes</p>
+          <p className="text-sm text-muted-foreground mb-2">No hay fotos subidas</p>
+          <p className="text-xs text-muted-foreground">Puedes subir hasta {maxImages} fotos</p>
         </div>
       )}
     </div>
