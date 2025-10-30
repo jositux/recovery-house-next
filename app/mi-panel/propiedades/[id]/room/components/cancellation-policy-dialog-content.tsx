@@ -54,13 +54,13 @@ export function CancellationPolicyDialogContent() {
             <div className="flex items-start gap-2">
               <span className="font-medium text-red-600">•</span>
               <span>
-                <strong>Después de 24hs y antes de las 72hs del checkIn:</strong> Se devuelve el monto total menos el anticipo (que se retiene como penalización).
+                <strong>Después de 24hs y antes de las 72hs del check-in:</strong> Se devuelve el monto total menos el anticipo (que se retiene como penalización).
               </span>
             </div>
             <div className="flex items-start gap-2">
               <span className="font-medium text-red-600">•</span>
               <span>
-                <strong>Después de las 72 horas antes del checkIn:</strong>  No hay reembolso. Se retiene el anticipo y el saldo pagado.
+                <strong>Después de las 72hs antes del check-in:</strong>  No hay reembolso. Se retiene el anticipo y el saldo pagado.
               </span>
             </div>
           </div>
