@@ -70,6 +70,8 @@ interface Booking {
   status: string
   checkOut: string
   checkIn: string
+  checkInHour: string;
+  checkOutHour: string;
   patient: string
   ownerId: string
   guests: number
@@ -151,6 +153,26 @@ interface BookingCardProps {
   onReviewDelete?: (bookingId: string) => Promise<void>
 }
 
+// ✅ función universal para obtener una fecha local correcta
+/*const toLocalDateFromString = (isoOrDateString: string | undefined): Date => {
+  if (!isoOrDateString) return new Date(0)
+  const datePart = isoOrDateString.split("T")[0]
+  const [y, m, d] = datePart.split("-").map(Number)
+  return new Date(y, m - 1, d) // medianoche local sin UTC shift
+}*/
+
+const combineDateAndTime = (dateString: string, timeString: string): Date => {
+  // Extraer la fecha del dateString
+  const datePart = dateString.split("T")[0]
+  const [year, month, day] = datePart.split("-").map(Number)
+
+  // Extraer hora, minutos y segundos del timeString (formato "16:00:00")
+  const [hours, minutes, seconds] = timeString.split(":").map(Number)
+
+  // Crear fecha completa con hora exacta
+  return new Date(year, month - 1, day, hours, minutes, seconds)
+}
+
 export const BookingCardPast = ({
   booking,
   review,
@@ -166,9 +188,12 @@ export const BookingCardPast = ({
     new Date(booking.checkOut),
     new Date(booking.checkIn)
   )
-  const isCurrentStay =
-    new Date() >= new Date(booking.checkIn) &&
-    new Date() <= new Date(booking.checkOut)
+
+  const checkInDateTime = combineDateAndTime(booking.checkIn, "22:00:00")
+  const checkOutDateTime = combineDateAndTime(booking.checkOut, booking.checkOutHour)
+  const now = new Date()
+  const isCurrentStay = now >= checkInDateTime && now <= checkOutDateTime
+
   const isCancelled =
     booking.bookingState === "cancelled_by_patient" ||
     booking.bookingState === "cancelled_by_owner"
