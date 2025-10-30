@@ -8,6 +8,7 @@ export interface ModifyBookingPayload {
   guests: number,
   checkInDateHour: string,
   checkOutDateHour: string,
+  checkInHour: string,
   price: number,
   cleaning: number,
   finalPrice: number,

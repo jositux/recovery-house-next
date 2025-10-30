@@ -49,6 +49,7 @@ const SuccessPageContent = () => {
             guests: parsedBooking.guests,
             checkInDateHour: parsedBooking.checkInDateHour,
             checkOutDateHour: parsedBooking.checkOutDateHour,
+            checkInHour: parsedBooking.checkInHour,
             price: parsedBooking.price,
             cleaning: parsedBooking.cleaning,
             finalPrice: parsedBooking.finalPrice,
@@ -64,6 +65,7 @@ const SuccessPageContent = () => {
           };
       
           await createBookingModify(payload, accessToken);
+          localStorage.removeItem("booking");
       
         } catch (error) {
           console.error("Error modificando reserva", error);
