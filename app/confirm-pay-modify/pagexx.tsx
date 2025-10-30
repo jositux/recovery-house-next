@@ -13,6 +13,7 @@ interface BookingData {
   bookingId: string;
   checkInDateHour: string;
   checkOutDateHour: string;
+  checkInHour: string;
   guests: number;
   nights: number;
   price: number;
@@ -63,15 +64,26 @@ export default function NewConfirmAndPay() {
     return Math.max(0, prepaymentPercentage - previousBalance);
   };
 
+    
   const getPaymentDeadline = (b: BookingData) => {
     if (!b.checkInDateHour) return "";
-    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const checkInZoned = toZonedTime(b.checkInDateHour, timeZone);
-    const deadline = new Date(checkInZoned);
-    deadline.setHours(deadline.getHours() - 72); // 72 horas antes
-    return format(deadline, "d MMM yyyy, HH:mm", { locale: es });
+  
+    // 🔹 Combinar fecha y hora en local (sin conversión a UTC)
+    const baseDate = b.checkInDateHour.split("T")[0];
+    const fullDateTime = b.checkInHour
+      ? `${baseDate}T${b.checkInHour}`
+      : `${baseDate}T00:00:00`;
+  
+    // 🔹 Crear fecha local correctamente
+    const checkIn = new Date(fullDateTime);
+  
+    // 🔹 Restar 72 horas (3 días)
+    const deadline = new Date(checkIn.getTime() - 72 * 60 * 60 * 1000);
+  
+    // 🔹 Formatear en formato 12h con AM/PM
+    return format(deadline, "d MMM yyyy, h:mm a", { locale: es }).toUpperCase();
   };
-
+  
   const getCurrentAmount = (b: BookingData) => {
     const previousBalance = Number(b.prepaymentAmount) || 0;
     const amount =
