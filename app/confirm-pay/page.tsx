@@ -216,7 +216,7 @@ export default function NewConfirmAndPay() {
           </div>
 
           <CancellationPolicy
-            showPrepayment={selectedDiscountOption === "with-discount"}
+           
           />
 
           <div className="flex items-start space-x-2">
@@ -314,7 +314,7 @@ function PaymentOption({
   );
 }
 
-function CancellationPolicy({ showPrepayment }: { showPrepayment: boolean }) {
+function CancellationPolicy() {
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold text-gray-800">
@@ -328,13 +328,14 @@ function CancellationPolicy({ showPrepayment }: { showPrepayment: boolean }) {
               Anulación gratuita hasta 72 horas antes del check-in. Después de
               este período, no hay reembolso disponible.
             </p>
-           
+          
           </div>
         </div>
       </div>
     </div>
   );
 }
+
 
 function BookingSummary({
   bookingData,
