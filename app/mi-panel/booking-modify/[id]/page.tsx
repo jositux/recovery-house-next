@@ -332,6 +332,7 @@ export default function BookingModifyPage() {
         name: room.name,
         unit_amount: paymentDifference,
         paymentAmount: paymentDifference,
+        checkInHour: room.check_in_hour,
       }
 
       localStorage.removeItem("booking")

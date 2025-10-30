@@ -6,8 +6,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent } from "@/components/ui/card";
 import { CalendarDays, Users, CheckCircle2, AlertCircle } from "lucide-react";
 import Image from "next/image";
+import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { toZonedTime, format } from "date-fns-tz";
+import { toZonedTime } from "date-fns-tz";
+
+
 
 interface BookingData {
   checkIn: string;
@@ -31,6 +34,7 @@ interface BookingData {
   propertyName: string;
   description: string;
   photo: string;
+  checkInHour: string;
 }
 
 type PaymentType = "fullpayment" | "prepayment";
@@ -69,13 +73,24 @@ export default function NewConfirmAndPay() {
   // 🔹 Fecha límite pago (72h antes del check-in)
   const getPaymentDeadline = (b: BookingData) => {
     if (!b.checkIn) return "";
+  
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const checkInZoned = toZonedTime(b.checkIn, timeZone);
+  
+    // 🔹 Combinar fecha y hora
+    const dateTimeString = b.checkInHour
+      ? `${b.checkIn}T${b.checkInHour}`
+      : `${b.checkIn}T00:00:00`;
+  
+    // 🔹 Convertir a zona horaria local
+    const checkInZoned = toZonedTime(dateTimeString, timeZone);
+  
+    // 🔹 Restar 72 horas (3 días)
     const deadline = new Date(checkInZoned);
     deadline.setHours(deadline.getHours() - 72);
-    return format(deadline, "d MMM yyyy, HH:mm", { locale: es });
+  
+    // 🔹 Formatear salida
+    return format(deadline, "d MMM yyyy, h:mm a", { locale: es });
   };
-
   const getCurrentAmount = (b: BookingData) => {
     return selectedDiscountOption === "with-discount"
       ? getPrepaymentAmount(b)
@@ -216,7 +231,7 @@ export default function NewConfirmAndPay() {
               className="text-sm text-gray-700 leading-relaxed cursor-pointer"
             >
               Acepto la{" "}
-              <a href="#" className="text-blue-600 hover:underline">
+              <a href="/terms" className="text-blue-600 hover:underline">
                 Política de Reembolso para Huéspedes
               </a>
               .
@@ -313,14 +328,7 @@ function CancellationPolicy({ showPrepayment }: { showPrepayment: boolean }) {
               Anulación gratuita hasta 72 horas antes del check-in. Después de
               este período, no hay reembolso disponible.
             </p>
-            {showPrepayment && (
-              <p className="mt-2 text-blue-800">
-                <strong>Pago Anticipado:</strong> Si cancelas después de las 72
-                horas, se reembolsa el monto pagado menos el anticipo. Si no
-                completas el pago del saldo antes de las 72 horas del check-in,
-                pierdes el anticipo.
-              </p>
-            )}
+           
           </div>
         </div>
       </div>
