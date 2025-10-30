@@ -52,17 +52,18 @@ export function CancellationPolicyDialogContent() {
               </span>
             </div>
             <div className="flex items-start gap-2">
-              <span className="font-medium text-red-600">•</span>
-              <span>
-                <strong>Después de 24hs y antes de las 72hs del checkIn:</strong> Se devuelve el monto total menos el anticipo (que se retiene como penalización).
-              </span>
-            </div>
-            <div className="flex items-start gap-2">
-              <span className="font-medium text-red-600">•</span>
-              <span>
-                <strong>Después de las 72 horas antes del checkIn:</strong>  No hay reembolso. Se retiene el anticipo y el saldo pagado.
-              </span>
-            </div>
+  <span className="font-medium text-red-600">•</span>
+  <span>
+    <strong>Entre 24 y 72 horas antes del check-in:</strong> Se reintegra el monto total menos el anticipo, que se retiene como penalización.
+  </span>
+</div>
+<div className="flex items-start gap-2">
+  <span className="font-medium text-red-600">•</span>
+  <span>
+    <strong>Con menos de 72 horas para el check-in:</strong> No se realiza ningún reembolso. Se retiene el anticipo y cualquier saldo ya abonado.
+  </span>
+</div>
+
           </div>
         </div>
 
@@ -85,14 +86,14 @@ export function CancellationPolicyDialogContent() {
             <div className="flex items-start gap-2">
               <span className="font-medium text-orange-600">•</span>
               <span>
-                <strong>Después de 15 días desde la reserva:</strong> Se devuelve el monto total menos el anticipo (que
-                se retiene como penalización).
+                <strong>Con menos 15 días desde la reserva:</strong> Se devuelve el monto total menos el anticipo, que
+                se retiene como penalización.
               </span>
             </div>
             <div className="flex items-start gap-2">
               <span className="font-medium text-red-600">•</span>
               <span>
-                <strong>Si el pago del saldo no se completa 72hs antes del check-in:</strong> Se pierde el anticipo como
+                <strong>Si el pago del saldo no se completa 72 horas antes del check-in:</strong> Se pierde el anticipo como
                 penalización.
               </span>
             </div>
