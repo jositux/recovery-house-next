@@ -67,17 +67,18 @@ export function HowToUseSection() {
               </div>
             ))}
 
-            <div className="flex gap-4">
-              <Link href="/rooms">
-                <Button className="bg-[#3184B4] hover:bg-[#39759E] flex items-center gap-2">
-                  <Search size={16} />
-                  Buscar
-                </Button>
-              </Link>
-              <Link href="/registro">
-                <Button variant="outline">Registrarse</Button>
-              </Link>
-            </div>
+<div className="flex gap-4 sm:justify-start justify-center">
+  <Link href="/rooms">
+    <Button className="bg-[#3184B4] hover:bg-[#39759E] flex items-center gap-2">
+      <Search size={16} />
+      Buscar
+    </Button>
+  </Link>
+  <Link href="/registro">
+    <Button variant="outline">Registrarse</Button>
+  </Link>
+</div>
+
           </div>
         </div>
       </div>

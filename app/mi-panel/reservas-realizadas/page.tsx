@@ -702,7 +702,7 @@ const BookingList = () => {
                         <h2
                           className={`${fraunces.className} text-2xl font-normal text-[#162F40]`}
                         >
-                          Próximas Pasadas
+                          Reservas Pasadas
                         </h2>
                         <p className="text-gray-500">
                           Historial de estadías completadas ({past.length})

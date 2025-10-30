@@ -32,7 +32,7 @@ export function BenefitsSection() {
               transporte seguro y lavandería, entre otros. Esto permite que los
               pacientes se enfoquen únicamente en su recuperación.
             </p>
-            <div className="flex gap-4">
+            <div className="flex gap-4 sm:justify-start justify-center">
               <Link href="/rooms">
                 <Button className="bg-[#39759E] hover:bg-[#39759E] flex items-center gap-2">
                   <Search size={16} />
