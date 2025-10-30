@@ -658,7 +658,7 @@ export default function RoomForm({ onSubmit, initialValues, isUploading = false 
             {form.formState.isSubmitting || isUploading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {isUploading ? "Subiendo imágenes..." : "Guardando..."}
+                {isUploading ? "Subiendo Fotos..." : "Guardando..."}
               </>
             ) : (
               "Guardar"
