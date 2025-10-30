@@ -1,16 +1,16 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { getCurrentUser } from "@/services/userService";
-import { cancelBooking } from "@/services/BookingCancelService";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Loader2, Home, Search, CheckCircle2 } from "lucide-react";
-import { BookingCard } from "./components/booking-card";
-import { BookingCardPast } from "./components/booking-card-past";
-import { CancelBookingModal } from "./components/cancel-booking-modal";
-import { SuccessModal } from "./components/success-modal";
-import { PaymentModal } from "./components/payment-modal";
+import { useState, useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { getCurrentUser } from "@/services/userService"
+import { cancelBooking } from "@/services/BookingCancelService"
+import { useRouter, useSearchParams } from "next/navigation"
+import { Loader2, Home, Search, CheckCircle2 } from "lucide-react"
+import { BookingCard } from "./components/booking-card"
+import { BookingCardPast } from "./components/booking-card-past"
+import { CancelBookingModal } from "./components/cancel-booking-modal"
+import { SuccessModal } from "./components/success-modal"
+import { PaymentModal } from "./components/payment-modal"
 import {
   Dialog,
   DialogContent,
@@ -18,180 +18,175 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Fraunces } from "next/font/google";
+} from "@/components/ui/dialog"
+import { Fraunces } from "next/font/google"
 
-const fraunces = Fraunces({ subsets: ["latin"] });
+const fraunces = Fraunces({ subsets: ["latin"] })
 
 interface Photo {
   directus_files_id: {
-    id: string;
-  };
+    id: string
+  }
 }
 
 interface Room {
-  id: string;
-  name: string;
-  roomNumber: string;
-  beds: number;
-  capacity: number;
-  description: string;
-  cleaningFee: string;
-  pricePerNight: string;
-  descriptionService: string;
-  isPrivate: boolean;
-  singleBeds: number;
-  doubleBeds: number;
-  privateRoomPrice: string;
-  privateRoomCleaning: string;
-  sharedRoomPrice: string;
-  sharedRoomCleaning: string;
-  bedType: string;
-  bedName: string;
-  photos: Photo[];
-  propertyId: Property;
+  id: string
+  name: string
+  roomNumber: string
+  beds: number
+  capacity: number
+  description: string
+  cleaningFee: string
+  pricePerNight: string
+  descriptionService: string
+  isPrivate: boolean
+  singleBeds: number
+  doubleBeds: number
+  privateRoomPrice: string
+  privateRoomCleaning: string
+  sharedRoomPrice: string
+  sharedRoomCleaning: string
+  bedType: string
+  bedName: string
+  photos: Photo[]
+  propertyId: Property
 }
 
 interface Property {
-  id: string;
-  name: string;
-  country: string;
-  state: string;
-  city: string;
-  address: string;
-  fullAddress: string;
-  hostName: string;
-  description: string;
-  mainImage: string;
-  type: string;
+  id: string
+  name: string
+  country: string
+  state: string
+  city: string
+  address: string
+  fullAddress: string
+  hostName: string
+  description: string
+  mainImage: string
+  type: string
 }
 
 interface Booking {
-  id: string;
-  status: string;
-  checkOut: string;
-  checkIn: string;
-  patient: string;
-  ownerId: string;
-  guests: number;
-  price: string;
-  finalPrice: string;
-  cleaning: string;
-  room: Room;
-  roomName?: string | null;
-  roomDescription?: string | null;
-  propertyName?: string | null;
-  paymentId?: string | null;
-  ownerName?: string | null;
-  patientName?: string | null;
-  isPrivate?: boolean;
-  singleBeds?: number | null;
-  doubleBeds?: number | null;
-  singleBedPrice?: string | null;
-  doubleBedPrice?: string | null;
-  singleBedCleaningPrice?: string | null;
-  doubleBedCleaningPrice?: string | null;
-  discountStayAmount: string | null;
-  prepaymentPercentageApplied: 10;
-  prepaymentAmount: string | null;
-  balanceAmount: string | null;
-  balancePaymentDate: string | null;
-  bookingDateUpdated: string | null;
-  bookingDateCreated: string | null;
-  discountStayType: string | null;
-  discountPercentageStayApplied: number | null;
-  modificationCount: number;
-  prepaymentModificationAmount: number;
-  numberOfNights: number | null;
-  prepaymentDate: string | null;
-  fullAmount: string | null;
-  fullPaymentDate: string | null;
-  cancelledById: string | null;
-  cancelledByType: string | null;
-  cancelledDate: string | null;
-  cancelledMessage: string | null;
-  bookingState: string | null;
-  paymentState: string | null;
-  review?: Review | null;
-  outstandingBalanceAmount: string | null;
-  refundAmount: string | null;
-  paymentReceivedAmount: string | null;
+  id: string
+  status: string
+  checkOut: string
+  checkIn: string
+  checkInHour: string
+  checkOutHour: string
+  patient: string
+  ownerId: string
+  guests: number
+  price: string
+  finalPrice: string
+  cleaning: string
+  room: Room
+  roomName?: string | null
+  roomDescription?: string | null
+  propertyName?: string | null
+  paymentId?: string | null
+  ownerName?: string | null
+  patientName?: string | null
+  isPrivate?: boolean
+  singleBeds?: number | null
+  doubleBeds?: number | null
+  singleBedPrice?: string | null
+  doubleBedPrice?: string | null
+  singleBedCleaningPrice?: string | null
+  doubleBedCleaningPrice?: string | null
+  discountStayAmount: string | null
+  prepaymentPercentageApplied: 10
+  prepaymentAmount: string | null
+  balanceAmount: string | null
+  balancePaymentDate: string | null
+  bookingDateUpdated: string | null
+  bookingDateCreated: string | null
+  discountStayType: string | null
+  discountPercentageStayApplied: number | null
+  modificationCount: number
+  prepaymentModificationAmount: number
+  numberOfNights: number | null
+  prepaymentDate: string | null
+  fullAmount: string | null
+  fullPaymentDate: string | null
+  cancelledById: string | null
+  cancelledByType: string | null
+  cancelledDate: string | null
+  cancelledMessage: string | null
+  bookingState: string | null
+  paymentState: string | null
+  review?: Review | null
+  outstandingBalanceAmount: string | null
+  refundAmount: string | null
+  paymentReceivedAmount: string | null
 }
 
 interface Ratings {
-  cleanliness: number;
-  attention: number;
-  location: number;
-  accuracy: number;
+  cleanliness: number
+  attention: number
+  location: number
+  accuracy: number
 }
 
 interface Review {
-  id: string;
-  bookingId: string;
-  roomId: string;
-  name: string;
-  comment: string;
-  ranking: Ratings; // 👈 así viene del backend
-  status: string;
-  dateCreated: string;
+  id: string
+  bookingId: string
+  roomId: string
+  name: string
+  comment: string
+  ranking: Ratings // 👈 así viene del backend
+  status: string
+  dateCreated: string
   //review_replies: any[]
 }
 
 interface PaymentDisplayValues {
-  shownAnticipo: number;
-  shownPendiente: number;
-  modificationDiff: number | null;
+  shownAnticipo: number
+  shownPendiente: number
+  modificationDiff: number | null
 }
 
 const BookingList = () => {
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [bookings, setBookings] = useState<Booking[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
-  const [cancelReason, setCancelReason] = useState("");
-  const [selectedCancelBookingId, setSelectedCancelBookingId] = useState<
-    string | null
-  >(null);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false)
+  const [cancelReason, setCancelReason] = useState("")
+  const [selectedCancelBookingId, setSelectedCancelBookingId] = useState<string | null>(null)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
 
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [selectedPaymentBookingId, setSelectedPaymentBookingId] = useState<
-    string | null
-  >(null);
-  const [selectedBalanceAmount, setSelectedBalanceAmount] =
-    useState<string>("");
-  const [showModifySuccessDialog, setShowModifySuccessDialog] = useState(false);
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false)
+  const [selectedPaymentBookingId, setSelectedPaymentBookingId] = useState<string | null>(null)
+  const [selectedBalanceAmount, setSelectedBalanceAmount] = useState<string>("")
+  const [showModifySuccessDialog, setShowModifySuccessDialog] = useState(false)
+  const router = useRouter()
+  const searchParams = useSearchParams()
 
   const handleCancelBooking = (bookingId: string) => {
-    setSelectedCancelBookingId(bookingId);
-    setIsCancelModalOpen(true);
-  };
+    setSelectedCancelBookingId(bookingId)
+    setIsCancelModalOpen(true)
+  }
 
   const handleConfirmCancel = async () => {
     if (selectedCancelBookingId && cancelReason.trim()) {
       try {
-        const accessToken = localStorage.getItem("access_token");
+        const accessToken = localStorage.getItem("access_token")
         if (!accessToken) {
-          console.error("No hay access_token");
-          return;
+          console.error("No hay access_token")
+          return
         }
 
-        const bookingId = selectedCancelBookingId;
-        const selectedBooking = bookings.find(
-          (booking) => booking.id === selectedCancelBookingId
-        );
+        const bookingId = selectedCancelBookingId
+        const selectedBooking = bookings.find((booking) => booking.id === selectedCancelBookingId)
 
         const payload = {
           cancelledById: selectedBooking?.patient || "",
           cancelledDate: new Date().toISOString(),
           cancelledMessage: cancelReason,
-        };
+        }
 
-        const result = await cancelBooking(bookingId, payload, accessToken);
-        console.log("Cancelación exitosa:", result);
+        const result = await cancelBooking(bookingId, payload, accessToken)
+        console.log("Cancelación exitosa:", result)
 
         setBookings((prevBookings) =>
           prevBookings.map((booking) =>
@@ -203,47 +198,47 @@ const BookingList = () => {
                   cancelledDate: new Date().toISOString(),
                   cancelledMessage: cancelReason,
                 }
-              : booking
-          )
-        );
+              : booking,
+          ),
+        )
 
-        setIsCancelModalOpen(false);
-        setShowSuccessModal(true);
-        setCancelReason("");
-        setSelectedCancelBookingId(null);
+        setIsCancelModalOpen(false)
+        setShowSuccessModal(true)
+        setCancelReason("")
+        setSelectedCancelBookingId(null)
       } catch (error) {
-        console.error("Error al cancelar la reserva:", error);
+        console.error("Error al cancelar la reserva:", error)
       }
     }
-  };
+  }
 
   const handleCancelModalClose = () => {
-    setIsCancelModalOpen(false);
-    setCancelReason("");
-    setSelectedCancelBookingId(null);
-  };
+    setIsCancelModalOpen(false)
+    setCancelReason("")
+    setSelectedCancelBookingId(null)
+  }
 
   const handleSuccessModalClose = () => {
-    setShowSuccessModal(false);
-  };
+    setShowSuccessModal(false)
+  }
 
   const handlePayBalance = (bookingId: string, balanceAmount: string) => {
-    setSelectedPaymentBookingId(bookingId);
-    setSelectedBalanceAmount(balanceAmount);
-    setIsPaymentModalOpen(true);
-  };
+    setSelectedPaymentBookingId(bookingId)
+    setSelectedBalanceAmount(balanceAmount)
+    setIsPaymentModalOpen(true)
+  }
 
   const handleConfirmPayment = async () => {
     if (selectedPaymentBookingId) {
       try {
-        const booking = bookings.find((b) => b.id === selectedPaymentBookingId);
+        const booking = bookings.find((b) => b.id === selectedPaymentBookingId)
         if (!booking) {
-          console.error("Booking not found");
-          return;
+          console.error("Booking not found")
+          return
         }
 
-        const paymentDisplay = calculatePaymentDisplay(booking);
-        const correctPaymentAmount = paymentDisplay.shownPendiente;
+        const paymentDisplay = calculatePaymentDisplay(booking)
+        const correctPaymentAmount = paymentDisplay.shownPendiente
 
         const newEntry = {
           bookingId: booking.id,
@@ -251,9 +246,9 @@ const BookingList = () => {
           paymentAmount: correctPaymentAmount.toString(), // Use calculated amount instead of raw balanceAmount
           paymentDate: new Date().toISOString(),
           paymentType: "balancepayment",
-        };
+        }
 
-        localStorage.setItem("bookingBalanced", JSON.stringify(newEntry));
+        localStorage.setItem("bookingBalanced", JSON.stringify(newEntry))
 
         setBookings((prevBookings) =>
           prevBookings.map((b) =>
@@ -264,38 +259,38 @@ const BookingList = () => {
                   paymentDate: new Date().toISOString(),
                   balanceAmount: b.balanceAmount,
                 }
-              : b
-          )
-        );
+              : b,
+          ),
+        )
 
-        setIsPaymentModalOpen(false);
-        setSelectedPaymentBookingId(null);
-        setSelectedBalanceAmount("");
+        setIsPaymentModalOpen(false)
+        setSelectedPaymentBookingId(null)
+        setSelectedBalanceAmount("")
 
-        router.push("/checkout-balanced");
+        router.push("/checkout-balanced")
       } catch (error) {
-        console.error("Error processing payment:", error);
+        console.error("Error processing payment:", error)
       }
     }
-  };
+  }
 
   const handlePaymentModalClose = () => {
-    setIsPaymentModalOpen(false);
-    setSelectedPaymentBookingId(null);
-    setSelectedBalanceAmount("");
-  };
+    setIsPaymentModalOpen(false)
+    setSelectedPaymentBookingId(null)
+    setSelectedBalanceAmount("")
+  }
 
   const handleReviewSubmit = async (
     bookingId: string,
     roomId: string,
     name: string,
     ratings: Ratings,
-    comment: string
+    comment: string,
   ) => {
     try {
-      const token = localStorage.getItem("access_token");
+      const token = localStorage.getItem("access_token")
 
-      if (!token) throw new Error("No access token found");
+      if (!token) throw new Error("No access token found")
 
       const response = await fetch("/webapi/items/Reviews", {
         method: "POST",
@@ -310,243 +305,211 @@ const BookingList = () => {
           ranking: ratings,
           comment,
         }),
-      });
+      })
 
-      if (!response.ok) throw new Error("Failed to submit review");
+      if (!response.ok) throw new Error("Failed to submit review")
 
-      console.log("[v0] Review submitted successfully for booking:", bookingId);
+      console.log("[v0] Review submitted successfully for booking:", bookingId)
     } catch (error) {
-      console.error("Error submitting review:", error);
+      console.error("Error submitting review:", error)
     }
-  };
+  }
 
   const handleReviewDelete = async (bookingId: string) => {
     try {
-      const token = localStorage.getItem("access_token");
-      if (!token) throw new Error("No access token found");
+      const token = localStorage.getItem("access_token")
+      if (!token) throw new Error("No access token found")
 
-      const response = await fetch(
-        `/webapi/items/Reviews?filter[bookingId][_eq]=${bookingId}`,
-        {
+      const response = await fetch(`/webapi/items/Reviews?filter[bookingId][_eq]=${bookingId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      })
+
+      const data = await response.json()
+
+      if (data.data && data.data.length > 0) {
+        const reviewId = data.data[0].id
+
+        const deleteResponse = await fetch(`/webapi/items/Reviews/${reviewId}`, {
+          method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-        }
-      );
+        })
 
-      const data = await response.json();
+        if (!deleteResponse.ok) throw new Error("Failed to delete review")
 
-      if (data.data && data.data.length > 0) {
-        const reviewId = data.data[0].id;
-
-        const deleteResponse = await fetch(
-          `/webapi/items/Reviews/${reviewId}`,
-          {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        if (!deleteResponse.ok) throw new Error("Failed to delete review");
-
-        console.log("[v0] Review deleted successfully for booking:", bookingId);
+        console.log("[v0] Review deleted successfully for booking:", bookingId)
       } else {
-        console.warn("No review found for booking:", bookingId);
+        console.warn("No review found for booking:", bookingId)
       }
     } catch (error) {
-      console.error("Error deleting review:", error);
+      console.error("Error deleting review:", error)
     }
-  };
+  }
 
   const separateBookingsByDate = (bookings: Booking[]) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const now = new Date()
 
     const sortedBookings = [...bookings].sort((a, b) => {
-      const dateA = a.bookingDateCreated
-        ? new Date(a.bookingDateCreated).getTime()
-        : 0;
-      const dateB = b.bookingDateCreated
-        ? new Date(b.bookingDateCreated).getTime()
-        : 0;
-      return dateB - dateA;
-    });
+      const dateA = a.bookingDateCreated ? new Date(a.bookingDateCreated).getTime() : 0
+      const dateB = b.bookingDateCreated ? new Date(b.bookingDateCreated).getTime() : 0
+      return dateB - dateA
+    })
 
     const upcoming = sortedBookings.filter((booking) => {
-      const checkoutDate = new Date(booking.checkOut);
-      checkoutDate.setHours(0, 0, 0, 0);
-      return checkoutDate >= today;
-    });
+      const checkoutDateTime = combineDateAndTime(booking.checkOut, booking.checkOutHour)
+      return checkoutDateTime >= now
+    })
 
     const past = sortedBookings.filter((booking) => {
-      const checkoutDate = new Date(booking.checkOut);
-      checkoutDate.setHours(0, 0, 0, 0);
-      return checkoutDate < today;
-    });
+      const checkoutDateTime = combineDateAndTime(booking.checkOut, booking.checkOutHour)
+      return checkoutDateTime < now
+    })
 
-    return { upcoming, past };
-  };
+    return { upcoming, past }
+  }
 
   const calculatePaymentDisplay = (booking: Booking): PaymentDisplayValues => {
-    const prepayment = Number(booking.prepaymentAmount);
-    //const prepaymentMod = Number(booking.prepaymentModificationAmount)
-    // const balance = Number(booking.balanceAmount)
-    const fullAmount = Number(booking.fullAmount);
-    const finalPrice = Number(booking.finalPrice);
+    const prepayment = Number(booking.prepaymentAmount)
+    const fullAmount = Number(booking.fullAmount)
+    const finalPrice = Number(booking.finalPrice)
 
-    if (
-      booking.paymentState === "fullpayment" &&
-      booking.modificationCount === 1
-    ) {
-      const diff = fullAmount - finalPrice;
+    if (booking.paymentState === "fullpayment" && booking.modificationCount === 1) {
+      const diff = fullAmount - finalPrice
       return {
         shownAnticipo: 0,
         shownPendiente: 0,
         modificationDiff: diff !== 0 ? diff : null,
-      };
+      }
     }
 
-    if (
-      booking.paymentState === "prepayment" &&
-      booking.modificationCount === 1
-    ) {
-      const shownAnticipo = Number(booking.paymentReceivedAmount);
-      const shownPendiente = Number(booking.outstandingBalanceAmount);
+    if (booking.paymentState === "prepayment" && booking.modificationCount === 1) {
+      const shownAnticipo = Number(booking.paymentReceivedAmount)
+      const shownPendiente = Number(booking.outstandingBalanceAmount)
 
       return {
         shownAnticipo,
         shownPendiente,
         modificationDiff: null,
-      };
+      }
     }
 
-    if (
-      booking.paymentState === "prepayment" &&
-      booking.modificationCount === 0
-    ) {
+    if (booking.paymentState === "prepayment" && booking.modificationCount === 0) {
       return {
         shownAnticipo: prepayment,
         shownPendiente: Number(booking.outstandingBalanceAmount),
         modificationDiff: null,
-      };
+      }
     }
 
     return {
       shownAnticipo: 0,
       shownPendiente: 0,
       modificationDiff: null,
-    };
-  };
+    }
+  }
+
+  const combineDateAndTime = (dateStr: string, timeStr: string): Date => {
+    // Extract just the date part (YYYY-MM-DD) to avoid UTC conversion issues
+    const datePart = dateStr.includes("T") ? dateStr.split("T")[0] : dateStr
+    const [year, month, day] = datePart.split("-").map(Number)
+
+    // Parse time string
+    const [hours = 0, minutes = 0, seconds = 0] = timeStr.split(":").map(Number)
+
+    // Create date in local timezone (not UTC) to avoid day shifts
+    return new Date(year, month - 1, day, hours, minutes, seconds)
+  }
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setIsLoading(true);
-        const token = localStorage.getItem("access_token");
+        setIsLoading(true)
+        const token = localStorage.getItem("access_token")
 
         if (!token) {
-          console.log("No access token found, using mock data for demo");
-          setIsLoading(false);
-          return;
+          console.log("No access token found, using mock data for demo")
+          setIsLoading(false)
+          return
         }
 
-        const user = await getCurrentUser(token);
+        const user = await getCurrentUser(token)
 
         const bookingsResponse = await fetch(
-          `/webapi/items/Booking?filter[patient][_eq]=${user.id}&fields=*, +room.*, +room.photos.directus_files_id.id, +room.propertyId.*&sort=-bookingDateCreated`
-        );
-        const bookingsData = await bookingsResponse.json();
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+          `/webapi/items/Booking?filter[patient][_eq]=${user.id}&fields=*, +room.*, +room.photos.directus_files_id.id, +room.propertyId.*&sort=-bookingDateCreated`,
+        )
+        const bookingsData = await bookingsResponse.json()
 
         const bookingsWithReviews = await Promise.all(
           bookingsData.data.map(async (booking: Booking) => {
             try {
-              const checkOutDate = new Date(booking.checkOut);
+              const checkOutDate = new Date(booking.checkOut)
 
-              if (checkOutDate >= today) {
-                return { ...booking, review: null };
+              if (checkOutDate >= new Date()) {
+                return { ...booking, review: null }
               }
 
-              const reviewResponse = await fetch(
-                `/webapi/items/Reviews?filter[bookingId][_eq]=${booking.id}`,
-                {
-                  headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                  },
-                }
-              );
+              const reviewResponse = await fetch(`/webapi/items/Reviews?filter[bookingId][_eq]=${booking.id}`, {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  "Content-Type": "application/json",
+                },
+              })
 
               if (!reviewResponse.ok) {
-                console.warn(
-                  `Failed to fetch review for booking ${booking.id}:`,
-                  reviewResponse.status
-                );
-                return { ...booking, review: null };
+                console.warn(`Failed to fetch review for booking ${booking.id}:`, reviewResponse.status)
+                return { ...booking, review: null }
               }
 
-              const reviewData = await reviewResponse.json();
+              const reviewData = await reviewResponse.json()
 
-              console.log(
-                "[v0] Review data for booking:",
-                booking.id,
-                reviewData
-              );
+              console.log("[v0] Review data for booking:", booking.id, reviewData)
 
-              booking.review = reviewData;
+              booking.review = reviewData
 
               return {
                 ...booking,
                 review: reviewData?.data?.[0] ?? null,
-              };
+              }
             } catch (error) {
-              console.error(
-                `Error fetching review for booking ${booking.id}:`,
-                error
-              );
-              return { ...booking, review: null };
+              console.error(`Error fetching review for booking ${booking.id}:`, error)
+              return { ...booking, review: null }
             }
-          })
-        );
+          }),
+        )
 
-        setBookings(bookingsWithReviews);
+        setBookings(bookingsWithReviews)
       } catch (error) {
-        console.error("Error fetching data:", error);
-        setError(
-          "Error al cargar las reservas. Por favor, intente de nuevo más tarde."
-        );
+        console.error("Error fetching data:", error)
+        setError("Error al cargar las reservas. Por favor, intente de nuevo más tarde.")
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
-
-    fetchData();
-
-    const rel = searchParams.get("rel");
-    if (rel === "modify") {
-      setShowModifySuccessDialog(true);
     }
-  }, [searchParams]);
+
+    fetchData()
+
+    const rel = searchParams.get("rel")
+    if (rel === "modify") {
+      setShowModifySuccessDialog(true)
+    }
+  }, [searchParams])
 
   const handleModifySuccessClose = () => {
-    setShowModifySuccessDialog(false);
-  };
+    setShowModifySuccessDialog(false)
+  }
 
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2 text-lg text-gray-700">
-          Cargando mis reservas...
-        </span>
+        <span className="ml-2 text-lg text-gray-700">Cargando mis reservas...</span>
       </div>
-    );
+    )
   }
 
   if (error) {
@@ -554,15 +517,12 @@ const BookingList = () => {
       <div className="container mx-auto p-4 text-center text-red-500">
         <p className="text-xl font-semibold">{error}</p>
       </div>
-    );
+    )
   }
 
   return (
     <div className="container mx-auto py-4">
-      <SuccessModal
-        isOpen={showSuccessModal}
-        onClose={handleSuccessModalClose}
-      />
+      <SuccessModal isOpen={showSuccessModal} onClose={handleSuccessModalClose} />
 
       <CancelBookingModal
         isOpen={isCancelModalOpen}
@@ -579,10 +539,7 @@ const BookingList = () => {
         onClose={handlePaymentModalClose}
       />
 
-      <Dialog
-        open={showModifySuccessDialog}
-        onOpenChange={setShowModifySuccessDialog}
-      >
+      <Dialog open={showModifySuccessDialog} onOpenChange={setShowModifySuccessDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <div className="flex items-center justify-center mb-4">
@@ -590,19 +547,13 @@ const BookingList = () => {
                 <CheckCircle2 className="h-8 w-8 text-green-600" />
               </div>
             </div>
-            <DialogTitle className="text-center text-xl">
-              ¡Modificación Exitosa!
-            </DialogTitle>
+            <DialogTitle className="text-center text-xl">¡Modificación Exitosa!</DialogTitle>
             <DialogDescription className="text-center text-base pt-2">
-              Se ha modificado la reserva exitosamente. Puedes ver todas las
-              reservas que tienes hechas.
+              Se ha modificado la reserva exitosamente. Puedes ver todas las reservas que tienes hechas.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="sm:justify-center">
-            <Button
-              onClick={handleModifySuccessClose}
-              className="w-full sm:w-auto px-8"
-            >
+            <Button onClick={handleModifySuccessClose} className="w-full sm:w-auto px-8">
               Ver Reservas
             </Button>
           </DialogFooter>
@@ -619,13 +570,12 @@ const BookingList = () => {
                 </div>
 
                 <div className="space-y-3">
-                  <h1 className="text-2xl md:text-3xl font-semibold text-gray-900">
+                  <h1 className={`${fraunces.className} text-2xl md:text-3xl font-semibold text-gray-900`}>
                     ¡Encuentra tu espacio ideal para una recuperación tranquila!
                   </h1>
                   <p className="text-base text-gray-600 max-w-md mx-auto">
-                    Aún no tienes reservas, pero estamos aquí para ayudarte a
-                    encontrar la casa de recuperación perfecta para tu proceso
-                    de sanación y bienestar.{" "}
+                    Aún no tienes reservas, pero estamos aquí para ayudarte a encontrar la casa de recuperación perfecta
+                    para tu proceso de sanación y bienestar.{" "}
                   </p>{" "}
                 </div>
 
@@ -644,14 +594,10 @@ const BookingList = () => {
         </main>
       ) : (
         <div className="space-y-12">
-          <h1
-            className={`${fraunces.className} text-3xl font-normal text-[#162F40]`}
-          >
-            Mis Reservas
-          </h1>
+          <h1 className={`${fraunces.className} text-3xl font-normal text-[#162F40]`}>Mis Reservas</h1>
 
           {(() => {
-            const { upcoming, past } = separateBookingsByDate(bookings);
+            const { upcoming, past } = separateBookingsByDate(bookings)
 
             return (
               <>
@@ -662,20 +608,16 @@ const BookingList = () => {
                         <div className="w-3 h-8 bg-gradient-to-b from-emerald-500 to-emerald-600 rounded-full"></div>
                       </div>
                       <div className="ml-4">
-                        <h2
-                          className={`${fraunces.className} text-2xl font-normal text-[#162F40]`}
-                        >
+                        <h2 className={`${fraunces.className} text-2xl font-normal text-[#162F40]`}>
                           Próximas Reservas
                         </h2>
 
-                        <p className="text-gray-600">
-                          Reservas activas y futuras ({upcoming.length})
-                        </p>
+                        <p className="text-gray-600">Reservas activas y futuras ({upcoming.length})</p>
                       </div>
                     </div>
                     <ul className="space-y-6">
                       {upcoming.map((booking) => {
-                        const paymentDisplay = calculatePaymentDisplay(booking);
+                        const paymentDisplay = calculatePaymentDisplay(booking)
 
                         return (
                           <li key={booking.id}>
@@ -686,7 +628,7 @@ const BookingList = () => {
                               onPayBalance={handlePayBalance}
                             />
                           </li>
-                        );
+                        )
                       })}
                     </ul>
                   </section>
@@ -699,14 +641,10 @@ const BookingList = () => {
                         <div className="w-3 h-8 bg-gradient-to-b from-gray-400 to-gray-500 rounded-full"></div>
                       </div>
                       <div className="ml-4">
-                        <h2
-                          className={`${fraunces.className} text-2xl font-normal text-[#162F40]`}
-                        >
+                        <h2 className={`${fraunces.className} text-2xl font-normal text-[#162F40]`}>
                           Reservas Pasadas
                         </h2>
-                        <p className="text-gray-500">
-                          Historial de estadías completadas ({past.length})
-                        </p>
+                        <p className="text-gray-500">Historial de estadías completadas ({past.length})</p>
                       </div>
                     </div>
                     <ul className="space-y-6">
@@ -725,12 +663,12 @@ const BookingList = () => {
                   </section>
                 )}
               </>
-            );
+            )
           })()}
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default BookingList;
+export default BookingList

@@ -64,8 +64,10 @@ interface Room {
 interface Booking {
   id: string;
   status: string;
-  checkOut: string;
   checkIn: string;
+  checkOut: string;
+  checkInHour: string;
+  checkOutHour: string;
   patient: string;
   ownerId: string;
   guests: number;
@@ -125,11 +127,38 @@ interface BookingCardProps {
 
 // ✅ función universal para obtener una fecha local correcta
 const toLocalDateFromString = (isoOrDateString: string | undefined): Date => {
-  if (!isoOrDateString) return new Date(0);
-  const datePart = isoOrDateString.split("T")[0];
-  const [y, m, d] = datePart.split("-").map(Number);
-  return new Date(y, m - 1, d); // medianoche local sin UTC shift
-};
+  if (!isoOrDateString) return new Date(0)
+  const datePart = isoOrDateString.split("T")[0]
+  const [y, m, d] = datePart.split("-").map(Number)
+  return new Date(y, m - 1, d) // medianoche local sin UTC shift
+}
+
+const combineDateAndTime = (dateString: string, timeString: string): Date => {
+  // Extraer la fecha del dateString
+  const datePart = dateString.split("T")[0]
+  const [year, month, day] = datePart.split("-").map(Number)
+
+  // Extraer hora, minutos y segundos del timeString (formato "16:00:00")
+  const [hours, minutes, seconds] = timeString.split(":").map(Number)
+
+  // Crear fecha completa con hora exacta
+  return new Date(year, month - 1, day, hours, minutes, seconds)
+}
+
+/*
+const isLessThan72HoursBeforeCheckIn = (checkInDate: string, checkInHour: string): boolean => {
+  const now = new Date()
+  const checkInDateTime = combineDateAndTime(checkInDate, checkInHour)
+
+  // Calcular diferencia en milisegundos
+  const diffInMs = checkInDateTime.getTime() - now.getTime()
+
+  // Convertir a horas
+  const diffInHours = diffInMs / (1000 * 60 * 60)
+
+  // Retornar true si faltan menos de 72 horas y la fecha aún no pasó
+  return diffInHours < 72 && diffInHours >= 0
+}*/
 
 // ✅ función para saber si faltan menos de 3 días para el check-in
 const isLessThan3DaysBeforeCheckIn = (checkInDate: string): boolean => {
@@ -139,6 +168,7 @@ const isLessThan3DaysBeforeCheckIn = (checkInDate: string): boolean => {
   const diff = differenceInCalendarDays(checkIn, todayLocal);
   return diff < 3 && diff >= 0;
 };
+
 
 export const BookingCard = ({
   booking,
@@ -154,8 +184,10 @@ export const BookingCard = ({
 
   const nights = differenceInDays(checkOutDate, checkInDate);
 
-  const isCurrentStay =
-    new Date() >= checkInDate && new Date() <= checkOutDate;
+  const checkInDateTime = combineDateAndTime(booking.checkIn, booking.checkInHour)
+  const checkOutDateTime = combineDateAndTime(booking.checkOut, booking.checkOutHour)
+  const now = new Date()
+  const isCurrentStay = now >= checkInDateTime && now <= checkOutDateTime
 
   const isCancelled =
     booking.bookingState === "cancelled_by_patient" ||
@@ -392,7 +424,9 @@ export const BookingCard = ({
 
               {booking.paymentState === "prepayment" &&
                 !isCancelled &&
-                onPayBalance && (
+                onPayBalance && 
+                !isLessThan3DaysBeforeCheckIn(booking.checkIn) &&
+                (
                   <Button
                     onClick={() =>
                       onPayBalance(
