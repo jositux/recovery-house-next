@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useParams, useSearchParams } from "next/navigation"
-import axios from "axios"
-import Image from "next/image"
+import { useState, useEffect } from "react";
+import { useParams, useSearchParams } from "next/navigation";
+import axios from "axios";
+import Image from "next/image";
 import {
   Bed,
   BedSingle,
@@ -19,120 +19,129 @@ import {
   Calendar,
   Home,
   Info,
-} from "lucide-react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { GoogleMap } from "@/components/ui/google-map"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { MagicBackButton } from "@/components/ui/magic-back-button"
-import { getCurrentUser } from "@/services/userService"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { CannotDeleteDialog } from "./cannot-delete-dialog"
-import { ConfirmDeleteDialog } from "./confirm-delete-dialog"
-import { Fraunces } from "next/font/google"
+} from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { GoogleMap } from "@/components/ui/google-map";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { MagicBackButton } from "@/components/ui/magic-back-button";
+import { getCurrentUser } from "@/services/userService";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { CannotDeleteDialog } from "./cannot-delete-dialog";
+import { ConfirmDeleteDialog } from "./confirm-delete-dialog";
+import { Fraunces } from "next/font/google";
 
-const fraunces = Fraunces({ subsets: ["latin"] })
+const fraunces = Fraunces({ subsets: ["latin"] });
 
 interface ImageType {
-  id: string
-  isModerated: boolean
+  id: string;
+  isModerated: boolean;
 }
 
 type ImageRoom = {
   directus_files_id: {
-    id: string
-    isModerated: boolean
-  }
-}
+    id: string;
+    isModerated: boolean;
+  };
+};
 
 interface FileData {
-  id: string
-  filename_download: string
+  id: string;
+  filename_download: string;
 }
 
 interface Room {
-  id: string
-  name: string
-  description: string
-  pricePerNight: string
-  cleaningFee: string
-  photos: ImageRoom[]
-  extraTags: { ExtraTags_id: string }[]
-  servicesTags: { serviceTags_id: string }[]
-  roomNumber: string
-  beds: number
-  capacity: number
-  isPrivate: boolean
-  singleBeds: number
-  doubleBeds: number
+  id: string;
+  name: string;
+  description: string;
+  pricePerNight: string;
+  cleaningFee: string;
+  photos: ImageRoom[];
+  extraTags: { ExtraTags_id: string }[];
+  servicesTags: { serviceTags_id: string }[];
+  roomNumber: string;
+  beds: number;
+  capacity: number;
+  isPrivate: boolean;
+  singleBeds: number;
+  doubleBeds: number;
   // Precios para habitación o cama
-  privateRoomPrice: number
-  privateRoomCleaning: number
+  privateRoomPrice: number;
+  privateRoomCleaning: number;
 
   // Pricing for SHARED room - 2 campos separados
-  sharedRoomPrice: number
-  sharedRoomCleaning: number
+  sharedRoomPrice: number;
+  sharedRoomCleaning: number;
 
-  bedType: string
-  bedName: string
-  descriptionService: string
-  disabledDates: string
+  bedType: string;
+  bedName: string;
+  descriptionService: string;
+  disabledDates: string;
 }
 
 interface Property {
-  id: string
-  userId: string
-  name: string
-  country: string
-  region: string
-  state: string
-  city: string
+  id: string;
+  userId: string;
+  name: string;
+  country: string;
+  region: string;
+  state: string;
+  city: string;
   place: {
-    type: string
-    coordinates: [number, number]
-  }
-  description: string
-  mainImage: ImageType
-  Rooms: Room[]
-  type: string
-  RNTFile: FileData
-  taxIdEINFile: FileData
-  taxIdApproved: boolean
-  address: string
-  fullAddress: string
-  postalCode: string
+    type: string;
+    coordinates: [number, number];
+  };
+  description: string;
+  mainImage: ImageType;
+  Rooms: Room[];
+  type: string;
+  RNTFile: FileData;
+  taxIdEINFile: FileData;
+  taxIdApproved: boolean;
+  address: string;
+  fullAddress: string;
+  postalCode: string;
 }
 
 export default function RoomPage() {
-  const { id } = useParams()
-  const [property, setProperty] = useState<Property | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [updated, setUpdated] = useState<string | null>(null)
+  const { id } = useParams();
+  const [property, setProperty] = useState<Property | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [updated, setUpdated] = useState<string | null>(null);
 
-  const [isOwner, setIsOwner] = useState(false)
-  const [showModal, setShowModal] = useState(false)
-  const [showCannotDeleteDialog, setShowCannotDeleteDialog] = useState(false)
-  const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState(false)
-  const [cannotDeleteType, setCannotDeleteType] = useState<"room" | "property">("room")
-  const [selectedRoomForDeletion, setSelectedRoomForDeletion] = useState<Room | null>(null)
-  const router = useRouter()
-  const searchParams = useSearchParams()
+  const [isOwner, setIsOwner] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [showCannotDeleteDialog, setShowCannotDeleteDialog] = useState(false);
+  const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState(false);
+  const [cannotDeleteType, setCannotDeleteType] = useState<"room" | "property">(
+    "room"
+  );
+  const [selectedRoomForDeletion, setSelectedRoomForDeletion] =
+    useState<Room | null>(null);
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true)
-      setError(null)
+      setIsLoading(true);
+      setError(null);
 
       try {
-        const accessToken = localStorage.getItem("access_token")
+        const accessToken = localStorage.getItem("access_token");
 
-        let propertyResponse
+        let propertyResponse;
 
         if (accessToken) {
-          const currentUser = await getCurrentUser(accessToken)
+          const currentUser = await getCurrentUser(accessToken);
           propertyResponse = await axios.get(`/webapi/items/Property/${id}`, {
             params: {
               fields:
@@ -141,12 +150,13 @@ export default function RoomPage() {
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },
-          })
+          });
 
-          console.log("current ", currentUser.id)
-          console.log("property User id ", propertyResponse.data.data.userId)
-          const isCurrentUserOwner = currentUser.id === propertyResponse.data.data.userId
-          setIsOwner(isCurrentUserOwner)
+          console.log("current ", currentUser.id);
+          console.log("property User id ", propertyResponse.data.data.userId);
+          const isCurrentUserOwner =
+            currentUser.id === propertyResponse.data.data.userId;
+          setIsOwner(isCurrentUserOwner);
 
           if (!isCurrentUserOwner) {
             propertyResponse = await axios.get(`/webapi/items/Property/${id}`, {
@@ -154,7 +164,7 @@ export default function RoomPage() {
                 fields:
                   "*, mainImage.id, mainImage.isModerated, Rooms.*, Rooms.photos.directus_files_id.id, Rooms.photos.directus_files_id.isModerated",
               },
-            })
+            });
           }
         } else {
           propertyResponse = await axios.get(`/webapi/items/Property/${id}`, {
@@ -162,74 +172,76 @@ export default function RoomPage() {
               fields:
                 "*, mainImage.id, mainImage.isModerated, Rooms.*, Rooms.photos.directus_files_id.id, Rooms.photos.directus_files_id.isModerated",
             },
-          })
+          });
         }
 
-        const propertyData: Property = propertyResponse.data.data
+        const propertyData: Property = propertyResponse.data.data;
 
-        setProperty(propertyData)
+        setProperty(propertyData);
       } catch (error) {
-        console.error("Error fetching data:", error)
-        setError("Error al cargar los datos. Por favor, intenta de nuevo más tarde.")
+        console.error("Error fetching data:", error);
+        setError(
+          "Error al cargar los datos. Por favor, intenta de nuevo más tarde."
+        );
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
     if (id) {
-      fetchData()
+      fetchData();
     }
-  }, [id])
+  }, [id]);
 
   useEffect(() => {
     if (searchParams.get("rel") === "new") {
-      setUpdated("property")
-      setShowModal(true)
+      setUpdated("property");
+      setShowModal(true);
     }
     if (searchParams.get("rel") === "new-room") {
-      setUpdated("room")
-      setShowModal(true)
+      setUpdated("room");
+      setShowModal(true);
     }
-  }, [searchParams])
+  }, [searchParams]);
 
   useEffect(() => {
-    console.log("isOwner updated:", isOwner)
-  }, [isOwner])
+    console.log("isOwner updated:", isOwner);
+  }, [isOwner]);
 
   const decodeHtmlAndRemoveTags = (html: string): string => {
-    const textWithoutTags = html.replace(/<\/?[^>]+(>|$)/g, "")
-    const txt = document.createElement("textarea")
-    txt.innerHTML = textWithoutTags
-    return txt.value
-  }
+    const textWithoutTags = html.replace(/<\/?[^>]+(>|$)/g, "");
+    const txt = document.createElement("textarea");
+    txt.innerHTML = textWithoutTags;
+    return txt.value;
+  };
 
   const handleEditBanner = (property: Property) => {
-    localStorage.setItem("selected_property", JSON.stringify(property))
-    router.push(`/mi-panel/editar-propiedad/${id}/`)
-  }
+    localStorage.setItem("selected_property", JSON.stringify(property));
+    router.push(`/mi-panel/editar-propiedad/${id}/`);
+  };
 
   const handleEditRoom = (room: Room) => {
-    localStorage.setItem("selected_room", JSON.stringify(room))
-    router.push(`/mi-panel/propiedades/${id}/room/edit`)
-  }
+    localStorage.setItem("selected_room", JSON.stringify(room));
+    router.push(`/mi-panel/propiedades/${id}/room/edit`);
+  };
 
   const handleCalendarRoom = (room: Room) => {
-    localStorage.setItem("selected_room", JSON.stringify(room))
-    router.push(`/mi-panel/calendario/${room.id}/`)
-  }
+    localStorage.setItem("selected_room", JSON.stringify(room));
+    router.push(`/mi-panel/calendario/${room.id}/`);
+  };
 
   const confirmDeleteProperty = async () => {
-    if (!property) return
+    if (!property) return;
 
     try {
-      const accessToken = localStorage.getItem("access_token")
+      const accessToken = localStorage.getItem("access_token");
       if (!accessToken) {
-        console.error("No access token found")
-        return
+        console.error("No access token found");
+        return;
       }
 
       // 1️⃣ Obtener los IDs de las habitaciones asociadas a la propiedad
-      const roomIds = property.Rooms.map((room) => room.id)
+      const roomIds = property.Rooms.map((room) => room.id);
 
       // 2️⃣ Eliminar cada habitación de forma secuencial
       for (const id of roomIds) {
@@ -238,10 +250,10 @@ export default function RoomPage() {
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },
-          })
-          console.log(`✅ Habitación ${id} eliminada`)
+          });
+          console.log(`✅ Habitación ${id} eliminada`);
         } catch (error) {
-          console.error(`❌ Error al eliminar la habitación ${id}:`, error)
+          console.error(`❌ Error al eliminar la habitación ${id}:`, error);
         }
       }
 
@@ -250,24 +262,24 @@ export default function RoomPage() {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
-      })
-      console.log(`🏠 Propiedad ${property.id} eliminada`)
+      });
+      console.log(`🏠 Propiedad ${property.id} eliminada`);
 
       // 4️⃣ Redireccionar a la lista de propiedades
-      router.push("/mi-panel/mis-propiedades")
+      router.push("/mi-panel/mis-propiedades");
     } catch (error) {
-      console.error("❌ Error al eliminar la propiedad:", error)
+      console.error("❌ Error al eliminar la propiedad:", error);
     }
-  }
+  };
 
   const confirmDeleteRoom = async () => {
-    if (!selectedRoomForDeletion) return
+    if (!selectedRoomForDeletion) return;
 
     try {
-      const accessToken = localStorage.getItem("access_token")
+      const accessToken = localStorage.getItem("access_token");
       if (!accessToken) {
-        console.error("No access token found")
-        return
+        console.error("No access token found");
+        return;
       }
 
       // Aquí implementar la lógica de eliminación real
@@ -275,123 +287,135 @@ export default function RoomPage() {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
-      })
+      });
 
       // Actualizar la lista de habitaciones en la UI
       if (property) {
         setProperty({
           ...property,
-          Rooms: property.Rooms.filter((room) => room.id !== selectedRoomForDeletion.id),
-        })
+          Rooms: property.Rooms.filter(
+            (room) => room.id !== selectedRoomForDeletion.id
+          ),
+        });
       }
     } catch (error) {
-      console.error("Error al eliminar la habitación:", error)
+      console.error("Error al eliminar la habitación:", error);
       // Aquí podrías mostrar un mensaje de error
     }
-  }
+  };
 
   const handleDeleteProperty = async (property: Property) => {
     const checkBookings = async (roomIds: string[]): Promise<boolean> => {
       if (roomIds.length === 0) {
-        console.log("❌ La propiedad no tiene habitaciones.")
-        return false
+        console.log("❌ La propiedad no tiene habitaciones.");
+        return false;
       }
 
       try {
-        const idsQuery = roomIds.map((id) => encodeURIComponent(id)).join(",") // Convertir array a string separado por comas
-        const url = `/webapi/items/Booking?filter[room][_in]=${idsQuery}&fields=*`
+        const idsQuery = roomIds.map((id) => encodeURIComponent(id)).join(","); // Convertir array a string separado por comas
+        const url = `/webapi/items/Booking?filter[room][_in]=${idsQuery}&fields=*`;
 
-        const response = await axios.get(url)
+        const response = await axios.get(url);
 
         if (response.data?.data?.length > 0) {
-          console.log("✅ Hay reservas:", response.data.data)
-          return true // Hay reservas
+          console.log("✅ Hay reservas:", response.data.data);
+          return true; // Hay reservas
         } else {
-          console.log("❌ No hay reservas para esta propiedad.")
-          return false // No hay reservas
+          console.log("❌ No hay reservas para esta propiedad.");
+          return false; // No hay reservas
         }
       } catch (error) {
-        console.error("Error en la solicitud:", error)
-        return false // Manejo de error, asumir que no hay reservas
+        console.error("Error en la solicitud:", error);
+        return false; // Manejo de error, asumir que no hay reservas
       }
-    }
+    };
 
     // 🔹 Obtener los IDs de las habitaciones de la propiedad
-    const roomIds = property.Rooms.map((room) => room.id)
+    const roomIds = property.Rooms.map((room) => room.id);
 
     // 🔹 Esperamos la respuesta antes de continuar
-    const hasBookings = await checkBookings(roomIds)
+    const hasBookings = await checkBookings(roomIds);
 
     if (!hasBookings) {
-      console.log("🚀 Propiedad sin reservas, puedes eliminarla.")
-      setCannotDeleteType("property")
-      setShowConfirmDeleteDialog(true)
+      console.log("🚀 Propiedad sin reservas, puedes eliminarla.");
+      setCannotDeleteType("property");
+      setShowConfirmDeleteDialog(true);
     } else {
-      console.log("⚠️ No se puede eliminar la propiedad porque tiene habitaciones con reservas.")
-      setCannotDeleteType("property")
-      setShowCannotDeleteDialog(true)
+      console.log(
+        "⚠️ No se puede eliminar la propiedad porque tiene habitaciones con reservas."
+      );
+      setCannotDeleteType("property");
+      setShowCannotDeleteDialog(true);
     }
-  }
+  };
 
   const handleDeleteRoom = async (room: Room) => {
-    setSelectedRoomForDeletion(room)
+    setSelectedRoomForDeletion(room);
 
     const checkBookings = async (roomId: string): Promise<boolean> => {
       try {
-        const url = `/webapi/items/Booking?filter[room][_eq]=${roomId}`
-        const response = await axios.get(url)
+        const url = `/webapi/items/Booking?filter[room][_eq]=${roomId}`;
+        const response = await axios.get(url);
 
         if (response.data?.data?.length > 0) {
-          console.log("✅ Hay reservas:", response.data.data)
-          return true // Hay reservas
+          console.log("✅ Hay reservas:", response.data.data);
+          return true; // Hay reservas
         } else {
-          console.log("❌ No hay reservas para esta habitación.")
-          return false // No hay reservas
+          console.log("❌ No hay reservas para esta habitación.");
+          return false; // No hay reservas
         }
       } catch (error) {
-        console.error("Error en la solicitud:", error)
-        return false // Manejo de error, asumir que no hay reservas
+        console.error("Error en la solicitud:", error);
+        return false; // Manejo de error, asumir que no hay reservas
       }
-    }
+    };
 
     // 🔹 Esperamos la respuesta antes de continuar
-    const hasBookings = await checkBookings(room.id)
+    const hasBookings = await checkBookings(room.id);
 
     if (!hasBookings) {
-      console.log("🚀 Habitación sin reservas, puedes eliminarla.")
-      setCannotDeleteType("room")
-      setShowConfirmDeleteDialog(true)
+      console.log("🚀 Habitación sin reservas, puedes eliminarla.");
+      setCannotDeleteType("room");
+      setShowConfirmDeleteDialog(true);
     } else {
-      console.log("⚠️ No se puede eliminar la habitación porque tiene reservas.")
-      setCannotDeleteType("room")
-      setShowCannotDeleteDialog(true)
+      console.log(
+        "⚠️ No se puede eliminar la habitación porque tiene reservas."
+      );
+      setCannotDeleteType("room");
+      setShowCannotDeleteDialog(true);
     }
-  }
+  };
 
   const transformImageRoomToImage = (fileData: ImageRoom): ImageType => {
     return {
       id: fileData.directus_files_id.id,
       isModerated: fileData.directus_files_id.isModerated,
-    }
-  }
+    };
+  };
 
   const getImageSrc = (image: ImageType) => {
-    return image.isModerated && !isOwner ? "/assets/empty.jpg" : `/webapi/assets/${image.id}?key=full`
-  }
+    return image.isModerated && !isOwner
+      ? "/assets/empty.jpg"
+      : `/webapi/assets/${image.id}?key=full`;
+  };
 
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2 text-lg text-gray-700">Cargando propiedad...</span>
+        <span className="ml-2 text-lg text-gray-700">
+          Cargando propiedad...
+        </span>
       </div>
-    )
+    );
   }
 
   if (error || !property) {
     return (
-      <div className="flex justify-center items-center h-screen text-red-500">{error || "Propiedad no encontrada"}</div>
-    )
+      <div className="flex justify-center items-center h-screen text-red-500">
+        {error || "Propiedad no encontrada"}
+      </div>
+    );
   }
 
   return (
@@ -441,12 +465,18 @@ export default function RoomPage() {
             {isOwner && property.mainImage.isModerated !== undefined && (
               <div className="">
                 {property.mainImage.isModerated ? (
-                  <Badge variant="outline" className="bg-red-900 text-orange-100 border-orange-300">
+                  <Badge
+                    variant="outline"
+                    className="bg-red-900 text-orange-100 border-orange-300"
+                  >
                     <AlertCircle className="w-3 h-3 mr-1" />
                     Foto En Revisión
                   </Badge>
                 ) : (
-                  <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
+                  <Badge
+                    variant="outline"
+                    className="bg-green-100 text-green-800 border-green-300"
+                  >
                     <CheckCircle className="w-3 h-3 mr-1" />
                     Foto Aprobada
                   </Badge>
@@ -454,7 +484,11 @@ export default function RoomPage() {
               </div>
             )}
 
-            <h1 className={`${fraunces.className} lg:text-5xl text-3xl mt-4 font-bold mb-2`}>{property.name}</h1>
+            <h1
+              className={`${fraunces.className} lg:text-5xl text-3xl mt-4 font-bold mb-2`}
+            >
+              {property.name}
+            </h1>
             <p className="text-1xl lg:text-1xl">
               {property.city}, {property.state}, {property.country}
             </p>
@@ -466,17 +500,24 @@ export default function RoomPage() {
       <div className="container mx-auto py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
           <div className="md:col-span-2">
-            <h2 className={`${fraunces.className} text-2xl font-normal text-[#162F40] mb-4`}>
+            <h2
+              className={`${fraunces.className} text-2xl font-normal text-[#162F40] mb-4`}
+            >
               Acerca de esta propiedad
             </h2>
-            <p className="text-lg text-gray-700 mb-6">{decodeHtmlAndRemoveTags(property.description)}</p>
+            <p className="text-lg text-gray-700 mb-6">
+              {decodeHtmlAndRemoveTags(property.description)}
+            </p>
             <div className="flex items-center text-gray-600 mb-6">
               <MapPin className="h-5 w-5 mr-2" />
               <p>{property.fullAddress}</p>
             </div>
           </div>
           <div className="h-64 rounded-lg overflow-hidden shadow-lg">
-            <GoogleMap lat={property.place.coordinates[0]} lng={property.place.coordinates[1]} />
+            <GoogleMap
+              lat={property.place.coordinates[0]}
+              lng={property.place.coordinates[1]}
+            />
           </div>
         </div>
 
@@ -484,13 +525,18 @@ export default function RoomPage() {
           <div className="rounded-xl mb-8">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
               <div className="space-y-2">
-                <h2 className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}>
+                <h2
+                  className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}
+                >
                   Habitaciones / camas
                 </h2>
               </div>
 
               {isOwner && (
-                <Link href={`/mi-panel/propiedades/${property.id}/room/create`} className="w-full sm:w-auto">
+                <Link
+                  href={`/mi-panel/propiedades/${property.id}/room/crear`}
+                  className="w-full sm:w-auto"
+                >
                   <Button className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#39759E] text-white hover:bg-green-800 transition">
                     <Plus className="h-5 w-5" />
                     Agregar Habitación o Cama
@@ -512,7 +558,9 @@ export default function RoomPage() {
                           <Image
                             src={
                               room.photos && room.photos.length > 0
-                                ? getImageSrc(transformImageRoomToImage(room.photos[0]))
+                                ? getImageSrc(
+                                    transformImageRoomToImage(room.photos[0])
+                                  )
                                 : "/assets/empty.jpg"
                             }
                             alt={property.name}
@@ -520,21 +568,30 @@ export default function RoomPage() {
                             style={{ objectFit: "cover" }}
                           />
 
-                          {isOwner && room.photos[0]?.directus_files_id.isModerated !== undefined && (
-                            <div className="absolute left-4 top-4">
-                              {room.photos[0].directus_files_id.isModerated ? (
-                                <Badge variant="outline" className="bg-red-900 text-orange-100 border-orange-300">
-                                  <AlertCircle className="w-3 h-3 mr-1" />
-                                  Foto En Revisión
-                                </Badge>
-                              ) : (
-                                <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
-                                  <CheckCircle className="w-3 h-3 mr-1" />
-                                  Foto Aprobada
-                                </Badge>
-                              )}
-                            </div>
-                          )}
+                          {isOwner &&
+                            room.photos[0]?.directus_files_id.isModerated !==
+                              undefined && (
+                              <div className="absolute left-4 top-4">
+                                {room.photos[0].directus_files_id
+                                  .isModerated ? (
+                                  <Badge
+                                    variant="outline"
+                                    className="bg-red-900 text-orange-100 border-orange-300"
+                                  >
+                                    <AlertCircle className="w-3 h-3 mr-1" />
+                                    Foto En Revisión
+                                  </Badge>
+                                ) : (
+                                  <Badge
+                                    variant="outline"
+                                    className="bg-green-100 text-green-800 border-green-300"
+                                  >
+                                    <CheckCircle className="w-3 h-3 mr-1" />
+                                    Foto Aprobada
+                                  </Badge>
+                                )}
+                              </div>
+                            )}
                         </div>
                       </Link>
 
@@ -560,8 +617,13 @@ export default function RoomPage() {
                     </div>
 
                     <div className="p-6">
-                      <h1 className={`${fraunces.className} text-xl font-normal text-[#162F40] mb-4`}>
-                        {room.isPrivate === false && `${room.bedName} -`} {room.name}
+                      <h1
+                        className={`${fraunces.className} text-xl font-normal text-[#162F40] mb-4`}
+                      >
+                        {room.isPrivate === false && room.bedName
+                          ? `${room.bedName} - `
+                          : ""}
+                        {room.name}
                       </h1>
 
                       {room.isPrivate === true || room.isPrivate === null ? (
@@ -580,7 +642,10 @@ export default function RoomPage() {
                           <div className="flex justify-between items-center mb-4">
                             <p className="text-2xl font-bold text-primary">
                               ${room.privateRoomPrice}{" "}
-                              <span className="text-sm font-normal text-gray-600"> USD / noche</span>
+                              <span className="text-sm font-normal text-gray-600">
+                                {" "}
+                                USD / noche
+                              </span>
                             </p>
                           </div>
                           <p className="text-sm text-gray-600 mb-4">
@@ -609,7 +674,10 @@ export default function RoomPage() {
                           <div className="flex justify-between items-center mb-4">
                             <p className="text-2xl font-bold text-primary">
                               ${room.sharedRoomPrice}{" "}
-                              <span className="text-sm font-normal text-gray-600"> USD / noche</span>
+                              <span className="text-sm font-normal text-gray-600">
+                                {" "}
+                                USD / noche
+                              </span>
                             </p>
                           </div>
                           <p className="text-sm text-gray-600 mb-4">
@@ -640,18 +708,24 @@ export default function RoomPage() {
                   <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
                     <Home className="h-8 w-8 text-gray-400" />
                   </div>
-                  <h2 className="text-2xl font-semibold text-gray-900">Sin espacios disponibles</h2>
-                  <p className="text-gray-600">El usuario aún no cargó ningún espacio para alquilar</p>
+                  <h2 className="text-2xl font-semibold text-gray-900">
+                    Sin espacios disponibles
+                  </h2>
+                  <p className="text-gray-600">
+                    El usuario aún no cargó ningún espacio para alquilar
+                  </p>
                 </div>
               </div>
             ) : (
               <div className="max-w-xl mx-auto py-16 px-4">
                 <div className="text-center space-y-6">
                   <div className="space-y-3">
-                    <h2 className="text-2xl font-semibold text-gray-900">Aún no hay espacios disponibles</h2>
+                    <h2 className="text-2xl font-semibold text-gray-900">
+                      Aún no hay espacios disponibles
+                    </h2>
                     <p className="text-gray-600 leading-relaxed">
-                      Para que tu residencia de recuperación sea visible, necesitas registrar al menos un espacio de
-                      alojamiento.
+                      Para que tu residencia de recuperación sea visible,
+                      necesitas registrar al menos un espacio de alojamiento.
                     </p>
                   </div>
 
@@ -659,16 +733,23 @@ export default function RoomPage() {
                     <div className="flex items-start gap-3">
                       <Home className="h-5 w-5 text-gray-700 mt-0.5 flex-shrink-0" />
                       <div>
-                        <h3 className="font-medium text-gray-900 mb-1">Habitación Privada</h3>
-                        <p className="text-sm text-gray-600">Espacio exclusivo. Se reserva la habitación completa.</p>
+                        <h3 className="font-medium text-gray-900 mb-1">
+                          Habitación Privada
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          Espacio exclusivo. Se reserva la habitación completa.
+                        </p>
                       </div>
                     </div>
                     <div className="border-t border-gray-200 pt-4 flex items-start gap-3">
                       <Bed className="h-5 w-5 text-gray-700 mt-0.5 flex-shrink-0" />
                       <div>
-                        <h3 className="font-medium text-gray-900 mb-1">Cama en Habitación Compartida</h3>
+                        <h3 className="font-medium text-gray-900 mb-1">
+                          Cama en Habitación Compartida
+                        </h3>
                         <p className="text-sm text-gray-600">
-                          Se reserva 1 Cama en un espacio compartido con otros pacientes.
+                          Se reserva 1 Cama en un espacio compartido con otros
+                          pacientes.
                         </p>
                       </div>
                     </div>
@@ -679,8 +760,10 @@ export default function RoomPage() {
                     <AlertDescription className="text-blue-900">
                       <p className="font-semibold mb-1">Importante:</p>
                       <p className="text-sm">
-                        Si tu propiedad es un <strong>monoambiente</strong> o <strong>apartastudio</strong>, debes cargar igualmente la habitación o cama para que esté visible para
-                        los visitantes.
+                        Si tu propiedad es un <strong>monoambiente</strong> o{" "}
+                        <strong>apartastudio</strong>, debes cargar igualmente
+                        la habitación o cama para que esté visible para los
+                        visitantes.
                       </p>
                     </AlertDescription>
                   </Alert>
@@ -693,7 +776,9 @@ export default function RoomPage() {
                         style={{ backgroundColor: "#39759E" }}
                         className="text-white hover:opacity-90 transition-opacity"
                       >
-                        <Link href={`/mi-panel/propiedades/${property.id}/room/create`}>
+                        <Link
+                          href={`/mi-panel/propiedades/${property.id}/room/crear`}
+                        >
                           <Plus className="h-5 w-5 mr-2" />
                           Agregar habitación o cama
                         </Link>
@@ -713,30 +798,42 @@ export default function RoomPage() {
           <DialogHeader>
             {updated === "property" ? (
               <>
-                <DialogTitle className="text-xl">🏡 ¡Propiedad cargada con éxito!</DialogTitle>
+                <DialogTitle className="text-xl">
+                  🏡 ¡Propiedad cargada con éxito!
+                </DialogTitle>
                 <DialogDescription className="text-md">
-                  Los moderadores de la plataforma revisarán tus documentos legales y fotos. Una vez aprobados,
-                  recibirás una notificación por email y tu propiedad quedará activa.
+                  Los moderadores de la plataforma revisarán tus documentos
+                  legales y fotos. Una vez aprobados, recibirás una notificación
+                  por email y tu propiedad quedará activa.
                   <br />
                   <br />
-                  Mientras tanto, puedes empezar a agregar las habitaciones o camas. ✨
+                  Mientras tanto, puedes empezar a agregar las habitaciones o
+                  camas. ✨
                 </DialogDescription>
               </>
             ) : updated === "room" ? (
               <>
-                <DialogTitle className="text-xl">🛏️ ¡Felitaciones, puedes disfrutar del alojamiento!</DialogTitle>
+                <DialogTitle className="text-xl">
+                  🛏️ ¡Felitaciones, puedes disfrutar del alojamiento!
+                </DialogTitle>
                 <DialogDescription className="text-md">
-                  Puedes seguir agregando más habitaciones / camas o editar las que ya creaste.
+                  Puedes seguir agregando más habitaciones / camas o editar las
+                  que ya creaste.
                   <br />
-                  <br />📸 <strong>Importante:</strong> Si agregaste nuevas fotos, serán revisadas para asegurar que
-                  cumplan con las normas de la plataforma. Recibirás una notificación cuando sean aprobadas.
+                  <br />
+                  📸 <strong>Importante:</strong> Si agregaste nuevas fotos,
+                  serán revisadas para asegurar que cumplan con las normas de la
+                  plataforma. Recibirás una notificación cuando sean aprobadas.
                 </DialogDescription>
               </>
             ) : (
               <>
-                <DialogTitle className="text-xl">🔔 Acción no reconocida</DialogTitle>
+                <DialogTitle className="text-xl">
+                  🔔 Acción no reconocida
+                </DialogTitle>
                 <DialogDescription className="text-md">
-                  Parece que ocurrió algo inesperado. Intenta nuevamente o contacta al soporte si el problema persiste.
+                  Parece que ocurrió algo inesperado. Intenta nuevamente o
+                  contacta al soporte si el problema persiste.
                 </DialogDescription>
               </>
             )}
@@ -760,8 +857,12 @@ export default function RoomPage() {
         isOpen={showConfirmDeleteDialog}
         onClose={() => setShowConfirmDeleteDialog(false)}
         type={cannotDeleteType}
-        onConfirm={cannotDeleteType === "property" ? confirmDeleteProperty : confirmDeleteRoom}
+        onConfirm={
+          cannotDeleteType === "property"
+            ? confirmDeleteProperty
+            : confirmDeleteRoom
+        }
       />
     </div>
-  )
+  );
 }
