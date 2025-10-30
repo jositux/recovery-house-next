@@ -371,6 +371,7 @@ export const BookingCard = ({
             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
               {!isCancelled &&
                 !isCurrentStay &&
+                !isLessThan3DaysBeforeCheckIn(booking.checkIn) &&
                 booking.modificationCount === 0 &&
                 booking.discountStayType === "long" && (
                   <Button
