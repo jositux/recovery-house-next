@@ -679,8 +679,7 @@ export default function RoomPage() {
                     <AlertDescription className="text-blue-900">
                       <p className="font-semibold mb-1">Importante:</p>
                       <p className="text-sm">
-                        Si tu propiedad es un <strong>monoambiente</strong> o <strong>apartastudio</strong> (espacio
-                        único sin divisiones), debes cargar igualmentela habitación o cama para que esté visible para
+                        Si tu propiedad es un <strong>monoambiente</strong> o <strong>apartastudio</strong>, debes cargar igualmente la habitación o cama para que esté visible para
                         los visitantes.
                       </p>
                     </AlertDescription>
