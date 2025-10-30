@@ -60,7 +60,7 @@ export function CancellationPolicyDialogContent() {
             <div className="flex items-start gap-2">
               <span className="font-medium text-red-600">•</span>
               <span>
-                <strong>Después de las 72 horas antes del checkIn:</strong>  No hay reembolso. Se retiene el anticipo y el saldo pagado.
+                <strong>Después de las 72hs antes del checkIn:</strong>  No hay reembolso. Se retiene el anticipo y el saldo pagado.
               </span>
             </div>
           </div>
