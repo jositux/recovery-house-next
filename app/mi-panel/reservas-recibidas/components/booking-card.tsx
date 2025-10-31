@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { format, parseISO, differenceInDays } from "date-fns";
+import { format, differenceInDays, differenceInCalendarDays } from "date-fns";
 import { es } from "date-fns/locale";
 import Image from "next/image";
 import {
@@ -15,14 +15,27 @@ import {
   MapPin,
   User,
   Info,
+  Edit,
 } from "lucide-react";
 import { InfoItem } from "./info-item";
 import { useRouter } from "next/navigation";
 
 interface Photo {
-  directus_files_id: {
-    id: string;
-  };
+  directus_files_id: { id: string };
+}
+
+interface Property {
+  id: string;
+  name: string;
+  country: string;
+  state: string;
+  city: string;
+  address: string;
+  fullAddress: string;
+  hostName: string;
+  description: string;
+  mainImage: string;
+  type: string;
 }
 
 interface Room {
@@ -48,25 +61,13 @@ interface Room {
   propertyId: Property;
 }
 
-interface Property {
-  id: string;
-  name: string;
-  country: string;
-  state: string;
-  city: string;
-  address: string;
-  fullAddress: string;
-  hostName: string;
-  description: string;
-  mainImage: string;
-  type: string;
-}
-
 interface Booking {
   id: string;
   status: string;
-  checkOut: string;
   checkIn: string;
+  checkOut: string;
+  checkInHour: string;
+  checkOutHour: string;
   patient: string;
   ownerId: string;
   guests: number;
@@ -119,32 +120,102 @@ interface PaymentDisplayValues {
 
 interface BookingCardProps {
   booking: Booking;
-  paymentDisplay: PaymentDisplayValues; // Receive calculated values from parent
+  paymentDisplay: PaymentDisplayValues;
   onCancelBooking?: (bookingId: string) => void;
   onPayBalance?: (bookingId: string, balanceAmount: string) => void;
 }
 
+// ✅ función universal para obtener una fecha local correcta
+const toLocalDateFromString = (isoOrDateString: string | undefined): Date => {
+  if (!isoOrDateString) return new Date(0);
+  const datePart = isoOrDateString.split("T")[0];
+  const [y, m, d] = datePart.split("-").map(Number);
+  return new Date(y, m - 1, d); // medianoche local sin UTC shift
+};
+
+const combineDateAndTime = (dateString: string, timeString: string): Date => {
+  // Extraer la fecha del dateString
+  const datePart = dateString.split("T")[0];
+  const [year, month, day] = datePart.split("-").map(Number);
+
+  // Extraer hora, minutos y segundos del timeString (formato "16:00:00")
+  const [hours, minutes, seconds] = timeString.split(":").map(Number);
+
+  // Crear fecha completa con hora exacta
+  return new Date(year, month - 1, day, hours, minutes, seconds);
+};
+
+/*
+const isLessThan72HoursBeforeCheckIn = (checkInDate: string, checkInHour: string): boolean => {
+  const now = new Date()
+  const checkInDateTime = combineDateAndTime(checkInDate, checkInHour)
+
+  // Calcular diferencia en milisegundos
+  const diffInMs = checkInDateTime.getTime() - now.getTime()
+
+  // Convertir a horas
+  const diffInHours = diffInMs / (1000 * 60 * 60)
+
+  // Retornar true si faltan menos de 72 horas y la fecha aún no pasó
+  return diffInHours < 72 && diffInHours >= 0
+}*/
+
+// ✅ función para saber si faltan menos de 3 días para el check-in
+const isLessThan3DaysBeforeCheckIn = (checkInDate: string): boolean => {
+  const today = new Date();
+  const todayLocal = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate()
+  );
+  const checkIn = toLocalDateFromString(checkInDate);
+  const diff = differenceInCalendarDays(checkIn, todayLocal);
+  return diff < 3 && diff >= 0;
+};
+
 export const BookingCard = ({
   booking,
-  paymentDisplay, // Receive calculated values
+  paymentDisplay,
   onCancelBooking,
   onPayBalance,
 }: BookingCardProps) => {
   const roomDetails = booking.room;
   const property = booking.room.propertyId;
-  const nights = differenceInDays(
-    new Date(booking.checkOut),
-    new Date(booking.checkIn)
+
+  const checkInDate = toLocalDateFromString(booking.checkIn);
+  const checkOutDate = toLocalDateFromString(booking.checkOut);
+
+  const nights = differenceInDays(checkOutDate, checkInDate);
+
+  const checkInDateTime = combineDateAndTime(
+    booking.checkIn,
+    booking.checkInHour
   );
-  const isCurrentStay =
-    new Date() >= new Date(booking.checkIn) &&
-    new Date() <= new Date(booking.checkOut);
+  const checkOutDateTime = combineDateAndTime(
+    booking.checkOut,
+    booking.checkOutHour
+  );
+  const now = new Date();
+  const isCurrentStay = now >= checkInDateTime && now <= checkOutDateTime;
+
   const isCancelled =
     booking.bookingState === "cancelled_by_patient" ||
-    booking.bookingState === "cancelled_by_owner";
+    booking.bookingState === "cancelled_by_owner" ||
+    booking.bookingState === "cancelled_by_system";
+
+  const cancelledByMap: Record<string, string> = {
+    cancelled_by_patient: "Anulado por el paciente",
+    cancelled_by_owner: "Anulado por el propietario",
+    cancelled_by_system: "Anulado por la plataforma",
+  };
+
+  
 
   const router = useRouter();
 
+  const handleModify = () => {
+    router.push(`/mi-panel/booking-modify/${booking.id}`);
+  };
 
   const getPaymentBadge = () => {
     if (
@@ -176,11 +247,13 @@ export const BookingCard = ({
         <div className="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1.5">
           <p className="text-xs font-medium flex items-center">
             <Info className="w-3 h-3 mr-1.5" />
-            Reserva Anulada -{" "}
-            {booking.cancelledMessage && `Motivo: ${booking.cancelledMessage}`}
+            Reserva Anulada{" "}
+            {booking.cancelledMessage &&
+              `- Motivo: ${booking.cancelledMessage}`}
           </p>
         </div>
       )}
+
       {isCurrentStay && !isCancelled && (
         <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-3 py-1.5">
           <p className="text-xs font-medium flex items-center">
@@ -189,6 +262,7 @@ export const BookingCard = ({
           </p>
         </div>
       )}
+
       <div className="flex flex-col md:flex-row">
         <div className="relative w-full md:w-1/3 h-48 md:h-auto">
           <Image
@@ -203,7 +277,6 @@ export const BookingCard = ({
             className="rounded-t-lg md:rounded-l-lg md:rounded-t-none"
           />
 
-          {/* Badge */}
           <div
             className={`absolute top-3 left-3 px-2 py-0.5 rounded-full text-xs font-medium ${
               roomDetails?.isPrivate === false
@@ -230,7 +303,6 @@ export const BookingCard = ({
             )}
           </div>
 
-          {/* Overlay clickeable */}
           <div
             className="absolute inset-0 cursor-pointer"
             onClick={() => router.push(`/rooms/${booking.room.id}`)}
@@ -245,23 +317,24 @@ export const BookingCard = ({
             </h3>
             {getPaymentBadge()}
           </div>
+
           <div className="flex items-center text-xs text-gray-500 mb-2">
             <User className="h-3 w-3 mr-1" />
             <span>Paciente: {`${booking.patientName}`}</span>
           </div>
+
           <div className="flex items-center text-xs text-gray-500 mb-2">
             <MapPin className="h-3 w-3 mr-1" />
             <span>{`${property?.address} ${property?.city}. ${property?.state}. ${property?.country}`}</span>
           </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mb-3">
             <InfoItem
               icon={<Calendar />}
               label="Estadía"
-              value={`${format(parseISO(booking.checkIn), "dd MMM", {
+              value={`${format(checkInDate, "dd MMM", {
                 locale: es,
-              })} → ${format(parseISO(booking.checkOut), "dd MMM", {
-                locale: es,
-              })}`}
+              })} → ${format(checkOutDate, "dd MMM", { locale: es })}`}
             />
             <InfoItem
               icon={<Calendar />}
@@ -311,6 +384,7 @@ export const BookingCard = ({
             )}
           </div>
 
+          {/* FOOTER */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3 mt-3 pt-3 border-t border-gray-200">
             <div className="flex-1">
               <p className="text-lg font-semibold text-gray-900 mb-0.5">
@@ -321,68 +395,45 @@ export const BookingCard = ({
                 }).format(Number(booking.finalPrice))}
               </p>
 
+              {/* Estado de pagos */}
               <div className="text-xs text-gray-500">
                 {booking.paymentState === "balancepayment" ||
                   (booking.paymentState === "pendingRefund" && (
                     <p>Pagó anticipo: ${booking.prepaymentAmount}</p>
                   ))}
 
-                {booking.paymentState === "fullpayment" &&
-                  booking.modificationCount === 1 &&
-                  paymentDisplay.modificationDiff !== null && (
-                    <p>
-                      {paymentDisplay.modificationDiff < 0
-                        ? "Pagó por modificación: "
-                        : "Crédito por modificación: "}
-                      {new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                      }).format(Math.abs(paymentDisplay.modificationDiff))}
-                    </p>
-                  )}
-
-                {booking.paymentState === "prepayment" &&
-                  booking.modificationCount === 0 && (
-                    <p>
-                      Anticipo:{" "}
-                      {new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                      }).format(paymentDisplay.shownAnticipo)}{" "}
-                      | Pendiente:{" "}
-                      {new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                      }).format(paymentDisplay.shownPendiente)}
-                    </p>
-                  )}
-
-                {booking.paymentState === "prepayment" &&
-                  booking.modificationCount === 1 && (
-                    <p>
-                      Anticipo:{" "}
-                      {new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                      }).format(paymentDisplay.shownAnticipo)}{" "}
-                      | Pendiente:{" "}
-                      {new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                      }).format(paymentDisplay.shownPendiente)}
-                    </p>
-                  )}
+                {booking.paymentState === "prepayment" && (
+                  <p>
+                    Anticipo:{" "}
+                    {new Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                    }).format(paymentDisplay.shownAnticipo)}{" "}
+                    | Pendiente:{" "}
+                    {new Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                    }).format(paymentDisplay.shownPendiente)}
+                  </p>
+                )}
               </div>
             </div>
 
+            {/* BOTONES */}
             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
               {!isCancelled &&
                 !isCurrentStay &&
+                !isLessThan3DaysBeforeCheckIn(booking.checkIn) &&
                 booking.modificationCount === 0 &&
                 booking.discountStayType === "long" && (
-                  <span className="inline-block px-2 py-2 text-xs font-semibold text-gray-700 bg-gray-200 rounded-full">
-                 Sin modificar
-                </span>
+                  <Button
+                    onClick={handleModify}
+                    size="sm"
+                    className="hidden bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto"
+                  >
+                    <Edit className="w-4 h-4 mr-1" />
+                    Modificar
+                  </Button>
                 )}
 
               {booking.modificationCount === 1 && (
@@ -393,7 +444,8 @@ export const BookingCard = ({
 
               {booking.paymentState === "prepayment" &&
                 !isCancelled &&
-                onPayBalance && (
+                onPayBalance &&
+                !isLessThan3DaysBeforeCheckIn(booking.checkIn) && (
                   <Button
                     onClick={() =>
                       onPayBalance(
@@ -403,13 +455,14 @@ export const BookingCard = ({
                     }
                     size="sm"
                     variant="outline"
-                    className="border-blue-600 text-blue-600 hover:bg-blue-50 w-full sm:w-auto"
+                    className="hidden border-blue-600 text-blue-600 hover:bg-blue-50 w-full sm:w-auto"
                   >
                     Pagar Pendiente
                   </Button>
                 )}
 
-              {!isCancelled && !isCurrentStay && onCancelBooking && (
+              {/* 🔴 Mostrar ANULAR solo si faltan <3 días */}
+              {!isCancelled && onCancelBooking && isLessThan3DaysBeforeCheckIn(booking.checkIn) && (
                 <Button
                   variant="outline"
                   size="sm"
@@ -421,10 +474,8 @@ export const BookingCard = ({
               )}
 
               {isCancelled && (
-                <span className="inline-block px-2 py-2 text-xs font-semibold text-red-600 bg-gray-200 rounded-full">
-                  {booking.bookingState === "cancelled_by_patient"
-                    ? "Anulado por el paciente"
-                    : "Anulado por el propietario"}
+                <span className="inline-block px-2 py-1 text-xs font-semibold text-red-600 bg-gray-100 rounded-full">
+                  {cancelledByMap[booking.bookingState ?? ""] || "Anulado" }
                 </span>
               )}
             </div>
