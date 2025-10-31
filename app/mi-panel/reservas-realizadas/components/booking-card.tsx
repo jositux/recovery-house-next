@@ -127,23 +127,23 @@ interface BookingCardProps {
 
 // ✅ función universal para obtener una fecha local correcta
 const toLocalDateFromString = (isoOrDateString: string | undefined): Date => {
-  if (!isoOrDateString) return new Date(0)
-  const datePart = isoOrDateString.split("T")[0]
-  const [y, m, d] = datePart.split("-").map(Number)
-  return new Date(y, m - 1, d) // medianoche local sin UTC shift
-}
+  if (!isoOrDateString) return new Date(0);
+  const datePart = isoOrDateString.split("T")[0];
+  const [y, m, d] = datePart.split("-").map(Number);
+  return new Date(y, m - 1, d); // medianoche local sin UTC shift
+};
 
 const combineDateAndTime = (dateString: string, timeString: string): Date => {
   // Extraer la fecha del dateString
-  const datePart = dateString.split("T")[0]
-  const [year, month, day] = datePart.split("-").map(Number)
+  const datePart = dateString.split("T")[0];
+  const [year, month, day] = datePart.split("-").map(Number);
 
   // Extraer hora, minutos y segundos del timeString (formato "16:00:00")
-  const [hours, minutes, seconds] = timeString.split(":").map(Number)
+  const [hours, minutes, seconds] = timeString.split(":").map(Number);
 
   // Crear fecha completa con hora exacta
-  return new Date(year, month - 1, day, hours, minutes, seconds)
-}
+  return new Date(year, month - 1, day, hours, minutes, seconds);
+};
 
 /*
 const isLessThan72HoursBeforeCheckIn = (checkInDate: string, checkInHour: string): boolean => {
@@ -163,12 +163,15 @@ const isLessThan72HoursBeforeCheckIn = (checkInDate: string, checkInHour: string
 // ✅ función para saber si faltan menos de 3 días para el check-in
 const isLessThan3DaysBeforeCheckIn = (checkInDate: string): boolean => {
   const today = new Date();
-  const todayLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const todayLocal = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate()
+  );
   const checkIn = toLocalDateFromString(checkInDate);
   const diff = differenceInCalendarDays(checkIn, todayLocal);
   return diff < 3 && diff >= 0;
 };
-
 
 export const BookingCard = ({
   booking,
@@ -184,17 +187,31 @@ export const BookingCard = ({
 
   const nights = differenceInDays(checkOutDate, checkInDate);
 
-  const checkInDateTime = combineDateAndTime(booking.checkIn, booking.checkInHour)
-  const checkOutDateTime = combineDateAndTime(booking.checkOut, booking.checkOutHour)
-  const now = new Date()
-  const isCurrentStay = now >= checkInDateTime && now <= checkOutDateTime
+  const checkInDateTime = combineDateAndTime(
+    booking.checkIn,
+    booking.checkInHour
+  );
+  const checkOutDateTime = combineDateAndTime(
+    booking.checkOut,
+    booking.checkOutHour
+  );
+  const now = new Date();
+  const isCurrentStay = now >= checkInDateTime && now <= checkOutDateTime;
 
   const isCancelled =
     booking.bookingState === "cancelled_by_patient" ||
-    booking.bookingState === "cancelled_by_owner";
+    booking.bookingState === "cancelled_by_owner" ||
+    booking.bookingState === "cancelled_by_system";
 
-  const showCancelButton =
-    !isCancelled && !isCurrentStay && !isLessThan3DaysBeforeCheckIn(booking.checkIn);
+  const showCancelButton = !isCancelled
+
+  const cancelledByMap: Record<string, string> = {
+    cancelled_by_patient: "Anulado por el paciente",
+    cancelled_by_owner: "Anulado por el propietario",
+    cancelled_by_system: "Anulado por la plataforma",
+  };
+
+  const cancelledText = cancelledByMap[booking.bookingState ?? ""] || "Anulado";
 
   const router = useRouter();
 
@@ -233,7 +250,8 @@ export const BookingCard = ({
           <p className="text-xs font-medium flex items-center">
             <Info className="w-3 h-3 mr-1.5" />
             Reserva Anulada{" "}
-            {booking.cancelledMessage && `- Motivo: ${booking.cancelledMessage}`}
+            {booking.cancelledMessage &&
+              `- Motivo: ${booking.cancelledMessage}`}
           </p>
         </div>
       )}
@@ -334,7 +352,11 @@ export const BookingCard = ({
 
             {roomDetails?.isPrivate !== false && (
               <>
-                <InfoItem icon={<Users />} label="Huéspedes" value={booking.guests} />
+                <InfoItem
+                  icon={<Users />}
+                  label="Huéspedes"
+                  value={booking.guests}
+                />
                 <InfoItem
                   icon={<DollarSign />}
                   label="Precio por noche"
@@ -424,9 +446,8 @@ export const BookingCard = ({
 
               {booking.paymentState === "prepayment" &&
                 !isCancelled &&
-                onPayBalance && 
-                !isLessThan3DaysBeforeCheckIn(booking.checkIn) &&
-                (
+                onPayBalance &&
+                !isLessThan3DaysBeforeCheckIn(booking.checkIn) && (
                   <Button
                     onClick={() =>
                       onPayBalance(
@@ -443,7 +464,7 @@ export const BookingCard = ({
                 )}
 
               {/* 🔴 Mostrar ANULAR solo si faltan <3 días */}
-              {showCancelButton && onCancelBooking && (
+              {showCancelButton && onCancelBooking && isLessThan3DaysBeforeCheckIn(booking.checkIn) && (
                 <Button
                   variant="outline"
                   size="sm"
@@ -455,10 +476,8 @@ export const BookingCard = ({
               )}
 
               {isCancelled && (
-                <span className="inline-block px-2 py-2 text-xs font-semibold text-red-600 bg-gray-200 rounded-full">
-                  {booking.bookingState === "cancelled_by_patient"
-                    ? "Anulado por el paciente"
-                    : "Anulado por el propietario"}
+                <span className="inline-block px-2 py-1 text-xs font-semibold text-red-600 bg-gray-100 rounded-full">
+                  {cancelledText ?? "Reserva anulada"}
                 </span>
               )}
             </div>
