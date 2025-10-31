@@ -199,13 +199,12 @@ export const BookingCardPast = ({
     booking.bookingState === "cancelled_by_owner" ||
     booking.bookingState === "cancelled_by_system";
 
-  const showCancelButton = !isCancelled
-
-  const cancelledByMap: Record<string, string> = {
+  
+  /*  const cancelledByMap: Record<string, string> = {
     cancelled_by_patient: "Anulado por el paciente",
     cancelled_by_owner: "Anulado por el propietario",
     cancelled_by_system: "Anulado por la plataforma",
-  };
+  };*/
 
 
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
