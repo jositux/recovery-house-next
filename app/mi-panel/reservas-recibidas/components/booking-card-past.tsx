@@ -1,6 +1,7 @@
 "use client"
 
 import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { format, parseISO, differenceInDays } from "date-fns"
 import { es } from "date-fns/locale"
 import Image from "next/image"
@@ -10,11 +11,15 @@ import {
   DollarSign,
   BedSingle,
   BedDouble,
+  Star,
   MapPin,
   User,
   Info,
 } from "lucide-react"
 import { InfoItem } from "./info-item"
+import { useState, useEffect } from "react"
+import { ReviewModal } from "./ReviewModal"
+import { ReviewCard } from "./ReviewCard"
 import { useRouter } from "next/navigation";
 
 interface Photo {
@@ -65,6 +70,8 @@ interface Booking {
   status: string
   checkOut: string
   checkIn: string
+  checkInHour: string;
+  checkOutHour: string;
   patient: string
   ownerId: string
   guests: number
@@ -104,7 +111,6 @@ interface Booking {
   cancelledMessage: string | null
   bookingState: string | null
   paymentState: string | null
-  modificationCount: number
 }
 
 interface Ratings {
@@ -126,17 +132,14 @@ interface ReviewFromAPI {
   //review_replies: any[]
 }
 
-
-interface PaymentDisplayValues {
-  shownAnticipo: number;
-  shownPendiente: number;
-  modificationDiff: number | null;
+interface Review {
+  ratings: Ratings
+  comment: string
 }
 
 interface BookingCardProps {
   booking: Booking
   review?: ReviewFromAPI | null
-  paymentDisplay: PaymentDisplayValues
   isPast?: boolean
   onCancelBooking?: (bookingId: string) => void
   onPayBalance?: (bookingId: string, balanceAmount: string) => void
@@ -150,12 +153,34 @@ interface BookingCardProps {
   onReviewDelete?: (bookingId: string) => Promise<void>
 }
 
+// ✅ función universal para obtener una fecha local correcta
+/*const toLocalDateFromString = (isoOrDateString: string | undefined): Date => {
+  if (!isoOrDateString) return new Date(0)
+  const datePart = isoOrDateString.split("T")[0]
+  const [y, m, d] = datePart.split("-").map(Number)
+  return new Date(y, m - 1, d) // medianoche local sin UTC shift
+}*/
+
+const combineDateAndTime = (dateString: string, timeString: string): Date => {
+  // Extraer la fecha del dateString
+  const datePart = dateString.split("T")[0]
+  const [year, month, day] = datePart.split("-").map(Number)
+
+  // Extraer hora, minutos y segundos del timeString (formato "16:00:00")
+  const [hours, minutes, seconds] = timeString.split(":").map(Number)
+
+  // Crear fecha completa con hora exacta
+  return new Date(year, month - 1, day, hours, minutes, seconds)
+}
+
 export const BookingCardPast = ({
   booking,
-  paymentDisplay,
+  review,
   isPast = false,
   //onCancelBooking,
   //onPayBalance,
+  onReviewSubmit,
+  onReviewDelete,
 }: BookingCardProps) => {
   const roomDetails = booking.room
   const property = booking.room.propertyId
@@ -163,13 +188,72 @@ export const BookingCardPast = ({
     new Date(booking.checkOut),
     new Date(booking.checkIn)
   )
-  const isCurrentStay =
-    new Date() >= new Date(booking.checkIn) &&
-    new Date() <= new Date(booking.checkOut)
+
+  const checkInDateTime = combineDateAndTime(booking.checkIn, "22:00:00")
+  const checkOutDateTime = combineDateAndTime(booking.checkOut, booking.checkOutHour)
+  const now = new Date()
+  const isCurrentStay = now >= checkInDateTime && now <= checkOutDateTime
+
   const isCancelled =
     booking.bookingState === "cancelled_by_patient" ||
-    booking.bookingState === "cancelled_by_owner"
+    booking.bookingState === "cancelled_by_owner" ||
+    booking.bookingState === "cancelled_by_system";
 
+  
+  /*  const cancelledByMap: Record<string, string> = {
+    cancelled_by_patient: "Anulado por el paciente",
+    cancelled_by_owner: "Anulado por el propietario",
+    cancelled_by_system: "Anulado por la plataforma",
+  };*/
+
+
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
+  const [hasReview, setHasReview] = useState(false)
+  const [reviewData, setReviewData] = useState<Review | null>(null)
+
+  // ✅ Inicializa reviewData sin provocar re-render infinito
+  useEffect(() => {
+    if (review) {
+      const formattedReview: Review = {
+        ratings: {
+          cleanliness: review?.ranking?.cleanliness ?? 0,
+          attention: review?.ranking?.attention ?? 0,
+          location: review?.ranking?.location ?? 0,
+          accuracy: review?.ranking?.accuracy ?? 0,
+        },
+        comment: review?.comment ?? "",
+      }
+
+      setReviewData(formattedReview)
+      setHasReview(true)
+    } else {
+      setReviewData(null)
+      setHasReview(false)
+    }
+  }, [review])
+
+  const handleReviewSubmit = async (ratings: Ratings, comment: string) => {
+    if (onReviewSubmit) {
+      await onReviewSubmit(
+        booking.id,
+        booking.room.id,
+        booking.patientName || "",
+        ratings,
+        comment
+      )
+      setHasReview(true)
+      setReviewData({ ratings, comment })
+      setIsReviewModalOpen(false)
+    }
+  }
+
+  const handleDeleteReview = async () => {
+    if (onReviewDelete) {
+      await onReviewDelete(booking.id)
+      setHasReview(false)
+      setReviewData(null)
+    }
+  }
 
   const router = useRouter();
 
@@ -262,7 +346,7 @@ export const BookingCardPast = ({
 
             <div className="flex items-center text-sm text-gray-500 mb-4">
               <User className="h-4 w-4 mr-1" />
-              <span>Paciente: {booking.patientName}</span>
+              <span>Paciente: {booking.patientName} </span>
             </div>
 
             <div className="flex items-center text-sm text-gray-500 mb-4">
@@ -302,74 +386,38 @@ export const BookingCardPast = ({
                 </>
               )}
             </div>
-            <div className="flex-1">
-              <p className="text-lg font-semibold text-gray-900 mb-0.5">
-                Total:{" "}
-                {new Intl.NumberFormat("en-US", {
-                  style: "currency",
-                  currency: "USD",
-                }).format(Number(booking.finalPrice))}
-              </p>
 
-              <div className="text-xs text-gray-500">
-                {booking.paymentState === "balancepayment" ||
-                  (booking.paymentState === "pendingRefund" && (
-                    <p>Pagó anticipo: ${booking.prepaymentAmount}</p>
-                  ))}
+            <div className="hidden flex flex-col sm:flex-row justify-between items-start sm:items-center mt-4">
+              {isPast && !hasReview && (
+                <Button
+                  onClick={() => setIsReviewModalOpen(true)}
+                  className="bg-[#39759E] text-white hover:bg-[#2c5a7a] rounded-lg px-4 py-2 transition-colors duration-300 flex items-center text-sm"
+                >
+                  <Star className="mr-1 h-4 w-4" />
+                  Comentar
+                </Button>
+              )}
 
-                {booking.paymentState === "fullpayment" &&
-                  booking.modificationCount === 1 &&
-                  paymentDisplay.modificationDiff !== null && (
-                    <p>
-                      {paymentDisplay.modificationDiff < 0
-                        ? "Pagó por modificación: "
-                        : "Crédito por modificación: "}
-                      {new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                      }).format(Math.abs(paymentDisplay.modificationDiff))}
-                    </p>
-                  )}
-
-                {booking.paymentState === "prepayment" &&
-                  booking.modificationCount === 0 && (
-                    <p>
-                      Anticipo:{" "}
-                      {new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                      }).format(paymentDisplay.shownAnticipo)}{" "}
-                      | Pendiente:{" "}
-                      {new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                      }).format(paymentDisplay.shownPendiente)}
-                    </p>
-                  )}
-
-                {booking.paymentState === "prepayment" &&
-                  booking.modificationCount === 1 && (
-                    <p>
-                      Anticipo:{" "}
-                      {new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                      }).format(paymentDisplay.shownAnticipo)}{" "}
-                      | Pendiente:{" "}
-                      {new Intl.NumberFormat("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                      }).format(paymentDisplay.shownPendiente)}
-                    </p>
-                  )}
-              </div>
+              {isPast && hasReview && reviewData && (
+                <ReviewCard
+                  ratings={reviewData.ratings}
+                  comment={reviewData.comment}
+                  onDelete={handleDeleteReview}
+                />
+              )}
             </div>
-            
           </CardContent>
         </div>
       </Card>
 
-     
+      {isPast && (
+        <ReviewModal
+          isOpen={isReviewModalOpen}
+          onClose={() => setIsReviewModalOpen(false)}
+          onSubmit={handleReviewSubmit}
+          bookingId={booking.id}
+        />
+      )}
     </>
   )
 }
