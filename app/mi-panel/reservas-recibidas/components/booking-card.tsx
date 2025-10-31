@@ -170,7 +170,7 @@ const isLessThan3DaysBeforeCheckIn = (checkInDate: string): boolean => {
   );
   const checkIn = toLocalDateFromString(checkInDate);
   const diff = differenceInCalendarDays(checkIn, todayLocal);
-  return diff < 3 && diff >= 0;
+  return Math.max(diff, 0) < 3;
 };
 
 export const BookingCard = ({
@@ -462,7 +462,7 @@ export const BookingCard = ({
                 )}
 
               {/* 🔴 Mostrar ANULAR solo si faltan <3 días */}
-              {!isCancelled && onCancelBooking && isLessThan3DaysBeforeCheckIn(booking.checkIn) && (
+              {!isCancelled && onCancelBooking && !isLessThan3DaysBeforeCheckIn(booking.checkIn) && (
                 <Button
                   variant="outline"
                   size="sm"
