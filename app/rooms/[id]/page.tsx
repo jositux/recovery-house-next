@@ -700,15 +700,17 @@ export default function RoomPage() {
                   totalReviews={totalReviews}
                 />
 
-                <div className="text-center">
-                  <Button
-                    onClick={() => setShowReviews(true)}
-                    size="lg"
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 text-lg font-medium rounded-lg"
-                  >
-                    Ver todas las evaluaciones ({totalReviews})
-                  </Button>
-                </div>
+{typeof totalReviews === "number" && totalReviews > 0 && (
+  <div className="text-center">
+    <Button
+      onClick={() => setShowReviews(true)}
+      size="lg"
+      className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 text-lg font-medium rounded-lg"
+    >
+      Ver todas las evaluaciones ({totalReviews})
+    </Button>
+  </div>
+)}
 
                 <ReviewsModal
                   isOpen={showReviews}

@@ -30,7 +30,7 @@ import {
   MapPin,
   FileText,
   Pencil,
-  Building2 /*, Trash2*/,
+  HandHelping
 } from "lucide-react";
 import { Fraunces } from "next/font/google";
 
@@ -119,13 +119,16 @@ export default function ProviderDataPage() {
         <div className="max-w-xl mx-auto">
           <div className="flex flex-col items-center justify-center text-center space-y-8 py-16">
             <div className="w-20 h-20 rounded-full bg-[#39759E]/10 flex items-center justify-center">
-              <Building2 className="w-10 h-10 text-[#39759E]" />
+              <HandHelping className="w-10 h-10 text-[#39759E]" />
             </div>
 
             <div className="space-y-3">
-              <h1 className="text-2xl md:text-3xl font-semibold text-gray-900">
-                Aún no has registrado ningún servicio
-              </h1>
+              
+              <h1
+            className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-8`}
+          >
+             Aún no has registrado ningún servicio
+          </h1>
               <p className="text-base text-gray-600 max-w-md mx-auto">
                 Registra tu servicio para pacientes y comienza a recibir
                 reservas.
