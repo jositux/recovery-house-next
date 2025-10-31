@@ -203,15 +203,13 @@ export const BookingCard = ({
     booking.bookingState === "cancelled_by_owner" ||
     booking.bookingState === "cancelled_by_system";
 
-  const showCancelButton = !isCancelled
-
   const cancelledByMap: Record<string, string> = {
     cancelled_by_patient: "Anulado por el paciente",
     cancelled_by_owner: "Anulado por el propietario",
     cancelled_by_system: "Anulado por la plataforma",
   };
 
-  const cancelledText = cancelledByMap[booking.bookingState ?? ""] || "Anulado";
+  
 
   const router = useRouter();
 
@@ -464,7 +462,7 @@ export const BookingCard = ({
                 )}
 
               {/* 🔴 Mostrar ANULAR solo si faltan <3 días */}
-              {showCancelButton && onCancelBooking && isLessThan3DaysBeforeCheckIn(booking.checkIn) && (
+              {!isCancelled && onCancelBooking && isLessThan3DaysBeforeCheckIn(booking.checkIn) && (
                 <Button
                   variant="outline"
                   size="sm"
@@ -477,7 +475,7 @@ export const BookingCard = ({
 
               {isCancelled && (
                 <span className="inline-block px-2 py-1 text-xs font-semibold text-red-600 bg-gray-100 rounded-full">
-                  {cancelledText ?? "Reserva anulada"}
+                  {cancelledByMap[booking.bookingState ?? ""] || "Anulado" }
                 </span>
               )}
             </div>

@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { format, differenceInDays, differenceInCalendarDays } from "date-fns";
+import { format, parseISO, differenceInDays } from "date-fns";
 import { es } from "date-fns/locale";
 import Image from "next/image";
 import {
@@ -20,21 +20,9 @@ import { InfoItem } from "./info-item";
 import { useRouter } from "next/navigation";
 
 interface Photo {
-  directus_files_id: { id: string };
-}
-
-interface Property {
-  id: string;
-  name: string;
-  country: string;
-  state: string;
-  city: string;
-  address: string;
-  fullAddress: string;
-  hostName: string;
-  description: string;
-  mainImage: string;
-  type: string;
+  directus_files_id: {
+    id: string;
+  };
 }
 
 interface Room {
@@ -60,13 +48,25 @@ interface Room {
   propertyId: Property;
 }
 
+interface Property {
+  id: string;
+  name: string;
+  country: string;
+  state: string;
+  city: string;
+  address: string;
+  fullAddress: string;
+  hostName: string;
+  description: string;
+  mainImage: string;
+  type: string;
+}
+
 interface Booking {
   id: string;
   status: string;
-  checkIn: string;
   checkOut: string;
-  checkInHour: string;
-  checkOutHour: string;
+  checkIn: string;
   patient: string;
   ownerId: string;
   guests: number;
@@ -119,74 +119,32 @@ interface PaymentDisplayValues {
 
 interface BookingCardProps {
   booking: Booking;
-  paymentDisplay: PaymentDisplayValues;
+  paymentDisplay: PaymentDisplayValues; // Receive calculated values from parent
   onCancelBooking?: (bookingId: string) => void;
+  onPayBalance?: (bookingId: string, balanceAmount: string) => void;
 }
-
-// ✅ función universal para obtener una fecha local correcta
-const toLocalDateFromString = (isoOrDateString: string | undefined): Date => {
-  if (!isoOrDateString) return new Date(0);
-  const datePart = isoOrDateString.split("T")[0];
-  const [y, m, d] = datePart.split("-").map(Number);
-  return new Date(y, m - 1, d);
-};
-
-const combineDateAndTime = (dateString: string, timeString: string): Date => {
-  const datePart = dateString.split("T")[0];
-  const [year, month, day] = datePart.split("-").map(Number);
-  const [hours, minutes, seconds] = timeString.split(":").map(Number);
-  return new Date(year, month - 1, day, hours, minutes, seconds);
-};
-
-const isLessThan3DaysBeforeCheckIn = (checkInDate: string): boolean => {
-  const today = new Date();
-  const todayLocal = new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate()
-  );
-  const checkIn = toLocalDateFromString(checkInDate);
-  const diff = differenceInCalendarDays(checkIn, todayLocal);
-  return diff < 3 && diff >= 0;
-};
-
 
 export const BookingCard = ({
   booking,
-  paymentDisplay,
+  paymentDisplay, // Receive calculated values
   onCancelBooking,
+  onPayBalance,
 }: BookingCardProps) => {
   const roomDetails = booking.room;
   const property = booking.room.propertyId;
-  const router = useRouter();
-
-  const checkInDate = toLocalDateFromString(booking.checkIn);
-  const checkOutDate = toLocalDateFromString(booking.checkOut);
-  const nights = differenceInDays(checkOutDate, checkInDate);
-
-  const checkInDateTime = combineDateAndTime(
-    booking.checkIn,
-    booking.checkInHour
+  const nights = differenceInDays(
+    new Date(booking.checkOut),
+    new Date(booking.checkIn)
   );
-  const checkOutDateTime = combineDateAndTime(
-    booking.checkOut,
-    booking.checkOutHour
-  );
-  const now = new Date();
-  const isCurrentStay = now >= checkInDateTime && now <= checkOutDateTime;
-
+  const isCurrentStay =
+    new Date() >= new Date(booking.checkIn) &&
+    new Date() <= new Date(booking.checkOut);
   const isCancelled =
     booking.bookingState === "cancelled_by_patient" ||
-    booking.bookingState === "cancelled_by_owner" ||
-    booking.bookingState === "cancelled_by_system";
+    booking.bookingState === "cancelled_by_owner";
 
-  const cancelledByMap: Record<string, string> = {
-    cancelled_by_patient: "Anulado por el paciente",
-    cancelled_by_owner: "Anulado por el propietario",
-    cancelled_by_system: "Anulado por la plataforma",
-  };
+  const router = useRouter();
 
-  const cancelledText = cancelledByMap[booking.bookingState ?? ""] || "Anulado";
 
   const getPaymentBadge = () => {
     if (
@@ -195,8 +153,11 @@ export const BookingCard = ({
     ) {
       return <Badge className="bg-green-500 text-white">Pagado 100%</Badge>;
     }
-    if (booking.paymentState === "prepayment") {
-      return <Badge className="bg-yellow-500 text-white">Anticipo</Badge>;
+    if (
+      booking.paymentState === "prepayment" &&
+      booking.modificationCount === 0
+    ) {
+      return <Badge className="bg-yellow-500 text-white">Anticipo 10%</Badge>;
     }
     return null;
   };
@@ -215,13 +176,11 @@ export const BookingCard = ({
         <div className="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1.5">
           <p className="text-xs font-medium flex items-center">
             <Info className="w-3 h-3 mr-1.5" />
-            Reserva Anulada{" "}
-            {booking.cancelledMessage &&
-              `- Motivo: ${booking.cancelledMessage}`}
+            Reserva Anulada -{" "}
+            {booking.cancelledMessage && `Motivo: ${booking.cancelledMessage}`}
           </p>
         </div>
       )}
-
       {isCurrentStay && !isCancelled && (
         <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-3 py-1.5">
           <p className="text-xs font-medium flex items-center">
@@ -230,7 +189,6 @@ export const BookingCard = ({
           </p>
         </div>
       )}
-
       <div className="flex flex-col md:flex-row">
         <div className="relative w-full md:w-1/3 h-48 md:h-auto">
           <Image
@@ -244,6 +202,8 @@ export const BookingCard = ({
             objectFit="cover"
             className="rounded-t-lg md:rounded-l-lg md:rounded-t-none"
           />
+
+          {/* Badge */}
           <div
             className={`absolute top-3 left-3 px-2 py-0.5 rounded-full text-xs font-medium ${
               roomDetails?.isPrivate === false
@@ -270,6 +230,7 @@ export const BookingCard = ({
             )}
           </div>
 
+          {/* Overlay clickeable */}
           <div
             className="absolute inset-0 cursor-pointer"
             onClick={() => router.push(`/rooms/${booking.room.id}`)}
@@ -284,24 +245,23 @@ export const BookingCard = ({
             </h3>
             {getPaymentBadge()}
           </div>
-
           <div className="flex items-center text-xs text-gray-500 mb-2">
             <User className="h-3 w-3 mr-1" />
-            <span>Propietario: {`${booking.ownerName}`}</span>
+            <span>Paciente: {`${booking.patientName}`}</span>
           </div>
-
           <div className="flex items-center text-xs text-gray-500 mb-2">
             <MapPin className="h-3 w-3 mr-1" />
             <span>{`${property?.address} ${property?.city}. ${property?.state}. ${property?.country}`}</span>
           </div>
-
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mb-3">
             <InfoItem
               icon={<Calendar />}
               label="Estadía"
-              value={`${format(checkInDate, "dd MMM", {
+              value={`${format(parseISO(booking.checkIn), "dd MMM", {
                 locale: es,
-              })} → ${format(checkOutDate, "dd MMM", { locale: es })}`}
+              })} → ${format(parseISO(booking.checkOut), "dd MMM", {
+                locale: es,
+              })}`}
             />
             <InfoItem
               icon={<Calendar />}
@@ -315,24 +275,42 @@ export const BookingCard = ({
               }
             />
 
-            <InfoItem
-              icon={<Users />}
-              label="Huéspedes"
-              value={booking.guests}
-            />
-            <InfoItem
-              icon={<DollarSign />}
-              label="Precio por noche"
-              value={`$${booking.price} USD`}
-            />
-            <InfoItem
-              icon={<DollarSign />}
-              label="Limpieza"
-              value={`$${booking.cleaning} USD`}
-            />
+            {roomDetails?.isPrivate !== false && (
+              <>
+                <InfoItem
+                  icon={<Users />}
+                  label="Huéspedes"
+                  value={booking.guests}
+                />
+                <InfoItem
+                  icon={<DollarSign />}
+                  label="Precio por noche"
+                  value={`$${booking.price} USD`}
+                />
+                <InfoItem
+                  icon={<DollarSign />}
+                  label="Limpieza"
+                  value={`$${booking.cleaning} USD`}
+                />
+              </>
+            )}
+
+            {roomDetails?.isPrivate === false && (
+              <>
+                <InfoItem
+                  icon={<DollarSign />}
+                  label="Precio por noche"
+                  value={`$${booking.price} USD`}
+                />
+                <InfoItem
+                  icon={<DollarSign />}
+                  label="Limpieza"
+                  value={`$${booking.cleaning} USD`}
+                />
+              </>
+            )}
           </div>
 
-          {/* FOOTER */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3 mt-3 pt-3 border-t border-gray-200">
             <div className="flex-1">
               <p className="text-lg font-semibold text-gray-900 mb-0.5">
@@ -342,11 +320,96 @@ export const BookingCard = ({
                   currency: "USD",
                 }).format(Number(booking.finalPrice))}
               </p>
+
+              <div className="text-xs text-gray-500">
+                {booking.paymentState === "balancepayment" ||
+                  (booking.paymentState === "pendingRefund" && (
+                    <p>Pagó anticipo: ${booking.prepaymentAmount}</p>
+                  ))}
+
+                {booking.paymentState === "fullpayment" &&
+                  booking.modificationCount === 1 &&
+                  paymentDisplay.modificationDiff !== null && (
+                    <p>
+                      {paymentDisplay.modificationDiff < 0
+                        ? "Pagó por modificación: "
+                        : "Crédito por modificación: "}
+                      {new Intl.NumberFormat("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                      }).format(Math.abs(paymentDisplay.modificationDiff))}
+                    </p>
+                  )}
+
+                {booking.paymentState === "prepayment" &&
+                  booking.modificationCount === 0 && (
+                    <p>
+                      Anticipo:{" "}
+                      {new Intl.NumberFormat("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                      }).format(paymentDisplay.shownAnticipo)}{" "}
+                      | Pendiente:{" "}
+                      {new Intl.NumberFormat("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                      }).format(paymentDisplay.shownPendiente)}
+                    </p>
+                  )}
+
+                {booking.paymentState === "prepayment" &&
+                  booking.modificationCount === 1 && (
+                    <p>
+                      Anticipo:{" "}
+                      {new Intl.NumberFormat("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                      }).format(paymentDisplay.shownAnticipo)}{" "}
+                      | Pendiente:{" "}
+                      {new Intl.NumberFormat("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                      }).format(paymentDisplay.shownPendiente)}
+                    </p>
+                  )}
+              </div>
             </div>
 
-            {/* 🔴 SOLO ANULAR */}
             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-              {!isCancelled && onCancelBooking && isLessThan3DaysBeforeCheckIn(booking.checkIn)  && (
+              {!isCancelled &&
+                !isCurrentStay &&
+                booking.modificationCount === 0 &&
+                booking.discountStayType === "long" && (
+                  <span className="inline-block px-2 py-2 text-xs font-semibold text-gray-700 bg-gray-200 rounded-full">
+                 Sin modificar
+                </span>
+                )}
+
+              {booking.modificationCount === 1 && (
+                <span className="inline-block px-2 py-2 text-xs font-semibold text-gray-700 bg-gray-200 rounded-full">
+                  Modificado
+                </span>
+              )}
+
+              {booking.paymentState === "prepayment" &&
+                !isCancelled &&
+                onPayBalance && (
+                  <Button
+                    onClick={() =>
+                      onPayBalance(
+                        booking.id,
+                        Math.max(paymentDisplay.shownPendiente, 0).toString()
+                      )
+                    }
+                    size="sm"
+                    variant="outline"
+                    className="border-blue-600 text-blue-600 hover:bg-blue-50 w-full sm:w-auto"
+                  >
+                    Pagar Pendiente
+                  </Button>
+                )}
+
+              {!isCancelled && !isCurrentStay && onCancelBooking && (
                 <Button
                   variant="outline"
                   size="sm"
@@ -358,8 +421,10 @@ export const BookingCard = ({
               )}
 
               {isCancelled && (
-                <span className="inline-block px-2 py-1 text-xs font-semibold text-red-600 bg-gray-100 rounded-full">
-                  {cancelledText ?? "Reserva anulada"}
+                <span className="inline-block px-2 py-2 text-xs font-semibold text-red-600 bg-gray-200 rounded-full">
+                  {booking.bookingState === "cancelled_by_patient"
+                    ? "Anulado por el paciente"
+                    : "Anulado por el propietario"}
                 </span>
               )}
             </div>
