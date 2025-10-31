@@ -75,7 +75,7 @@ const PropertiesPage: React.FC = () => {
       
       {properties.length === 0 ? (
        
-          <div className="container min-h-screen mx-auto p-4 py-8">
+          <div className="container min-h-screen mx-auto p-4 py-4">
             <div className="max-w-xl mx-auto">
               <div className="flex flex-col items-center justify-center text-center space-y-8 py-16">
                 <div className="w-20 h-20 rounded-full bg-[#39759E]/10 flex items-center justify-center">
@@ -83,9 +83,11 @@ const PropertiesPage: React.FC = () => {
                 </div>
     
                 <div className="space-y-3">
-                  <h1 className="text-2xl md:text-3xl font-semibold text-gray-900">
-                    Aún no has registrado una propiedad
-                  </h1>
+                <h1
+            className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-8`}
+          >
+             Aún no has registrado una propiedad
+          </h1>
                   <p className="text-base text-gray-600 max-w-md mx-auto">
                   Dar el primer paso para convertirte en anfitrión puede ser el comienzo de una experiencia increíble.                  </p>
                 </div>
