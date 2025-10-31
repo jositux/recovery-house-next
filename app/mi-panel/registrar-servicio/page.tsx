@@ -19,6 +19,9 @@ import { getCurrentUser } from "@/services/userService"
 import { Loader2, Check, Eye, Edit } from "lucide-react"
 import Link from "next/link"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
+import { Fraunces } from "next/font/google"
+
+const fraunces = Fraunces({ subsets: ["latin"] })
 
 const formSchema = z.object({
   name: z.string().min(1, "El nombre es requerido."),
@@ -267,7 +270,11 @@ export default function RegisterServicePage() {
   return (
     <div className="min-h-screen bg-[#F8F8F7]">
       <div className="container mx-auto max-w-2xl py-4">
-        <h1 className="text-3xl font-bold mb-6">Registra tu servicio</h1>
+      <h1
+            className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-8`}
+          >
+            Registra tu servicio
+          </h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="space-y-4 p-4 bg-white rounded-xl">
