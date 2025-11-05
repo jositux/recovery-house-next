@@ -222,7 +222,7 @@ export default function RoomPage() {
 
   const handleEditRoom = (room: Room) => {
     localStorage.setItem("selected_room", JSON.stringify(room));
-    router.push(`/mi-panel/propiedades/${id}/room/edit`);
+    router.push(`/mi-panel/propiedades/${id}/room/editar`);
   };
 
   const handleCalendarRoom = (room: Room) => {
