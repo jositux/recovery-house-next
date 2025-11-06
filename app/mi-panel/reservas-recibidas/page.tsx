@@ -648,17 +648,22 @@ const BookingList = () => {
                       </div>
                     </div>
                     <ul className="space-y-6">
-                      {past.map((booking) => (
-                        <li key={booking.id}>
-                          <BookingCardPast
-                            booking={booking}
-                            review={booking.review}
-                            isPast
-                            onReviewSubmit={handleReviewSubmit}
-                            onReviewDelete={handleReviewDelete}
-                          />
-                        </li>
-                      ))}
+                    {past.map((booking) => {
+  const paymentDisplay = calculatePaymentDisplay(booking);
+  return (
+    <li key={booking.id}>
+      <BookingCardPast
+        booking={booking}
+        review={booking.review}
+        isPast
+        paymentDisplay={paymentDisplay}
+        onReviewSubmit={handleReviewSubmit}
+        onReviewDelete={handleReviewDelete}
+      />
+    </li>
+  );
+})}
+                 
                     </ul>
                   </section>
                 )}
