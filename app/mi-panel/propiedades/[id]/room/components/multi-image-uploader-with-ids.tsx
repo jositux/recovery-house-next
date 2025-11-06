@@ -8,7 +8,11 @@ import Image from "next/image";
 
 interface MultiImageUploaderWithIdsProps {
   maxImages?: number;
-  onImagesChange?: (files: File[], existingIds: string[], markedForDeletion: string[]) => void;
+  onImagesChange?: (
+    files: File[],
+    existingIds: string[],
+    markedForDeletion: string[]
+  ) => void;
   defaultImageIds?: string[];
 }
 
@@ -32,7 +36,9 @@ export function MultiImageUploaderWithIds({
   const existingIds = existingIdsRef.current;
 
   const [newFiles, setNewFiles] = useState<NewFile[]>([]);
-  const [markedForDeletion, setMarkedForDeletion] = useState<Set<string>>(new Set());
+  const [markedForDeletion, setMarkedForDeletion] = useState<Set<string>>(
+    new Set()
+  );
 
   // Notificar al componente padre cada vez que cambien los archivos o los marcados para borrar
   useEffect(() => {
@@ -55,7 +61,9 @@ export function MultiImageUploaderWithIds({
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
 
-    const visibleExistingCount = existingIds.filter((id) => !markedForDeletion.has(id)).length;
+    const visibleExistingCount = existingIds.filter(
+      (id) => !markedForDeletion.has(id)
+    ).length;
     const totalCurrentImages = visibleExistingCount + newFiles.length;
     const remainingSlots = Math.max(0, maxImages - totalCurrentImages);
 
@@ -84,7 +92,9 @@ export function MultiImageUploaderWithIds({
   };
 
   const handleRemoveImage = (index: number) => {
-    const visibleExisting = existingIds.filter((id) => !markedForDeletion.has(id));
+    const visibleExisting = existingIds.filter(
+      (id) => !markedForDeletion.has(id)
+    );
     if (index < visibleExisting.length) {
       // Marcar imagen existente para eliminación
       const idToRemove = visibleExisting[index];
@@ -101,7 +111,9 @@ export function MultiImageUploaderWithIds({
     });
   };
 
-  const visibleExisting = existingIds.filter((id) => !markedForDeletion.has(id));
+  const visibleExisting = existingIds.filter(
+    (id) => !markedForDeletion.has(id)
+  );
   const totalImages = visibleExisting.length + newFiles.length;
   const canUploadMore = totalImages < maxImages;
 
@@ -116,7 +128,7 @@ export function MultiImageUploaderWithIds({
             onClick={() => document.getElementById("image-upload-ids")?.click()}
           >
             <Upload className="mr-2 h-4 w-4" />
-           Cargar
+            Cargar
           </Button>
           <span className="text-sm text-muted-foreground">
             {totalImages} / {maxImages} fotos
@@ -168,7 +180,12 @@ export function MultiImageUploaderWithIds({
                 key={`new-${file.id}`}
                 className="relative aspect-square rounded-lg border border-border overflow-hidden group transition-all duration-300 ease-in-out animate-in fade-in zoom-in"
               >
-                <Image src={file.url} alt={`New image ${fileIndex + 1}`} fill className="object-cover" />
+                <Image
+                  src={file.url}
+                  alt={`New image ${fileIndex + 1}`}
+                  fill
+                  className="object-cover"
+                />
                 <button
                   type="button"
                   onClick={() => handleRemoveImage(displayIndex)}
@@ -188,7 +205,9 @@ export function MultiImageUploaderWithIds({
         >
           <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
           <p className="text-sm text-muted-foreground mb-2">No hay fotos</p>
-          <p className="text-xs text-muted-foreground">Puedes subir hasta {maxImages}</p>
+          <p className="text-xs text-muted-foreground">
+            Puedes subir hasta {maxImages}
+          </p>
         </div>
       )}
     </div>
