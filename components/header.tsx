@@ -19,7 +19,7 @@ export function Header() {
   const [userName, setUserName] = useState("")
   const pathname = usePathname()
 
-  const showSearchBar = pathname === "/" || pathname === "/rooms" || pathname === "/rooms2"
+  const showSearchBar = pathname === "/es" || pathname === "/en" || pathname === "/" || pathname === "/rooms" || pathname === "/rooms2"
 
   useEffect(() => {
     // Función para verificar autenticación y obtener nombre

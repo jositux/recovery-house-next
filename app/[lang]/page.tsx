@@ -9,22 +9,28 @@ import { BenefitsSection } from "@/components/sections/benefits-section"
 import { HostCTASection } from "@/components/sections/host-cta-section"
 import { NewsSection } from "@/components/sections/news-section"
 import styles from "./page.module.css"
+import { getDictionary, type Locale, getTranslations } from "@/lib/i18n"
 
+export default async function Home({
+  params,
+}: {
+  params: Promise<{ lang: Locale }>
+}) {
+  const { lang } = await params
 
-export default function Home() {
   return (
     
     <main>
      
       <div className={`${styles.Container} hidden mt-[-124px] pt-[50px] md:block px-4`}>
-        <HeroSlider lang="en"/>
+        <HeroSlider lang={lang}/>
       </div>
       <div className="md:hidden px-4">
-        <HeroSliderMobile lang="en"/>
+        <HeroSliderMobile lang={lang}/>
       </div>
-      <WelcomeSection lang="en"/>
-      <FeaturesSection lang="en"/>
-      <HowToUseSection lang="en"/>
+      <WelcomeSection />
+      <FeaturesSection />
+      <HowToUseSection />
       <BenefitsSection />
       <TestimonialsSection />
       {/*

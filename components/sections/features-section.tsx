@@ -1,56 +1,105 @@
-import { Button } from "@/components/ui/button";
-import { FeatureCard } from "@/components/ui/feature-card";
-import Link from "next/link";
-import { Fraunces } from "next/font/google";
-import { Search } from "lucide-react";
+import { Button } from "@/components/ui/button"
+import { FeatureCard } from "@/components/ui/feature-card"
+import Link from "next/link"
+import { Fraunces } from "next/font/google"
+import { Search } from "lucide-react"
 
-const fraunces = Fraunces({ subsets: ["latin"] });
+const fraunces = Fraunces({ subsets: ["latin"] })
 
-const features = [
-  {
-    title: "Facilidad de búsqueda",
-    description:
-      "Nuestra plataforma te permite buscar de manera sencilla y rápida las opciones de estadías disponibles para tu tipo de intervención médica.",
-    imageSrc: "/assets/features/2.jpg",
-  },
-  {
-    title: "Variedad de opciones",
-    description:
-      "Contamos con una amplia selección de casas y apartamentos en todo el mundo, para que puedas elegir la opción que mejor se adapte a tus necesidades.",
-    imageSrc: "/assets/features/1.jpg",
-  },
-  {
-    title: "Seguridad y confianza",
-    description:
-      "Nos preocupamos por tu seguridad y confianza. Todas las estadías disponibles en nuestra plataforma han sido verificadas y cumplen con altos estándares de calidad.",
-    imageSrc: "/assets/features/0.jpg",
-  },
-];
+interface FeaturesSectionProps {
+  lang?: string // 👈 idioma recibido como prop
+}
 
-export function FeaturesSection() {
+export function FeaturesSection({ lang = "en" }: FeaturesSectionProps) {
+  const isSpanish = lang === "es"
+
+  const features = isSpanish
+    ? [
+        {
+          title: "Facilidad de búsqueda",
+          description:
+            "Nuestra plataforma te permite buscar de manera sencilla y rápida las opciones de estadías disponibles para tu tipo de intervención médica.",
+          imageSrc: "/assets/features/2.jpg",
+        },
+        {
+          title: "Variedad de opciones",
+          description:
+            "Contamos con una amplia selección de casas y apartamentos en todo el mundo, para que puedas elegir la opción que mejor se adapte a tus necesidades.",
+          imageSrc: "/assets/features/1.jpg",
+        },
+        {
+          title: "Seguridad y confianza",
+          description:
+            "Nos preocupamos por tu seguridad y confianza. Todas las estadías disponibles en nuestra plataforma han sido verificadas y cumplen con altos estándares de calidad.",
+          imageSrc: "/assets/features/0.jpg",
+        },
+      ]
+    : [
+        {
+          title: "Ease of search",
+          description:
+            "Our platform allows you to easily and quickly find available recovery stay options for your medical procedure.",
+          imageSrc: "/assets/features/2.jpg",
+        },
+        {
+          title: "Variety of options",
+          description:
+            "We offer a wide selection of homes and apartments around the world so you can choose the one that best suits your needs.",
+          imageSrc: "/assets/features/1.jpg",
+        },
+        {
+          title: "Safety and trust",
+          description:
+            "We care about your safety and trust. All the stays listed on our platform have been verified and meet high-quality standards.",
+          imageSrc: "/assets/features/0.jpg",
+        },
+      ]
+
   return (
     <section className="py-16 bg-white">
       <div className="container mx-auto px-4 lg:px-0">
+        {/* ✅ Título principal */}
         <div className="max-w-3xl mx-auto md:text-center mb-12">
-        <h2
-  className={`${fraunces.className} text-3xl sm:text-6xl md:hidden text-[#162F40] mb-4`}
->
-  Encuentra la mejor<br/> opción para tu<br/> recuperación
-</h2>
+          <h2
+            className={`${fraunces.className} text-3xl sm:text-6xl md:hidden text-[#162F40] mb-4`}
+          >
+            {isSpanish
+              ? (
+                  <>
+                    Encuentra la mejor<br /> opción para tu<br /> recuperación
+                  </>
+                )
+              : (
+                  <>
+                    Find the best<br /> option for your<br /> recovery
+                  </>
+                )}
+          </h2>
 
-<h2
-  className={`${fraunces.className} hidden md:block text-4xl sm:text-4xl text-[#162F40] mb-4`}
->
-  Encuentra la mejor opción<br />para tu recuperación
-</h2>
+          <h2
+            className={`${fraunces.className} hidden md:block text-4xl sm:text-4xl text-[#162F40] mb-4`}
+          >
+            {isSpanish
+              ? (
+                  <>
+                    Encuentra la mejor opción<br />para tu recuperación
+                  </>
+                )
+              : (
+                  <>
+                    Find the best option<br />for your recovery
+                  </>
+                )}
+          </h2>
+
           <p className="text-[#162F40]">
-            En Recovery Care Solutions, te ofrecemos una plataforma fácil de
-            usar donde podrás encontrar una amplia variedad de opciones de
-            estadías para tu recuperación. Nuestra prioridad es garantizar tu
-            seguridad y confianza en todo momento.
+            {isSpanish
+              ? `En Recovery Care Solutions, te ofrecemos una plataforma fácil de usar donde podrás encontrar una amplia variedad de opciones de estadías para tu recuperación. Nuestra prioridad es garantizar tu seguridad y confianza en todo momento.`
+              : `At Recovery Care Solutions, we offer an easy-to-use platform where you can find a wide variety of recovery stay options. Our priority is to ensure your safety and trust at all times.`}
           </p>
         </div>
 
+        {/* ✅ Tarjetas con traducción */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           {features.map((feature, index) => (
             <FeatureCard
@@ -62,18 +111,21 @@ export function FeaturesSection() {
           ))}
         </div>
 
+        {/* ✅ Botones con traducción */}
         <div className="flex justify-center gap-4">
           <Link href="/rooms">
             <Button className="bg-[#39759E] hover:bg-[#39759E] flex items-center gap-2">
               <Search size={16} />
-              Buscar
+              {isSpanish ? "Buscar" : "Search"}
             </Button>
           </Link>
           <Link href="/registro">
-            <Button variant="outline">Registrarse</Button>
+            <Button variant="outline">
+              {isSpanish ? "Registrarse" : "Sign up"}
+            </Button>
           </Link>
         </div>
       </div>
     </section>
-  );
+  )
 }
