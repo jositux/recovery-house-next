@@ -1,71 +1,88 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useCallback } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import FileUpload from "@/components/FileUpload"
-import { SingleImageUploaderWithId } from "../single-image-uploader-with-id"
-import { LocationSelector } from "@/components/ui/location-selector"
-import { UserTypeCard } from "@/components/ui/user-type-card"
-import { propertyUpdateService, type PropertyData } from "@/services/propertyUpdateService"
-import { uploadFile } from "@/services/fileUploadService"
-import { deleteFile as deleteFileService } from "@/services/deleteFileService"
-import { Fraunces } from "next/font/google"
+import { useState, useEffect, useCallback } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import FileUpload from "@/components/FileUpload";
+import ImageUpload from "@/components/CoverPhotoUpload";
+import { LocationSelector } from "@/components/ui/location-selector";
+import { UserTypeCard } from "@/components/ui/user-type-card";
+import {
+  propertyUpdateService,
+  type PropertyData,
+} from "@/services/propertyUpdateService";
+import { Fraunces } from "next/font/google";
 
-const fraunces = Fraunces({ subsets: ["latin"] })
+const fraunces = Fraunces({ subsets: ["latin"] });
 
-import { Building2, Home, Save, X } from "lucide-react"
+import { Building2, Home, Save, X } from "lucide-react";
 
-import { MultiSelectCase } from "@/components/MultiSelectCase"
+import { MultiSelectCase } from "@/components/MultiSelectCase";
 
-import { useRouter } from "next/navigation"
+import { useRouter } from "next/navigation";
 
-import { formSchema, type FormValues, type FileData, type Property } from "../types"
+import {
+  formSchema,
+  type FormValues,
+  type FileData,
+  //type RoomSkeleton,
+  //type Room,
+  type Property,
+} from "../types";
 
-import GoogleMapsSelector, { type LocationDetails } from "@/components/google-maps-selector"
+import GoogleMapsSelector, {
+  type LocationDetails,
+} from "@/components/google-maps-selector";
+
+/*
+import OpenStreetMapSelector, {
+  type LocationDetails,
+} from "@/components/OSMSelector";*/
 
 export default function EditPropertyPage({
   params,
 }: {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string }>;
 }) {
   const handleLocationSelected = (details: LocationDetails) => {
-    console.log("Detalles de la ubicación seleccionada:", details)
-    form.setValue("address", details.address)
-    form.setValue("latitude", details.lat)
-    form.setValue("longitude", details.lng)
-    form.setValue("postalCode", details.postalCode)
-  }
-  const [property, setProperty] = useState<Property | null>(null)
-  const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
-  const [paramId, setParamId] = useState<string | null>(null)
-
-  const [newImageFile, setNewImageFile] = useState<File | null>(null)
-  const [imageToDelete, setImageToDelete] = useState<string | undefined>(undefined)
-  const [originalImageId, setOriginalImageId] = useState<string | undefined>(undefined)
-  const [currentImageId, setCurrentImageId] = useState<string | undefined>(undefined)
-
+    console.log("Detalles de la ubicación seleccionada:", details);
+    form.setValue("address", details.address);
+    form.setValue("latitude", details.lat);
+    form.setValue("longitude", details.lng);
+    form.setValue("postalCode", details.postalCode);
+  };
+  const [property, setProperty] = useState<Property | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [paramId, setParamId] = useState<string | null>(null);
+  const [imageId, setImageId] = useState<string>("");
   const [RNTFileData, setRNTFileData] = useState<FileData>({
     id: "",
     filename_download: "",
-  })
+  });
   const [TaxFileData, setTaxFileData] = useState<FileData>({
     id: "",
     filename_download: "",
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [defaultLocation, setDefaultLocation] = useState<LocationDetails>({
     address: "",
     lat: 0,
     lng: 0,
     postalCode: "",
-  })
+  });
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -85,47 +102,45 @@ export default function EditPropertyPage({
       mainImage: "",
       RNTFile: "",
       taxIdEINFile: "",
-      address: "",
+      address: "", // Added address field
       patology: [],
       hostName: "",
       guestComments: "",
     },
-  })
+  });
 
   useEffect(() => {
     const getParams = async () => {
-      const resolvedParams = await params
-      setParamId(resolvedParams.id)
-    }
-    getParams()
-  }, [params])
+      const resolvedParams = await params;
+      setParamId(resolvedParams.id);
+    };
+    getParams();
+  }, [params]);
 
   const decodeHtmlAndRemoveTags = (html: string): string => {
-    const textWithoutTags = html.replace(/<\/?[^>]+(>|$)/g, "")
-    const txt = document.createElement("textarea")
-    txt.innerHTML = textWithoutTags
-    return txt.value
-  }
+    const textWithoutTags = html.replace(/<\/?[^>]+(>|$)/g, "");
+    const txt = document.createElement("textarea");
+    txt.innerHTML = textWithoutTags;
+    return txt.value;
+  };
 
   const fetchProperty = useCallback(async () => {
-    if (!paramId) return
+    if (!paramId) return;
 
-    setLoading(true)
+    setLoading(true);
     try {
-      const storedProperty = localStorage.getItem("selected_property")
+      const storedProperty = localStorage.getItem("selected_property");
 
-      console.log(JSON.stringify(storedProperty))
+      console.log(JSON.stringify(storedProperty));
       if (storedProperty) {
-        const selectedProperty: Property = JSON.parse(storedProperty)
+        const selectedProperty: Property = JSON.parse(storedProperty);
 
         if (selectedProperty) {
-          setProperty(selectedProperty)
+          setProperty(selectedProperty);
 
-          setOriginalImageId(selectedProperty.mainImage.id)
-          setCurrentImageId(selectedProperty.mainImage.id)
+          console.log("patology", selectedProperty.patology);
 
-          console.log("patology", selectedProperty.patology)
-
+          // Actualizar el formulario con los datos de la propiedad
           form.reset({
             id: selectedProperty.id,
             name: selectedProperty.name,
@@ -145,145 +160,101 @@ export default function EditPropertyPage({
             address: selectedProperty.address,
             patology: selectedProperty.patology,
             hostName: selectedProperty.hostName,
-            guestComments: decodeHtmlAndRemoveTags(selectedProperty.guestComments),
-          })
+            guestComments: decodeHtmlAndRemoveTags(
+              selectedProperty.guestComments
+            ),
+          });
 
+          // Actualizar defaultLocation con los datos de la propiedad
           setDefaultLocation({
             address: selectedProperty.address || "",
             lat: selectedProperty.place.coordinates[0] || 0,
             lng: selectedProperty.place.coordinates[1] || 0,
             postalCode: selectedProperty.postalCode || "",
-          })
+          });
 
-          console.log("ID = ", selectedProperty.RNTFile)
-          setRNTFileData(selectedProperty.RNTFile)
-          setTaxFileData(selectedProperty.taxIdEINFile)
+          console.log("ID = ", selectedProperty.RNTFile);
+          setRNTFileData(selectedProperty.RNTFile);
+          setTaxFileData(selectedProperty.taxIdEINFile);
 
-          form.setValue("patology", JSON.parse(String(selectedProperty.patology)))
+          form.setValue(
+            "patology",
+            JSON.parse(String(selectedProperty.patology))
+          );
         } else {
-          throw new Error("Propiedad no encontrada")
+          throw new Error("Propiedad no encontrada");
         }
+      } else {
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al cargar la propiedad")
+      setError(
+        err instanceof Error ? err.message : "Error al cargar la propiedad"
+      );
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [paramId])
+  }, [paramId]); // Dependencia de paramId para que se actualice si cambia
 
   useEffect(() => {
     if (paramId) {
-      fetchProperty()
+      fetchProperty();
     }
-  }, [paramId, fetchProperty])
+  }, [paramId, fetchProperty]);
 
-  const router = useRouter()
+  const router = useRouter();
 
   const onSubmit = async (values: FormValues) => {
-    if (!currentImageId && !newImageFile) {
-      form.setError("mainImage", {
-        type: "manual",
-        message: "La imagen principal es obligatoria",
-      })
-      return
-    }
-
-    setIsSubmitting(true)
+    setIsSubmitting(true);
+    //let propertyIdLocal = property?.id || "";
 
     try {
-      const accessToken = localStorage.getItem("access_token")
-      if (!accessToken) {
-        throw new Error("No access token found")
-      }
-
-      let finalImageId = values.mainImage
-
-      // Delete marked image if exists
-      if (imageToDelete && accessToken) {
-        try {
-          await deleteFileService(imageToDelete, accessToken)
-          console.log("Deleted image:", imageToDelete)
-        } catch (error) {
-          console.error("Error deleting image:", error)
-        }
-      }
-
-      // Upload new image if exists
-      if (newImageFile && accessToken) {
-        try {
-          const uploadedId = await uploadFile(newImageFile)
-          finalImageId = uploadedId.id
-          console.log("Uploaded new image:", uploadedId)
-        } catch (error) {
-          console.error("Error uploading image:", error)
-          throw error
-        }
-      }
-
       const propertyUpdateData: PropertyData = {
         ...values,
-        mainImage: finalImageId,
         region: "default",
         latitude: values.latitude ?? 0,
         longitude: values.longitude ?? 0,
-      }
+      };
 
       if (property) {
-        await propertyUpdateService.updateProperty(property.id, propertyUpdateData)
+        await propertyUpdateService.updateProperty(
+          property.id,
+          propertyUpdateData
+        );
+        // propertyIdLocal = property.id;
 
-        localStorage.removeItem("selected_property")
+        localStorage.removeItem("selected_property");
 
-        router.push(`/mi-panel/propiedades/${property.id}`)
+        router.push(`/mi-panel/propiedades/${property.id}`);
       }
     } catch (error) {
-      console.error("Error al actualizar la propiedad:", error)
+      console.error("Error al registrar la propiedad:", error);
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const handleCancel = () => {
     if (property) {
-      router.push(`/mi-panel/propiedades/${property.id}`)
+      router.push(`/mi-panel/propiedades/${property.id}`);
     }
-  }
-
-  const handleImageChange = (data: {
-    existingImageId: string | null
-    newFile: File | null
-    markedForDeletion: boolean
-  }) => {
-    if (data.markedForDeletion && originalImageId) {
-      setImageToDelete(originalImageId)
-      setCurrentImageId(undefined)
-      form.setValue("mainImage", "")
-      form.setError("mainImage", {
-        type: "manual",
-        message: "La imagen principal es obligatoria",
-      })
-    }
-
-    setNewImageFile(data.newFile)
-
-    // Update form validation
-    if (data.newFile || (data.existingImageId && !data.markedForDeletion)) {
-      form.setValue("mainImage", data.existingImageId || "pending")
-      form.clearErrors("mainImage")
-    }
-  }
+  };
 
   if (loading) {
-    return <p className="text-center p-4">Cargando datos de la propiedad...</p>
+    return <p className="text-center p-4">Cargando datos de la propiedad...</p>;
   }
 
   if (error) {
-    return <p className="text-center p-4 text-red-500">Error: {error}</p>
+    return <p className="text-center p-4 text-red-500">Error: {error}</p>;
   }
 
   return (
     <div className="min-h-screen bg-[#F8F8F7]">
       <div className="container mx-auto max-w-2xl py-4">
-        <h1 className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}>Editar Propiedad</h1>
+        <h1
+          className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}
+        >
+          Editar Propiedad
+        </h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="space-y-4 p-4 bg-white rounded-xl">
@@ -315,9 +286,9 @@ export default function EditPropertyPage({
                           filename_download={RNTFileData.filename_download}
                           onUploadSuccess={(response) => {
                             if (response.id !== RNTFileData.id) {
-                              setRNTFileData(response)
-                              form.setValue("RNTFile", response.id)
-                              form.clearErrors("RNTFile")
+                              setRNTFileData(response);
+                              form.setValue("RNTFile", response.id);
+                              form.clearErrors("RNTFile");
                             }
                           }}
                         />
@@ -339,9 +310,9 @@ export default function EditPropertyPage({
                           filename_download={TaxFileData.filename_download}
                           onUploadSuccess={(response) => {
                             if (response.id !== TaxFileData.id) {
-                              setTaxFileData(response)
-                              form.setValue("taxIdEINFile", response.id)
-                              form.clearErrors("taxIdEINFile")
+                              setTaxFileData(response);
+                              form.setValue("taxIdEINFile", response.id);
+                              form.clearErrors("taxIdEINFile");
                             }
                           }}
                         />
@@ -374,10 +345,15 @@ export default function EditPropertyPage({
                   <FormItem>
                     <FormLabel>Foto de la Propiedad</FormLabel>
                     <FormControl>
-                      <SingleImageUploaderWithId
-                        existingImageId={currentImageId}
-                        newFile={newImageFile}
-                        onChange={handleImageChange}
+                      <ImageUpload
+                        defaultImageId={property?.mainImage.id}
+                        onImageIdChange={(newImageId) => {
+                          if (newImageId !== imageId) {
+                            setImageId(newImageId);
+                            form.setValue("mainImage", newImageId);
+                            form.clearErrors("mainImage");
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -412,7 +388,10 @@ export default function EditPropertyPage({
                   <FormItem>
                     <FormLabel>Tratamientos en que se especializa</FormLabel>
                     <FormControl>
-                      <MultiSelectCase value={field.value} onChange={field.onChange} />
+                      <MultiSelectCase
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -428,9 +407,9 @@ export default function EditPropertyPage({
                   defaultState={property.state}
                   defaultCity={property.city}
                   onChange={({ country, state, city }) => {
-                    form.setValue("country", country)
-                    form.setValue("state", state)
-                    form.setValue("city", city)
+                    form.setValue("country", country);
+                    form.setValue("state", state);
+                    form.setValue("city", city);
                   }}
                   error={{
                     country: form.formState.errors.country?.message,
@@ -469,7 +448,10 @@ export default function EditPropertyPage({
                 )}
               />
 
-              <GoogleMapsSelector onLocationSelected={handleLocationSelected} defaultLocation={defaultLocation} />
+              <GoogleMapsSelector
+                onLocationSelected={handleLocationSelected}
+                defaultLocation={defaultLocation}
+              />
 
               <div className="hidden">
                 <FormField
@@ -500,7 +482,13 @@ export default function EditPropertyPage({
                           step="any"
                           placeholder="Latitud"
                           {...field}
-                          onChange={(e) => field.onChange(e.target.value ? Number.parseFloat(e.target.value) : null)}
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value
+                                ? Number.parseFloat(e.target.value)
+                                : null
+                            )
+                          }
                           value={field.value ?? ""}
                         />
                       </FormControl>
@@ -521,7 +509,13 @@ export default function EditPropertyPage({
                           step="any"
                           placeholder="Longitud"
                           {...field}
-                          onChange={(e) => field.onChange(e.target.value ? Number.parseFloat(e.target.value) : null)}
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value
+                                ? Number.parseFloat(e.target.value)
+                                : null
+                            )
+                          }
                           value={field.value ?? ""}
                         />
                       </FormControl>
@@ -576,7 +570,10 @@ export default function EditPropertyPage({
                       <FormLabel>Nombre del anfitrión</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <Input placeholder="Nombre del anfitrión" {...field} />
+                          <Input
+                            placeholder="Nombre del anfitrión"
+                            {...field}
+                          />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -638,5 +635,5 @@ export default function EditPropertyPage({
         </Form>
       </div>
     </div>
-  )
+  );
 }

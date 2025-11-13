@@ -9,7 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import FileUpload from "@/components/FileUpload"
-import { SingleImageUploaderWithId } from "./single-image-uploader-with-id"
+import ImageUpload from "@/components/CoverPhotoUpload"
 import { LocationSelector } from "@/components/ui/location-selector"
 import { UserTypeCard } from "@/components/ui/user-type-card"
 import { useRouter } from "next/navigation"
@@ -17,14 +17,24 @@ import { Fraunces } from "next/font/google"
 
 const fraunces = Fraunces({ subsets: ["latin"] })
 
+//import type { LocationDetails } from "@/components/OSMSelector"
+//import dynamic from "next/dynamic"
+
+/*
+const OpenStreetMapSelector = dynamic(() => import("@/components/OSMSelector").then((mod) => mod.default), {
+  ssr: false,
+})*/
+
 import GoogleMapsSelector, { type LocationDetails } from "@/components/google-maps-selector"
 
 import { propertyService, type PropertyData } from "@/services/propertyService"
-import { uploadFile } from "@/services/fileUploadService"
+//import { roomService, type RoomData } from "@/services/RoomService";
 
 import { MultiSelectCase } from "@/components/MultiSelectCase"
 
 import { Building2, Home, Save } from "lucide-react"
+
+//import RoomAccordion from "@/components/RoomAccordion";
 
 const formSchema = z.object({
   name: z.string().min(1, "El nombre es requerido."),
@@ -52,7 +62,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>
 
-export default function RegisterPropertyPage() {
+export default function RegisterPropertyBasePage() {
   const handleLocationSelected = (details: LocationDetails) => {
     console.log("Detalles de la ubicación seleccionada:", details)
     form.setValue("address", details.address)
@@ -68,8 +78,7 @@ export default function RegisterPropertyPage() {
     postalCode: "",
   }
 
-  const [mainImageFile, setMainImageFile] = useState<File | null>(null)
-  const [existingMainImageId, setExistingMainImageId] = useState<string | undefined>(undefined)
+  const [imageId, setImageId] = useState<string>("") // Estado para guardar el ID de la imagen
 
   const [RNTFileData, setRNTFileData] = useState<{
     id: string
@@ -116,43 +125,10 @@ export default function RegisterPropertyPage() {
 
   const router = useRouter()
 
-  const handleMainImageChange = (data: {
-    existingImageId: string | null
-    newFile: File | null
-    markedForDeletion: boolean
-  }) => {
-    setMainImageFile(data.newFile)
-    setExistingMainImageId(data.existingImageId || undefined)
-
-    // Update form validation - set a placeholder if there's a new file
-    if (data.newFile) {
-      form.setValue("mainImage", "pending-upload")
-      form.clearErrors("mainImage")
-    } else if (data.existingImageId) {
-      form.setValue("mainImage", data.existingImageId)
-      form.clearErrors("mainImage")
-    } else {
-      form.setValue("mainImage", "")
-    }
-  }
-
   const onSubmit = async (values: FormValues) => {
     setIsSubmitting(true)
 
     try {
-      let finalMainImageId = existingMainImageId || ""
-
-      if (mainImageFile) {
-        const uploadResponse = await uploadFile(mainImageFile)
-        finalMainImageId = uploadResponse.id
-      }
-
-      if (!finalMainImageId) {
-        alert("Por favor selecciona una imagen para la propiedad")
-        setIsSubmitting(false)
-        return
-      }
-
       const propertyData: PropertyData = {
         name: values.name,
         description: values.description,
@@ -166,7 +142,7 @@ export default function RegisterPropertyPage() {
         longitude: values.longitude ?? 0,
         type: values.type,
         taxIdEIN: values.taxIdEIN,
-        mainImage: finalMainImageId,
+        mainImage: values.mainImage,
         RNTFile: values.RNTFile,
         taxIdEINFile: values.taxIdEINFile,
         hostName: values.hostName,
@@ -184,7 +160,6 @@ export default function RegisterPropertyPage() {
       }
     } catch (error) {
       console.error("Error al registrar la propiedad:", error)
-      alert("Error al registrar la propiedad. Por favor intenta de nuevo.")
     } finally {
       setIsSubmitting(false)
     }
@@ -193,7 +168,11 @@ export default function RegisterPropertyPage() {
   return (
     <div className="min-h-screen bg-[#F8F8F7]">
       <div className="container mx-auto max-w-2xl py-4">
-        <h1 className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-8`}>Registra tu propiedad</h1>
+      <h1
+            className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-8`}
+          >
+            Registra tu propiedad
+          </h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="space-y-4 p-4 bg-white rounded-xl">
@@ -285,10 +264,15 @@ export default function RegisterPropertyPage() {
                   <FormItem>
                     <FormLabel>Foto de la Propiedad</FormLabel>
                     <FormControl>
-                      <SingleImageUploaderWithId
-                        existingImageId={existingMainImageId}
-                        newFile={mainImageFile}
-                        onChange={handleMainImageChange}
+                      <ImageUpload
+                        defaultImageId={""}
+                        onImageIdChange={(newImageId) => {
+                          if (newImageId !== imageId) {
+                            setImageId(newImageId)
+                            form.setValue("mainImage", newImageId)
+                            form.clearErrors("mainImage")
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -474,6 +458,13 @@ export default function RegisterPropertyPage() {
               />
             </div>
 
+            {/* <div className="container mx-auto py-12 hidden">
+              <h1 className="text-2xl font-bold mb-8">
+                Datos de las habitaciones
+              </h1>
+              <RoomAccordion rooms={rooms} setRooms={setRooms} />
+                        </div>*/}
+
             <div className="space-y-4 p-4 bg-white rounded-xl">
               <h2 className="text-lg">Información para el huésped</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -557,12 +548,12 @@ export default function RegisterPropertyPage() {
             >
               {isSubmitting ? (
                 <>
-                  <Save className="animate-spin" />
+                  <Save className="animate-spin" /> {/* Icono de guardar con animación de giro */}
                   CARGANDO...
                 </>
               ) : (
                 <>
-                  <Save />
+                  <Save /> {/* Icono de guardar */}
                   REGISTRAR PROPIEDAD
                 </>
               )}
