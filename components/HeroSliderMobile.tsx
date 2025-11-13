@@ -3,18 +3,40 @@
 import { useRef, useState, useEffect } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
+import { Fraunces } from "next/font/google"
 
-import { Fraunces } from 'next/font/google'
+const fraunces = Fraunces({ subsets: ["latin"] })
 
-const fraunces = Fraunces({ subsets: ['latin'] })
+interface HeroSliderMobileProps {
+  lang?: string // 👈 idioma recibido como prop (es, en, etc.)
+}
 
-const cards = [
-  { title: "Conectamos pacientes con casas de recuperación", imageSrc: "/assets/hero-mobile/0.jpg" },
-  { title: "Factores importantes de la experiencia del paciente", imageSrc: "/assets/hero-mobile/1.jpg" },
-  { title: "Cuidado personalizado para tu recuperación", imageSrc: "/assets/hero-mobile/0.jpg" },
-]
+export function HeroSliderMobile({ lang = "es" }: HeroSliderMobileProps) {
+  // ✅ Textos según idioma
+  const cards = [
+    {
+      title:
+        lang === "es"
+          ? "Conectamos pacientes con casas de recuperación"
+          : "We connect patients with recovery homes",
+      imageSrc: "/assets/hero-mobile/0.jpg",
+    },
+    {
+      title:
+        lang === "es"
+          ? "Factores importantes de la experiencia del paciente"
+          : "Key factors in patient experience",
+      imageSrc: "/assets/hero-mobile/1.jpg",
+    },
+    {
+      title:
+        lang === "es"
+          ? "Cuidado personalizado para tu recuperación"
+          : "Personalized care for your recovery",
+      imageSrc: "/assets/hero-mobile/0.jpg",
+    },
+  ]
 
-export function HeroSliderMobile() {
   const sliderRef = useRef<HTMLDivElement>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [startX, setStartX] = useState(0)
@@ -24,7 +46,10 @@ export function HeroSliderMobile() {
     const interval = setInterval(() => {
       if (sliderRef.current && !isDragging) {
         sliderRef.current.scrollLeft += sliderRef.current.offsetWidth
-        if (sliderRef.current.scrollLeft >= sliderRef.current.scrollWidth - sliderRef.current.offsetWidth) {
+        if (
+          sliderRef.current.scrollLeft >=
+          sliderRef.current.scrollWidth - sliderRef.current.offsetWidth
+        ) {
           sliderRef.current.scrollLeft = 0
         }
       }
@@ -53,8 +78,11 @@ export function HeroSliderMobile() {
     <div className="relative w-full overflow-hidden py-4 rounded-2xl">
       <button
         className="absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/70 p-2 hover:bg-white/90"
-        onClick={() => sliderRef.current && (sliderRef.current.scrollLeft -= sliderRef.current.offsetWidth)}
-        aria-label="Previous slide"
+        onClick={() =>
+          sliderRef.current &&
+          (sliderRef.current.scrollLeft -= sliderRef.current.offsetWidth)
+        }
+        aria-label={lang === "es" ? "Anterior" : "Previous"}
       >
         <ChevronLeft className="h-6 w-6 text-[#162F40]" />
       </button>
@@ -71,8 +99,16 @@ export function HeroSliderMobile() {
           <div key={index} className="w-full flex-shrink-0 snap-start">
             <Card className="w-full shadow-none border-none">
               <CardContent className="p-0">
-                <img src={card.imageSrc} alt={card.title} className="w-full rounded-2xl" />
-                <p className={`${fraunces.className} mt-2 text-center text-xl font-normal leading-1.3 color-[162F40]`}>{card.title}</p>
+                <img
+                  src={card.imageSrc}
+                  alt={card.title}
+                  className="w-full rounded-2xl"
+                />
+                <p
+                  className={`${fraunces.className} mt-2 text-center text-xl font-normal leading-1.3 text-[#162F40]`}
+                >
+                  {card.title}
+                </p>
               </CardContent>
             </Card>
           </div>
@@ -81,8 +117,11 @@ export function HeroSliderMobile() {
 
       <button
         className="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/70 p-2 hover:bg-white/90"
-        onClick={() => sliderRef.current && (sliderRef.current.scrollLeft += sliderRef.current.offsetWidth)}
-        aria-label="Next slide"
+        onClick={() =>
+          sliderRef.current &&
+          (sliderRef.current.scrollLeft += sliderRef.current.offsetWidth)
+        }
+        aria-label={lang === "es" ? "Siguiente" : "Next"}
       >
         <ChevronRight className="h-6 w-6 text-[#162F40]" />
       </button>
