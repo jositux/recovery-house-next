@@ -3,14 +3,26 @@
 import { useState, useEffect, useRef } from "react"
 import { Plus, Building, HandHeart, Search } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { syncAuthCookies } from "@/utils/syncAuthCookies"
 
 export function MenuActions() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
 
   const toggleMenu = () => setIsMenuOpen((prev) => !prev)
 
   const closeMenu = () => setIsMenuOpen(false)
+
+  // Función para navegar de forma segura sincronizando cookies primero
+  const navigateWithAuth = (path: string) => {
+    closeMenu()
+    // Sincronizar cookies ANTES de navegar
+    syncAuthCookies()
+    // Navegar después de sincronizar
+    router.push(path)
+  }
 
   // Cierra el menú si se hace clic fuera de él
   useEffect(() => {
@@ -44,16 +56,22 @@ export function MenuActions() {
       >
         <ul className="text-sm text-[#162F40]">
           <li className="px-4 py-2 hover:bg-gray-100 rounded-lg cursor-pointer">
-            <Link href="/mi-panel/registrar-propiedad" className="flex items-center gap-2" onClick={closeMenu}>
+            <button
+              onClick={() => navigateWithAuth("/mi-panel/registrar-propiedad")}
+              className="flex items-center gap-2 w-full text-left"
+            >
               <Building className="w-4 h-4" />
               Agregar Propiedad
-            </Link>
+            </button>
           </li>
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-            <Link href="/mi-panel/registrar-servicio" className="flex items-center gap-2" onClick={closeMenu}>
+            <button
+              onClick={() => navigateWithAuth("/mi-panel/registrar-servicio")}
+              className="flex items-center gap-2 w-full text-left"
+            >
               <HandHeart className="w-4 h-4" />
               Agregar Servicio
-            </Link>
+            </button>
           </li>
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
             <Link href="/rooms" className="flex items-center gap-2" onClick={closeMenu}>
