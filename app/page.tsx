@@ -17,14 +17,14 @@ export default function Home() {
     <main>
      
       <div className={`${styles.Container} hidden mt-[-124px] pt-[50px] md:block px-4`}>
-        <HeroSlider lang="en"/>
+        <HeroSlider lang="es"/>
       </div>
       <div className="md:hidden px-4">
-        <HeroSliderMobile lang="en"/>
+        <HeroSliderMobile lang="es"/>
       </div>
-      <WelcomeSection lang="en"/>
-      <FeaturesSection lang="en"/>
-      <HowToUseSection lang="en"/>
+      <WelcomeSection lang="es"/>
+      <FeaturesSection lang="es"/>
+      <HowToUseSection lang="es"/>
       <BenefitsSection />
       <TestimonialsSection />
       {/*

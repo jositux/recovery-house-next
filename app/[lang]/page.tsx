@@ -9,7 +9,7 @@ import { BenefitsSection } from "@/components/sections/benefits-section"
 import { HostCTASection } from "@/components/sections/host-cta-section"
 import { NewsSection } from "@/components/sections/news-section"
 import styles from "./page.module.css"
-import { getDictionary, type Locale, getTranslations } from "@/lib/i18n"
+import {type Locale} from "@/lib/i18n"
 
 export default async function Home({
   params,
