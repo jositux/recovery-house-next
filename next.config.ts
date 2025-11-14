@@ -8,7 +8,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "us-east-1a.recoverycaresolutions.com", // Cambia esto por el dominio real de tus imágenes
+        //hostname: "localtunnel.elcanoso.lat",
+        hostname: "us-east-1a.recoverycaresolutions.com", 
         pathname: "/**",
       },
     ],
@@ -19,7 +20,8 @@ const nextConfig: NextConfig = {
     return [  
       {  
         source: '/webapi/:path*',  
-        destination: 'https://us-east-1a.recoverycaresolutions.com/:path*', // Use environment variable  
+        //destination: 'https://localtunnel.elcanoso.lat/:path*',
+        destination: 'https://us-east-1a.recoverycaresolutions.com/:path*'
       },  
     ];  
   },
