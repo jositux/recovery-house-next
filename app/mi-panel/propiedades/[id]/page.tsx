@@ -313,7 +313,9 @@ export default function RoomPage() {
 
       try {
         const idsQuery = roomIds.map((id) => encodeURIComponent(id)).join(","); // Convertir array a string separado por comas
-        const url = `/webapi/items/Booking?filter[generalState][_eq]=true&filter[room][_in]=${idsQuery}&fields=*`;
+        const url = `/webapi/items/Booking?filter[room][_in]=${idsQuery}&fields=*`;
+
+        //const url = `/webapi/items/Booking?filter[generalState][_eq]=true&filter[room][_in]=${idsQuery}&fields=*`;
 
         const response = await axios.get(url);
 
@@ -354,7 +356,8 @@ export default function RoomPage() {
 
     const checkBookings = async (roomId: string): Promise<boolean> => {
       try {
-        const url = `/webapi/items/Booking?filter[generalState][_eq]=true&filter[room][_eq]=${roomId}`;
+        const url = `/webapi/items/Booking?filter[room][_eq]=${roomId}`;
+        //const url = `/webapi/items/Booking?filter[generalState][_eq]=true&filter[room][_eq]=${roomId}`;
         const response = await axios.get(url);
 
         if (response.data?.data?.length > 0) {
