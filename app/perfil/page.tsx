@@ -241,7 +241,7 @@ export default function RegistrationPage() {
   const getActionButtonText = () => {
     const relParam = searchParams.get("rel");
 
-    if (!relParam) return "Ver habitaciones disponible";
+    if (!relParam) return "Ver habitaciones disponibles";
 
     if (relParam === "registrar-propiedad") return "Agregar Propiedad";
     if (relParam === "registrar-servicio") return "Agregar Servicio";
