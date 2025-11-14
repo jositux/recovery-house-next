@@ -9,6 +9,7 @@ import Image from "next/image";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { toZonedTime } from "date-fns-tz";
+import Link from 'next/link'
 
 
 
@@ -178,6 +179,7 @@ export default function NewConfirmAndPay() {
         <div className="lg:col-span-2 space-y-8">
           <div className="text-sm text-gray-500">
             <span className="font-medium">
+             
               <a href={`/rooms/${bookingData.room}`}>Volver</a>
             </span>
             <span className="mx-2">&gt;</span>
@@ -231,10 +233,9 @@ export default function NewConfirmAndPay() {
               className="text-sm text-gray-700 leading-relaxed cursor-pointer"
             >
               Acepto la{" "}
-              <a href="/terms" className="text-blue-600 hover:underline">
-                Política de Reembolso para Huéspedes
-              </a>
-              .
+              <Link href="/terms" className="text-blue-600 hover:underline"> Política de Reembolso para Huéspedes</Link>
+             
+              
             </label>
           </div>
 

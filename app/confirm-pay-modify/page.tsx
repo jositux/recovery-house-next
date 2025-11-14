@@ -8,6 +8,8 @@ import { CalendarDays, Users, CheckCircle2, AlertCircle } from "lucide-react";
 import Image from "next/image";
 import { toZonedTime, format } from "date-fns-tz";
 import { es } from "date-fns/locale";
+import Link from 'next/link'
+
 
 interface BookingData {
   bookingId: string;
@@ -218,9 +220,9 @@ export default function NewConfirmAndPay() {
             />
             <label htmlFor="terms" className="text-sm text-gray-700 leading-relaxed cursor-pointer">
               Acepto la{" "}
-              <a href="/terms" className="text-blue-600 hover:underline">
-                Política de Reembolso para Huéspedes
-              </a>
+              Acepto la{" "}
+              <Link href="/terms" className="text-blue-600 hover:underline"> Política de Reembolso para Huéspedes</Link>
+             
               .
             </label>
           </div>
