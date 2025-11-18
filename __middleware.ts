@@ -105,6 +105,7 @@ export function middleware(request: NextRequest) {
     path === '/registro' ||
     path === '/user' ||  
     path === '/terms' ||  
+    path === '/policy' ||  
     path === '/privacidad' ||    
     path === '/webapi/auth/login' ||
     path === '/webapi/users' ||    

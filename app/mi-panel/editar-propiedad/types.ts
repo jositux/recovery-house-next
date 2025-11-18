@@ -17,8 +17,8 @@ export const formSchema = z.object({
   mainImage: z.string().min(1, "La foto de la propiedad es obligatoria."),
   RNTFile: z.string().min(1, "El archivo RNT es obligatorio."),
   taxIdEINFile: z.string().min(1, "El archivo TAX ID es obligatorio."),
-  hostName: z.string().min(1, "El Hostname"),
-  guestComments: z.string().min(1, "El comentario es Obligatorio"),
+  hostName: z.string().min(1, "El nombre del anfitrión es obligatorio"),
+  guestComments: z.string().min(1, "La información útil es obligatoria"),
   patology: z.array(z.string()).min(1, "Selecciona al menos una patología."),
 });
 

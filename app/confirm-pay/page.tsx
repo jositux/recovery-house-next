@@ -233,7 +233,7 @@ export default function NewConfirmAndPay() {
               className="text-sm text-gray-700 leading-relaxed cursor-pointer"
             >
               Acepto la{" "}
-              <Link href="/terms" className="text-blue-600 hover:underline"> Política de Reembolso para Huéspedes</Link>
+              <Link href="/policy" className="text-blue-600 hover:underline"> Política de Reembolso para Huéspedes</Link>
              
               
             </label>
