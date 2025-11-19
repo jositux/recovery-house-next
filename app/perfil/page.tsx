@@ -62,6 +62,7 @@ export default function RegistrationPage() {
       type RelParamType =
         | "registrar-propiedad"
         | "registrar-servicio"
+        | "mi-perfil"
         | "checkout"
         | string;
 

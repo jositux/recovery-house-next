@@ -8,11 +8,12 @@ const fraunces = Fraunces({ subsets: ['latin'] })
 
 const assistanceLinks = [
   { title: "Términos y condiciones", href: "/terms" },
+  { title: "Políticas de uso", href: "/policy" },
   { title: "Política de privacidad", href: "/privacidad" },
 ]
 
 const hostLinks = [
-  { title: "Pon tu espacio con nosotros", href: "/registro" },
+  { title: "Pon tu espacio", href: "/registro" },
 ]
 
 const socialLinks = [
@@ -63,12 +64,11 @@ export function Footer() {
             </Link>
             <p className="text-[#162F40] mb-6">
               Encuentra y reserva casas de recuperación postoperatoria en todo el mundo. 
-              Ofrecemos una red de alojamientos especializados con servicios profesionales 
-              de enfermería, nutrición personalizada, y transporte seguro, garantizando un 
+              Ofrecemos una red de alojamientos especializados con servicios profesionales, garantizando un 
               entorno ideal para una recuperación cómoda y efectiva.
             </p>
             <p className="text-[#162F40]">
-              Contáctenos: <Link href="mailto:info@recoverycaresolutions.com" className="hover:text-[#39759E]">info@recoverycaresolutions.com</Link>
+              Contáctenos: <Link href="mailto:manager@recoverycaresolutions.com" className="hover:text-[#39759E]">manager@recoverycaresolutions.com</Link>
             </p>
           </div>
 
@@ -125,10 +125,13 @@ export function Footer() {
             <p className="text-[#162F40] text-sm">
               © 2025 Recovery Care Solutions. Todos los derechos reservados.
             </p>
-            <div className="flex flex-wrap justify-center gap-4 text-sm items-center">
+            <div className="flex hidden flex-wrap justify-center gap-4 text-sm items-center">
              
               <Link href="/terms" className="text-[#162F40] hover:text-[#39759E]">
                 Términos y condiciones
+              </Link>
+              <Link href="/policy" className="text-[#162F40] hover:text-[#39759E]">
+                Políticas de uso
               </Link>
               <Link href="/privacidad" className="text-[#162F40] hover:text-[#39759E]">
                 Política de Privacidad

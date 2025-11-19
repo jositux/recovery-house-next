@@ -297,10 +297,6 @@ export const countriesData: { [key: string]: CountryData } = {
           "Ura Vajgurore"
         ]
       },
-      "01": {
-        "name": "Berat",
-        "cities": []
-      },
       "BU": {
         "name": "Bulqizë",
         "cities": []

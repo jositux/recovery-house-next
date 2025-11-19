@@ -1,28 +1,28 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { FileUpload, type FileUploadHandle } from "../file-upload"
+import FileUpload from "@/components/FileUpload"
 import { SingleImageUploaderWithId } from "../single-image-uploader-with-id"
 import { LocationSelector } from "@/components/ui/location-selector"
 import { UserTypeCard } from "@/components/ui/user-type-card"
 import { propertyUpdateService, type PropertyData } from "@/services/propertyUpdateService"
 import { uploadFile } from "@/services/fileUploadService"
 import { deleteFile as deleteFileService } from "@/services/deleteFileService"
-import { Fraunces } from 'next/font/google'
+import { Fraunces } from "next/font/google"
 
 const fraunces = Fraunces({ subsets: ["latin"] })
 
-import { Building2, Home, Save, X } from 'lucide-react'
+import { Building2, Home, Save, X } from "lucide-react"
 
 import { MultiSelectCase } from "@/components/MultiSelectCase"
 
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation"
 
 import { formSchema, type FormValues, type FileData, type Property } from "../types"
 
@@ -33,7 +33,6 @@ export default function EditPropertyPage({
 }: {
   params: Promise<{ id: string }>
 }) {
-
   const handleLocationSelected = (details: LocationDetails) => {
     console.log("Detalles de la ubicación seleccionada:", details)
     form.setValue("address", details.address)
@@ -50,14 +49,6 @@ export default function EditPropertyPage({
   const [imageToDelete, setImageToDelete] = useState<string | undefined>(undefined)
   const [originalImageId, setOriginalImageId] = useState<string | undefined>(undefined)
   const [currentImageId, setCurrentImageId] = useState<string | undefined>(undefined)
-
-  const rntFileRef = useRef<FileUploadHandle>(null)
-  const taxFileRef = useRef<FileUploadHandle>(null)
-
-  const [rntFileToDelete, setRntFileToDelete] = useState<string | undefined>(undefined)
-  const [taxFileToDelete, setTaxFileToDelete] = useState<string | undefined>(undefined)
-  const [newRntFile, setNewRntFile] = useState<File | null>(null)
-  const [newTaxFile, setNewTaxFile] = useState<File | null>(null)
 
   const [RNTFileData, setRNTFileData] = useState<FileData>({
     id: "",
@@ -100,7 +91,6 @@ export default function EditPropertyPage({
       guestComments: "",
     },
   })
-
 
   useEffect(() => {
     const getParams = async () => {
@@ -190,32 +180,11 @@ export default function EditPropertyPage({
   const router = useRouter()
 
   const onSubmit = async (values: FormValues) => {
-    const isRntValid = rntFileRef.current?.validate() ?? false
-    const isTaxValid = taxFileRef.current?.validate() ?? false
-
-    if (!isRntValid) {
-      form.setError("RNTFile", {
-        type: "manual",
-        message: "El archivo RNT es obligatorio",
-      })
-    }
-
-    if (!isTaxValid) {
-      form.setError("taxIdEINFile", {
-        type: "manual",
-        message: "El archivo TAX ID es obligatorio",
-      })
-    }
-
     if (!currentImageId && !newImageFile) {
       form.setError("mainImage", {
         type: "manual",
         message: "La imagen principal es obligatoria",
       })
-      return
-    }
-
-    if (!isRntValid || !isTaxValid) {
       return
     }
 
@@ -251,56 +220,9 @@ export default function EditPropertyPage({
         }
       }
 
-      let finalRntId = rntFileRef.current?.getCurrentFileId() || ""
-      let finalTaxId = taxFileRef.current?.getCurrentFileId() || ""
-
-      // Eliminar archivos marcados para eliminación
-      if (rntFileToDelete && accessToken) {
-        try {
-          await deleteFileService(rntFileToDelete, accessToken)
-          console.log("Deleted RNT file:", rntFileToDelete)
-        } catch (error) {
-          console.error("Error deleting RNT file:", error)
-        }
-      }
-
-      if (taxFileToDelete && accessToken) {
-        try {
-          await deleteFileService(taxFileToDelete, accessToken)
-          console.log("Deleted TAX file:", taxFileToDelete)
-        } catch (error) {
-          console.error("Error deleting TAX file:", error)
-        }
-      }
-
-      // Subir nuevos archivos si existen
-      if (newRntFile) {
-        try {
-          const uploadedRnt = await uploadFile(newRntFile)
-          finalRntId = uploadedRnt.id
-          console.log("Uploaded new RNT file:", uploadedRnt)
-        } catch (error) {
-          console.error("Error uploading RNT file:", error)
-          throw error
-        }
-      }
-
-      if (newTaxFile) {
-        try {
-          const uploadedTax = await uploadFile(newTaxFile)
-          finalTaxId = uploadedTax.id
-          console.log("Uploaded new TAX file:", uploadedTax)
-        } catch (error) {
-          console.error("Error uploading TAX file:", error)
-          throw error
-        }
-      }
-
       const propertyUpdateData: PropertyData = {
         ...values,
         mainImage: finalImageId,
-        RNTFile: finalRntId,
-        taxIdEINFile: finalTaxId,
         region: "default",
         latitude: values.latitude ?? 0,
         longitude: values.longitude ?? 0,
@@ -351,10 +273,7 @@ export default function EditPropertyPage({
   }
 
   if (loading) {
-    return  <div className="flex items-center justify-center h-64">
-    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
-    <p className="text-center p-4">Cargando datos de la propiedad...</p>
-  </div>    
+    return <p className="text-center p-4">Cargando datos de la propiedad...</p>
   }
 
   if (error) {
@@ -389,21 +308,18 @@ export default function EditPropertyPage({
                   name="RNTFile"
                   render={() => (
                     <FormItem>
+                      <FormLabel>Archivo RNT</FormLabel>
                       <FormControl>
                         <FileUpload
-                          ref={rntFileRef}
-                          label="Archivo RNT"
-                          defaultFile={RNTFileData}
-                          onChange={(file, fileIdToDelete) => {
-                            setNewRntFile(file)
-                            if (fileIdToDelete) {
-                              setRntFileToDelete(fileIdToDelete)
-                            }
-                            if (file || fileIdToDelete) {
+                          id={RNTFileData.id}
+                          filename_download={RNTFileData.filename_download}
+                          onUploadSuccess={(response) => {
+                            if (response.id !== RNTFileData.id) {
+                              setRNTFileData(response)
+                              form.setValue("RNTFile", response.id)
                               form.clearErrors("RNTFile")
                             }
                           }}
-                          error={form.formState.errors.RNTFile?.message}
                         />
                       </FormControl>
                       <FormMessage />
@@ -416,21 +332,18 @@ export default function EditPropertyPage({
                   name="taxIdEINFile"
                   render={() => (
                     <FormItem>
+                      <FormLabel>Archivo de Impuestos TAX ID</FormLabel>
                       <FormControl>
                         <FileUpload
-                          ref={taxFileRef}
-                          label="Archivo de Impuestos TAX ID"
-                          defaultFile={TaxFileData}
-                          onChange={(file, fileIdToDelete) => {
-                            setNewTaxFile(file)
-                            if (fileIdToDelete) {
-                              setTaxFileToDelete(fileIdToDelete)
-                            }
-                            if (file || fileIdToDelete) {
+                          id={TaxFileData.id}
+                          filename_download={TaxFileData.filename_download}
+                          onUploadSuccess={(response) => {
+                            if (response.id !== TaxFileData.id) {
+                              setTaxFileData(response)
+                              form.setValue("taxIdEINFile", response.id)
                               form.clearErrors("taxIdEINFile")
                             }
                           }}
-                          error={form.formState.errors.taxIdEINFile?.message}
                         />
                       </FormControl>
                       <FormMessage />
@@ -439,8 +352,6 @@ export default function EditPropertyPage({
                 />
               </div>
             </div>
-
-
             <div className="space-y-4 p-4 bg-white rounded-xl">
               <FormField
                 control={form.control}
@@ -723,29 +634,6 @@ export default function EditPropertyPage({
                 )}
               </Button>
             </div>
-
-            {Object.values(form.formState.errors).length > 0 && (
-              <div className="mt-4 space-y-1">
-                {Object.entries(form.formState.errors).map(
-                  ([fieldName, error]) => (
-                    <div key={fieldName}>
-                      {/* Mensaje principal */}
-                      <p className="text-red-500 text-sm">{error?.message}</p>
-
-                      {/* Mensajes adicionales (si existen múltiples) */}
-                      {error?.types &&
-                        Object.values(error.types).map(
-                          (msg, i) => (
-                            <p key={i} className="text-red-500 text-sm">
-                              {String(msg)}
-                            </p>
-                          )
-                        )}
-                    </div>
-                  )
-                )}
-              </div>
-            )}
           </form>
         </Form>
       </div>
