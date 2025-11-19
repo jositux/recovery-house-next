@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Fraunces } from "next/font/google";
@@ -253,13 +253,15 @@ export default function RegistrationPage() {
     return "Seguir con la reserva";
   };
 
-  const handleActionButtonClick = () => {
+  const handleActionButtonClick = useCallback(() => {
     const relParam = searchParams.get("rel");
 
-    console.log("mi-perfil", relParam)
+    console.log("[v0] handleActionButtonClick called");
+    console.log("[v0] relParam:", relParam);
 
     // Si no hay parámetro, redirige por defecto a /rooms
     if (!relParam) {
+      console.log("[v0] No relParam, redirecting to /rooms");
       router.push("/rooms");
       return;
     }
@@ -268,13 +270,24 @@ export default function RegistrationPage() {
       "registrar-propiedad": "/mi-panel/registrar-propiedad",
       "registrar-servicio": "/mi-panel/registrar-servicio",
       checkout: "/checkout",
-      "mi-perfil": "/mi-panel/mi-perfil",
+      "mi-perfil": "/mi-panel/mi-perfil"
     };
 
     // Usa la ruta definida o una dinámica según el parámetro
     const targetRoute = routes[relParam] || `/rooms/${relParam}`;
-    router.push(targetRoute);
-  };
+
+    console.log("[v0] targetRoute:", targetRoute);
+    console.log("[v0] Attempting navigation to:", targetRoute);
+    
+    try {
+      router.push(targetRoute);
+      console.log("[v0] router.push executed successfully");
+    } catch (error) {
+      console.error("[v0] Navigation error:", error);
+      // Fallback usando window.location
+      window.location.href = targetRoute;
+    }
+  }, [router, searchParams]);
 
   return (
     <div className="min-h-screen bg-[#F8F8F7]">
