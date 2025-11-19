@@ -259,10 +259,9 @@ export default function RegistrationPage() {
     console.log("[v0] handleActionButtonClick called");
     console.log("[v0] relParam:", relParam);
 
-    // Si no hay parámetro, redirige por defecto a /rooms
     if (!relParam) {
       console.log("[v0] No relParam, redirecting to /rooms");
-      router.push("/rooms");
+      window.location.href = "/rooms";
       return;
     }
 
@@ -273,21 +272,13 @@ export default function RegistrationPage() {
       "mi-perfil": "/mi-panel/mi-perfil"
     };
 
-    // Usa la ruta definida o una dinámica según el parámetro
     const targetRoute = routes[relParam] || `/rooms/${relParam}`;
 
     console.log("[v0] targetRoute:", targetRoute);
-    console.log("[v0] Attempting navigation to:", targetRoute);
+    console.log("[v0] Navigating to:", targetRoute);
     
-    try {
-      router.push(targetRoute);
-      console.log("[v0] router.push executed successfully");
-    } catch (error) {
-      console.error("[v0] Navigation error:", error);
-      // Fallback usando window.location
-      window.location.href = targetRoute;
-    }
-  }, [router, searchParams]);
+    window.location.href = targetRoute;
+  }, [searchParams]);
 
   return (
     <div className="min-h-screen bg-[#F8F8F7]">
