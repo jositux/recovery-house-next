@@ -256,6 +256,8 @@ export default function RegistrationPage() {
   const handleActionButtonClick = () => {
     const relParam = searchParams.get("rel");
 
+    console.log("mi-perfil", relParam)
+
     // Si no hay parámetro, redirige por defecto a /rooms
     if (!relParam) {
       router.push("/rooms");
