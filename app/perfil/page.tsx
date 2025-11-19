@@ -268,11 +268,16 @@ export default function RegistrationPage() {
       "registrar-propiedad": "/mi-panel/registrar-propiedad",
       "registrar-servicio": "/mi-panel/registrar-servicio",
       checkout: "/checkout",
-      "mi-perfil": "/mi-panel/mi-perfil",
+      "mi-perfil": "/mi-panel/mi-perfil"
     };
+
+
 
     // Usa la ruta definida o una dinámica según el parámetro
     const targetRoute = routes[relParam] || `/rooms/${relParam}`;
+
+    console.log("targetRoute", targetRoute)
+
     router.push(targetRoute);
   };
 
