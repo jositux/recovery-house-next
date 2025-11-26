@@ -1,0 +1,11 @@
+.reservedDate {
+  background-color: #fee2e2;
+  color: #991b1b;
+  text-decoration: line-through;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.reservedDate:hover {
+  background-color: #fecaca;
+}

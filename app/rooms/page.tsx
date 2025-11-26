@@ -449,6 +449,7 @@ function RoomsPageContent() {
                       country={room.propertyLocation?.country || ""}
                       state={room.propertyLocation?.state || ""}
                       city={room.propertyLocation?.city || ""}
+                      lang="es"
                     />
                   ) : (
                     <RoomCard
@@ -461,6 +462,7 @@ function RoomsPageContent() {
                       country={room.propertyLocation?.country || ""}
                       state={room.propertyLocation?.state || ""}
                       city={room.propertyLocation?.city || ""}
+                      lang="es"
                     />
                   )}
                 </div>

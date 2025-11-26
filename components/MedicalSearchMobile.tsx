@@ -1,25 +1,33 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
 //import { Input } from "@/components/ui/input"
-import { Search, ChevronDown, Check, X } from "lucide-react"
-import Image from "next/image"
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { format, parse } from "date-fns"
-import { es } from "date-fns/locale"
-import { cn } from "@/lib/utils"
-import { NumberInput } from "@/components/number-input"
-import LocationAutocomplete from "@/components/ui/location-autocomplete"
+import { Search, ChevronDown, Check, X } from "lucide-react";
+import Image from "next/image";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { format, parse } from "date-fns";
+import { es } from "date-fns/locale";
+import { cn } from "@/lib/utils";
+import { NumberInput } from "@/components/number-input";
+import LocationAutocomplete from "@/components/ui/location-autocomplete";
 
 interface Procedure {
-  name: string
-  icon: string
+  name: string;
+  icon: string;
 }
 
 const procedures: Procedure[] = [
@@ -29,109 +37,111 @@ const procedures: Procedure[] = [
   { name: "Salud mental", icon: "/assets/icons/03.svg" },
   { name: "Rehabilitación", icon: "/assets/icons/04.svg" },
   { name: "Otro", icon: "/assets/icons/05.svg" },
-]
+];
 
 interface MedicalSearchMobileProps {
-  onSearch: () => void
+  onSearch: () => void;
 }
 
-let travelers = 1
+let travelers = 1;
 
 const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
-  const router = useRouter()
-  const searchParams = useSearchParams()
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [selectedProcedures, setSelectedProcedures] = useState<string[]>([])
-  const [location, setLocation] = useState("")
-  const [startDate, setStartDate] = useState<Date | undefined>()
-  const [endDate, setEndDate] = useState<Date | undefined>()
-  const [patientCount, setPatientCount] = useState(1)
+  const [selectedProcedures, setSelectedProcedures] = useState<string[]>([]);
+  const [location, setLocation] = useState("");
+  const [startDate, setStartDate] = useState<Date | undefined>();
+  const [endDate, setEndDate] = useState<Date | undefined>();
+  const [patientCount, setPatientCount] = useState(1);
 
   useEffect(() => {
     // Initialize state from URL parameters
-    const proceduresParam = searchParams.get("procedures")
+    const proceduresParam = searchParams.get("procedures");
     if (proceduresParam) {
-      setSelectedProcedures(proceduresParam.split(","))
+      setSelectedProcedures(proceduresParam.split(","));
     }
 
-    const locationParam = searchParams.get("location")
+    const locationParam = searchParams.get("location");
     if (locationParam) {
-      setLocation(locationParam)
+      setLocation(locationParam);
     }
 
-    const checkInParam = searchParams.get("checkIn")
+    const checkInParam = searchParams.get("checkIn");
     if (checkInParam) {
-      setStartDate(parse(checkInParam, "yyyy-MM-dd", new Date()))
+      setStartDate(parse(checkInParam, "yyyy-MM-dd", new Date()));
     }
 
-    const checkOutParam = searchParams.get("checkOut")
+    const checkOutParam = searchParams.get("checkOut");
     if (checkOutParam) {
-      setEndDate(parse(checkOutParam, "yyyy-MM-dd", new Date()))
+      setEndDate(parse(checkOutParam, "yyyy-MM-dd", new Date()));
     }
 
-    const travelersParam = searchParams.get("travelers")
+    const travelersParam = searchParams.get("travelers");
     if (travelersParam) {
-      travelers = Number.parseInt(travelersParam, 10)
-      setPatientCount(travelers > 0 ? travelers : 1)
-      console.log(travelers, patientCount)
+      travelers = Number.parseInt(travelersParam, 10);
+      setPatientCount(travelers > 0 ? travelers : 1);
+      console.log(travelers, patientCount);
     }
-  }, [searchParams])
+  }, [searchParams]);
 
   const toggleProcedure = (procedureName: string) => {
     setSelectedProcedures((prev) =>
-      prev.includes(procedureName) ? prev.filter((name) => name !== procedureName) : [...prev, procedureName],
-    )
-  }
+      prev.includes(procedureName)
+        ? prev.filter((name) => name !== procedureName)
+        : [...prev, procedureName]
+    );
+  };
 
   const handleStartDateSelect = (date: Date | undefined) => {
-    setStartDate(date)
-  }
+    setStartDate(date);
+  };
 
   const handleEndDateSelect = (date: Date | undefined) => {
-    setEndDate(date)
-  }
+    setEndDate(date);
+  };
 
   const handleSearch = () => {
-    const params = new URLSearchParams()
+    const params = new URLSearchParams();
 
     if (selectedProcedures.length > 0) {
-      params.append("procedures", selectedProcedures.join(","))
+      params.append("procedures", selectedProcedures.join(","));
     }
 
     if (location) {
-      params.append("location", location)
+      params.append("location", location);
     }
 
     if (startDate) {
-      params.append("checkIn", format(startDate, "yyyy-MM-dd"))
+      params.append("checkIn", format(startDate, "yyyy-MM-dd"));
     }
 
     if (endDate) {
-      params.append("checkOut", format(endDate, "yyyy-MM-dd"))
+      params.append("checkOut", format(endDate, "yyyy-MM-dd"));
     }
 
-    params.append("travelers", patientCount.toString())
+    params.append("travelers", patientCount.toString());
 
-    router.push(`/rooms?${params.toString()}`)
-    onSearch()
-  }
+    router.push(`/rooms?${params.toString()}`);
+    onSearch();
+  };
 
   const formatDate = (date: Date | undefined) => {
-    if (!date) return ""
-    return format(date, "d MMM", { locale: es })
-  }
+    if (!date) return "";
+    return format(date, "d MMM", { locale: es });
+  };
 
   const resetStartDate = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setStartDate(undefined)
-  }
+    e.preventDefault();
+    e.stopPropagation();
+    setStartDate(undefined);
+  };
 
   const resetEndDate = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setEndDate(undefined)
-  }
+    e.preventDefault();
+    e.stopPropagation();
+    setEndDate(undefined);
+  };
 
   return (
     <div className="md:hidden w-full max-w-[850px] mx-auto p-4 space-y-3 bg-[#39759E] rounded-b-xl">
@@ -139,9 +149,14 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
         <label className="block text-sm mb-1 text-white">Motivo médico</label>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="w-full justify-between bg-white hover:bg-white">
+            <Button
+              variant="outline"
+              className="w-full justify-between bg-white hover:bg-white"
+            >
               <span className="text-[#162F40]">
-                {selectedProcedures.length > 0 ? `${selectedProcedures.length} seleccionados` : "Tipo de intervención"}
+                {selectedProcedures.length > 0
+                  ? `${selectedProcedures.length} seleccionados`
+                  : "Tipo de intervención"}
               </span>
               <ChevronDown className="h-4 w-4 opacity-50" />
             </Button>
@@ -158,7 +173,11 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
                       : "text-[#EAFFF4] hover:text-[#EAFFF4]"
                   }`}
                   onClick={() => toggleProcedure(procedure.name)}
-                  data-state={selectedProcedures.includes(procedure.name) ? "active" : "inactive"}
+                  data-state={
+                    selectedProcedures.includes(procedure.name)
+                      ? "active"
+                      : "inactive"
+                  }
                 >
                   <div className="relative">
                     <Image
@@ -174,7 +193,9 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
                       </div>
                     )}
                   </div>
-                  <span className="font-light text-sm mt-2 px-4">{procedure.name}</span>
+                  <span className="font-light text-sm mt-2 px-4">
+                    {procedure.name}
+                  </span>
                 </Button>
               ))}
             </div>
@@ -192,15 +213,16 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
           onChange={(e) => setLocation(e.target.value)}
         />*/}
 
-<div className="py-1">
-  <label className="block text-sm mb-1 text-white">Lugar</label>
-              <LocationAutocomplete
-                value={location}
-                onChange={(newLocation) => {
-                  setLocation(newLocation)
-                }}
-              />
-              {/*<div className="relative">
+        <div className="py-1">
+          <label className="block text-sm mb-1 text-white">Lugar</label>
+          <LocationAutocomplete
+            value={location}
+            onChange={(newLocation) => {
+              setLocation(newLocation);
+            }}
+            lang="es"
+          />
+          {/*<div className="relative">
                 <Input
                   type="text"
                   value={location}
@@ -221,7 +243,7 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
 
 
                 </div>*/}
-            </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
@@ -231,7 +253,10 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                className={cn("w-full justify-start bg-white hover:bg-white", !startDate && "text-muted-foreground")}
+                className={cn(
+                  "w-full justify-start bg-white hover:bg-white",
+                  !startDate && "text-muted-foreground"
+                )}
               >
                 {startDate ? formatDate(startDate) : "Elegir fecha"}
               </Button>
@@ -264,7 +289,10 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                className={cn("w-full justify-start bg-white hover:bg-white", !endDate && "text-muted-foreground")}
+                className={cn(
+                  "w-full justify-start bg-white hover:bg-white",
+                  !endDate && "text-muted-foreground"
+                )}
               >
                 {endDate ? formatDate(endDate) : "Elegir fecha"}
               </Button>
@@ -293,7 +321,9 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
       </div>
 
       <div className="w-full mx-auto flex flex-col items-center text-center mt-2">
-        <label className="block text-sm mb-1 text-white">Cantidad de personas</label>
+        <label className="block text-sm mb-1 text-white">
+          Cantidad de personas
+        </label>
         <div className="rounded-md px-3 py-2">
           <NumberInput
             min={1}
@@ -313,8 +343,7 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
         Buscar
       </Button>
     </div>
-  )
-}
+  );
+};
 
-export default MedicalSearchMobile
-
+export default MedicalSearchMobile;

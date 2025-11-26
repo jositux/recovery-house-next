@@ -25,13 +25,13 @@ export default function Home() {
       <WelcomeSection lang="es"/>
       <FeaturesSection lang="es"/>
       <HowToUseSection lang="es"/>
-      <BenefitsSection />
-      <TestimonialsSection />
+      <BenefitsSection lang="es" />
+      <TestimonialsSection lang="es"/>
       {/*
       <CareDividerSection />
   */}
-      <HostCTASection />
-      <NewsSection />
+      <HostCTASection lang="es"/>
+      <NewsSection lang="es"/>
     </main>
   )
 }

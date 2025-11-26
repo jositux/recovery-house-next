@@ -1,129 +1,157 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useState, Suspense } from "react"
-import { format, parseISO } from "date-fns"
-import { es } from "date-fns/locale"
-import { Search, Check, X } from "lucide-react"
-import type { DateRange } from "react-day-picker"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import { NumberCounter } from "./number-counter"
+import * as React from "react";
+import { useState, Suspense } from "react";
+import { format, parseISO } from "date-fns";
+import { es, enUS } from "date-fns/locale";
+import { Search, Check, X } from "lucide-react";
+import type { DateRange } from "react-day-picker";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { NumberCounter } from "./number-counter";
 //import { Input } from "@/components/ui/input"
-import LocationAutocomplete from "@/components/ui/location-autocomplete"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import Image from "next/image"
-import styles from "./MedicalSearch.module.css"
-import { useRouter } from "next/navigation"
-import { useSearchParams } from "next/navigation"
+import LocationAutocomplete from "@/components/ui/location-autocomplete";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import Image from "next/image";
+import styles from "./MedicalSearch.module.css";
+import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 interface Procedure {
-  name: string
-  icon: string
+  name: string;
+  icon: string;
 }
-
-const procedures: Procedure[] = [
-  { name: "Cirugía plástica", icon: "/assets/icons/00.svg" },
-  { name: "Cirugía bariátrica", icon: "/assets/icons/01.svg" },
-  { name: "Implante capilar", icon: "/assets/icons/02.svg" },
-  { name: "Salud mental", icon: "/assets/icons/03.svg" },
-  { name: "Rehabilitación", icon: "/assets/icons/04.svg" },
-  { name: "Otro", icon: "/assets/icons/05.svg" },
-]
 
 interface SearchParamsHandlerProps {
-  setSelectedProcedures: React.Dispatch<React.SetStateAction<string[]>>
-  setLocation: React.Dispatch<React.SetStateAction<string>>
-  setDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>
-  setTravelers: React.Dispatch<React.SetStateAction<number>>
+  setSelectedProcedures: React.Dispatch<React.SetStateAction<string[]>>;
+  setLocation: React.Dispatch<React.SetStateAction<string>>;
+  setDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
+  setTravelers: React.Dispatch<React.SetStateAction<number>>;
 }
 
-function SearchParamsHandler({ setSelectedProcedures, setLocation, setDate, setTravelers }: SearchParamsHandlerProps) {
-  const searchParams = useSearchParams()
+function SearchParamsHandler({
+  setSelectedProcedures,
+  setLocation,
+  setDate,
+  setTravelers,
+}: SearchParamsHandlerProps) {
+  const searchParams = useSearchParams();
 
   React.useEffect(() => {
-    const proceduresParam = searchParams.get("procedures")
-    const locationParam = searchParams.get("location")
-    const checkInParam = searchParams.get("checkIn")
-    const checkOutParam = searchParams.get("checkOut")
-    const travelersParam = searchParams.get("travelers")
+    const proceduresParam = searchParams.get("procedures");
+    const locationParam = searchParams.get("location");
+    const checkInParam = searchParams.get("checkIn");
+    const checkOutParam = searchParams.get("checkOut");
+    const travelersParam = searchParams.get("travelers");
 
     if (proceduresParam) {
-      setSelectedProcedures(proceduresParam.split(","))
+      setSelectedProcedures(proceduresParam.split(","));
     }
 
     if (locationParam) {
-      setLocation(locationParam)
+      setLocation(locationParam);
     }
 
     if (checkInParam) {
-      const fromDate = parseISO(checkInParam)
-      setDate((prev) => ({ ...prev, from: fromDate }))
+      const fromDate = parseISO(checkInParam);
+      setDate((prev) => ({ ...prev, from: fromDate }));
     }
 
     if (checkOutParam) {
-      const toDate = parseISO(checkOutParam)
+      const toDate = parseISO(checkOutParam);
       setDate((prev) => ({
         from: prev?.from ?? undefined,
         to: toDate,
-      }))
+      }));
     }
 
     if (travelersParam) {
-      const travelersCount = Number.parseInt(travelersParam, 10)
+      const travelersCount = Number.parseInt(travelersParam, 10);
       if (!isNaN(travelersCount) && travelersCount > 0) {
-        setTravelers(travelersCount)
+        setTravelers(travelersCount);
       }
     }
-  }, [searchParams, setDate, setLocation, setSelectedProcedures, setTravelers])
+  }, [searchParams, setDate, setLocation, setSelectedProcedures, setTravelers]);
 
-  return null
+  return null;
 }
 
-export function SearchBar() {
-  const [selectedProcedures, setSelectedProcedures] = useState<string[]>([])
+export function SearchBar({ lang = "es" }: { lang?: string }) {
+  const [selectedProcedures, setSelectedProcedures] = useState<string[]>([]);
 
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: undefined,
     to: undefined,
-  })
+  });
 
-  const [travelers, setTravelers] = React.useState(1)
-  const [location, setLocation] = React.useState("")
+  const isSpanish = lang === "es";
+
+  const procedures: Procedure[] = [
+    {
+      name: isSpanish ? "Cirugía plástica" : "Plastic surgery",
+      icon: "/assets/icons/00.svg",
+    },
+    {
+      name: isSpanish ? "Cirugía bariátrica" : "Bariatric surgery",
+      icon: "/assets/icons/01.svg",
+    },
+    {
+      name: isSpanish ? "Implante capilar" : "Hair transplant",
+      icon: "/assets/icons/02.svg",
+    },
+    {
+      name: isSpanish ? "Salud mental" : "Mental health",
+      icon: "/assets/icons/03.svg",
+    },
+    {
+      name: isSpanish ? "Rehabilitación" : "Rehabilitation",
+      icon: "/assets/icons/04.svg",
+    },
+    { name: isSpanish ? "Otro" : "Other", icon: "/assets/icons/05.svg" },
+  ];
+
+  const [travelers, setTravelers] = React.useState(1);
+  const [location, setLocation] = React.useState("");
 
   const toggleProcedure = (procedureName: string) => {
     setSelectedProcedures((prev) =>
-      prev.includes(procedureName) ? prev.filter((name) => name !== procedureName) : [...prev, procedureName],
-    )
-  }
+      prev.includes(procedureName)
+        ? prev.filter((name) => name !== procedureName)
+        : [...prev, procedureName]
+    );
+  };
 
   //const resetLocation = () => setLocation("")
-  const resetDates = () => setDate(undefined)
-  const resetTravelers = () => setTravelers(1)
+  const resetDates = () => setDate(undefined);
+  const resetTravelers = () => setTravelers(1);
 
-  const router = useRouter()
+  const router = useRouter();
 
   const handleSearch = () => {
-    const searchParams = new URLSearchParams()
+    const searchParams = new URLSearchParams();
     if (selectedProcedures.length > 0) {
-      searchParams.append("procedures", selectedProcedures.join(","))
+      searchParams.append("procedures", selectedProcedures.join(","));
     }
     if (location) {
-      searchParams.append("location", location)
+      searchParams.append("location", location);
     }
     if (date?.from) {
-      searchParams.append("checkIn", date.from.toISOString().split("T")[0])
+      searchParams.append("checkIn", date.from.toISOString().split("T")[0]);
     }
     if (date?.to) {
-      searchParams.append("checkOut", date.to.toISOString().split("T")[0])
+      searchParams.append("checkOut", date.to.toISOString().split("T")[0]);
     }
     if (travelers > 1) {
-      searchParams.append("travelers", travelers.toString())
+      searchParams.append("travelers", travelers.toString());
     }
 
-    const searchUrl = `/rooms?${searchParams.toString()}`
-    router.push(searchUrl)
-  }
+    const searchUrl = `/rooms?${searchParams.toString()}`;
+    router.push(searchUrl);
+  };
 
   return (
     <>
@@ -141,8 +169,17 @@ export function SearchBar() {
         <div className="px-8 bg-[#1B2B3A] rounded-3xl">
           <div className="flex flex-col md:flex-row md:items-center gap-6">
             <h2 className="text-white leading-[1.2rem] font-medium text-sm whitespace-nowrap">
-              Motivo médico <br />
-              de tu viaje
+              {isSpanish ? (
+                <>
+                  Motivo médico <br />
+                  de tu viaje
+                </>
+              ) : (
+                <>
+                  Medical reason <br />
+                  for your trip
+                </>
+              )}
             </h2>
             <div className="grid grid-cols-6 md:grid-cols-6 gap-10 flex-1">
               {procedures.map((procedure) => (
@@ -181,12 +218,15 @@ export function SearchBar() {
           {/* Lugar */}
           <div className="relative flex-1">
             <div className="py-1">
-              <div className="text-sm font-semibold mb-1">Lugar</div>
+              <div className="text-sm font-semibold mb-1">
+                {isSpanish ? "Lugar" : "Location"}
+              </div>
               <LocationAutocomplete
                 value={location}
                 onChange={(newLocation) => {
-                  setLocation(newLocation)
+                  setLocation(newLocation);
                 }}
+                lang={lang}
               />
               {/*<div className="relative">
                 <Input
@@ -221,15 +261,31 @@ export function SearchBar() {
               <div className="flex-1 flex cursor-pointer rounded-full hover:bg-gray-100 px-6 py-3 relative">
                 <div className="grid grid-cols-2 gap-4 min-w-[200px]">
                   <div>
-                    <div className="text-sm font-semibold">Llegada</div>
+                    <div className="text-sm font-semibold">
+                      {isSpanish ? "Llegada" : "Check-in"}
+                    </div>
                     <div className="text-sm text-muted-foreground">
-                      {date?.from ? format(date.from, "d MMM.", { locale: es }) : "Agregar fecha"}
+                      {date?.from
+                        ? format(date.from, isSpanish ? "d MMM." : "MMM d", {
+                            locale: isSpanish ? es : enUS,
+                          })
+                        : isSpanish
+                        ? "Agregar fecha"
+                        : "Add date"}
                     </div>
                   </div>
                   <div>
-                    <div className="text-sm font-semibold">Salida</div>
+                    <div className="text-sm font-semibold">
+                      {isSpanish ? "Salida" : "Check-out"}
+                    </div>
                     <div className="text-sm text-muted-foreground">
-                      {date?.to ? format(date.to, "d MMM.", { locale: es }) : "Agregar fecha"}
+                      {date?.to
+                        ? format(date.to, isSpanish ? "d MMM." : "MMM d", {
+                            locale: isSpanish ? es : enUS,
+                          })
+                        : isSpanish
+                        ? "Agregar fecha"
+                        : "Add date"}
                     </div>
                   </div>
                 </div>
@@ -253,7 +309,7 @@ export function SearchBar() {
                 selected={date}
                 onSelect={setDate}
                 numberOfMonths={2}
-                locale={es}
+                locale={isSpanish ? es : enUS}
                 disabled={{ before: new Date() }}
               />
             </PopoverContent>
@@ -267,9 +323,19 @@ export function SearchBar() {
             <PopoverTrigger asChild>
               <div className="relative flex-1">
                 <div className="cursor-pointer rounded-full hover:bg-gray-100 px-6 py-3">
-                  <div className="text-sm font-semibold">Quién</div>
+                  <div className="text-sm font-semibold">
+                    {isSpanish ? "Quién" : "Who"}
+                  </div>
+
                   <div className="text-sm text-muted-foreground">
-                    {travelers} {travelers === 1 ? "paciente" : "pacientes"}
+                    {travelers}{" "}
+                    {isSpanish
+                      ? travelers === 1
+                        ? "paciente"
+                        : "pacientes"
+                      : travelers === 1
+                      ? "patient"
+                      : "patients"}
                   </div>
                   {travelers > 1 && (
                     <Button
@@ -288,9 +354,16 @@ export function SearchBar() {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="font-medium">Pacientes</div>
-                  <div className="text-sm text-muted-foreground">Cantidad de personas</div>
+                  <div className="text-sm text-muted-foreground">
+                    Cantidad de personas
+                  </div>
                 </div>
-                <NumberCounter value={travelers} onChange={setTravelers} min={1} max={16} />
+                <NumberCounter
+                  value={travelers}
+                  onChange={setTravelers}
+                  min={1}
+                  max={16}
+                />
               </div>
             </PopoverContent>
           </Popover>
@@ -306,6 +379,5 @@ export function SearchBar() {
         </div>
       </div>
     </>
-  )
+  );
 }
-

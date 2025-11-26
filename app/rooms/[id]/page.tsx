@@ -222,7 +222,7 @@ export default function RoomPage() {
       : 0;
 
   const totalReviews = reviews.length;
-  const hostExperience = "4 meses de experiencia como anfitrión";
+  const hostExperience = "";
 
   const filterCurrentBookings = (bookings: Booking[]) => {
     const today = new Date();

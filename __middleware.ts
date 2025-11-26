@@ -114,6 +114,7 @@ export function middleware(request: NextRequest) {
     path.startsWith('/rooms') ||
     path.startsWith('/user/') ||
     path.startsWith('/webapi/items/Booking') ||
+    path.startsWith('/webapi/items/ExtraTags') ||
     path.startsWith('/webapi/items/Property') ||
     path.startsWith('/webapi/items/Provider') ||    
     path.startsWith('/webapi/items/Room') ||
@@ -181,6 +182,6 @@ export const config = {
      * - assets (assets folder)
      * - webapi/assets (assets folder)
      */
-    '/((?!api|_next/static|_next/image|assets|webapi/assets|favicon.ico|placeholder.svg).*)',
+    '/((?!api|_next/static|_next/image|assets|webapi|webapi/assets|favicon.ico|placeholder.svg).*)',
   ],
 };

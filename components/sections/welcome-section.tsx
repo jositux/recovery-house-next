@@ -7,7 +7,7 @@ interface WelcomeSectionProps {
   lang?: string // 👈 idioma recibido como prop (es, en, etc.)
 }
 
-export function WelcomeSection({ lang = "es" }: WelcomeSectionProps) {
+export function WelcomeSection({ lang }: WelcomeSectionProps) {
   const isSpanish = lang === "es"
 
   return (

@@ -1,22 +1,23 @@
-import Image from "next/image"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { MapPin, BedSingle, BedDouble } from "lucide-react"
+import Image from "next/image";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { MapPin, BedSingle, BedDouble } from "lucide-react";
 
 interface RoomCardProps {
-  id: string
-  name: string
-  description: string
-  bedType: string
-  bedName: string
-  bedPrice: number
-  bedCleaning: number
-  image: string
-  propertyName: string
-  country: string
-  state: string
-  city: string
+  id: string;
+  name: string;
+  description: string;
+  bedType: string;
+  bedName: string;
+  bedPrice: number;
+  bedCleaning: number;
+  image: string;
+  propertyName: string;
+  country: string;
+  state: string;
+  city: string;
+  lang: string;
 }
 
 export function RoomCardShared({
@@ -30,8 +31,10 @@ export function RoomCardShared({
   bedType,
   bedName,
   bedPrice,
+  lang,
 }: RoomCardProps) {
-  
+  const isSpanish = lang === "es";
+
   return (
     <Card className="overflow-hidden h-full rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
       <Link href={`/rooms/${id}`}>
@@ -45,19 +48,29 @@ export function RoomCardShared({
           />
           {/* Icono y texto de habitación compartida */}
           <div className="absolute top-2 right-2 flex items-center space-x-1 bg-white py-1 px-2 rounded-full shadow-md">
-  {bedType === "single" ? (
-    <BedSingle size={16} color="#333" />
-  ) : (
-    <BedDouble size={16} color="#333" />
-  )}
-  <span className="text-sm text-gray-800">
-    1 Cama {bedType === "single" ? "Sencilla" : "Doble"}
-  </span>
-</div>
+            {bedType === "single" ? (
+              <BedSingle size={16} color="#333" />
+            ) : (
+              <BedDouble size={16} color="#333" />
+            )}
+            <span className="text-sm text-gray-800">
+              {isSpanish ? "1 Cama" : "1 Bed"}{" "}
+              {bedType === "single"
+                ? isSpanish
+                  ? "Sencilla"
+                  : "Single"
+                : isSpanish
+                ? "Doble"
+                : "Double"}
+            </span>
+          </div>
         </div>
       </Link>
       <CardContent className="p-4">
-        <h3 className="text-lg font-semibold text-gray-800 mb-1">{bedName && `${bedName} - `}{name}</h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-1">
+          {bedName && `${bedName} - `}
+          {name}
+        </h3>
         <p className="text-sm text-gray-600 mb-2">{propertyName}</p>
         <div className="flex items-center text-sm text-gray-500">
           <MapPin size={16} className="mr-1" />
@@ -69,21 +82,30 @@ export function RoomCardShared({
           {bedPrice > 0 && (
             <div className="text-base font-bold flex items-center space-x-1">
               <BedSingle size={16} />
-              <span>${bedPrice} <span className="text-sm font-normal">USD / noche</span></span>
-              
+              <span className="inline-flex items-baseline gap-1">
+                <span className="text-lg font-semibold">
+                  {bedPrice?.toLocaleString(isSpanish ? "es-ES" : "en-US")}
+                </span>
+
+                <span className="text-sm font-normal">
+                  {isSpanish ? "USD / noche" : "USD / night"}
+                </span>
+              </span>
             </div>
           )}
-         
+
           {bedPrice <= 0 && (
-            <div className="text-sm text-gray-500 italic">Precio no disponible</div>
+            <div className="text-sm text-gray-500 italic">
+              {isSpanish ? "Precio no disponible" : "Price not available"}
+            </div>
           )}
         </div>
         <Link href={`/rooms/${id}`}>
           <Button variant="outline" className="rounded-full">
-            Ver
+            {isSpanish ? "Ver" : "View"}
           </Button>
         </Link>
       </CardFooter>
     </Card>
-  )
+  );
 }

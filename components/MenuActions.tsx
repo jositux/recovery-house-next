@@ -6,25 +6,23 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { syncAuthCookies } from "@/utils/syncAuthCookies"
 
-export function MenuActions() {
+
+export function MenuActions({ lang = "es" }: { lang?: string }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
 
-  const toggleMenu = () => setIsMenuOpen((prev) => !prev)
+  const isSpanish = lang === "es"
 
+  const toggleMenu = () => setIsMenuOpen((prev) => !prev)
   const closeMenu = () => setIsMenuOpen(false)
 
-  // Función para navegar de forma segura sincronizando cookies primero
   const navigateWithAuth = (path: string) => {
     closeMenu()
-    // Sincronizar cookies ANTES de navegar
     syncAuthCookies()
-    // Navegar después de sincronizar
     router.push(path)
   }
 
-  // Cierra el menú si se hace clic fuera de él
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -40,7 +38,6 @@ export function MenuActions() {
 
   return (
     <div className="relative" ref={menuRef}>
-      {/* Botón para abrir/cerrar el menú */}
       <button
         className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-800 text-white hover:bg-gray-700 focus:outline-none"
         onClick={toggleMenu}
@@ -48,7 +45,6 @@ export function MenuActions() {
         <Plus className="w-5 h-5" />
       </button>
 
-      {/* Menú desplegable */}
       <div
         className={`absolute right-0 mt-2 w-48 bg-white shadow-md rounded-lg z-10 transition-all duration-300 ${
           isMenuOpen ? "opacity-100 scale-100 visible" : "opacity-0 scale-95 invisible"
@@ -61,22 +57,24 @@ export function MenuActions() {
               className="flex items-center gap-2 w-full text-left"
             >
               <Building className="w-4 h-4" />
-              Agregar Propiedad
+              {isSpanish ? "Agregar Propiedad" : "Add Property"}
             </button>
           </li>
+
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
             <button
               onClick={() => navigateWithAuth("/mi-panel/registrar-servicio")}
               className="flex items-center gap-2 w-full text-left"
             >
               <HandHeart className="w-4 h-4" />
-              Agregar Servicio
+              {isSpanish ? "Agregar Servicio" : "Add Service"}
             </button>
           </li>
+
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
             <Link href="/rooms" className="flex items-center gap-2" onClick={closeMenu}>
               <Search className="w-4 h-4" />
-              Buscar Alojamiento
+              {isSpanish ? "Buscar Alojamiento" : "Search Room"}
             </Link>
           </li>
         </ul>
@@ -84,4 +82,3 @@ export function MenuActions() {
     </div>
   )
 }
-

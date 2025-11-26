@@ -60,6 +60,7 @@ export function middleware(request: NextRequest) {
     path.startsWith('/rooms') ||
     path.startsWith('/user/') ||
     path.startsWith('/webapi/items/Booking') ||
+    path.startsWith('/webapi/items/ExtraTags') ||
     path.startsWith('/webapi/items/Property') ||
     path.startsWith('/webapi/items/Provider') ||    
     path.startsWith('/webapi/items/Room') ||
