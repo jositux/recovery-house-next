@@ -32,17 +32,19 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className={`${fraunces.variable} ${dmSans.variable}`}>
+      
+      
       <head>
         <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
       </head>
       <body className="font-dm-sans">
-        <Header />
+        <Header /> 
         <main className="max-auto relative z-0">
           <PageTracker />
           {children}
         </main>
        
-        <Footer />
+       <Footer lang="es"/> 
       </body>
     </html>
   );

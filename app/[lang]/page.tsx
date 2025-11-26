@@ -28,16 +28,16 @@ export default async function Home({
       <div className="md:hidden px-4">
         <HeroSliderMobile lang={lang}/>
       </div>
-      <WelcomeSection />
-      <FeaturesSection />
-      <HowToUseSection />
-      <BenefitsSection />
-      <TestimonialsSection />
+      <WelcomeSection lang={lang} />
+      <FeaturesSection lang={lang} />
+      <HowToUseSection lang={lang} />
+      <BenefitsSection lang={lang} />
+      <TestimonialsSection lang={lang} />
       {/*
       <CareDividerSection />
   */}
-      <HostCTASection />
-      <NewsSection />
+      <HostCTASection lang={lang} />
+      <NewsSection lang={lang} />
     </main>
   )
 }

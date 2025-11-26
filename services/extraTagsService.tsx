@@ -1,5 +1,3 @@
-// src/services/extraTagsService.ts
-
 import axios from 'axios';
 
 export const getExtraTags = async () => {

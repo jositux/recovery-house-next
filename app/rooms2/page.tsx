@@ -304,8 +304,6 @@ function RoomsPageContent() {
       return true
     })
 
-    console.log("Filtered rooms count:", filteredRooms.length)
-    console.log("=== END DEBUGGING ===")
   }, [allRooms, searchParams, bookings, isRoomAvailable, properties])
 
   useEffect(() => {
@@ -451,6 +449,7 @@ function RoomsPageContent() {
                       country={room.propertyLocation?.country || ""}
                       state={room.propertyLocation?.state || ""}
                       city={room.propertyLocation?.city || ""}
+                      lang="es"
                     />
                   ) : (
                     <RoomCard
@@ -463,6 +462,7 @@ function RoomsPageContent() {
                       country={room.propertyLocation?.country || ""}
                       state={room.propertyLocation?.state || ""}
                       city={room.propertyLocation?.city || ""}
+                      lang="es"
                     />
                   )}
                 </div>

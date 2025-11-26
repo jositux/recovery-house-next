@@ -12,6 +12,7 @@ import { countriesData } from "@/data/countries"
 interface Props {
   value?: string
   onChange?: (value: string) => void // Nueva prop
+  lang: string
 }
 
 interface LocationOption {
@@ -31,14 +32,14 @@ const normalizeText = (text: string): string => {
     .replace(/[^\w\s]/g, "") // Eliminar caracteres especiales
 }
 
-export default function LocationAutocomplete({ value, onChange }: Props) {
+export default function LocationAutocomplete({ value, lang, onChange }: Props) {
   const [inputValue, setInputValue] = useState(value || "")
   const [suggestions, setSuggestions] = useState<LocationOption[]>([])
   const [selectedLocation, setSelectedLocation] = useState<LocationOption | null>(null)
   const [isOpen, setIsOpen] = useState(false)
   const wrapperRef = useRef<HTMLDivElement>(null)
   const [allLocations, setAllLocations] = useState<LocationOption[]>([])
-
+  const isSpanish = lang === "es"
   // Generate all location options
   useEffect(() => {
     const locations: LocationOption[] = []
@@ -203,6 +204,10 @@ export default function LocationAutocomplete({ value, onChange }: Props) {
     setSuggestions([])
   }
 
+  const placeholderText = isSpanish
+  ? "¿Dónde deseas recuperarte?"
+  : "Where would you like to recover?"
+
   return (
     <div className="w-full max-w-md mx-auto" ref={wrapperRef}>
       <div className="relative">
@@ -210,7 +215,7 @@ export default function LocationAutocomplete({ value, onChange }: Props) {
           <div className="relative flex-1">
             <Input
               type="text"
-              placeholder="Dónde deseas recuperarte?"
+              placeholder={placeholderText}
               value={inputValue}
               onChange={handleInputChange}
               onFocus={() => inputValue && setIsOpen(true)}

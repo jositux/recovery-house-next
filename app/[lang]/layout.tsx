@@ -41,13 +41,13 @@ export default async function RootLayout({
         <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
       </head>
       <body className="font-dm-sans">
-        <Header />
+        <Header lang={lang}/>
         <main className="max-auto relative z-0">
           <PageTracker />
           {children}
         </main>
        
-        <Footer />
+        <Footer lang={lang} />
       </body>
     </html>
   );
