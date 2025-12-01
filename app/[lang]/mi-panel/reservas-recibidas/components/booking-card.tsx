@@ -19,11 +19,12 @@ import {
 } from "lucide-react";
 import { InfoItem } from "./info-item";
 import { useRouter } from "next/navigation";
+import { type Locale } from "@/lib/i18n"; // Importación requerida
 
+// --- Definición de Interfaces (Omitidas para brevedad, pero se mantienen) ---
 interface Photo {
   directus_files_id: { id: string };
 }
-
 interface Property {
   id: string;
   name: string;
@@ -37,7 +38,6 @@ interface Property {
   mainImage: string;
   type: string;
 }
-
 interface Room {
   id: string;
   name: string;
@@ -60,7 +60,6 @@ interface Room {
   photos: Photo[];
   propertyId: Property;
 }
-
 interface Booking {
   id: string;
   status: string;
@@ -80,7 +79,7 @@ interface Booking {
   propertyName?: string | null;
   paymentId?: string | null;
   ownerName?: string | null;
-  patientName?: string | null;
+  patientName?: string | null; // Se usa en esta card
   isPrivate?: boolean;
   singleBeds?: number | null;
   doubleBeds?: number | null;
@@ -111,19 +110,86 @@ interface Booking {
   prepaymentModificationAmount: number;
   refundAmount: string | null;
 }
-
 interface PaymentDisplayValues {
   shownAnticipo: number;
   shownPendiente: number;
   modificationDiff: number | null;
 }
+// --------------------------------------------------------------------------
 
 interface BookingCardProps {
   booking: Booking;
   paymentDisplay: PaymentDisplayValues;
   onCancelBooking?: (bookingId: string) => void;
   onPayBalance?: (bookingId: string, balanceAmount: string) => void;
+  lang: Locale; // ✅ Prop de idioma agregado
 }
+
+// --- Objeto de Traducción (Mismo que el anterior, adaptado ligeramente para la vista del Owner) ---
+const translations = {
+  es: {
+    privateRoom: "Habitación Privada",
+    singleBed: "1 cama sencilla",
+    doubleBed: "1 cama doble",
+    room: "Habitación",
+    unknownProperty: "Propiedad desconocida",
+    paid100: "Pagado 100%",
+    prepayment10: "Anticipo 10%",
+    patient: "Paciente", // <-- Cambiado de 'Owner' a 'Paciente'
+    stay: "Estadía",
+    nights: (n: number) => `${n} Noches`,
+    discount: (p: number) => `${p}% de descuento`,
+    guests: "Huéspedes",
+    pricePerNight: "Precio por noche",
+    cleaning: "Limpieza",
+    total: "Total",
+    paidPrepayment: (amount: string) => `Pagó anticipo: $${amount}`,
+    prepayment: "Anticipo",
+    pending: "Pendiente",
+    modify: "Modificar",
+    modified: "Modificado",
+    payPending: "Pagar Pendiente",
+    cancel: "Anular",
+    cancelled: "Anulado",
+    cancelledBooking: "Reserva Anulada",
+    cancellationReason: (msg: string) => `- Motivo: ${msg}`,
+    currentStay: "Estadía actual - Disfruta tu recuperación",
+    cancelledByPatient: "Anulado por el paciente",
+    cancelledByOwner: "Anulado por el propietario",
+    cancelledBySystem: "Anulado por la plataforma",
+  },
+  en: {
+    privateRoom: "Private Room",
+    singleBed: "1 single bed",
+    doubleBed: "1 double bed",
+    room: "Room",
+    unknownProperty: "Unknown property",
+    paid100: "Paid 100%",
+    prepayment10: "Prepayment 10%",
+    patient: "Patient", // <-- Changed from 'Owner' to 'Patient'
+    stay: "Stay",
+    nights: (n: number) => `${n} Nights`,
+    discount: (p: number) => `${p}% discount`,
+    guests: "Guests",
+    pricePerNight: "Price per night",
+    cleaning: "Cleaning",
+    total: "Total",
+    paidPrepayment: (amount: string) => `Paid prepayment: $${amount}`,
+    prepayment: "Prepayment",
+    pending: "Pending",
+    modify: "Modify",
+    modified: "Modified",
+    payPending: "Pay Pending Balance",
+    cancel: "Cancel",
+    cancelled: "Cancelled",
+    cancelledBooking: "Booking Cancelled",
+    cancellationReason: (msg: string) => `- Reason: ${msg}`,
+    currentStay: "Current Stay - Enjoy your recovery",
+    cancelledByPatient: "Cancelled by patient",
+    cancelledByOwner: "Cancelled by owner",
+    cancelledBySystem: "Cancelled by platform",
+  },
+};
 
 // ✅ función universal para obtener una fecha local correcta
 const toLocalDateFromString = (isoOrDateString: string | undefined): Date => {
@@ -145,21 +211,6 @@ const combineDateAndTime = (dateString: string, timeString: string): Date => {
   return new Date(year, month - 1, day, hours, minutes, seconds);
 };
 
-/*
-const isLessThan72HoursBeforeCheckIn = (checkInDate: string, checkInHour: string): boolean => {
-  const now = new Date()
-  const checkInDateTime = combineDateAndTime(checkInDate, checkInHour)
-
-  // Calcular diferencia en milisegundos
-  const diffInMs = checkInDateTime.getTime() - now.getTime()
-
-  // Convertir a horas
-  const diffInHours = diffInMs / (1000 * 60 * 60)
-
-  // Retornar true si faltan menos de 72 horas y la fecha aún no pasó
-  return diffInHours < 72 && diffInHours >= 0
-}*/
-
 // ✅ función para saber si faltan menos de 3 días para el check-in
 const isLessThan3DaysBeforeCheckIn = (checkInDate: string): boolean => {
   const today = new Date();
@@ -178,7 +229,11 @@ export const BookingCard = ({
   paymentDisplay,
   onCancelBooking,
   onPayBalance,
+  lang, // ✅ Recibir lang como prop
 }: BookingCardProps) => {
+  const t = translations[lang] || translations.es; // Obtener traducciones
+  const isSpanish = lang === "es"; // Bandera para format de date-fns
+
   const roomDetails = booking.room;
   const property = booking.room.propertyId;
 
@@ -203,13 +258,12 @@ export const BookingCard = ({
     booking.bookingState === "cancelled_by_owner" ||
     booking.bookingState === "cancelled_by_system";
 
+  // ✅ Mapa de anulación TRADUCIDO
   const cancelledByMap: Record<string, string> = {
-    cancelled_by_patient: "Anulado por el paciente",
-    cancelled_by_owner: "Anulado por el propietario",
-    cancelled_by_system: "Anulado por la plataforma",
+    cancelled_by_patient: t.cancelledByPatient,
+    cancelled_by_owner: t.cancelledByOwner,
+    cancelled_by_system: t.cancelledBySystem,
   };
-
-  
 
   const router = useRouter();
 
@@ -222,13 +276,13 @@ export const BookingCard = ({
       booking.paymentState === "fullpayment" ||
       booking.paymentState === "balancepayment"
     ) {
-      return <Badge className="bg-green-500 text-white">Pagado 100%</Badge>;
+      return <Badge className="bg-green-500 text-white">{t.paid100}</Badge>;
     }
     if (
       booking.paymentState === "prepayment" &&
       booking.modificationCount === 0
     ) {
-      return <Badge className="bg-yellow-500 text-white">Anticipo 10%</Badge>;
+      return <Badge className="bg-yellow-500 text-white">{t.prepayment10}</Badge>;
     }
     return null;
   };
@@ -247,9 +301,9 @@ export const BookingCard = ({
         <div className="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1.5">
           <p className="text-xs font-medium flex items-center">
             <Info className="w-3 h-3 mr-1.5" />
-            Reserva Anulada{" "}
+            {t.cancelledBooking}{" "}
             {booking.cancelledMessage &&
-              `- Motivo: ${booking.cancelledMessage}`}
+              t.cancellationReason(booking.cancelledMessage)}
           </p>
         </div>
       )}
@@ -258,7 +312,7 @@ export const BookingCard = ({
         <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-3 py-1.5">
           <p className="text-xs font-medium flex items-center">
             <div className="w-1.5 h-1.5 bg-white rounded-full mr-1.5 animate-pulse"></div>
-            Estadía actual - Disfruta tu recuperación
+            {t.currentStay}
           </p>
         </div>
       )}
@@ -271,7 +325,7 @@ export const BookingCard = ({
                 ? `/webapi/assets/${roomDetails.photos[0]?.directus_files_id.id}?key=medium`
                 : "/placeholder.svg?height=400&width=600"
             }
-            alt={roomDetails?.name || "Room image"}
+            alt={roomDetails?.name || t.room}
             layout="fill"
             objectFit="cover"
             className="rounded-t-lg md:rounded-l-lg md:rounded-t-none"
@@ -289,17 +343,17 @@ export const BookingCard = ({
                 {roomDetails?.bedType === "double" ? (
                   <>
                     <BedDouble size={14} color="white" />
-                    <span>1 cama doble</span>
+                    <span>{t.doubleBed}</span>
                   </>
                 ) : (
                   <>
                     <BedSingle size={14} color="white" />
-                    <span>1 cama sencilla</span>
+                    <span>{t.singleBed}</span>
                   </>
                 )}
               </div>
             ) : (
-              <span>Habitación Privada</span>
+              <span>{t.privateRoom}</span>
             )}
           </div>
 
@@ -312,15 +366,15 @@ export const BookingCard = ({
         <CardContent className="flex-1 p-3 md:w-2/3">
           <div className="flex items-start justify-between mb-1.5">
             <h3 className="text-lg font-semibold text-gray-900 flex-1">
-              {roomDetails?.name || "Habitación"} -{" "}
-              {property?.name || "Propiedad desconocida"}
+              {roomDetails?.name || t.room} -{" "}
+              {property?.name || t.unknownProperty}
             </h3>
             {getPaymentBadge()}
           </div>
 
           <div className="flex items-center text-xs text-gray-500 mb-2">
             <User className="h-3 w-3 mr-1" />
-            <span>Paciente: {`${booking.patientName}`}</span>
+            <span>{t.patient}: {`${booking.patientName}`}</span> {/* <-- TRADUCIDO (Paciente) */}
           </div>
 
           <div className="flex items-center text-xs text-gray-500 mb-2">
@@ -331,19 +385,21 @@ export const BookingCard = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mb-3">
             <InfoItem
               icon={<Calendar />}
-              label="Estadía"
-              value={`${format(checkInDate, "dd MMM", {
-                locale: es,
-              })} → ${format(checkOutDate, "dd MMM", { locale: es })}`}
+              label={t.stay} // <-- TRADUCIDO
+              value={`${format(checkInDate, isSpanish ? "dd MMM" : "MMM dd", {
+                locale: isSpanish ? es : undefined,
+              })} → ${format(checkOutDate, isSpanish ? "dd MMM" : "MMM dd", {
+                locale: isSpanish ? es : undefined,
+              })}`}
             />
             <InfoItem
               icon={<Calendar />}
-              label={`${nights} Noches`}
+              label={t.nights(nights)} // <-- TRADUCIDO (función)
               value={
                 booking.discountStayType &&
                 booking.discountStayType !== "short" &&
                 booking.discountPercentageStayApplied !== null
-                  ? `${booking.discountPercentageStayApplied}% de descuento`
+                  ? t.discount(booking.discountPercentageStayApplied) // <-- TRADUCIDO (función)
                   : nights
               }
             />
@@ -352,17 +408,17 @@ export const BookingCard = ({
               <>
                 <InfoItem
                   icon={<Users />}
-                  label="Huéspedes"
+                  label={t.guests} // <-- TRADUCIDO
                   value={booking.guests}
                 />
                 <InfoItem
                   icon={<DollarSign />}
-                  label="Precio por noche"
+                  label={t.pricePerNight} // <-- TRADUCIDO
                   value={`$${booking.price} USD`}
                 />
                 <InfoItem
                   icon={<DollarSign />}
-                  label="Limpieza"
+                  label={t.cleaning} // <-- TRADUCIDO
                   value={`$${booking.cleaning} USD`}
                 />
               </>
@@ -372,12 +428,12 @@ export const BookingCard = ({
               <>
                 <InfoItem
                   icon={<DollarSign />}
-                  label="Precio por noche"
+                  label={t.pricePerNight} // <-- TRADUCIDO
                   value={`$${booking.price} USD`}
                 />
                 <InfoItem
                   icon={<DollarSign />}
-                  label="Limpieza"
+                  label={t.cleaning} // <-- TRADUCIDO
                   value={`$${booking.cleaning} USD`}
                 />
               </>
@@ -388,8 +444,8 @@ export const BookingCard = ({
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3 mt-3 pt-3 border-t border-gray-200">
             <div className="flex-1">
               <p className="text-lg font-semibold text-gray-900 mb-0.5">
-                Total:{" "}
-                {new Intl.NumberFormat("en-US", {
+                {t.total}:{" "}
+                {new Intl.NumberFormat(isSpanish ? "es-ES" : "en-US", {
                   style: "currency",
                   currency: "USD",
                 }).format(Number(booking.finalPrice))}
@@ -399,18 +455,18 @@ export const BookingCard = ({
               <div className="text-xs text-gray-500">
                 {booking.paymentState === "balancepayment" ||
                   (booking.paymentState === "pendingRefund" && (
-                    <p>Pagó anticipo: ${booking.prepaymentAmount}</p>
+                    <p>{t.paidPrepayment(booking.prepaymentAmount || "0")}</p> // <-- TRADUCIDO (función)
                   ))}
 
                 {booking.paymentState === "prepayment" && (
                   <p>
-                    Anticipo:{" "}
-                    {new Intl.NumberFormat("en-US", {
+                    {t.prepayment}:{" "}
+                    {new Intl.NumberFormat(isSpanish ? "es-ES" : "en-US", {
                       style: "currency",
                       currency: "USD",
                     }).format(paymentDisplay.shownAnticipo)}{" "}
-                    | Pendiente:{" "}
-                    {new Intl.NumberFormat("en-US", {
+                    | {t.pending}:{" "}
+                    {new Intl.NumberFormat(isSpanish ? "es-ES" : "en-US", {
                       style: "currency",
                       currency: "USD",
                     }).format(paymentDisplay.shownPendiente)}
@@ -421,6 +477,7 @@ export const BookingCard = ({
 
             {/* BOTONES */}
             <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+              {/* Botón Modificar (Oculto en el original) */}
               {!isCancelled &&
                 !isCurrentStay &&
                 !isLessThan3DaysBeforeCheckIn(booking.checkIn) &&
@@ -432,16 +489,18 @@ export const BookingCard = ({
                     className="hidden bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto"
                   >
                     <Edit className="w-4 h-4 mr-1" />
-                    Modificar
+                    {t.modify} {/* <-- TRADUCIDO */}
                   </Button>
                 )}
 
+              {/* Etiqueta Modificado */}
               {booking.modificationCount === 1 && (
                 <span className="inline-block px-2 py-2 text-xs font-semibold text-gray-700 bg-gray-200 rounded-full">
-                  Modificado
+                  {t.modified} {/* <-- TRADUCIDO */}
                 </span>
               )}
 
+              {/* Botón Pagar Pendiente (Oculto en el original) */}
               {booking.paymentState === "prepayment" &&
                 !isCancelled &&
                 onPayBalance &&
@@ -457,11 +516,11 @@ export const BookingCard = ({
                     variant="outline"
                     className="hidden border-blue-600 text-blue-600 hover:bg-blue-50 w-full sm:w-auto"
                   >
-                    Pagar Pendiente
+                    {t.payPending} {/* <-- TRADUCIDO */}
                   </Button>
                 )}
 
-              {/* 🔴 Mostrar ANULAR solo si faltan <3 días */}
+              {/* Botón Anular */}
               {!isCancelled && onCancelBooking && !isLessThan3DaysBeforeCheckIn(booking.checkIn) && (
                 <Button
                   variant="outline"
@@ -469,13 +528,14 @@ export const BookingCard = ({
                   onClick={() => onCancelBooking(booking.id)}
                   className="text-red-600 border-red-600 hover:bg-red-50 w-full sm:w-auto"
                 >
-                  Anular
+                  {t.cancel} {/* <-- TRADUCIDO */}
                 </Button>
               )}
 
+              {/* Etiqueta Anulado */}
               {isCancelled && (
                 <span className="inline-block px-2 py-1 text-xs font-semibold text-red-600 bg-gray-100 rounded-full">
-                  {cancelledByMap[booking.bookingState ?? ""] || "Anulado" }
+                  {cancelledByMap[booking.bookingState ?? ""] || t.cancelled}
                 </span>
               )}
             </div>

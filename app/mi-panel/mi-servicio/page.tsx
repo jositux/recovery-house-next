@@ -282,6 +282,7 @@ export default function ProviderDataPage() {
                       extraTags={extraTags}
                       enable="services"
                       roomTags={provider.extraTags}
+                      lang="es"
                     />
                   </div>
                 )}

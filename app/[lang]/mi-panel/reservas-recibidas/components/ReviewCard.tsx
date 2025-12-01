@@ -1,7 +1,6 @@
 "use client"
 
-import { Star, Trash2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Star } from "lucide-react"
 
 interface Ratings {
   cleanliness: number
@@ -13,7 +12,6 @@ interface Ratings {
 interface ReviewCardProps {
   ratings: Ratings
   comment: string
-  onDelete: () => void
 }
 
 const calculateAverage = (ratings: Ratings) => {
@@ -22,7 +20,7 @@ const calculateAverage = (ratings: Ratings) => {
   return values.reduce((sum, rating) => sum + rating, 0) / values.length
 }
 
-export function ReviewCard({ ratings, comment, onDelete }: ReviewCardProps) {
+export function ReviewCard({ ratings, comment }: ReviewCardProps) {
   const average = calculateAverage(ratings)
 
   return (
@@ -36,14 +34,7 @@ export function ReviewCard({ ratings, comment, onDelete }: ReviewCardProps) {
           <p className="mt-2 text-sm text-muted-foreground">{comment}</p>
         )}
       </div>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={onDelete}
-        className="text-destructive hover:text-destructive"
-      >
-        <Trash2 className="h-5 w-5" />
-      </Button>
+     
     </div>
   )
 }

@@ -46451,7 +46451,7 @@ export const countriesData: { [key: string]: CountryData } = {
     }
   },
   "USA": {
-    "name": "Estados Unidos",
+    "name": "United States",
     "states": {
       "AL": {
         "name": "Alabama",

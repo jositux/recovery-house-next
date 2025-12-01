@@ -798,7 +798,7 @@ export default function RoomPage() {
                 Amenidades / Servicios
               </h2>
 
-              <CollectionExtraTags extraTags={extraTags} enable="property" roomTags={room.extraTags} />
+              <CollectionExtraTags extraTags={extraTags} enable="property" roomTags={room.extraTags} lang="es"/>
             </div>
 
             {/* Description */}
@@ -882,6 +882,7 @@ export default function RoomPage() {
                   hostExperience={hostExperience}
                   averageRating={averageRating}
                   totalReviews={totalReviews}
+                  lang="es"
                 />
 
                 <div className="text-center">

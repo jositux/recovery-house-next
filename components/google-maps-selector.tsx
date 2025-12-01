@@ -6,6 +6,9 @@ import { Loader2 } from "lucide-react"
 import { useLoadScript, GoogleMap, Marker } from "@react-google-maps/api"
 import type { Libraries } from "@react-google-maps/api"
 
+// 💡 Importación de Locale
+import { type Locale } from "@/lib/i18n" 
+
 // Definimos un tipo más específico para window.google
 declare global {
   interface Window {
@@ -23,16 +26,41 @@ export interface LocationDetails {
 interface GoogleMapsSelectorProps {
   onLocationSelected: (details: LocationDetails) => void
   defaultLocation: LocationDetails
+  lang: Locale // 💡 Usando el tipo Locale
 }
 
 const libraries: Libraries = ["places"]
 
-export default function GoogleMapsSelector({ onLocationSelected, defaultLocation }: GoogleMapsSelectorProps) {
+// 💡 Objeto de Traducciones
+const translations = {
+  es: {
+    loadingMaps: "Cargando mapas",
+    errorMaps: "Error al cargar los mapas",
+    searchPlaceholder: "Busca una dirección y mueve el punto para ubicar con precisión",
+    noGeometry: "El lugar devuelto no contiene geometría",
+    geocoderFailed: "Geocodificador falló debido a:",
+  },
+  en: {
+    loadingMaps: "Loading maps",
+    errorMaps: "Error loading maps",
+    searchPlaceholder: "Search for an address and move the marker to locate precisely",
+    noGeometry: "Returned place contains no geometry",
+    geocoderFailed: "Geocoder failed due to:",
+  },
+}
+
+
+export default function GoogleMapsSelector({ onLocationSelected, defaultLocation, lang }: GoogleMapsSelectorProps) {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""
+  
+  // 💡 Variables de traducción
+  const t = translations[lang] || translations.es
+  //const isSpanish = lang === 'es'
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: apiKey,
     libraries: libraries,
+    language: lang, // Usa el idioma para el script de Google Maps
   })
 
   const [map, setMap] = useState<google.maps.Map | null>(null)
@@ -85,7 +113,7 @@ export default function GoogleMapsSelector({ onLocationSelected, defaultLocation
         setIsLoading(true)
         const place = autocomplete.getPlace()
         if (!place.geometry || !place.geometry.location) {
-          console.log("Returned place contains no geometry")
+          console.log(t.noGeometry)
           setIsLoading(false)
           return
         }
@@ -93,7 +121,7 @@ export default function GoogleMapsSelector({ onLocationSelected, defaultLocation
         updateLocationDetails(place)
       })
     }
-  }, [isLoaded, map, updateLocationDetails])
+  }, [isLoaded, map, t.noGeometry, updateLocationDetails])
 
   const handleMarkerDrag = useCallback((event: google.maps.MapMouseEvent) => {
     if (event.latLng) {
@@ -114,17 +142,17 @@ export default function GoogleMapsSelector({ onLocationSelected, defaultLocation
             const place = results[0]
             updateLocationDetails(place)
           } else {
-            console.error("Geocoder failed due to: " + status)
+            console.error(t.geocoderFailed + " " + status)
             setIsLoading(false)
           }
         },
       )
     },
-    [updateLocationDetails],
+    [t.geocoderFailed, updateLocationDetails],
   )
 
-  if (loadError) return <div>Error loading maps</div>
-  if (!isLoaded) return <div>Loading maps</div>
+  if (loadError) return <div>{t.errorMaps}</div>
+  if (!isLoaded) return <div>{t.loadingMaps}</div>
 
   return (
     <div className="space-y-4">
@@ -141,7 +169,7 @@ export default function GoogleMapsSelector({ onLocationSelected, defaultLocation
               setIsLoading(true)
             }
           }}
-          placeholder="Busca una dirección y mueve el punto para ubicar con precisión"
+          placeholder={t.searchPlaceholder}
           className="w-full pr-10"
         />
         {isLoading && <Loader2 className="absolute right-3 top-3 h-4 w-4 animate-spin text-gray-400" />}
@@ -171,4 +199,3 @@ export default function GoogleMapsSelector({ onLocationSelected, defaultLocation
     </div>
   )
 }
-

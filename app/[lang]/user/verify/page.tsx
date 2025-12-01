@@ -1,14 +1,18 @@
 "use client"
 
 import { useEffect, useState, Suspense } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams, useParams } from "next/navigation"
 import { Loader2, CheckCircle, XCircle } from "lucide-react"
-import { Button } from "@/components/ui/button" // Usa tu sistema de UI si tienes uno
+import { Button } from "@/components/ui/button"
+import { type Locale } from "@/lib/i18n"
 
-// Component that will be wrapped in Suspense
 const EmailVerificationPage = () => {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const params = useParams()
+  const lang = (params.lang as Locale) || "es" // Default to 'es'
+  const isSpanish = lang === "es"
+
   const token = searchParams.get("token")
   const verificationUrl = token ? `/webapi/users/register/verify-email?token=${token}` : ""
 
@@ -22,20 +26,11 @@ const EmailVerificationPage = () => {
       }
 
       try {
-        const response = await fetch(verificationUrl, {
-          method: "GET",
-        })
+        const response = await fetch(verificationUrl, { method: "GET" })
 
-        console.log("response", response)
-
-        if (response.redirected === true) {
+        if (response.redirected === true || response.status === 302) {
           setVerificationStatus("success")
           setTimeout(() => router.push("/login?message=aceptado"), 2000)
-        }
-
-        if (response.status === 302) {
-          setVerificationStatus("success")
-          setTimeout(() => router.push("/login"), 2000)
         } else if (response.status === 400) {
           setVerificationStatus("error")
         } 
@@ -55,14 +50,18 @@ const EmailVerificationPage = () => {
         {verificationStatus === "verifying" && (
           <>
             <Loader2 className="w-10 h-10 text-blue-500 animate-spin mx-auto" />
-            <p className="mt-4 text-[#162F40]">Validando usuario...</p>
+            <p className="mt-4 text-[#162F40]">
+              {isSpanish ? "Validando usuario..." : "Verifying user..."}
+            </p>
           </>
         )}
 
         {verificationStatus === "success" && (
           <>
             <CheckCircle className="w-10 h-10 text-green-500 mx-auto" />
-            <p className="mt-4 text-green-600">El usuario ha sido validado</p>
+            <p className="mt-4 text-green-600">
+              {isSpanish ? "El usuario ha sido validado" : "User has been verified"}
+            </p>
           </>
         )}
 
@@ -70,18 +69,20 @@ const EmailVerificationPage = () => {
           <>
             <XCircle className="w-10 h-10 text-red-500 mx-auto" />
             <p className="mt-4 py-2 text-red-600">
-              El token se ha vencido, por favor pruebe crear de nuevo el usuario.
+              {isSpanish
+                ? "El token se ha vencido, por favor pruebe crear de nuevo el usuario."
+                : "The token has expired, please try creating the user again."}
             </p>
           </>
         )}
 
         {token && verificationStatus === "error" && (
            <Button 
-           className="mt-4 bg-blue-500 text-white hover:bg-blue-600"
-           onClick={() => router.push("/registro")}
-         >
-           Crear Usuario
-         </Button>
+             className="mt-4 bg-blue-500 text-white hover:bg-blue-600"
+             onClick={() => router.push("/registro")}
+           >
+             {isSpanish ? "Crear Usuario" : "Create User"}
+           </Button>
         )}
       </div>
     </div>
@@ -90,7 +91,7 @@ const EmailVerificationPage = () => {
 
 export default function SuspendedEmailVerificationPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div>{/* Aquí también se puede traducir */}Loading...</div>}>
       <EmailVerificationPage />
     </Suspense>
   )

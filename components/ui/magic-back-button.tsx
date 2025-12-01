@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { Button, ButtonProps } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { usePageTrackerStore } from 'react-page-tracker';
 import { ChevronLeft } from 'lucide-react';
+import { type Locale } from '@/lib/i18n';
 
 export const MagicBackButton = React.forwardRef<
   HTMLButtonElement,
@@ -11,6 +12,10 @@ export const MagicBackButton = React.forwardRef<
 >(({ className, onClick, backLink = '/', ...props }, ref) => {
   const router = useRouter();
   const isFirstPage = usePageTrackerStore((state) => state.isFirstPage);
+
+  const params = useParams();
+  const lang = (params.lang as Locale) || "es";
+  const isSpanish = lang === "es";
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -43,7 +48,7 @@ export const MagicBackButton = React.forwardRef<
       {...props}
     >
       <ChevronLeft className="w-4 h-4" />
-      Volver
+      {isSpanish ? "Volver" : "Back"}
     </Button>
   );
 });

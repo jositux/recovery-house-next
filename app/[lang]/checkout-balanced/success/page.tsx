@@ -12,9 +12,10 @@ import {
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo } from "react"; // Importamos useMemo
+import { useRouter, useSearchParams, useParams } from "next/navigation"; // Importamos useParams
 import { createBookingBalanced } from "@/services/BookingBalancedService";
+import { type Locale } from "@/lib/i18n" // Asumiendo que esta es la ruta correcta para tu tipo Locale
 
 interface BookingBalanced {
   bookingId: string,
@@ -24,9 +25,31 @@ interface BookingBalanced {
   paymentType: string
 }
 
+// --- Objeto de Traducción ---
+const translations = {
+  es: {
+    title: "¡Te esperamos para tu estadía!",
+    message: "Se ha procesado el pago de lo pendiente. Tu reserva está confirmada y lista para que disfrutes de una experiencia inolvidable.",
+    status: "Pago pendiente realizado",
+    viewBookings: "Ver tus reservas",
+    exploreRooms: "Explorar más alojamientos",
+  },
+  en: {
+    title: "We look forward to your stay!",
+    message: "The pending payment has been processed. Your booking is confirmed and ready for you to enjoy an unforgettable experience.",
+    status: "Pending payment completed",
+    viewBookings: "View Your Bookings",
+    exploreRooms: "Explore More Accommodations",
+  },
+};
+
 const SuccessPageContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const params = useParams();
+  
+  const lang = (params.lang as Locale) || 'es'; // Obtener lang del URL, por defecto 'es'
+  const t = useMemo(() => translations[lang], [lang]); 
 
   useEffect(() => {
     const sendBookingBalanced = async () => {
@@ -36,13 +59,11 @@ const SuccessPageContent = () => {
         return;
       }
 
-      const bookingRaw = localStorage.getItem("bookingBalanced")!;
-      const parsedBookingBalanced: BookingBalanced = JSON.parse(bookingRaw) as BookingBalanced;
-
-
+      const bookingRaw = localStorage.getItem("bookingBalanced");
       if (!bookingRaw) return;
 
       try {
+        const parsedBookingBalanced: BookingBalanced = JSON.parse(bookingRaw) as BookingBalanced;
         const paymentId = searchParams.get("rel");
 
         const data: BookingBalanced = {
@@ -54,8 +75,8 @@ const SuccessPageContent = () => {
         };
 
         await createBookingBalanced(data, accessToken);
-        localStorage.removeItem("bookingBalanced"); // Fixed: should be "bookingData" not "booking"
-        localStorage.removeItem("booking");
+        localStorage.removeItem("bookingBalanced");
+        localStorage.removeItem("booking"); // Mantener para limpieza, aunque no relacionado directamente con 'bookingBalanced'
       } catch (error) {
         console.error("Error al enviar la reserva:", error);
       }
@@ -81,27 +102,27 @@ const SuccessPageContent = () => {
               <CheckCircle className="h-20 w-20 mx-auto mb-4" />
             </motion.div>
             <CardTitle className="text-center text-2xl font-bold">
-              ¡Te esperamos para tu estadía!
+              {t.title} {/* <-- TRADUCIDO */}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6">
             <p className="text-center text-gray-600 mb-6">
-              Se ha procesado el pago de lo pendiente. Tu reserva está confirmada
-              y lista para que disfrutes de una experiencia inolvidable.
+              {t.message} {/* <-- TRADUCIDO */}
             </p>
             <div className="flex justify-center space-x-4 mb-6">
               <div className="text-center">
                 <Calendar className="h-8 w-8 mx-auto text-blue-500 mb-2" />
-                <p className="text-sm text-gray-600">Pago pendiente realizado</p>
+                <p className="text-sm text-gray-600">
+                  {t.status} {/* <-- TRADUCIDO */}
+                </p>
               </div>
-              
             </div>
           </CardContent>
           <CardFooter className="bg-gray-50 p-6">
             <div className="w-full space-y-3">
               <Link href="/mi-panel/reservas-realizadas" passHref className="block w-full">
                 <Button className="w-full bg-[#39759E] hover:bg-blue-600 text-white transition duration-300">
-                  Ver tus reservas
+                  {t.viewBookings} {/* <-- TRADUCIDO */}
                 </Button>
               </Link>
               <Link href="/rooms" passHref className="block w-full">
@@ -109,7 +130,7 @@ const SuccessPageContent = () => {
                   variant="outline"
                   className="w-full border-blue-500 text-blue-500 hover:bg-blue-50 transition duration-300 bg-transparent"
                 >
-                  Explorar más alojamientos
+                  {t.exploreRooms} {/* <-- TRADUCIDO */}
                 </Button>
               </Link>
             </div>
@@ -120,30 +141,31 @@ const SuccessPageContent = () => {
   );
 };
 
+// ... (LoadingFallback y SuccessPage se mantienen sin cambios ya que no contienen texto estático a traducir)
 const LoadingFallback = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-    <Card className="w-full max-w-md mx-auto overflow-hidden shadow-lg">
-      <CardHeader className="bg-gradient-to-r from-[#39759E] to-blue-500 text-white p-6">
-        <div className="h-20 w-20 mx-auto mb-4 bg-white/20 rounded-full animate-pulse" />
-        <div className="h-8 bg-white/20 rounded animate-pulse" />
-      </CardHeader>
-      <CardContent className="p-6">
-        <div className="space-y-4">
-          <div className="h-4 bg-gray-200 rounded animate-pulse" />
-          <div className="h-4 bg-gray-200 rounded animate-pulse" />
-          <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4" />
-        </div>
-      </CardContent>
-    </Card>
-  </div>
-);
-
-const SuccessPage = () => {
-  return (
-    <Suspense fallback={<LoadingFallback />}>
-      <SuccessPageContent />
-    </Suspense>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+      <Card className="w-full max-w-md mx-auto overflow-hidden shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-[#39759E] to-blue-500 text-white p-6">
+          <div className="h-20 w-20 mx-auto mb-4 bg-white/20 rounded-full animate-pulse" />
+          <div className="h-8 bg-white/20 rounded animate-pulse" />
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="space-y-4">
+            <div className="h-4 bg-gray-200 rounded animate-pulse" />
+            <div className="h-4 bg-gray-200 rounded animate-pulse" />
+            <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4" />
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
-};
-
-export default SuccessPage;
+  
+  const SuccessPage = () => {
+    return (
+      <Suspense fallback={<LoadingFallback />}>
+        <SuccessPageContent />
+      </Suspense>
+    );
+  };
+  
+  export default SuccessPage;

@@ -20,19 +20,119 @@ const fraunces = Fraunces({ subsets: ["latin"] })
 
 import { Building2, Home, Save, X } from 'lucide-react'
 
-import { MultiSelectCase } from "@/components/MultiSelectCase"
+import { MultiSelectCase } from "@/components/MultiSelectCase2"
 
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 
 import { formSchema, type FormValues, type FileData, type Property } from "../types"
 
 import GoogleMapsSelector, { type LocationDetails } from "@/components/google-maps-selector"
+
+import { type Locale } from "@/lib/i18n" 
+
+const translations = {
+  es: {
+    title: "Editar Propiedad",
+    loading: "Cargando datos de la propiedad...",
+    error: "Error al cargar la propiedad",
+    
+    legalDocs: "Documentos Legales",
+    location: "Ubicación",
+    guestInfo: "Información para el huésped",
+    propType: "Tipo de Propiedad",
+
+    taxIdEinNumber: "Número de Impuestos Tax ID/EIN",
+    taxIdEinPlaceholder: "Tax ID/EIN",
+    rntFile: "Archivo RNT",
+    taxFile: "Archivo de Impuestos TAX ID",
+    propName: "Nombre de la propiedad",
+    propNamePlaceholder: "Nombre de la propiedad",
+    propPhoto: "Foto de la Propiedad",
+    description: "Describe tu propiedad",
+    descriptionPlaceholder: "Describe las características de la propiedad",
+    specializations: "Tratamientos en que se especializa",
+    postalCode: "Código Postal",
+    fullAddress: "Dirección Legal",
+    fullAddressPlaceholder: "Dirección completa",
+    address: "Dirección",
+    latitude: "Latitud",
+    longitude: "Longitud",
+    hostName: "Nombre del anfitrión",
+    hostNamePlaceholder: "Nombre del anfitrión",
+    usefulInfo: "Información Util",
+    usefulInfoPlaceholder: "Escribe un mensaje de bienvenida o instrucciones para tus huéspedes",
+    
+    stay: "Estancia",
+    stayDesc: "Alojamiento para estancias cortas",
+    recoveryHouse: "Casa de Recuperación",
+    recoveryHouseDesc: "Alojamiento para recuperación post-operatoria",
+    
+    cancel: "CANCELAR",
+    save: "GUARDAR",
+    saving: "GUARDANDO...",
+    
+    rntRequired: "El archivo RNT es obligatorio",
+    taxRequired: "El archivo TAX ID es obligatorio",
+    imageRequired: "La imagen principal es obligatoria",
+    noToken: "No access token found",
+  },
+  en: {
+    title: "Edit Property",
+    loading: "Loading property data...",
+    error: "Error loading property",
+    
+    legalDocs: "Legal Documents",
+    location: "Location",
+    guestInfo: "Guest Information",
+    propType: "Property Type",
+
+    taxIdEinNumber: "Tax ID/EIN Number",
+    taxIdEinPlaceholder: "Tax ID/EIN",
+    rntFile: "RNT File",
+    taxFile: "TAX ID File",
+    propName: "Property Name",
+    propNamePlaceholder: "Property name",
+    propPhoto: "Property Photo",
+    description: "Describe your property",
+    descriptionPlaceholder: "Describe the characteristics of the property",
+    specializations: "Specialized Treatments",
+    postalCode: "Postal Code",
+    fullAddress: "Legal Address",
+    fullAddressPlaceholder: "Full address",
+    address: "Address",
+    latitude: "Latitude",
+    longitude: "Longitude",
+    hostName: "Host Name",
+    hostNamePlaceholder: "Host name",
+    usefulInfo: "Useful Information",
+    usefulInfoPlaceholder: "Write a welcome message or instructions for your guests",
+
+    stay: "Stay",
+    stayDesc: "Accommodation for short stays",
+    recoveryHouse: "Recovery House",
+    recoveryHouseDesc: "Accommodation for post-operative recovery",
+    
+    cancel: "CANCEL",
+    save: "SAVE",
+    saving: "SAVING...",
+    
+    rntRequired: "The RNT file is mandatory",
+    taxRequired: "The TAX ID file is mandatory",
+    imageRequired: "The main image is mandatory",
+    noToken: "No access token found",
+  },
+}
+
 
 export default function EditPropertyPage({
   params,
 }: {
   params: Promise<{ id: string }>
 }) {
+  const urlParams = useParams();
+  const lang = (urlParams.lang as Locale) || 'es';
+  
+  const t = translations[lang as keyof typeof translations] || translations.es
 
   const handleLocationSelected = (details: LocationDetails) => {
     console.log("Detalles de la ubicación seleccionada:", details)
@@ -175,11 +275,11 @@ export default function EditPropertyPage({
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al cargar la propiedad")
+      setError(err instanceof Error ? err.message : t.error)
     } finally {
       setLoading(false)
     }
-  }, [paramId])
+  }, [paramId, form, t.error])
 
   useEffect(() => {
     if (paramId) {
@@ -196,21 +296,21 @@ export default function EditPropertyPage({
     if (!isRntValid) {
       form.setError("RNTFile", {
         type: "manual",
-        message: "El archivo RNT es obligatorio",
+        message: t.rntRequired,
       })
     }
 
     if (!isTaxValid) {
       form.setError("taxIdEINFile", {
         type: "manual",
-        message: "El archivo TAX ID es obligatorio",
+        message: t.taxRequired,
       })
     }
 
     if (!currentImageId && !newImageFile) {
       form.setError("mainImage", {
         type: "manual",
-        message: "La imagen principal es obligatoria",
+        message: t.imageRequired,
       })
       return
     }
@@ -224,12 +324,11 @@ export default function EditPropertyPage({
     try {
       const accessToken = localStorage.getItem("access_token")
       if (!accessToken) {
-        throw new Error("No access token found")
+        throw new Error(t.noToken)
       }
 
       let finalImageId = values.mainImage
 
-      // Delete marked image if exists
       if (imageToDelete && accessToken) {
         try {
           await deleteFileService(imageToDelete, accessToken)
@@ -239,7 +338,6 @@ export default function EditPropertyPage({
         }
       }
 
-      // Upload new image if exists
       if (newImageFile && accessToken) {
         try {
           const uploadedId = await uploadFile(newImageFile)
@@ -254,7 +352,6 @@ export default function EditPropertyPage({
       let finalRntId = rntFileRef.current?.getCurrentFileId() || ""
       let finalTaxId = taxFileRef.current?.getCurrentFileId() || ""
 
-      // Eliminar archivos marcados para eliminación
       if (rntFileToDelete && accessToken) {
         try {
           await deleteFileService(rntFileToDelete, accessToken)
@@ -273,7 +370,6 @@ export default function EditPropertyPage({
         }
       }
 
-      // Subir nuevos archivos si existen
       if (newRntFile) {
         try {
           const uploadedRnt = await uploadFile(newRntFile)
@@ -337,13 +433,12 @@ export default function EditPropertyPage({
       form.setValue("mainImage", "")
       form.setError("mainImage", {
         type: "manual",
-        message: "La imagen principal es obligatoria",
+        message: t.imageRequired,
       })
     }
 
     setNewImageFile(data.newFile)
 
-    // Update form validation
     if (data.newFile || (data.existingImageId && !data.markedForDeletion)) {
       form.setValue("mainImage", data.existingImageId || "pending")
       form.clearErrors("mainImage")
@@ -353,7 +448,7 @@ export default function EditPropertyPage({
   if (loading) {
     return  <div className="flex items-center justify-center h-64">
     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500"></div>
-    <p className="text-center p-4">Cargando datos de la propiedad...</p>
+    <p className="text-center p-4">{t.loading}</p>
   </div>    
   }
 
@@ -364,19 +459,19 @@ export default function EditPropertyPage({
   return (
     <div className="min-h-screen bg-[#F8F8F7]">
       <div className="container mx-auto max-w-2xl py-4">
-        <h1 className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}>Editar Propiedad</h1>
+        <h1 className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}>{t.title}</h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="space-y-4 p-4 bg-white rounded-xl">
-              <h2 className="text-lg">Documentos Legales</h2>
+              <h2 className="text-lg">{t.legalDocs}</h2>
               <FormField
                 control={form.control}
                 name="taxIdEIN"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Número de Impuestos Tax ID/EIN</FormLabel>
+                    <FormLabel>{t.taxIdEinNumber}</FormLabel>
                     <FormControl>
-                      <Input type="text" placeholder="Tax ID/EIN" {...field} />
+                      <Input type="text" placeholder={t.taxIdEinPlaceholder} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -392,7 +487,7 @@ export default function EditPropertyPage({
                       <FormControl>
                         <FileUpload
                           ref={rntFileRef}
-                          label="Archivo RNT"
+                          label={t.rntFile}
                           defaultFile={RNTFileData}
                           onChange={(file, fileIdToDelete) => {
                             setNewRntFile(file)
@@ -419,7 +514,7 @@ export default function EditPropertyPage({
                       <FormControl>
                         <FileUpload
                           ref={taxFileRef}
-                          label="Archivo de Impuestos TAX ID"
+                          label={t.taxFile}
                           defaultFile={TaxFileData}
                           onChange={(file, fileIdToDelete) => {
                             setNewTaxFile(file)
@@ -447,9 +542,9 @@ export default function EditPropertyPage({
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nombre de la propiedad</FormLabel>
+                    <FormLabel>{t.propName}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nombre de la propiedad" {...field} />
+                      <Input placeholder={t.propNamePlaceholder} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -461,7 +556,7 @@ export default function EditPropertyPage({
                 name="mainImage"
                 render={() => (
                   <FormItem>
-                    <FormLabel>Foto de la Propiedad</FormLabel>
+                    <FormLabel>{t.propPhoto}</FormLabel>
                     <FormControl>
                       <SingleImageUploaderWithId
                         existingImageId={currentImageId}
@@ -479,11 +574,11 @@ export default function EditPropertyPage({
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Describe tu propiedad</FormLabel>
+                    <FormLabel>{t.description}</FormLabel>
                     <FormControl>
                       <Textarea
                         className="h-full min-h-[100px]"
-                        placeholder="Describe las características de la propiedad"
+                        placeholder={t.descriptionPlaceholder}
                         {...field}
                       />
                     </FormControl>
@@ -499,9 +594,9 @@ export default function EditPropertyPage({
                 name="patology"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tratamientos en que se especializa</FormLabel>
+                    <FormLabel>{t.specializations}</FormLabel>
                     <FormControl>
-                      <MultiSelectCase value={field.value} onChange={field.onChange} />
+                      <MultiSelectCase value={field.value} onChange={field.onChange} lang={lang} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -510,7 +605,7 @@ export default function EditPropertyPage({
             </div>
 
             <div className="space-y-4 p-4 bg-white rounded-xl">
-              <h2 className="text-lg">Ubicación</h2>
+              <h2 className="text-lg">{t.location}</h2>
               {property && (
                 <LocationSelector
                   defaultCountry={property.country}
@@ -526,6 +621,7 @@ export default function EditPropertyPage({
                     state: form.formState.errors.state?.message,
                     city: form.formState.errors.city?.message,
                   }}
+                  lang={lang}
                 />
               )}
               <div className="hidden">
@@ -534,9 +630,9 @@ export default function EditPropertyPage({
                   name="postalCode"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Código Postal</FormLabel>
+                      <FormLabel>{t.postalCode}</FormLabel>
                       <FormControl>
-                        <Input placeholder="Código Postal" {...field} />
+                        <Input placeholder={t.postalCode} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -549,16 +645,16 @@ export default function EditPropertyPage({
                 name="fullAddress"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Dirección Legal</FormLabel>
+                    <FormLabel>{t.fullAddress}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Dirección completa" {...field} />
+                      <Input placeholder={t.fullAddressPlaceholder} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <GoogleMapsSelector onLocationSelected={handleLocationSelected} defaultLocation={defaultLocation} />
+              <GoogleMapsSelector onLocationSelected={handleLocationSelected} defaultLocation={defaultLocation} lang={lang} />
 
               <div className="hidden">
                 <FormField
@@ -566,9 +662,9 @@ export default function EditPropertyPage({
                   name="address"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Dirección</FormLabel>
+                      <FormLabel>{t.address}</FormLabel>
                       <FormControl>
-                        <Input placeholder="Dirección completa" {...field} />
+                        <Input placeholder={t.fullAddressPlaceholder} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -582,12 +678,12 @@ export default function EditPropertyPage({
                   name="latitude"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Latitud</FormLabel>
+                      <FormLabel>{t.latitude}</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
                           step="any"
-                          placeholder="Latitud"
+                          placeholder={t.latitude}
                           {...field}
                           onChange={(e) => field.onChange(e.target.value ? Number.parseFloat(e.target.value) : null)}
                           value={field.value ?? ""}
@@ -603,12 +699,12 @@ export default function EditPropertyPage({
                   name="longitude"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Longitud</FormLabel>
+                      <FormLabel>{t.longitude}</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
                           step="any"
-                          placeholder="Longitud"
+                          placeholder={t.longitude}
                           {...field}
                           onChange={(e) => field.onChange(e.target.value ? Number.parseFloat(e.target.value) : null)}
                           value={field.value ?? ""}
@@ -627,21 +723,21 @@ export default function EditPropertyPage({
                 name="type"
                 render={({ field }) => (
                   <FormItem className="space-y-3">
-                    <FormLabel className="text-lg">Tipo de Propiedad</FormLabel>
+                    <FormLabel className="text-lg">{t.propType}</FormLabel>
                     <FormControl>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <UserTypeCard
                           icon={Home}
-                          title="Estancia"
-                          description="Alojamiento para estancias cortas"
+                          title={t.stay}
+                          description={t.stayDesc}
                           selected={field.value === "Stay"}
                           onClick={() => field.onChange("Stay")}
                           aria-label="Select Stay as property type"
                         />
                         <UserTypeCard
                           icon={Building2}
-                          title="Casa de Recuperación"
-                          description="Alojamiento para recuperación post-operatoria"
+                          title={t.recoveryHouse}
+                          description={t.recoveryHouseDesc}
                           selected={field.value === "RecoveryHouse"}
                           onClick={() => field.onChange("RecoveryHouse")}
                           aria-label="Select Recovery as property type"
@@ -655,17 +751,17 @@ export default function EditPropertyPage({
             </div>
 
             <div className="space-y-4 p-4 bg-white rounded-xl">
-              <h2 className="text-lg">Información para el huésped</h2>
+              <h2 className="text-lg">{t.guestInfo}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="hostName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nombre del anfitrión</FormLabel>
+                      <FormLabel>{t.hostName}</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <Input placeholder="Nombre del anfitrión" {...field} />
+                          <Input placeholder={t.hostNamePlaceholder} {...field} />
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -678,11 +774,11 @@ export default function EditPropertyPage({
                   name="guestComments"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Información Util</FormLabel>
+                      <FormLabel>{t.usefulInfo}</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Textarea
-                            placeholder="Escribe un mensaje de bienvenida o instrucciones para tus huéspedes"
+                            placeholder={t.usefulInfoPlaceholder}
                             {...field}
                             className="h-full min-h-[100px]"
                           />
@@ -692,8 +788,8 @@ export default function EditPropertyPage({
                     </FormItem>
                   )}
                 />
-              </div>
-            </div>
+              </div> {/* Cierre correcto del div grid */}
+            </div> {/* Cierre correcto del div space-y-4 p-4 bg-white rounded-xl */}
 
             <div className="flex gap-3">
               <Button
@@ -703,7 +799,7 @@ export default function EditPropertyPage({
                 onClick={handleCancel}
               >
                 <X />
-                CANCELAR
+                {t.cancel}
               </Button>
               <Button
                 type="submit"
@@ -713,12 +809,12 @@ export default function EditPropertyPage({
                 {isSubmitting ? (
                   <>
                     <Save className="animate-spin" />
-                    GUARDANDO...
+                    {t.saving}
                   </>
                 ) : (
                   <>
                     <Save />
-                    GUARDAR
+                    {t.save}
                   </>
                 )}
               </Button>
@@ -729,10 +825,8 @@ export default function EditPropertyPage({
                 {Object.entries(form.formState.errors).map(
                   ([fieldName, error]) => (
                     <div key={fieldName}>
-                      {/* Mensaje principal */}
                       <p className="text-red-500 text-sm">{error?.message}</p>
 
-                      {/* Mensajes adicionales (si existen múltiples) */}
                       {error?.types &&
                         Object.values(error.types).map(
                           (msg, i) => (

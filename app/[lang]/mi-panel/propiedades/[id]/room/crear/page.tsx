@@ -7,6 +7,9 @@ import { uploadFile } from "@/services/fileUploadService"
 import { Fraunces } from "next/font/google"
 import { usePathname, useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
+// Definición simple de tipos de idioma para referencia 
+import { type Locale } from "@/lib/i18n"
+import { useParams } from "next/navigation";
 
 const fraunces = Fraunces({ subsets: ["latin"] })
 
@@ -43,14 +46,38 @@ export default function RoomPage() {
   const [isUploading, setIsUploading] = useState(false)
   const { toast } = useToast()
 
+
+  // Función para obtener el ID de forma robusta
+  const getPropertyIdFromPath = (path: string): string => {
+    // 1. Dividir la ruta y filtrar los segmentos vacíos
+    //    '/es/mi-panel/propiedades/ID/room/crear' -> ['es', 'mi-panel', 'propiedades', 'ID', 'room', 'crear']
+    const segments = path.split('/').filter(segment => segment.length > 0);
+    
+    // 2. Buscar el índice de la palabra clave 'propiedades'
+    const propertiesIndex = segments.indexOf('propiedades');
+    
+    // 3. Verificar si se encontró 'propiedades' y si hay un segmento que lo sigue (el ID)
+    if (propertiesIndex !== -1 && segments.length > propertiesIndex + 1) {
+      // El ID de la propiedad es el segmento que sigue inmediatamente a 'propiedades'
+      return segments[propertiesIndex + 1];
+    }
+    
+    // 4. Fallback si no se encuentra
+    return "demo-property-id";
+  };
+
+
   const pathname = usePathname()
-  const pathSegments = pathname.split("/")
-  const propertyId = pathSegments[3] || "demo-property-id"
+  const propertyId = getPropertyIdFromPath(pathname);
+
+
+  const params = useParams();
+  const lang = (params.lang as Locale) || 'es'; // Por defecto 'es'
+  const isSpanish = lang === "es";
 
   const router = useRouter()
 
   const handleFormSubmit = async (data: RoomFormData) => {
-    console.log("Form data received:", data)
 
     if (data.imageFiles && data.imageFiles.length > 0) {
       setIsUploading(true)
@@ -132,7 +159,7 @@ export default function RoomPage() {
   return (
     <div className="min-h-screen bg-[#F8F8F7]">
       <div className="container mx-auto max-w-2xl py-4">
-        <h1 className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}>Agregar Habitación / Cama</h1>
+        <h1 className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}>{isSpanish ? "Agregar Habitación / Cama": "Add Room / Bed"}</h1>
         <div className="grid gap-6 md:grid-cols-1">
           <div>
             <RoomForm onSubmit={handleFormSubmit} initialValues={initialValues} isUploading={isUploading} />

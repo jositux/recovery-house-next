@@ -39,94 +39,110 @@ import RoomTypeSelector from "../components/room-type-selector"
 import { CheckinCheckoutSection } from "../components/checkin-checkout-section"
 import { BudgetFlexibleDiscounts } from "../components/budget-flexible-discounts"
 
-import { CancellationPolicyDialogContent } from "../components/cancellation-policy-dialog-content"
-import { ModificationPolicyDialogContent } from "../components/modification-policy-dialog-content"
+import { CancellationPolicyDialogContent } from "@/components/popups/cancellation-policy-dialog-content"
+import { ModificationPolicyDialogContent } from "@/components/popups/modification-policy-dialog-content"
+
+// Definición simple de tipos de idioma para referencia 
+import { type Locale } from "@/lib/i18n"
+import { useParams } from "next/navigation";
 
 // Function to pluralize words in Spanish
 export const pluralize = (quantity: number, singular: string, plural: string) => {
   return quantity === 1 ? `${quantity} ${singular}` : `${quantity} ${plural}`
 }
 
-export const formSchema = z
-  .object({
-    id: z.string(),
-    propertyId: z.string(),
-    name: z.string().min(1, { message: "El nombre es requerido" }),
-    roomNumber: z.string().min(1, { message: "El número de habitación es requerido" }),
-    description: z.string().min(1, { message: "La descripción es requerida" }),
+// === FUNCIÓN PARA CREAR EL ESQUEMA DINÁMICO ===
+const createFormSchema = (isSpanish: boolean) => {
+  const nameRequired = isSpanish ? "El nombre es requerido" : "Name Required";
+  const roomNumberRequired = isSpanish ? "El número de habitación es requerido" : "Room number required";
+  const descriptionRequired = isSpanish ? "La descripción es requerida" : "Description required";
+  const quantityRequired = isSpanish ? "Debe seleccionar cantidad" : "Must select quantity";
+  const max99Beds = isSpanish ? "Máximo 99 camas" : "Maximum 99 beds";
+  const max99Capacity = isSpanish ? "Capacidad máxima 99" : "Maximum capacity 99";
+  const checkinRequired = isSpanish ? "Seleccione horario de check-in" : "Select check-in time";
+  const checkoutRequired = isSpanish ? "Seleccione horario de check-out" : "Select check-out time";
+  const photoRequired = isSpanish ? "Suba al menos 1 foto" : "Upload at least 1 photo";
+  const extraTagRequired = isSpanish ? "Elija al menos un servicio adicional" : "Choose at least one extra service";
+  const serviceTagRequired = isSpanish ? "Elija al menos un servicio básico" : "Choose at least one basic service";
+  const priceRefineError = isSpanish ? "Los precios por noche deben ser mayores que 0" : "Prices per night must be greater than 0";
 
-    // Room type fields from previous component
-    isPrivate: z.boolean(),
+  return z
+    .object({
+      id: z.string(),
+      propertyId: z.string(),
+      name: z.string().min(1, { message: nameRequired }),
+      roomNumber: z.string().min(1, { message: roomNumberRequired }),
+      description: z.string().min(1, { message: descriptionRequired }),
 
-    // Beds configuration
-    singleBeds: z.coerce
-      .number()
-      .min(0, { message: "Debe seleccionar cantidad" })
-      .transform((val) => (isNaN(val) ? 0 : val)),
-    doubleBeds: z.coerce
-      .number()
-      .min(0, { message: "Debe seleccionar cantidad" })
-      .transform((val) => (isNaN(val) ? 0 : val)),
+      isPrivate: z.boolean(),
 
-    // Total beds and capacity - Modificado para aceptar 0 sin mostrar error
-    beds: z.coerce
-      .number()
-      .min(0)
-      .max(99, { message: "Máximo 99 camas" })
-      .transform((val) => (isNaN(val) ? 0 : val)),
+      singleBeds: z.coerce
+        .number()
+        .min(0, { message: quantityRequired })
+        .transform((val) => (isNaN(val) ? 0 : val)),
+      doubleBeds: z.coerce
+        .number()
+        .min(0, { message: quantityRequired })
+        .transform((val) => (isNaN(val) ? 0 : val)),
 
-    capacity: z.coerce
-      .number()
-      .min(0)
-      .max(99, { message: "Capacidad máxima 99" })
-      .transform((val) => (isNaN(val) ? 1 : val)),
+      beds: z.coerce
+        .number()
+        .min(0)
+        .max(99, { message: max99Beds })
+        .transform((val) => (isNaN(val) ? 0 : val)),
 
-    // Pricing for PRIVATE room - CAMPOS COMPLETAMENTE INDEPENDIENTES
-    privateRoomPrice: z.coerce.number().transform((val) => (isNaN(val) ? 0 : val)),
-    privateRoomCleaning: z.coerce.number().transform((val) => (isNaN(val) ? 0 : val)),
+      capacity: z.coerce
+        .number()
+        .min(0)
+        .max(99, { message: max99Capacity })
+        .transform((val) => (isNaN(val) ? 1 : val)),
 
-    // Pricing for SHARED room - CAMPOS COMPLETAMENTE INDEPENDIENTES
-    sharedRoomPrice: z.coerce.number().transform((val) => (isNaN(val) ? 0 : val)),
-    sharedRoomCleaning: z.coerce.number().transform((val) => (isNaN(val) ? 0 : val)),
+      privateRoomPrice: z.coerce.number().transform((val) => (isNaN(val) ? 0 : val)),
+      privateRoomCleaning: z.coerce.number().transform((val) => (isNaN(val) ? 0 : val)),
 
-    bedType: z.string(),
-    bedName: z.string(),
+      sharedRoomPrice: z.coerce.number().transform((val) => (isNaN(val) ? 0 : val)),
+      sharedRoomCleaning: z.coerce.number().transform((val) => (isNaN(val) ? 0 : val)),
 
-    // Check-in/Check-out times - NEW FIELDS
-    checkinTime: z.string().min(1, { message: "Seleccione horario de check-in" }),
-    checkoutTime: z.string().min(1, { message: "Seleccione horario de check-out" }),
+      bedType: z.string(),
+      bedName: z.string(),
 
-    // Discount fields
-    shortStayDiscount: z.string().default("0"),
-    mediumStayDiscount: z.string().default("0"),
-    longStayDiscount: z.string().default("0"),
+      checkinTime: z.string().min(1, { message: checkinRequired }),
+      checkoutTime: z.string().min(1, { message: checkoutRequired }),
 
-    // Other fields
-    photos: z.array(z.string()).min(1, { message: "Suba al menos 1 foto" }),
-    extraTags: z.array(z.string()).min(1, { message: "Elija al menos un servicio adicional" }),
-    servicesTags: z.array(z.string()).min(1, { message: "Elija al menos un servicio básico" }),
-    descriptionService: z.string(),
-  })
-  .refine(
-    (data) => {
-      // Si no hay camas, no validamos precios
-      if (data.singleBeds === 0 && data.doubleBeds === 0) {
+      shortStayDiscount: z.string().default("0"),
+      mediumStayDiscount: z.string().default("0"),
+      longStayDiscount: z.string().default("0"),
+
+      photos: z.array(z.string()).min(1, { message: photoRequired }),
+      extraTags: z.array(z.string()).min(1, { message: extraTagRequired }),
+      servicesTags: z.array(z.string()).min(1, { message: serviceTagRequired }),
+      descriptionService: z.string(),
+    })
+    .refine(
+      (data) => {
+        // La validación interna de precios se mueve a handleSubmit
+        if (data.singleBeds === 0 && data.doubleBeds === 0) {
+          return true
+        }
         return true
-      }
+      },
+      {
+        message: priceRefineError,
+        path: ["pricePerNight"],
+      },
+    )
+}
 
-      return true
-    },
-    {
-      message: "Los precios por noche deben ser mayores que 0",
-      path: ["pricePerNight"], // Este campo mostrará el error
-    },
-  )
+// === INFERENCIA DE TIPO PARA FormData ===
+// Inferir el tipo de datos que se enviará del esquema dinámico
+type FormData = z.infer<
+  ReturnType<typeof createFormSchema>
+>;
 
-type FormData = z.infer<typeof formSchema>
-
+// El tipo FormData se usa aquí para tipar correctamente las props
 interface RoomFormProps {
-  onSubmit: (data: FormData) => void
-  initialValues?: Partial<FormData>
+  onSubmit: (data: FormData) => void // ✅ 'any' reemplazado por 'FormData'
+  initialValues?: Partial<FormData> // ✅ Uso de FormData
   onImagesChange?: (files: File[], existingIds: string[], markedForDeletion: string[]) => void
 }
 
@@ -144,6 +160,17 @@ interface DiscountData {
 
 export default function RoomForm({ onSubmit, initialValues, onImagesChange }: RoomFormProps) {
   const { toast } = useToast()
+  
+  const params = useParams();
+  const lang = (params.lang as Locale) || 'es'; // Por defecto 'es'
+  const isSpanish = lang === "es";
+
+  // 1. Crear el esquema de forma dinámica basado en el idioma
+  const formSchema = createFormSchema(isSpanish);
+  
+  // 2. FormData ya está tipado arriba
+  // type FormData = z.infer<typeof formSchema>; // NO NECESARIO AQUÍ
+
 
   // State for check-in/check-out times
   const [checkinTime, setCheckinTime] = useState(initialValues?.checkinTime || "15:00")
@@ -196,6 +223,7 @@ export default function RoomForm({ onSubmit, initialValues, onImagesChange }: Ro
     loadData()
   }, [])
 
+  // 3. Pasar el esquema dinámico a useForm
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -276,7 +304,6 @@ export default function RoomForm({ onSubmit, initialValues, onImagesChange }: Ro
     form.setValue("beds", totalBeds)
 
     // Also update capacity based on beds
-    // Assuming 1 person per single bed and 2 per double bed
     const estimatedCapacity = singleBeds + doubleBeds * 2
     form.setValue("capacity", estimatedCapacity)
 
@@ -293,7 +320,7 @@ export default function RoomForm({ onSubmit, initialValues, onImagesChange }: Ro
       form.clearErrors("singleBeds")
       form.clearErrors("doubleBeds")
     }
-  }, [singleBeds, doubleBeds, form])
+  }, [singleBeds, doubleBeds, form, isPrivate])
 
   // Modificar la validación en el handleSubmit para manejar correctamente los precios según el tipo de habitación
   async function handleSubmit(values: FormData) {
@@ -312,16 +339,13 @@ export default function RoomForm({ onSubmit, initialValues, onImagesChange }: Ro
         sharedRoomCleaning: Number(values.sharedRoomCleaning) || 0,
       }
 
-      // Validación adicional según el tipo de habitación
-
-      // Validación de precios según el tipo de habitación
       // Validación de precios SOLO para el tipo activo
       if (processedValues.isPrivate) {
         // Validación SOLO para habitación privada
         if (processedValues.privateRoomPrice <= 0) {
           form.setError("privateRoomPrice", {
             type: "manual",
-            message: "El precio por noche debe ser mayor que 0",
+            message: isSpanish ? "El precio por noche debe ser mayor que 0" : "Price per night must be greater than 0",
           })
           document.getElementById("privateRoomPrice")?.focus()
           return
@@ -330,8 +354,8 @@ export default function RoomForm({ onSubmit, initialValues, onImagesChange }: Ro
         // Validar que haya al menos una cama
         if (processedValues.singleBeds === 0 && processedValues.doubleBeds === 0) {
           toast({
-            title: "Error de validación",
-            description: "Debe seleccionar al menos una cama",
+            title: isSpanish ? "Error de validación" : "Validation Error",
+            description: isSpanish ? "Debe seleccionar al menos una cama" : "You must select at least one bed",
             variant: "destructive",
           })
           return
@@ -340,7 +364,7 @@ export default function RoomForm({ onSubmit, initialValues, onImagesChange }: Ro
         if (processedValues.privateRoomCleaning < 0) {
           form.setError("privateRoomCleaning", {
             type: "manual",
-            message: "La tarifa de limpieza no puede ser negativa",
+            message: isSpanish ? "La tarifa de limpieza no puede ser negativa" : "Cleaning fee cannot be negative",
           })
           document.getElementById("privateRoomCleaning")?.focus()
           return
@@ -350,7 +374,7 @@ export default function RoomForm({ onSubmit, initialValues, onImagesChange }: Ro
         if (processedValues.sharedRoomPrice <= 0) {
           form.setError("sharedRoomPrice", {
             type: "manual",
-            message: "El precio por noche por cama debe ser mayor que 0",
+            message: isSpanish ? "El precio por noche por cama debe ser mayor que 0" : "Price per night per bed must be greater than 0",
           })
           document.getElementById("sharedRoomPrice")?.focus()
           return
@@ -359,7 +383,7 @@ export default function RoomForm({ onSubmit, initialValues, onImagesChange }: Ro
         if (processedValues.sharedRoomCleaning < 0) {
           form.setError("sharedRoomCleaning", {
             type: "manual",
-            message: "La tarifa de limpieza por cama no puede ser negativa",
+            message: isSpanish ? "La tarifa de limpieza por cama no puede ser negativa" : "Cleaning fee per bed cannot be negative",
           })
           document.getElementById("sharedRoomCleaning")?.focus()
           return
@@ -368,15 +392,15 @@ export default function RoomForm({ onSubmit, initialValues, onImagesChange }: Ro
 
       await onSubmit(processedValues)
       toast({
-        title: "¡Felicidades!",
-        description: "La habitación ha sido guardada",
+        title: isSpanish ? "¡Felicidades!" : "Success!",
+        description: isSpanish ? "La habitación ha sido guardada" : "The room has been saved",
         variant: "default",
       })
     } catch (error) {
       console.log(error)
       toast({
-        title: "Error",
-        description: "Por favor revise todos los datos",
+        title: isSpanish ? "Error" : "Error",
+        description: isSpanish ? "Por favor revise todos los datos" : "Please check all data",
         variant: "destructive",
       })
     }
@@ -392,9 +416,9 @@ export default function RoomForm({ onSubmit, initialValues, onImagesChange }: Ro
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nombre del alojamiento</FormLabel>
+                  <FormLabel>{isSpanish ? "Nombre del alojamiento" : "Accommodation Name"}</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ej. Habitación con Vista al Lago" {...field} />
+                    <Input placeholder={isSpanish ? "Ej. Habitación con Vista al Lago" : "Ex. Room with Lake View"} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -407,9 +431,9 @@ export default function RoomForm({ onSubmit, initialValues, onImagesChange }: Ro
               name="roomNumber"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Número</FormLabel>
+                  <FormLabel>{isSpanish ? "Número" : "Number"}</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ej. 1D" {...field} />
+                    <Input placeholder={isSpanish ? "Ej. 1D" : "Ex. 1D"} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -424,7 +448,7 @@ export default function RoomForm({ onSubmit, initialValues, onImagesChange }: Ro
             name="description"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Descripción</FormLabel>
+                <FormLabel>{isSpanish ? "Descripción" : "Description"}</FormLabel>
                 <FormControl>
                   <RichTextEditor
                     content={field.value}
@@ -446,14 +470,18 @@ export default function RoomForm({ onSubmit, initialValues, onImagesChange }: Ro
           doubleBeds={doubleBeds}
           watch={form.watch}
           setValue={form.setValue}
+          lang={lang}
+           // Pasar isSpanish si el componente RoomTypeSelector necesita traducción
         />
 
         {/* Check-in/Check-out Section */}
         <div className="space-y-4 p-4 bg-white rounded-xl">
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-800">Horarios de Check-in y Check-out</h3>
+            <h3 className="text-lg font-semibold text-gray-800">
+              {isSpanish ? "Horarios de Check-in y Check-out" : "Check-in and Check-out Times"}
+            </h3>
             <p className="text-sm text-gray-600">
-              Establece los horarios estándar para la llegada y salida de los huéspedes.
+              {isSpanish ? "Establece los horarios estándar para la llegada y salida de los huéspedes." : "Set the standard times for guest arrival and departure."}
             </p>
             <CheckinCheckoutSection
               checkinTime={checkinTime}
@@ -462,6 +490,7 @@ export default function RoomForm({ onSubmit, initialValues, onImagesChange }: Ro
               setCheckoutTime={setCheckoutTime}
               defaultCheckinTime="15:00"
               defaultCheckoutTime="11:00"
+              lang={lang}
             />
             {/* Display form validation errors for check-in/check-out */}
             <FormField
@@ -502,6 +531,8 @@ export default function RoomForm({ onSubmit, initialValues, onImagesChange }: Ro
           shortStayRange={discountData?.shortStayRange}
           mediumStayRange={discountData?.mediumStayRange}
           longStayRange={discountData?.longStayRange}
+          lang={lang}
+          // Pasar isSpanish si el componente necesita traducción interna
         />
 
         {/* Hidden form fields for discounts validation */}
@@ -539,7 +570,7 @@ export default function RoomForm({ onSubmit, initialValues, onImagesChange }: Ro
             name="photos"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Fotos</FormLabel>
+                <FormLabel>{isSpanish ? "Fotos" : "Photos"}</FormLabel>
                 <FormControl>
                   <MultiImageUploaderWithIds
                     maxImages={6}
@@ -552,11 +583,12 @@ export default function RoomForm({ onSubmit, initialValues, onImagesChange }: Ro
                       const visibleIds = existingIds.filter((id) => !markedForDeletion.includes(id))
 
                       // Create array with existing IDs + placeholders for new files
-                      // This ensures validation passes when there are new files
                       const totalImages = [...visibleIds, ...files.map((_, index) => `new-file-${index}`)]
 
                       field.onChange(totalImages)
                     }}
+                    lang={lang}
+                     // Pasar isSpanish si el componente necesita traducción
                   />
                 </FormControl>
                 <FormMessage />
@@ -571,7 +603,7 @@ export default function RoomForm({ onSubmit, initialValues, onImagesChange }: Ro
             name="servicesTags"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Servicios Básicos</FormLabel>
+                <FormLabel>{isSpanish ? "Servicios Básicos" : "Basic Services"}</FormLabel>
                 <FormControl>
                   <CollectionServiceTags
                     onChange={(newTags: string[]) => {
@@ -581,6 +613,7 @@ export default function RoomForm({ onSubmit, initialValues, onImagesChange }: Ro
                     }}
                     servicesTags={serviceTags || []}
                     initialSelectedTags={field.value}
+                    lang={lang}
                   />
                 </FormControl>
                 <FormMessage />
@@ -595,7 +628,7 @@ export default function RoomForm({ onSubmit, initialValues, onImagesChange }: Ro
             name="extraTags"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Servicios Adicionales</FormLabel>
+                <FormLabel>{isSpanish ? "Servicios Adicionales" : "Additional Services"}</FormLabel>
                 <FormControl>
                   <CollectionExtraTags
                     onChange={(newTags: string[]) => {
@@ -606,6 +639,8 @@ export default function RoomForm({ onSubmit, initialValues, onImagesChange }: Ro
                     extraTags={extraTags || []}
                     initialSelectedTags={field.value}
                     enable="property"
+                    lang={lang}
+                   // Pasar isSpanish si el componente necesita traducción
                   />
                 </FormControl>
                 <FormMessage />
@@ -618,9 +653,9 @@ export default function RoomForm({ onSubmit, initialValues, onImagesChange }: Ro
             name="descriptionService"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Información Adicional de Servicios</FormLabel>
+                <FormLabel>{isSpanish ? "Información Adicional de Servicios" : "Additional Service Information"}</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="Si necesita explicar más sobre sus servicios, escriba aquí" {...field} />
+                  <Textarea placeholder={isSpanish ? "Si necesita explicar más sobre sus servicios, escriba aquí" : "If you need to explain more about your services, write here"} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -628,24 +663,23 @@ export default function RoomForm({ onSubmit, initialValues, onImagesChange }: Ro
           />
         </div>
         <div className="grid grid-cols-1 gap-6 p-4 bg-white rounded-xl">
-          <FormLabel>Políticas de Recovery Care Solutions</FormLabel>
+          <FormLabel>{isSpanish ? "Políticas de Recovery Care Solutions" : "Recovery Care Solutions Policies"}</FormLabel>
           <div className="p-3 bg-white rounded-xl border border-gray-200 shadow-sm">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <InfoIcon className="h-4 w-4 text-green-600" />
-                  <span className="font-medium text-gray-800 text-sm">Pago Flexible</span>
+                  <span className="font-medium text-gray-800 text-sm">{isSpanish ? "Pago Flexible" : "Flexible Payment"}</span>
                 </div>
                 <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                  Anticipo 10%
+                  {isSpanish ? "Anticipo 10%" : "10% Advance"}
                 </span>
               </div>
 
               <p className="text-xs text-gray-600">
-                Se permite al huésped pagar un <strong>anticipo del 10%</strong> para asegurar la reserva y completar el
-                pago más adelante, con anulación gratuita en las primeras 24 horas. Para estadías largas (+10 noches),
-                este anticipo es reembolsable bajo ciertas condiciones según las políticas de la plataforma Recovery
-                Care Solutions.
+                {isSpanish
+                  ? "Se permite al huésped pagar un anticipo del 10% para asegurar la reserva y completar el pago más adelante, con anulación gratuita en las primeras 24 horas. Para estadías largas (+10 noches), este anticipo es reembolsable bajo ciertas condiciones según las políticas de la plataforma Recovery Care Solutions."
+                  : "The guest is allowed to pay a 10% advance to secure the booking and complete the payment later, with free cancellation within the first 24 hours. For long stays (+10 nights), this advance is refundable under certain conditions according to the Recovery Care Solutions platform policies."}
               </p>
             </div>
           </div>
@@ -657,17 +691,17 @@ export default function RoomForm({ onSubmit, initialValues, onImagesChange }: Ro
               <DialogTrigger asChild>
                 <Button variant="outline" className="flex-1 bg-transparent">
                   <AlertCircle className="h-4 w-4 mr-2" />
-                  Ver Políticas de Anulación
+                  {isSpanish ? "Ver Políticas de Anulación" : "View Cancellation Policies"}
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>Políticas de Anulación de Reserva</DialogTitle>
+                  <DialogTitle>{isSpanish ? "Políticas de Anulación de Reserva" : "Booking Cancellation Policies"}</DialogTitle>
                   <DialogDescription>
-                    Detalles sobre las condiciones de cancelación para diferentes tipos de estadía.
+                    {isSpanish ? "Detalles sobre las condiciones de cancelación para diferentes tipos de estadía." : "Details on cancellation conditions for different stay types."}
                   </DialogDescription>
                 </DialogHeader>
-                <CancellationPolicyDialogContent />
+                <CancellationPolicyDialogContent  lang={lang}/>
               </DialogContent>
             </Dialog>
 
@@ -676,17 +710,17 @@ export default function RoomForm({ onSubmit, initialValues, onImagesChange }: Ro
               <DialogTrigger asChild>
                 <Button variant="outline" className="flex-1 bg-transparent">
                   <Edit className="h-4 w-4 mr-2" />
-                  Ver Políticas de Modificación
+                  {isSpanish ? "Ver Políticas de Modificación" : "View Modification Policies"}
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle>Políticas de Modificación de Reserva</DialogTitle>
+                  <DialogTitle>{isSpanish ? "Políticas de Modificación de Reserva" : "Booking Modification Policies"}</DialogTitle>
                   <DialogDescription>
-                    Detalles sobre las condiciones para modificar una reserva existente.
+                    {isSpanish ? "Detalles sobre las condiciones para modificar una reserva existente." : "Details on the conditions for modifying an existing booking."}
                   </DialogDescription>
                 </DialogHeader>
-                <ModificationPolicyDialogContent />
+                <ModificationPolicyDialogContent lang={lang}/>
               </DialogContent>
             </Dialog>
           </div>
@@ -695,7 +729,7 @@ export default function RoomForm({ onSubmit, initialValues, onImagesChange }: Ro
         <div className="flex gap-4 mt-4 p-4 md:p-0">
           <Link href={`/mi-panel/propiedades/${initialValues?.propertyId}/`} className="flex-1 w-full">
             <Button variant="outline" type="button" className="w-full text-sm px-4 py-3 h-full bg-transparent">
-              Cancelar
+              {isSpanish ? "Cancelar" : "Cancel"}
             </Button>
           </Link>
           <Button
@@ -706,10 +740,10 @@ export default function RoomForm({ onSubmit, initialValues, onImagesChange }: Ro
             {form.formState.isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Guardando...
+                {isSpanish ? "Guardando..." : "Saving..."}
               </>
             ) : (
-              "Guardar"
+              isSpanish ? "Guardar" : "Save"
             )}
           </Button>
         </div>

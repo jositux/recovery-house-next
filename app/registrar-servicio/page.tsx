@@ -48,6 +48,7 @@ export default function RegisterPropertyBasePage() {
     {
       id: string
       name: string
+      name_en: string
       icon: string
       enable_property: boolean
       enable_services: boolean
@@ -345,6 +346,7 @@ useEffect(() => {
                           extraTags={extraTags}
                           initialSelectedTags={selectedExtraTags}
                           enable="services"
+                          lang="es"
                         />
                       )}
                     />
@@ -366,6 +368,7 @@ useEffect(() => {
                   state: form.formState.errors.state?.message,
                   city: form.formState.errors.city?.message,
                 }}
+                lang="es"
               />
             </div>
             <Button type="submit" className="w-full bg-[#39759E]" disabled={isSubmitting}>

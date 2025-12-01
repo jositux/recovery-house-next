@@ -21,7 +21,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 
-import { MultiImageUploader } from "./components/multi-image-uploader"
+import { MultiImageUploader } from "../components/multi-image-uploader"
 import { CollectionExtraTags } from "@/components/collectionExtraTags"
 import { CollectionServiceTags } from "@/components/collectionServiceTags"
 import { getExtraTags } from "@/services/extraTagsService"
@@ -38,8 +38,8 @@ import RoomTypeSelector from "./components/room-type-selector"
 import { CheckinCheckoutSection } from "./components/checkin-checkout-section"
 import { BudgetFlexibleDiscounts } from "./components/budget-flexible-discounts"
 
-import { CancellationPolicyDialogContent } from "./components/cancellation-policy-dialog-content"
-import { ModificationPolicyDialogContent } from "./components/modification-policy-dialog-content"
+import { CancellationPolicyDialogContent } from "@/components/popups/cancellation-policy-dialog-content"
+import { ModificationPolicyDialogContent } from "@/components/popups/modification-policy-dialog-content"
 
 export const pluralize = (quantity: number, singular: string, plural: string) => {
   return quantity === 1 ? `${quantity} ${singular}` : `${quantity} ${plural}`
@@ -535,6 +535,7 @@ export default function RoomForm({ onSubmit, initialValues, isUploading = false 
                     }}
                     servicesTags={serviceTags || []}
                     initialSelectedTags={field.value}
+                    lang="es"
                   />
                 </FormControl>
                 <FormMessage />
@@ -560,6 +561,7 @@ export default function RoomForm({ onSubmit, initialValues, isUploading = false 
                     extraTags={extraTags || []}
                     initialSelectedTags={field.value}
                     enable="property"
+                    lang="es"
                   />
                 </FormControl>
                 <FormMessage />
@@ -620,7 +622,7 @@ export default function RoomForm({ onSubmit, initialValues, isUploading = false 
                     Detalles sobre las condiciones de cancelación para diferentes tipos de estadía.
                   </DialogDescription>
                 </DialogHeader>
-                <CancellationPolicyDialogContent />
+                <CancellationPolicyDialogContent lang="es"/>
               </DialogContent>
             </Dialog>
 
@@ -638,7 +640,7 @@ export default function RoomForm({ onSubmit, initialValues, isUploading = false 
                     Detalles sobre las condiciones para modificar una reserva existente.
                   </DialogDescription>
                 </DialogHeader>
-                <ModificationPolicyDialogContent />
+                <ModificationPolicyDialogContent lang="es"/>
               </DialogContent>
             </Dialog>
           </div>

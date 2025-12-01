@@ -43,7 +43,7 @@ const CheckoutPage = () => {
         ) : (
           <div className="flex justify-center items-center h-screen">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <span className="ml-2 text-lg text-gray-700">Cargando...</span>
+            
           </div>
         )}
       </div>

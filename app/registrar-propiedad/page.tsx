@@ -325,6 +325,7 @@ export default function RegisterPropertyBasePage() {
                   state: form.formState.errors.state?.message,
                   city: form.formState.errors.city?.message,
                 }}
+                lang="es"
               />
 
               <div className="">
@@ -357,7 +358,7 @@ export default function RegisterPropertyBasePage() {
                 )}
               />
 
-              <GoogleMapsSelector onLocationSelected={handleLocationSelected} defaultLocation={defaultLocation} />
+              <GoogleMapsSelector onLocationSelected={handleLocationSelected} defaultLocation={defaultLocation} lang="es"/>
             </div>
             <div className="hidden">
               <FormField

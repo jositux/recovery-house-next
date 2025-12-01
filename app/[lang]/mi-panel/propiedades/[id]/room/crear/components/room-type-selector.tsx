@@ -20,13 +20,195 @@ import {
 import { Input } from "@/components/ui/input";
 import { useEffect } from "react";
 import type { Control, UseFormWatch, UseFormSetValue } from "react-hook-form";
-import type { z } from "zod";
+//import type { z } from "zod";
 
 // Importa el esquema de validación del formulario padre
-import type { formSchema } from "../RoomForm"; // Asegúrate de que la ruta de importación sea correcta
+import type { RoomFormData } from "../RoomForm"; // Asegúrate de que la ruta de importación sea correcta
 
 // Define el tipo FormData basado en el esquema zod
-type FormData = z.infer<typeof formSchema>;
+type FormData = RoomFormData;
+
+// ===============================================================
+// 📚 Objeto de Traducciones
+// ===============================================================
+
+type TranslationText = {
+  roomTypeLabel: string;
+  privateRoom: string;
+  privateRoomDesc: string;
+  sharedBed: string;
+  sharedBedDesc: string;
+  debugTitle: string;
+  debugPrivate: string;
+  debugShared: string;
+  debugCurrentType: string;
+  debugEmpty: string;
+
+  // Private Room
+  singleBedsTitle: string;
+  doubleBedsTitle: string;
+  quantityLabel: string;
+  selectQuantityPlaceholder: string;
+  singleBedSingular: string;
+  singleBedPlural: string;
+  doubleBedSingular: string;
+  doubleBedPlural: string;
+  
+  // Shared Room
+  bedTypeLabel: string;
+  selectTypePlaceholder: string;
+  bedNameLabel: string;
+  bedNamePlaceholder: string;
+  simpleBedType: string;
+  doubleBedType: string;
+
+  // Calculated Fields (Hidden)
+  totalBedsLabel: string;
+  totalBedsDesc: string;
+  maxCapacityLabel: string;
+  maxCapacityDesc: string;
+
+  // Prices (Private)
+  privatePriceTitle: string;
+  privatePriceWarning: string;
+  privatePriceLabel: string;
+  privatePriceDesc: string;
+  privateCleaningLabel: string;
+  privateCleaningDesc: string;
+  selectBedsPlaceholder: string;
+
+  // Prices (Shared)
+  sharedPriceTitle: string;
+  sharedPriceWarning: string;
+  sharedPriceLabel: string;
+  sharedPriceDescSingle: string;
+  sharedPriceDescDouble: string;
+  sharedPriceDescDefault: string;
+  sharedCleaningLabel: string;
+  sharedCleaningDescOptional: string;
+  sharedCleaningDescDefault: string;
+  selectBedTypePlaceholder: string;
+  pricePerSingleBedPlaceholder: string;
+};
+
+const translations: Record<string, TranslationText> = {
+  es: {
+    roomTypeLabel: "Tipo de Alojamiento",
+    privateRoom: "Habitación Privada",
+    privateRoomDesc: "Uso exclusivo, se reserva toda la habitación",
+    sharedBed: "Cama (Habitación compartida)",
+    sharedBedDesc: "Se toma 1 cama como unidad de alojamiento",
+    debugTitle: "DEBUG - Valores en tiempo real:",
+    debugPrivate: "PRIVADA:",
+    debugShared: "COMPARTIDA:",
+    debugCurrentType: "Tipo actual:",
+    debugEmpty: "vacío",
+
+    // Private Room
+    singleBedsTitle: "Camas Individuales",
+    doubleBedsTitle: "Camas Dobles",
+    quantityLabel: "Cantidad",
+    selectQuantityPlaceholder: "Seleccionar cantidad",
+    singleBedSingular: "cama individual",
+    singleBedPlural: "camas individuales",
+    doubleBedSingular: "cama doble",
+    doubleBedPlural: "camas dobles",
+    
+    // Shared Room
+    bedTypeLabel: "Tipo de Cama",
+    selectTypePlaceholder: "Seleccionar tipo",
+    bedNameLabel: "Nombre de la Cama",
+    bedNamePlaceholder: "Ej: Cama 1, Litera Superior...",
+    simpleBedType: "Cama Sencilla",
+    doubleBedType: "Cama Doble",
+
+    // Calculated Fields (Hidden)
+    totalBedsLabel: "Total de Camas",
+    totalBedsDesc: "Según camas elegidas",
+    maxCapacityLabel: "Capacidad Máxima de personas",
+    maxCapacityDesc: "Sugerido, pero puede ajustarse",
+
+    // Prices (Private)
+    privatePriceTitle: "Precios para la Habitación (U$D)",
+    privatePriceWarning: "Debe seleccionar al menos 1 cama para configurar los precios.",
+    privatePriceLabel: "Precio x Noche",
+    privatePriceDesc: "Para toda la habitación privada",
+    privateCleaningLabel: "Tarifa de Limpieza",
+    privateCleaningDesc: "Opcional para habitación privada",
+    selectBedsPlaceholder: "Seleccione camas primero",
+
+    // Prices (Shared)
+    sharedPriceTitle: "Precios para la Cama (U$D)",
+    sharedPriceWarning: "Debe seleccionar el tipo de cama para configurar los precios.",
+    sharedPriceLabel: "Precio x Noche",
+    sharedPriceDescSingle: "Por 1 cama",
+    sharedPriceDescDouble: "Por 1 cama",
+    sharedPriceDescDefault: "Por cada cama en habitación compartida",
+    sharedCleaningLabel: "Tarifa de Limpieza",
+    sharedCleaningDescOptional: "Opcional",
+    sharedCleaningDescDefault: "Opcional para habitación compartida",
+    selectBedTypePlaceholder: "Seleccione tipo de cama primero",
+    pricePerSingleBedPlaceholder: "Precio por cama individual",
+  },
+  en: {
+    roomTypeLabel: "Accommodation Type",
+    privateRoom: "Private Room",
+    privateRoomDesc: "Exclusive use, the entire room is booked",
+    sharedBed: "Bed (Shared Room)",
+    sharedBedDesc: "1 bed is taken as the unit of accommodation",
+    debugTitle: "DEBUG - Real-time Values:",
+    debugPrivate: "PRIVATE:",
+    debugShared: "SHARED:",
+    debugCurrentType: "Current Type:",
+    debugEmpty: "empty",
+
+    // Private Room
+    singleBedsTitle: "Single Beds",
+    doubleBedsTitle: "Double Beds",
+    quantityLabel: "Quantity",
+    selectQuantityPlaceholder: "Select quantity",
+    singleBedSingular: "single bed",
+    singleBedPlural: "single beds",
+    doubleBedSingular: "double bed",
+    doubleBedPlural: "double beds",
+    
+    // Shared Room
+    bedTypeLabel: "Bed Type",
+    selectTypePlaceholder: "Select type",
+    bedNameLabel: "Bed Name",
+    bedNamePlaceholder: "Ex: Bed 1, Upper Bunk...",
+    simpleBedType: "Simple Bed",
+    doubleBedType: "Double Bed",
+
+    // Calculated Fields (Hidden)
+    totalBedsLabel: "Total Beds",
+    totalBedsDesc: "Based on chosen beds",
+    maxCapacityLabel: "Maximum Guest Capacity",
+    maxCapacityDesc: "Suggested, but can be adjusted",
+
+    // Prices (Private)
+    privatePriceTitle: "Room Prices (U$D)",
+    privatePriceWarning: "You must select at least 1 bed to set prices.",
+    privatePriceLabel: "Price per Night",
+    privatePriceDesc: "For the entire private room",
+    privateCleaningLabel: "Cleaning Fee",
+    privateCleaningDesc: "Optional for private room",
+    selectBedsPlaceholder: "Select beds first",
+
+    // Prices (Shared)
+    sharedPriceTitle: "Bed Prices (U$D)",
+    sharedPriceWarning: "You must select the bed type to set prices.",
+    sharedPriceLabel: "Price per Night",
+    sharedPriceDescSingle: "For 1 bed",
+    sharedPriceDescDouble: "For 1 bed",
+    sharedPriceDescDefault: "Per bed in shared room",
+    sharedCleaningLabel: "Cleaning Fee",
+    sharedCleaningDescOptional: "Optional",
+    sharedCleaningDescDefault: "Optional for shared room",
+    selectBedTypePlaceholder: "Select bed type first",
+    pricePerSingleBedPlaceholder: "Price per single bed",
+  },
+};
 
 interface RoomTypeSelectorProps {
   control: Control<FormData>;
@@ -35,14 +217,31 @@ interface RoomTypeSelectorProps {
   doubleBeds: number;
   watch: UseFormWatch<FormData>;
   setValue: UseFormSetValue<FormData>;
+  lang: string; // ✅ Añadida la prop lang
 }
 
-// Function to pluralize words in Spanish
+// Function to pluralize words, now supports ES and EN
 export const pluralize = (
   quantity: number,
   singular: string,
-  plural: string
+  plural: string,
+  lang: string
 ) => {
+  if (lang === 'en') {
+      const singularEn = singular.replace(/(cama\s+individual|cama\s+doble)/g, (match) => {
+          if (match === 'cama individual') return 'single bed';
+          if (match === 'cama doble') return 'double bed';
+          return match;
+      });
+      const pluralEn = plural.replace(/(camas\s+individuales|camas\s+dobles)/g, (match) => {
+          if (match === 'camas individuales') return 'single beds';
+          if (match === 'camas dobles') return 'double beds';
+          return match;
+      });
+      return quantity === 1 ? `${quantity} ${singularEn}` : `${quantity} ${pluralEn}`;
+  }
+  
+  // Spanish (default)
   return quantity === 1 ? `${quantity} ${singular}` : `${quantity} ${plural}`;
 };
 
@@ -53,7 +252,13 @@ export default function RoomTypeSelector({
   doubleBeds,
   watch,
   setValue,
+  lang, // ✅ Recibiendo lang
 }: RoomTypeSelectorProps) {
+  
+  // 🌐 Lógica de Idioma
+  const currentLang = lang === 'es' ? 'es' : 'en';
+  const texts = translations[currentLang];
+  
   // Update total beds when single or double beds change
   useEffect(() => {
     const totalBeds = singleBeds + doubleBeds;
@@ -85,7 +290,7 @@ export default function RoomTypeSelector({
         name="isPrivate"
         render={({ field }) => (
           <FormItem className="space-y-3">
-            <FormLabel>Tipo de Alojamiento</FormLabel>
+            <FormLabel>{texts.roomTypeLabel}</FormLabel>
             <FormControl>
               <RadioGroup
                 onValueChange={(value) => field.onChange(value === "true")}
@@ -106,9 +311,9 @@ export default function RoomTypeSelector({
                     className="sr-only"
                   />
                   <Home className="h-8 w-8 mb-2" />
-                  <span className="font-medium text-center">Habitación Privada</span>
+                  <span className="font-medium text-center">{texts.privateRoom}</span>
                   <span className="text-xs text-muted-foreground text-center">
-                    Uso exclusivo, se reserva toda la habitación
+                    {texts.privateRoomDesc}
                   </span>
                 </label>
                 <label
@@ -125,9 +330,9 @@ export default function RoomTypeSelector({
                     className="sr-only"
                   />
                   <Bed className="h-8 w-8 mb-2" />
-                  <span className="font-medium text-center">Cama (Habitación compartida)</span>
+                  <span className="font-medium text-center">{texts.sharedBed}</span>
                   <span className="text-xs text-muted-foreground text-center">
-                    Se toma 1 cama como unidad de alojamiento
+                    {texts.sharedBedDesc}
                   </span>
                 </label>
               </RadioGroup>
@@ -139,19 +344,19 @@ export default function RoomTypeSelector({
 
       {/* DEBUG INFO - Mostrar valores actuales */}
       <div className="mt-4 hidden p-3 bg-gray-100 rounded-lg text-xs">
-        <strong>DEBUG - Valores en tiempo real:</strong>
+        <strong>{texts.debugTitle}</strong>
         <div className="grid grid-cols-2 gap-4 mt-2">
           <div>
-            <strong>PRIVADA:</strong> Precio: {privatePrice || "vacío"} |
-            Limpieza: {privateCleaning || "vacío"}
+            <strong>{texts.debugPrivate}</strong> Precio: {privatePrice || texts.debugEmpty} |
+            Limpieza: {privateCleaning || texts.debugEmpty}
           </div>
           <div>
-            <strong>COMPARTIDA:</strong> Precio: {sharedPrice || "vacío"} |
-            Limpieza: {sharedCleaning || "vacío"}
+            <strong>{texts.debugShared}</strong> Precio: {sharedPrice || texts.debugEmpty} |
+            Limpieza: {sharedCleaning || texts.debugEmpty}
           </div>
         </div>
         <div className="mt-1">
-          <strong>Tipo actual:</strong> {isPrivate ? "Privada" : "Compartida"}
+          <strong>{texts.debugCurrentType}</strong> {isPrivate ? texts.privateRoom : texts.sharedBed}
         </div>
       </div>
 
@@ -162,7 +367,7 @@ export default function RoomTypeSelector({
           <div className="border rounded-lg p-4">
             <div className="flex items-center gap-2 mb-4">
               <Bed className="h-5 w-5" />
-              <h3 className="text-lg font-medium">Camas Individuales</h3>
+              <h3 className="text-lg font-medium">{texts.singleBedsTitle}</h3>
             </div>
 
             <div className="grid grid-cols-1 gap-4">
@@ -171,7 +376,7 @@ export default function RoomTypeSelector({
                 name="singleBeds"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Cantidad</FormLabel>
+                    <FormLabel>{texts.quantityLabel}</FormLabel>
                     <Select
                       onValueChange={(value) =>
                         field.onChange(Number.parseInt(value))
@@ -180,7 +385,7 @@ export default function RoomTypeSelector({
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Seleccionar cantidad" />
+                          <SelectValue placeholder={texts.selectQuantityPlaceholder} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -188,8 +393,9 @@ export default function RoomTypeSelector({
                           <SelectItem key={i} value={i.toString()}>
                             {pluralize(
                               i,
-                              "cama individual",
-                              "camas individuales"
+                              texts.singleBedSingular,
+                              texts.singleBedPlural,
+                              currentLang
                             )}
                           </SelectItem>
                         ))}
@@ -206,7 +412,7 @@ export default function RoomTypeSelector({
           <div className="border rounded-lg p-4">
             <div className="flex items-center gap-2 mb-4">
               <BedDouble className="h-5 w-5" />
-              <h3 className="text-lg font-medium">Camas Dobles</h3>
+              <h3 className="text-lg font-medium">{texts.doubleBedsTitle}</h3>
             </div>
 
             <div className="grid grid-cols-1 gap-4">
@@ -215,7 +421,7 @@ export default function RoomTypeSelector({
                 name="doubleBeds"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Cantidad</FormLabel>
+                    <FormLabel>{texts.quantityLabel}</FormLabel>
                     <Select
                       onValueChange={(value) =>
                         field.onChange(Number.parseInt(value))
@@ -224,13 +430,18 @@ export default function RoomTypeSelector({
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Seleccionar cantidad" />
+                          <SelectValue placeholder={texts.selectQuantityPlaceholder} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
                         {[...Array(11)].map((_, i) => (
                           <SelectItem key={i} value={i.toString()}>
-                            {pluralize(i, "cama doble", "camas dobles")}
+                            {pluralize(
+                              i,
+                              texts.doubleBedSingular,
+                              texts.doubleBedPlural,
+                              currentLang
+                            )}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -250,19 +461,19 @@ export default function RoomTypeSelector({
               name="bedType"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tipo de Cama</FormLabel>
+                  <FormLabel>{texts.bedTypeLabel}</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Seleccionar tipo" />
+                        <SelectValue placeholder={texts.selectTypePlaceholder} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="single">Cama Sencilla</SelectItem>
-                      <SelectItem value="double">Cama Doble</SelectItem>
+                      <SelectItem value="single">{texts.simpleBedType}</SelectItem>
+                      <SelectItem value="double">{texts.doubleBedType}</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -275,10 +486,10 @@ export default function RoomTypeSelector({
               name="bedName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nombre de la Cama</FormLabel>
+                  <FormLabel>{texts.bedNameLabel}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Ej: Cama 1, Litera Superior..."
+                      placeholder={texts.bedNamePlaceholder}
                       {...field}
                     />
                   </FormControl>
@@ -298,7 +509,7 @@ export default function RoomTypeSelector({
             name="beds"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Total de Camas</FormLabel>
+                <FormLabel>{texts.totalBedsLabel}</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
@@ -307,7 +518,7 @@ export default function RoomTypeSelector({
                     className="bg-gray-50"
                   />
                 </FormControl>
-                <FormDescription>Según camas elegidas</FormDescription>
+                <FormDescription>{texts.totalBedsDesc}</FormDescription>
               </FormItem>
             )}
           />
@@ -316,12 +527,12 @@ export default function RoomTypeSelector({
             name="capacity"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Capacidad Máxima de personas</FormLabel>
+                <FormLabel>{texts.maxCapacityLabel}</FormLabel>
                 <FormControl>
                   <Input type="number" {...field} />
                 </FormControl>
                 <FormDescription>
-                  Sugerido, pero puede ajustarse
+                  {texts.maxCapacityDesc}
                 </FormDescription>
               </FormItem>
             )}
@@ -335,12 +546,12 @@ export default function RoomTypeSelector({
           // SOLO campos para habitación PRIVADA - NOMBRES ÚNICOS
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-900">
-              Precios para la Habitación (U$D)
+              {texts.privatePriceTitle}
             </h3>
             {noBeds && (
               <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-800">
                 <p className="text-sm font-medium">
-                  Debe seleccionar al menos 1 cama para configurar los precios.
+                  {texts.privatePriceWarning}
                 </p>
               </div>
             )}
@@ -350,7 +561,7 @@ export default function RoomTypeSelector({
                 name="privateRoomPrice"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Precio x Noche</FormLabel>
+                    <FormLabel>{texts.privatePriceLabel}</FormLabel>
                     <FormControl>
                       <Input
                         key={`private-price-${isPrivate}`} // Key único para forzar re-render
@@ -373,13 +584,13 @@ export default function RoomTypeSelector({
                         }}
                         placeholder={
                           noBeds
-                            ? "Seleccione camas primero"
+                            ? texts.selectBedsPlaceholder
                             : ""
                         }
                       />
                     </FormControl>
                     <FormDescription>
-                      Para toda la habitación privada
+                      {texts.privatePriceDesc}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -390,7 +601,7 @@ export default function RoomTypeSelector({
                 name="privateRoomCleaning"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tarifa de Limpieza</FormLabel>
+                    <FormLabel>{texts.privateCleaningLabel}</FormLabel>
                     <FormControl>
                       <Input
                         key={`private-cleaning-${isPrivate}`} // Key único para forzar re-render
@@ -413,13 +624,13 @@ export default function RoomTypeSelector({
                         }}
                         placeholder={
                           noBeds
-                            ? "Seleccione camas primero"
+                            ? texts.selectBedsPlaceholder
                             : ""
                         }
                       />
                     </FormControl>
                     <FormDescription>
-                      Opcional para habitación privada
+                      {texts.privateCleaningDesc}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -431,12 +642,12 @@ export default function RoomTypeSelector({
           // SOLO campos para habitación COMPARTIDA - NOMBRES ÚNICOS
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-900">
-              Precios para la Cama (U$D)
+              {texts.sharedPriceTitle}
             </h3>
             {noBedTypeSelected && (
               <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-800">
                 <p className="text-sm font-medium">
-                  Debe seleccionar el tipo de cama para configurar los precios.
+                  {texts.sharedPriceWarning}
                 </p>
               </div>
             )}
@@ -446,7 +657,7 @@ export default function RoomTypeSelector({
                 name="sharedRoomPrice"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Precio x Noche</FormLabel>
+                    <FormLabel>{texts.sharedPriceLabel}</FormLabel>
                     <FormControl>
                       <Input
                         key={`shared-price-${isPrivate}`} // Key único para forzar re-render
@@ -469,17 +680,15 @@ export default function RoomTypeSelector({
                         }}
                         placeholder={
                           noBedTypeSelected
-                            ? "Seleccione tipo de cama primero"
-                            : "Precio por cama individual"
+                            ? texts.selectBedTypePlaceholder
+                            : texts.pricePerSingleBedPlaceholder
                         }
                       />
                     </FormControl>
                     <FormDescription>
-                      {bedType === "single" &&
-                        "Por 1 cama"}
-                      {bedType === "double" &&
-                        "Por 1 cama"}
-                      {!bedType && "Por cada cama en habitación compartida"}
+                      {bedType === "single" && texts.sharedPriceDescSingle}
+                      {bedType === "double" && texts.sharedPriceDescDouble}
+                      {!bedType && texts.sharedPriceDescDefault}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -490,7 +699,7 @@ export default function RoomTypeSelector({
                 name="sharedRoomCleaning"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tarifa de Limpieza</FormLabel>
+                    <FormLabel>{texts.sharedCleaningLabel}</FormLabel>
                     <FormControl>
                       <Input
                         key={`shared-cleaning-${isPrivate}`} // Key único para forzar re-render
@@ -513,16 +722,14 @@ export default function RoomTypeSelector({
                         }}
                         placeholder={
                           noBedTypeSelected
-                            ? "Seleccione tipo de cama primero"
-                            : "Limpieza por cama"
+                            ? texts.selectBedTypePlaceholder
+                            : ""
                         }
                       />
                     </FormControl>
                     <FormDescription>
-                      {bedType === "single" &&
-                        "Opcional"}
-                      {bedType === "double" && "Opcional"}
-                      {!bedType && "Opcional para habitación compartida"}
+                      {(bedType === "single" || bedType === "double") && texts.sharedCleaningDescOptional}
+                      {!bedType && texts.sharedCleaningDescDefault}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

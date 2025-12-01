@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { useForm, Controller, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -8,53 +8,213 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import FileUpload from "@/components/FileUpload"
+import { useParams, useRouter } from "next/navigation" // Importamos useParams
+import { type Locale } from "@/lib/i18n" 
+
+// 💡 Importaciones para el nuevo manejo de archivos (asumiendo rutas)
+import { FileUpload, type FileUploadHandle } from "./file-upload";
+import { uploadFile } from "@/services/fileUploadService"
+import { deleteFile } from "@/services/deleteFileService"
+// ------------------------------------------------------------------------
+
 import { LocationSelector } from "@/components/ui/location-selector"
-import type { ProviderData } from "@/services/providerService"
 import { CollectionExtraTags } from "@/components/collectionExtraTags"
 import { getExtraTags } from "@/services/extraTagsService"
-import { useRouter } from "next/navigation"
 import { getProvidersByUserId } from "@/services/providerCollectionService"
 import { getCurrentUser } from "@/services/userService"
-import { Loader2, Check, Eye, Edit } from "lucide-react"
+import { Loader2, Check, Eye, Edit, Save } from "lucide-react"
 import Link from "next/link"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { Fraunces } from "next/font/google"
+import type { ProviderData } from "@/services/providerService"
 
 const fraunces = Fraunces({ subsets: ["latin"] })
 
-const formSchema = z.object({
-  name: z.string().min(1, "El nombre es requerido."),
-  email: z.string().email("Debe ser un email válido."),
-  phone: z.string().min(1, "El teléfono es requerido."),
-  country: z.string().min(1, "Por favor selecciona un país."),
-  state: z.string().min(1, "Por favor selecciona un estado."),
-  city: z.string().min(1, "Por favor selecciona una ciudad."),
-  membership: z.string(),
-  description: z.string().min(6, "La descripción es requerida."),
-  taxIdEIN: z.string().min(1, "El TAX ID es requerido."),
-  RNTFile: z.string().refine((val) => val.length > 0, {
-    message: "El archivo RNT es obligatorio.",
-  }),
-  taxIdEINFile: z.string().refine((val) => val.length > 0, {
-    message: "El archivo TAX ID es obligatorio.",
-  }),
-  extraTags: z.array(z.string()),
-  serviceTags: z.array(z.string()).default([]),
-  subscriptionPrice: z.string().default(""),
-  subscriptionType: z.string().default(""),
-  price: z.string().default(""),
-})
+// 💡 Datos por defecto para los FileUpload
+const defaultRNTFile = {
+  id: "",
+  filename_download: "",
+}
+const defaultTaxFile = {
+  id: "",
+  filename_download: "",
+}
+// ------------------------------------------------------------------------
 
-type FormValues = z.infer<typeof formSchema>
+// --- Translation Data ---
+
+interface RegisterServiceTranslation {
+  // General
+  pageTitle: string;
+  loadingServiceCheck: string;
+
+  // Existing Service Card
+  cardTitle: string;
+  cardDescription: string;
+  nextSteps: string;
+  reviewInfo: string;
+  updateDetails: string;
+  keepUpdated: string;
+  viewButton: string;
+  editButton: string;
+
+  // Form Labels & Placeholders
+  legalInfoTitle: string;
+  taxIdEINLabel: string;
+  taxIdEINPlaceholder: string;
+  RNTFileLabel: string;
+  TaxIdEINFileLabel: string;
+  serviceInfoTitle: string;
+  serviceNameLabel: string;
+  serviceNamePlaceholder: string;
+  emailLabel: string;
+  emailPlaceholder: string;
+  phoneLabel: string;
+  phonePlaceholder: string;
+  descriptionLabel: string;
+  descriptionPlaceholder: string;
+  servicesOfferedTitle: string;
+  locationTitle: string;
+
+  // Buttons & Alerts
+  registeringButton: string;
+  continueButton: string;
+  errorNoToken: string;
+  errorRNTRequired: string;
+  errorTaxRequired: string;
+  errorRNTUpload: string;
+  errorTaxUpload: string;
+  errorRegistrationGeneric: string;
+
+  // Zod Validation Errors
+  validationName: string;
+  validationEmail: string;
+  validationPhone: string;
+  validationCountry: string;
+  validationState: string;
+  validationCity: string;
+  validationDescription: string;
+  validationTaxIdEIN: string;
+  validationRNTFile: string;
+  validationTaxIdEINFile: string;
+}
+
+const translations: Record<string, RegisterServiceTranslation> = {
+  es: {
+    pageTitle: "Registra tu servicio",
+    loadingServiceCheck: "Verificando servicios...",
+
+    cardTitle: "Servicio Cargado",
+    cardDescription: "Has completado exitosamente el registro de tu servicio. Ahora puedes editarlo según tus necesidades.",
+    nextSteps: "Próximos pasos:",
+    reviewInfo: "Revisa la información de tu servicio",
+    updateDetails: "Actualiza tus detalles si es necesario",
+    keepUpdated: "Mantén tu perfil actualizado para atraer más clientes",
+    viewButton: "Ver",
+    editButton: "Editar",
+
+    legalInfoTitle: "Información Legal",
+    taxIdEINLabel: "Tax ID/EIN",
+    taxIdEINPlaceholder: "Tax ID/EIN",
+    RNTFileLabel: "Archivo RNT",
+    TaxIdEINFileLabel: "Archivo de Impuestos TAX ID",
+    serviceInfoTitle: "Información del Servicio",
+    serviceNameLabel: "Nombre del Servicio",
+    serviceNamePlaceholder: "Ej. Peluquería Pedrito",
+    emailLabel: "Email",
+    emailPlaceholder: "Correo electrónico",
+    phoneLabel: "Teléfono",
+    phonePlaceholder: "Número de teléfono",
+    descriptionLabel: "Descripción del Servicio",
+    descriptionPlaceholder: "Describe las características",
+    servicesOfferedTitle: "Servicios Ofrecidos",
+    locationTitle: "¿Dónde ofrece su servicio?",
+
+    registeringButton: "Registrando...",
+    continueButton: "Continuar",
+    errorNoToken: "No se encontró el token de acceso. Por favor inicia sesión nuevamente.",
+    errorRNTRequired: "El archivo RNT es obligatorio.",
+    errorTaxRequired: "El archivo TAX ID es obligatorio.",
+    errorRNTUpload: "Error al cargar el archivo RNT. Intenta de nuevo.",
+    errorTaxUpload: "Error al cargar el archivo TAX ID. Intenta de nuevo.",
+    errorRegistrationGeneric: "Error al registrar el servicio. Por favor intenta de nuevo.",
+
+    validationName: "El nombre es requerido.",
+    validationEmail: "Debe ser un email válido.",
+    validationPhone: "El teléfono es requerido.",
+    validationCountry: "Por favor selecciona un país.",
+    validationState: "Por favor selecciona un estado.",
+    validationCity: "Por favor selecciona una ciudad.",
+    validationDescription: "La descripción es requerida.",
+    validationTaxIdEIN: "El TAX ID es requerido.",
+    validationRNTFile: "El archivo RNT es obligatorio.",
+    validationTaxIdEINFile: "El archivo TAX ID es obligatorio.",
+  },
+  en: {
+    pageTitle: "Register your service",
+    loadingServiceCheck: "Checking services...",
+
+    cardTitle: "Service Loaded",
+    cardDescription: "You have successfully completed the registration of your service. Now you can edit it according to your needs.",
+    nextSteps: "Next steps:",
+    reviewInfo: "Review your service information",
+    updateDetails: "Update your details if necessary",
+    keepUpdated: "Keep your profile updated to attract more customers",
+    viewButton: "View",
+    editButton: "Edit",
+
+    legalInfoTitle: "Legal Information",
+    taxIdEINLabel: "Tax ID/EIN",
+    taxIdEINPlaceholder: "Tax ID/EIN",
+    RNTFileLabel: "RNT File",
+    TaxIdEINFileLabel: "TAX ID File",
+    serviceInfoTitle: "Service Information",
+    serviceNameLabel: "Service Name",
+    serviceNamePlaceholder: "Ex. Pedrito's Hair Salon",
+    emailLabel: "Email",
+    emailPlaceholder: "Email address",
+    phoneLabel: "Phone",
+    phonePlaceholder: "Phone number",
+    descriptionLabel: "Service Description",
+    descriptionPlaceholder: "Describe the characteristics",
+    servicesOfferedTitle: "Services Offered",
+    locationTitle: "Where do you offer your service?",
+
+    registeringButton: "Registering...",
+    continueButton: "Continue",
+    errorNoToken: "Access token not found. Please log in again.",
+    errorRNTRequired: "The RNT file is mandatory.",
+    errorTaxRequired: "The TAX ID file is mandatory.",
+    errorRNTUpload: "Error uploading the RNT file. Please try again.",
+    errorTaxUpload: "Error uploading the TAX ID file. Please try again.",
+    errorRegistrationGeneric: "Error registering the service. Please try again.",
+
+    validationName: "Name is required.",
+    validationEmail: "Must be a valid email.",
+    validationPhone: "Phone is required.",
+    validationCountry: "Please select a country.",
+    validationState: "Please select a state.",
+    validationCity: "Please select a city.",
+    validationDescription: "Description is required.",
+    validationTaxIdEIN: "The TAX ID is required.",
+    validationRNTFile: "The RNT file is mandatory.",
+    validationTaxIdEINFile: "The TAX ID file is mandatory.",
+  }
+}
 
 export default function RegisterServicePage() {
+  // 1. Obtener el idioma de la URL
+  const params = useParams();
+  const lang = (params.lang as Locale) || 'es'; // Default to 'es' if not found
+  const t = translations[lang] || translations.es; // Seleccionar traducción
+
   const [isCheckingServices, setIsCheckingServices] = useState(true)
   const [hasExistingService, setHasExistingService] = useState(false)
   const [extraTags, setExtraTags] = useState<
     {
       id: string
       name: string
+      name_en: string
       icon: string
       enable_property: boolean
       enable_services: boolean
@@ -63,10 +223,46 @@ export default function RegisterServicePage() {
 
   const router = useRouter()
 
+  // 💡 Refs y Estados para el manejo de archivos (RNT File)
+  const RNTFileRef = useRef<FileUploadHandle>(null)
+  const [RNTFileToUpload, setRNTFileToUpload] = useState<File | null>(null)
+  const [RNTFileToDelete, setRNTFileToDelete] = useState<string | undefined>(undefined)
+
+  // 💡 Refs y Estados para el manejo de archivos (TAX ID File)
+  const taxFileRef = useRef<FileUploadHandle>(null)
+  const [taxFileToUpload, setTaxFileToUpload] = useState<File | null>(null)
+  const [taxFileToDelete, setTaxFileToDelete] = useState<string | undefined>(undefined)
+  // ------------------------------------------------------------------------
+
+  // Zod Schema using dynamic translations
+  const formSchema = z.object({
+    name: z.string().min(1, t.validationName),
+    email: z.string().email(t.validationEmail),
+    phone: z.string().min(1, t.validationPhone),
+    country: z.string().min(1, t.validationCountry),
+    state: z.string().min(1, t.validationState),
+    city: z.string().min(1, t.validationCity),
+    membership: z.string(),
+    description: z.string().min(6, t.validationDescription),
+    taxIdEIN: z.string().min(1, t.validationTaxIdEIN),
+    RNTFile: z.string().min(1, t.validationRNTFile),
+    taxIdEINFile: z.string().min(1, t.validationTaxIdEINFile),
+    extraTags: z.array(z.string()),
+    serviceTags: z.array(z.string()).default([]),
+    subscriptionPrice: z.string().default(""),
+    subscriptionType: z.string().default(""),
+    price: z.string().default(""),
+  })
+
+  type FormValues = z.infer<typeof formSchema>
+
+
   useEffect(() => {
     const checkAuthAndFetchData = async () => {
       const token = localStorage.getItem("access_token")
       if (!token) {
+        // Mejor usar console.error y redirigir
+        console.error(t.errorNoToken); 
         router.push("/login")
         return
       }
@@ -87,7 +283,7 @@ export default function RegisterServicePage() {
     }
 
     checkAuthAndFetchData()
-  }, [router])
+  }, [router, t]) // Dependencia 't' para el errorNoToken
 
   useEffect(() => {
     const loadTags = async () => {
@@ -101,16 +297,6 @@ export default function RegisterServicePage() {
     loadTags()
   }, [])
 
-  const [RNTFileData, setRNTFileData] = useState<{
-    id: string
-    filename_download: string
-  }>({ id: "", filename_download: "" })
-
-  const [TaxFileData, setTaxFileData] = useState<{
-    id: string
-    filename_download: string
-  }>({ id: "", filename_download: "" })
-
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<FormValues>({
@@ -122,34 +308,123 @@ export default function RegisterServicePage() {
       description: "",
       membership: "bronze",
       taxIdEIN: "",
-      RNTFile: "",
-      taxIdEINFile: "",
+      RNTFile: defaultRNTFile.id, // Inicializa con ID vacío
+      taxIdEINFile: defaultTaxFile.id, // Inicializa con ID vacío
       extraTags: [],
       serviceTags: [],
     },
   })
 
-  const { setValue } = form
+  const { setValue, setError } = form
 
-  const handleTagsChange = (tags: string[]) => {
-    if (JSON.stringify(tags) !== JSON.stringify(selectedExtraTags)) {
-      setValue("extraTags", tags, { shouldDirty: true })
-    }
-  }
 
   const selectedExtraTags = useWatch({
     control: form.control,
     name: "extraTags",
   })
 
+  const handleTagsChange = useCallback(
+    (tags: string[]) => {
+      if (JSON.stringify(tags) !== JSON.stringify(selectedExtraTags)) {
+        setValue("extraTags", tags, { shouldDirty: true })
+      }
+    },
+    [selectedExtraTags, setValue],
+  )
+
+
+
+  // 💡 Nuevo manejador de cambio para RNTFile
+  const handleRNTFileChange = (file: File | null, fileIdToDelete: string | undefined) => {
+    setRNTFileToUpload(file)
+    setRNTFileToDelete(fileIdToDelete)
+    if (file || fileIdToDelete) {
+      form.clearErrors("RNTFile")
+      form.setValue("RNTFile", file ? "pending-upload" : fileIdToDelete || "")
+    } else {
+      form.setValue("RNTFile", "")
+    }
+  }
+
+  // 💡 Nuevo manejador de cambio para TaxFile
+  const handleTaxFileChange = (file: File | null, fileIdToDelete: string | undefined) => {
+    setTaxFileToUpload(file)
+    setTaxFileToDelete(fileIdToDelete)
+    if (file || fileIdToDelete) {
+      form.clearErrors("taxIdEINFile")
+      form.setValue("taxIdEINFile", file ? "pending-upload" : fileIdToDelete || "")
+    } else {
+      form.setValue("taxIdEINFile", "")
+    }
+  }
+
   const onSubmit = async (values: FormValues) => {
-    if (!values.RNTFile || !values.taxIdEINFile) {
-      console.error("Faltan archivos obligatorios.")
+    setIsSubmitting(true)
+
+    // 1. Obtener el token de acceso
+    const accessToken = localStorage.getItem("access_token")
+    if (!accessToken) {
+      console.error(t.errorNoToken)
+      router.push("/login")
+      setIsSubmitting(false)
       return
     }
 
-    setIsSubmitting(true)
+    // 2. Validar archivos requeridos usando la referencia
+    const isRNTFileValid = RNTFileRef.current?.validate()
+    const isTaxFileValid = taxFileRef.current?.validate()
+
+    if (!isRNTFileValid) {
+      setError("RNTFile", { message: t.errorRNTRequired })
+      setIsSubmitting(false)
+      return
+    }
+    if (!isTaxFileValid) {
+      setError("taxIdEINFile", { message: t.errorTaxRequired })
+      setIsSubmitting(false)
+      return
+    }
+
+    // 3. Obtener IDs actuales antes de cargar/eliminar
+    let finalRNTFileId = RNTFileRef.current?.getCurrentFileId() || ""
+    let finalTaxFileId = taxFileRef.current?.getCurrentFileId() || ""
+
     try {
+      // 4. ELIMINACIÓN: Eliminar archivos marcados para borrado
+      if (RNTFileToDelete) {
+        await deleteFile(RNTFileToDelete, accessToken)
+      }
+      if (taxFileToDelete) {
+        await deleteFile(taxFileToDelete, accessToken)
+      }
+
+      // 5. CARGA: Subir nuevos archivos y actualizar IDs
+      if (RNTFileToUpload) {
+        const uploadResponse = await uploadFile(RNTFileToUpload)
+        finalRNTFileId = uploadResponse.id
+      }
+
+      if (taxFileToUpload) {
+        const uploadResponse = await uploadFile(taxFileToUpload)
+        finalTaxFileId = uploadResponse.id
+      }
+      
+      // 6. Validación final de IDs (por si la carga falló silenciosamente)
+      if (!finalRNTFileId) {
+        console.error(t.errorRNTUpload)
+        setError("RNTFile", { message: t.errorRNTUpload })
+        setIsSubmitting(false)
+        return
+      }
+      if (!finalTaxFileId) {
+        console.error(t.errorTaxUpload)
+        setError("taxIdEINFile", { message: t.errorTaxUpload })
+        setIsSubmitting(false)
+        return
+      }
+
+
+      // 7. Preparar y enviar los datos del proveedor con los IDs finales
       const providerData: ProviderData = {
         userId: "",
         name: values.name,
@@ -161,8 +436,8 @@ export default function RegisterServicePage() {
         description: values.description,
         membership: "bronze",
         taxIdEIN: values.taxIdEIN,
-        RNTFile: values.RNTFile,
-        taxIdEINFile: values.taxIdEINFile,
+        RNTFile: finalRNTFileId, // ID Final
+        taxIdEINFile: finalTaxFileId, // ID Final
         extraTags: values.extraTags,
         serviceTags: values.serviceTags,
         subscriptionPrice: values.subscriptionPrice || "",
@@ -171,43 +446,26 @@ export default function RegisterServicePage() {
       }
 
       localStorage.setItem("new_service", JSON.stringify(providerData))
-      //router.push(`/mi-panel/mi-servicio`)
+      // router.push(`/mi-panel/mi-servicio`) // Descomentar al integrar la API real
       router.push(`/subscriptions`)
+
     } catch (error) {
-      console.error("Error al registrar el servicio:", error)
+      console.error("Error al registrar el servicio o manejar archivos:", error)
+      // Mensaje de error genérico en la UI
+      setError("name", { message: t.errorRegistrationGeneric })
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  const handleRNTFileUpload = (response: { id: string; filename_download: string }) => {
-    setRNTFileData(response)
-    form.setValue("RNTFile", response.id)
-    form.clearErrors("RNTFile")
-  }
-
-  const handleTaxFileUpload = (response: { id: string; filename_download: string }) => {
-    setTaxFileData(response)
-    form.setValue("taxIdEINFile", response.id)
-    form.clearErrors("taxIdEINFile")
-  }
-
-  const handleRNTFileClear = () => {
-    setRNTFileData({ id: "", filename_download: "" })
-    form.setValue("RNTFile", "")
-  }
-
-  const handleTaxFileClear = () => {
-    setTaxFileData({ id: "", filename_download: "" })
-    form.setValue("taxIdEINFile", "")
-  }
+  // Se eliminan los manejadores antiguos (handleRNTFileUpload, handleTaxFileUpload, etc.)
 
   if (isCheckingServices) {
     return (
       <div className="min-h-screen bg-[#F8F8F7] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-[#39759E]" />
-          <p className="text-muted-foreground">Verificando servicios...</p>
+          <p className="text-muted-foreground">{t.loadingServiceCheck}</p>
         </div>
       </div>
     )
@@ -220,28 +478,28 @@ export default function RegisterServicePage() {
           <CardHeader className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white p-6">
             <CardTitle className="text-2xl font-bold flex items-center justify-center">
               <Check className="mr-2" size={24} />
-              Servicio Cargado
+              {t.cardTitle}
             </CardTitle>
             <CardDescription className="text-blue-100"></CardDescription>
           </CardHeader>
           <CardContent className="p-6">
             <p className="text-gray-600 mb-4">
-              Has completado exitosamente el registro de tu servicio. Ahora puedes editarlo según tus necesidades.
+              {t.cardDescription}
             </p>
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h3 className="font-semibold text-blue-700 mb-2">Próximos pasos:</h3>
+              <h3 className="font-semibold text-blue-700 mb-2">{t.nextSteps}</h3>
               <ul className="text-sm text-gray-600 space-y-2">
                 <li className="flex items-start">
                   <Check className="text-green-500 mr-2 mt-1 flex-shrink-0" size={16} />
-                  Revisa la información de tu servicio
+                  {t.reviewInfo}
                 </li>
                 <li className="flex items-start">
                   <Check className="text-green-500 mr-2 mt-1 flex-shrink-0" size={16} />
-                  Actualiza tus detalles si es necesario
+                  {t.updateDetails}
                 </li>
                 <li className="flex items-start">
                   <Check className="text-green-500 mr-2 mt-1 flex-shrink-0" size={16} />
-                  Mantén tu perfil actualizado para atraer más clientes
+                  {t.keepUpdated}
                 </li>
               </ul>
             </div>
@@ -251,13 +509,13 @@ export default function RegisterServicePage() {
               <Link href="/mi-panel/mi-servicio" passHref className="w-full">
                 <Button variant="outline" className="w-full bg-transparent">
                   <Eye className="mr-2" size={16} />
-                 Ver
+                 {t.viewButton}
                 </Button>
               </Link>
               <Link href="/mi-panel/editar-servicio" passHref className="w-full">
                 <Button variant="default" className="w-full">
                   <Edit className="mr-2" size={16} />
-                  Editar
+                  {t.editButton}
                 </Button>
               </Link>
             </div>
@@ -273,20 +531,20 @@ export default function RegisterServicePage() {
       <h1
             className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-8`}
           >
-            Registra tu servicio
+            {t.pageTitle}
           </h1>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <div className="space-y-4 p-4 bg-white rounded-xl">
-              <h2 className="text-lg">Información Legal</h2>
+              <h2 className="text-lg">{t.legalInfoTitle}</h2>
               <FormField
                 control={form.control}
                 name="taxIdEIN"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tax ID/EIN</FormLabel>
+                    <FormLabel>{t.taxIdEINLabel}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Tax ID/EIN" {...field} />
+                      <Input placeholder={t.taxIdEINPlaceholder} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -299,15 +557,18 @@ export default function RegisterServicePage() {
                   name="RNTFile"
                   render={() => (
                     <FormItem>
-                      <FormLabel>RNT File</FormLabel>
                       <FormControl>
+                        {/* 💡 FileUpload con ref, onChange y lang */}
                         <FileUpload
-                          id={RNTFileData.id}
-                          filename_download={RNTFileData.filename_download}
-                          onUploadSuccess={handleRNTFileUpload}
-                          onClearFile={handleRNTFileClear}
+                          ref={RNTFileRef}
+                          label={t.RNTFileLabel}
+                          defaultFile={defaultRNTFile}
+                          onChange={handleRNTFileChange}
+                          error={form.formState.errors.RNTFile?.message}
+                          lang={lang}
                         />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -316,15 +577,18 @@ export default function RegisterServicePage() {
                   name="taxIdEINFile"
                   render={() => (
                     <FormItem>
-                      <FormLabel>TAX ID File</FormLabel>
                       <FormControl>
+                        {/* 💡 FileUpload con ref, onChange y lang */}
                         <FileUpload
-                          id={TaxFileData.id}
-                          filename_download={TaxFileData.filename_download}
-                          onUploadSuccess={handleTaxFileUpload}
-                          onClearFile={handleTaxFileClear}
+                          ref={taxFileRef}
+                          label={t.TaxIdEINFileLabel}
+                          defaultFile={defaultTaxFile}
+                          onChange={handleTaxFileChange}
+                          error={form.formState.errors.taxIdEINFile?.message}
+                          lang={lang}
                         />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -332,14 +596,15 @@ export default function RegisterServicePage() {
             </div>
 
             <div className="space-y-4 p-4 bg-white rounded-xl">
+                <h2 className="text-lg">{t.serviceInfoTitle}</h2>
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nombre del Servicio</FormLabel>
+                    <FormLabel>{t.serviceNameLabel}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Ej. Peluquería Pedrito" {...field} />
+                      <Input placeholder={t.serviceNamePlaceholder} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -351,9 +616,9 @@ export default function RegisterServicePage() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>{t.emailLabel}</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="Correo electrónico" {...field} />
+                        <Input type="email" placeholder={t.emailPlaceholder} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -364,9 +629,9 @@ export default function RegisterServicePage() {
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Teléfono</FormLabel>
+                      <FormLabel>{t.phoneLabel}</FormLabel>
                       <FormControl>
-                        <Input type="text" placeholder="Número de teléfono" {...field} />
+                        <Input type="text" placeholder={t.phonePlaceholder} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -379,8 +644,9 @@ export default function RegisterServicePage() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
+                    <FormLabel>{t.descriptionLabel}</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Describe las características" {...field} />
+                      <Textarea placeholder={t.descriptionPlaceholder} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -393,7 +659,7 @@ export default function RegisterServicePage() {
                 name="extraTags"
                 render={() => (
                   <FormItem>
-                    <FormLabel className="text-lg">Servicios Ofrecidos</FormLabel>
+                    <FormLabel className="text-lg">{t.servicesOfferedTitle}</FormLabel>
                     <Controller
                       control={form.control}
                       name="extraTags"
@@ -403,6 +669,7 @@ export default function RegisterServicePage() {
                           extraTags={extraTags}
                           initialSelectedTags={selectedExtraTags}
                           enable="services"
+                          lang={lang} // Pasamos la prop lang
                         />
                       )}
                     />
@@ -412,7 +679,7 @@ export default function RegisterServicePage() {
               />
             </div>
             <div className="space-y-4 p-4 bg-white rounded-xl">
-              <h2 className="text-lg">Dónde ofrece su servicio?</h2>
+              <h2 className="text-lg">{t.locationTitle}</h2>
               <LocationSelector
                 onChange={({ country, state, city }) => {
                   form.setValue("country", country)
@@ -424,10 +691,25 @@ export default function RegisterServicePage() {
                   state: form.formState.errors.state?.message,
                   city: form.formState.errors.city?.message,
                 }}
+                lang={lang} // Pasamos la prop lang
               />
             </div>
-            <Button type="submit" className="w-full bg-[#39759E]" disabled={isSubmitting}>
-              {isSubmitting ? "Registrando..." : "Continuar"}
+            <Button
+              type="submit"
+              className="w-full bg-[#39759E] px-6 py-5 rounded-lg text-white font-medium hover:bg-[#3a5a77] transition-colors flex items-center justify-center gap-2"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="animate-spin" />
+                  {t.registeringButton}
+                </>
+              ) : (
+                <>
+                  <Save />
+                  {t.continueButton}
+                </>
+              )}
             </Button>
           </form>
         </Form>

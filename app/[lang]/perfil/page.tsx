@@ -2,15 +2,17 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, useParams } from "next/navigation"; // ✅ Añadido useParams
 import { Fraunces } from "next/font/google";
 import Image from "next/image";
 import type { z } from "zod";
 
 // Import components
+// DESPUÉS (Usa el esquema base estático):
 import PerfilRegisterForm, {
-  type complementaryFormSchema,
+   complementaryFormSchemaBase, // 👈 Si necesitas el objeto esquema estático
 } from "@/components/forms/PerfilRegisterForm";
+
 import { ProfileImageSection } from "@/components/profile/ProfileImageSection";
 import { getCurrentUser, type User } from "@/services/userService";
 import {
@@ -29,12 +31,90 @@ import {
 import { Button } from "@/components/ui/button";
 import { AlertCircle } from "lucide-react";
 
+// Definición simple de tipos de idioma para referencia (Asegúrate de que esta importación exista)
+import { type Locale } from "@/lib/i18n"; 
+
 const fraunces = Fraunces({ subsets: ["latin"] });
 
 type RegistrationStep = "details" | "success";
-type RegistrationData = z.infer<typeof complementaryFormSchema>;
+type RegistrationData = z.infer<typeof complementaryFormSchemaBase>;
+
+// 📚 Objeto de Traducciones
+const translations = {
+  es: {
+    title: "Perfil de Usuario",
+    subtitle:
+      "Completa tu perfil para utilizar la plataforma. Si prefieres hacerlo más adelante, ten en cuenta que se te solicitará esta información en el futuro para poder operar.",
+    loading: "Cargando",
+    successTitle: "¡Gracias, ",
+    successDefault: "Tu información ha sido actualizada.",
+    errorAuth: "Error: No se pudo obtener la información del usuario. Por favor, inicia sesión de nuevo.",
+    errorUpdate: "Ocurrió un error al actualizar la información. Por favor, inténtalo de nuevo.",
+    actionRooms: "Ver habitaciones disponibles",
+    actionProperty: "Agregar Propiedad",
+    actionService: "Agregar Servicio",
+    actionProfile: "Ver mi Perfil",
+    actionCheckout: "Seguir con el pago",
+    actionReserve: "Seguir con la reserva",
+    alertTitleError: "Error",
+    alertTitleSuccess: "Éxito",
+
+    // Dialog & Rel messages
+    dialogTitle: "Completar Datos de Usuario",
+    dialogCancel: "Cancelar",
+    dialogAccept: "Aceptar",
+    relProperty:
+      "Si desea registrar la propiedad debe completar los datos de usuario obligatoriamente",
+    relService:
+      "Si desea registrar un servicio debe completar los datos de usuario obligatoriamente",
+    relCheckout:
+      "Si desea pagar la reserva debe completar los datos de usuario obligatoriamente",
+    relProfile:
+      "Debe completar los datos de usuario obligatoriamente antes de modificar",
+    relDefault:
+      "Si desea reservar la habitación debe completar los datos de usuario obligatoriamente",
+  },
+  en: {
+    title: "User Profile",
+    subtitle:
+      "Complete your profile to use the platform. If you prefer to do it later, please note that this information will be required in the future to operate.",
+    loading: "Loading",
+    successTitle: "Thank you, ",
+    successDefault: "Your information has been updated.",
+    errorAuth: "Error: Could not retrieve user information. Please log in again.",
+    errorUpdate: "An error occurred while updating the information. Please try again.",
+    actionRooms: "View available rooms",
+    actionProperty: "Add Property",
+    actionService: "Add Service",
+    actionProfile: "View my Profile",
+    actionCheckout: "Continue with payment",
+    actionReserve: "Continue with booking",
+    alertTitleError: "Error",
+    alertTitleSuccess: "Success",
+
+    // Dialog & Rel messages
+    dialogTitle: "Complete User Details",
+    dialogCancel: "Cancel",
+    dialogAccept: "Accept",
+    relProperty:
+      "If you wish to register the property, you must complete the user data.",
+    relService:
+      "If you wish to register a service, you must complete the user data.",
+    relCheckout:
+      "If you wish to pay for the reservation, you must complete the user data.",
+    relProfile:
+      "You must complete the user data before modifying.",
+    relDefault:
+      "If you wish to book the room, you must complete the user data.",
+  },
+};
 
 export default function RegistrationPage() {
+  // 🌐 Lógica de Idioma
+  const params = useParams();
+  const lang = (params.lang as Locale) || "es";
+  const texts = translations[lang as keyof typeof translations] || translations.en;
+
   const [currentStep, setCurrentStep] = useState<RegistrationStep>("details");
   const [registrationData, setRegistrationData] =
     useState<RegistrationData | null>(null);
@@ -54,64 +134,65 @@ export default function RegistrationPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  // Función de mapeo de mensajes de diálogo, ahora traducida con useMemo
+  const getUserCompletionMessage = useCallback(
+    (relParam: string): { message: string; cancelRoute: string } => {
+      const routes: Record<string, { message: string; cancelRoute: string }> = {
+        "registrar-propiedad": {
+          message: texts.relProperty,
+          cancelRoute: "/mi-panel/mis-propiedades",
+        },
+        "registrar-servicio": {
+          message: texts.relService,
+          cancelRoute: "/mi-panel/mi-servicio",
+        },
+        checkout: {
+          message: texts.relCheckout,
+          cancelRoute: "/checkout",
+        },
+        "mi-perfil": {
+          message: texts.relProfile,
+          cancelRoute: "/rooms", // Mejor ruta si cancela desde mi-perfil? O un sitio seguro.
+        },
+      };
+
+      return (
+        routes[relParam] || {
+          message: texts.relDefault,
+          cancelRoute: `/rooms/${relParam}`,
+        }
+      );
+    },
+    [texts]
+  );
+  
+  // Función para obtener el texto del botón de acción
+  const getActionButtonText = useCallback(() => {
+    const relParam = searchParams.get("rel");
+
+    if (!relParam) return texts.actionRooms;
+
+    if (relParam === "registrar-propiedad") return texts.actionProperty;
+    if (relParam === "registrar-servicio") return texts.actionService;
+    if (relParam === "mi-perfil") return texts.actionProfile;
+    if (relParam === "checkout" || relParam.includes("pay"))
+      return texts.actionCheckout;
+
+    return texts.actionReserve;
+  }, [searchParams, texts]);
+
+  // useEffect para el diálogo de 'rel'
   useEffect(() => {
     const relParam = searchParams.get("rel");
 
     if (relParam) {
-      // Definimos el tipo de las claves que puede tener "relParam"
-      type RelParamType =
-        | "registrar-propiedad"
-        | "registrar-servicio"
-        | "mi-perfil"
-        | "checkout"
-        | string;
-
-      interface RelDialogConfig {
-        message: string;
-        cancelRoute: string;
-      }
-
-      const getUserCompletionMessage = (
-        relParam: RelParamType
-      ): RelDialogConfig => {
-        const routes: Record<string, RelDialogConfig> = {
-          "registrar-propiedad": {
-            message:
-              "Si desea registrar la propiedad debe completar los datos de usuario obligatoriamente",
-            cancelRoute: "/mi-panel/mis-propiedades",
-          },
-          "registrar-servicio": {
-            message:
-              "Si desea registrar un servicio debe completar los datos de usuario obligatoriamente",
-            cancelRoute: "/mi-panel/mi-servicio",
-          },
-          checkout: {
-            message:
-              "Si desea pagar la reserva debe completar los datos de usuario obligatoriamente",
-            cancelRoute: "/checkout",
-          },
-          "mi-perfil": {
-            message:
-              "Debe completar los datos de usuario obligatoriamente antes de modificar",
-            cancelRoute: "/rooms",
-          },
-        };
-
-        return (
-          routes[relParam] || {
-            message:
-              "Si desea reservar la habitación debe completar los datos de usuario obligatoriamente",
-            cancelRoute: `/rooms/${relParam}`,
-          }
-        );
-      };
-
       const { message, cancelRoute } = getUserCompletionMessage(relParam);
       setRelDialogConfig({ message, cancelRoute });
       setShowRelDialog(true);
     }
-  }, [searchParams]);
+  }, [searchParams, getUserCompletionMessage]); // Depende de la función traducida
 
+  // useEffect para cargar el usuario (sin cambios)
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     if (!token) {
@@ -143,7 +224,7 @@ export default function RegistrationPage() {
   }, [router]);
 
   const handleRegisterSubmit = (
-    values: z.infer<typeof complementaryFormSchema>
+    values: z.infer<typeof complementaryFormSchemaBase>
   ) => {
     setRegistrationData(values);
   };
@@ -181,9 +262,7 @@ export default function RegistrationPage() {
 
     const token = localStorage.getItem("access_token");
     if (!token) {
-      setCompletionMessage(
-        "Error: No se pudo obtener la información del usuario. Por favor, inicia sesión de nuevo."
-      );
+      setCompletionMessage(texts.errorAuth); // 👈 Traducido
       console.error("Session or access token missing");
       return;
     }
@@ -217,13 +296,13 @@ export default function RegistrationPage() {
 
       window.dispatchEvent(new Event("storage"));
 
-      setCompletionMessage("¡Información actualizada con éxito!");
+      setCompletionMessage(texts.successDefault); // 👈 Traducido
       setCurrentStep("success");
     } catch (error) {
       const errorMessage =
         error instanceof Error
           ? error.message
-          : "Ocurrió un error al actualizar la información. Por favor, inténtalo de nuevo.";
+          : texts.errorUpdate; // 👈 Traducido
       setCompletionMessage(errorMessage);
       console.error("User update error:", error);
     }
@@ -239,28 +318,10 @@ export default function RegistrationPage() {
     }
   };
 
-  const getActionButtonText = () => {
-    const relParam = searchParams.get("rel");
-
-    if (!relParam) return "Ver habitaciones disponibles";
-
-    if (relParam === "registrar-propiedad") return "Agregar Propiedad";
-    if (relParam === "registrar-servicio") return "Agregar Servicio";
-    if (relParam === "mi-perfil") return "Ver mi Perfil";
-    if (relParam === "checkout" || relParam.includes("pay"))
-      return "Seguir con el pago";
-
-    return "Seguir con la reserva";
-  };
-
   const handleActionButtonClick = useCallback(() => {
     const relParam = searchParams.get("rel");
 
-    console.log("[v0] handleActionButtonClick called");
-    console.log("[v0] relParam:", relParam);
-
     if (!relParam) {
-      console.log("[v0] No relParam, redirecting to /rooms");
       window.location.href = "/rooms";
       return;
     }
@@ -273,13 +334,11 @@ export default function RegistrationPage() {
     };
 
     const targetRoute = routes[relParam] || `/rooms/${relParam}`;
-
-    console.log("[v0] targetRoute:", targetRoute);
-    console.log("[v0] Navigating to:", targetRoute);
     
     window.location.href = targetRoute;
   }, [searchParams]);
 
+  // 🖼️ RENDERIZADO Y TRADUCCIÓN EN JSX
   return (
     <div className="min-h-screen bg-[#F8F8F7]">
       <Dialog open={showRelDialog} onOpenChange={setShowRelDialog}>
@@ -287,7 +346,7 @@ export default function RegistrationPage() {
           <DialogHeader>
             <div className="flex items-center gap-2 mb-2">
               <AlertCircle className="h-5 w-5 text-amber-600" />
-              <DialogTitle>Completar Datos de Usuario</DialogTitle>
+              <DialogTitle>{texts.dialogTitle}</DialogTitle> {/* 👈 Traducido */}
             </div>
             <DialogDescription className="text-base pt-2">
               {relDialogConfig?.message}
@@ -299,13 +358,13 @@ export default function RegistrationPage() {
               onClick={handleDialogCancel}
               className="flex-1 bg-transparent"
             >
-              Cancelar
+              {texts.dialogCancel} {/* 👈 Traducido */}
             </Button>
             <Button
               onClick={handleDialogAccept}
               className="flex-1 bg-[#39759E] hover:bg-[#2d5f7f]"
             >
-              Aceptar
+              {texts.dialogAccept} {/* 👈 Traducido */}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -325,12 +384,10 @@ export default function RegistrationPage() {
                 <h1
                   className={`${fraunces.className} text-2xl font-medium mb-6`}
                 >
-                  Perfil de Usuario
+                  {texts.title} {/* 👈 Traducido */}
                 </h1>
                 <p className="mb-4">
-                  Completa tu perfil para utilizar la plataforma. Si prefieres
-                  hacerlo más adelante, ten en cuenta que se te solicitará esta
-                  información en el futuro para poder operar.
+                  {texts.subtitle} {/* 👈 Traducido */}
                 </p>
               </div>
             </motion.div>
@@ -356,7 +413,9 @@ export default function RegistrationPage() {
 
               {isLoading ? (
                 <div className="flex justify-center items-center p-10 bg-white rounded-lg">
-                  <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#39759E]"></div>
+                  {/* Mensaje de carga */}
+                  <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#39759E] mr-3"></div>
+                  <span className="text-[#39759E]">{texts.loading}</span> {/* 👈 Traducido */}
                 </div>
               ) : (
                 <PerfilRegisterForm
@@ -379,10 +438,11 @@ export default function RegistrationPage() {
                 <h1
                   className={`${fraunces.className} text-2xl font-medium mb-6`}
                 >
-                  ¡Gracias, {registrationData?.first_name}!
+                  {texts.successTitle}
+                  {registrationData?.first_name}!
                 </h1>
                 <p className="mb-4">
-                  {completionMessage || "Tu información ha sido actualizada."}
+                  {completionMessage || texts.successDefault}
                 </p>
 
                 {getActionButtonText() && (
@@ -392,7 +452,7 @@ export default function RegistrationPage() {
                       className="px-16 py-6 text-base font-medium"
                       style={{ backgroundColor: "#39759E" }}
                     >
-                      {getActionButtonText()}
+                      {getActionButtonText()} {/* 👈 Traducido */}
                     </Button>
                   </div>
                 )}
@@ -412,14 +472,14 @@ export default function RegistrationPage() {
           {completionMessage && currentStep !== "success" && (
             <div
               className={`border-l-4 p-4 mt-4 mb-4 rounded ${
-                completionMessage.includes("error")
+                completionMessage.includes("Error") || completionMessage.includes("error")
                   ? "bg-red-100 border-red-500 text-red-700"
                   : "bg-green-100 border-green-500 text-green-700"
               }`}
               role="alert"
             >
               <p className="font-bold">
-                {completionMessage.includes("error") ? "Error" : "Éxito"}
+                {completionMessage.includes("Error") || completionMessage.includes("error") ? texts.alertTitleError : texts.alertTitleSuccess}
               </p>
               <p>{completionMessage}</p>
             </div>

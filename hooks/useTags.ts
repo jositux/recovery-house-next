@@ -6,6 +6,7 @@ import { useState, useEffect } from "react"
 type ExtraTag = {
   id: string
   name: string
+  name_en: string
   icon: string
   enable_property: boolean
   enable_services: boolean
@@ -14,6 +15,7 @@ type ExtraTag = {
 type ServicesTag = {
   id: string
   name: string
+  name_en: string
   icon: string
 }
 

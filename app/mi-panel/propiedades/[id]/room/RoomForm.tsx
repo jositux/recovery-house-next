@@ -635,6 +635,7 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
                     }}
                     servicesTags={serviceTags || []}
                     initialSelectedTags={field.value}
+                    lang="es"
                   />
                 </FormControl>
                 <FormMessage />
@@ -662,6 +663,7 @@ export default function RoomForm({ onSubmit, initialValues }: RoomFormProps) {
                     extraTags={extraTags || []}
                     initialSelectedTags={field.value}
                     enable="property"
+                    lang="es"
                   />
                 </FormControl>
                 <FormMessage />

@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react" // Importamos useMemo
 import { Button } from "@/components/ui/button"
 import { getCurrentUser } from "@/services/userService"
 import { cancelBooking } from "@/services/BookingCancelService"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams, useParams } from "next/navigation" // Importamos useParams
 import { Loader2, Home, Search, CheckCircle2 } from "lucide-react"
 import { BookingCard } from "./components/booking-card"
 import { BookingCardPast } from "./components/booking-card-past"
@@ -20,9 +20,46 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Fraunces } from "next/font/google"
+import { type Locale } from "@/lib/i18n" // Asumiendo que esta es la ruta correcta para tu tipo Locale
 
 const fraunces = Fraunces({ subsets: ["latin"] })
 
+// --- Objeto de Traducción ---
+const translations = {
+  es: {
+    loading: "Cargando mis reservas...",
+    error: "Error al cargar las reservas. Por favor, intente de nuevo más tarde.",
+    myBookingsTitle: "Mis Reservas",
+    upcomingTitle: "Próximas Reservas",
+    upcomingSubtitle: (count: number) => `Reservas activas y futuras (${count})`,
+    pastTitle: "Reservas Pasadas",
+    pastSubtitle: (count: number) => `Historial de estadías completadas (${count})`,
+    emptyTitle: "¡Encuentra tu espacio ideal para una recuperación tranquila!",
+    emptyMessage: "Aún no tienes reservas, pero estamos aquí para ayudarte a encontrar la casa de recuperación perfecta para tu proceso de sanación y bienestar.",
+    searchButton: "Buscar casa de recuperación",
+    modifySuccessTitle: "¡Modificación Exitosa!",
+    modifySuccessMessage: "Se ha modificado la reserva exitosamente. Puedes ver todas las reservas que tienes hechas.",
+    viewBookingsButton: "Ver Reservas",
+  },
+  en: {
+    loading: "Loading my bookings...",
+    error: "Error loading bookings. Please try again later.",
+    myBookingsTitle: "My Bookings",
+    upcomingTitle: "Upcoming Bookings",
+    upcomingSubtitle: (count: number) => `Active and future reservations (${count})`,
+    pastTitle: "Past Bookings",
+    pastSubtitle: (count: number) => `History of completed stays (${count})`,
+    emptyTitle: "Find your ideal space for a quiet recovery!",
+    emptyMessage: "You don't have any bookings yet, but we are here to help you find the perfect recovery house for your healing and wellness journey.",
+    searchButton: "Search recovery house",
+    modifySuccessTitle: "Modification Successful!",
+    modifySuccessMessage: "The booking has been successfully modified. You can view all your current reservations.",
+    viewBookingsButton: "View Bookings",
+  },
+}
+
+
+// Interfaces (sin cambios, omitidas para brevedad, pero deben estar presentes)
 interface Photo {
   directus_files_id: {
     id: string
@@ -145,7 +182,15 @@ interface PaymentDisplayValues {
   modificationDiff: number | null
 }
 
+
 const BookingList = () => {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const params = useParams()
+  
+  const lang = (params.lang as Locale) || 'es'; // Obtener lang del URL, por defecto 'es'
+  const t = useMemo(() => translations[lang], [lang]); 
+
   const [bookings, setBookings] = useState<Booking[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -159,8 +204,7 @@ const BookingList = () => {
   const [selectedPaymentBookingId, setSelectedPaymentBookingId] = useState<string | null>(null)
   const [selectedBalanceAmount, setSelectedBalanceAmount] = useState<string>("")
   const [showModifySuccessDialog, setShowModifySuccessDialog] = useState(false)
-  const router = useRouter()
-  const searchParams = useSearchParams()
+
 
   const handleCancelBooking = (bookingId: string) => {
     setSelectedCancelBookingId(bookingId)
@@ -485,7 +529,7 @@ const BookingList = () => {
         setBookings(bookingsWithReviews)
       } catch (error) {
         console.error("Error fetching data:", error)
-        setError("Error al cargar las reservas. Por favor, intente de nuevo más tarde.")
+        setError(t.error) // <-- TRADUCIDO
       } finally {
         setIsLoading(false)
       }
@@ -497,7 +541,7 @@ const BookingList = () => {
     if (rel === "modify") {
       setShowModifySuccessDialog(true)
     }
-  }, [searchParams])
+  }, [searchParams, t]) // Agregamos 't' a las dependencias
 
   const handleModifySuccessClose = () => {
     setShowModifySuccessDialog(false)
@@ -507,7 +551,7 @@ const BookingList = () => {
     return (
       <div className="flex justify-center items-center h-screen">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2 text-lg text-gray-700">Cargando mis reservas...</span>
+        <span className="ml-2 text-lg text-gray-700">{t.loading}</span> {/* <-- TRADUCIDO */}
       </div>
     )
   }
@@ -520,9 +564,14 @@ const BookingList = () => {
     )
   }
 
+  const { upcoming, past } = separateBookingsByDate(bookings)
+
   return (
     <div className="container mx-auto py-4">
-      <SuccessModal isOpen={showSuccessModal} onClose={handleSuccessModalClose} />
+      {/* Nota: Los modales (SuccessModal, CancelBookingModal, PaymentModal) NO se traducen aquí.
+        Deberías pasar el prop `lang` a estos componentes y traducirlos internamente.
+      */}
+      <SuccessModal isOpen={showSuccessModal} onClose={handleSuccessModalClose} lang={lang}/> 
 
       <CancelBookingModal
         isOpen={isCancelModalOpen}
@@ -530,6 +579,7 @@ const BookingList = () => {
         onReasonChange={setCancelReason}
         onConfirm={handleConfirmCancel}
         onClose={handleCancelModalClose}
+        lang={lang} 
       />
 
       <PaymentModal
@@ -537,8 +587,10 @@ const BookingList = () => {
         balanceAmount={selectedBalanceAmount}
         onConfirm={handleConfirmPayment}
         onClose={handlePaymentModalClose}
+        lang={lang} 
       />
 
+      {/* Diálogo de Modificación Exitosa */}
       <Dialog open={showModifySuccessDialog} onOpenChange={setShowModifySuccessDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -547,14 +599,16 @@ const BookingList = () => {
                 <CheckCircle2 className="h-8 w-8 text-green-600" />
               </div>
             </div>
-            <DialogTitle className="text-center text-xl">¡Modificación Exitosa!</DialogTitle>
+            <DialogTitle className="text-center text-xl">
+              {t.modifySuccessTitle} {/* <-- TRADUCIDO */}
+            </DialogTitle>
             <DialogDescription className="text-center text-base pt-2">
-              Se ha modificado la reserva exitosamente. Puedes ver todas las reservas que tienes hechas.
+              {t.modifySuccessMessage} {/* <-- TRADUCIDO */}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="sm:justify-center">
             <Button onClick={handleModifySuccessClose} className="w-full sm:w-auto px-8">
-              Ver Reservas
+              {t.viewBookingsButton} {/* <-- TRADUCIDO */}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -571,11 +625,10 @@ const BookingList = () => {
 
                 <div className="space-y-3">
                   <h1 className={`${fraunces.className} text-2xl md:text-3xl font-semibold text-gray-900`}>
-                    ¡Encuentra tu espacio ideal para una recuperación tranquila!
+                    {t.emptyTitle} {/* <-- TRADUCIDO */}
                   </h1>
                   <p className="text-base text-gray-600 max-w-md mx-auto">
-                    Aún no tienes reservas, pero estamos aquí para ayudarte a encontrar la casa de recuperación perfecta
-                    para tu proceso de sanación y bienestar.{" "}
+                    {t.emptyMessage}{" "} {/* <-- TRADUCIDO */}
                   </p>{" "}
                 </div>
 
@@ -586,7 +639,7 @@ const BookingList = () => {
                   onClick={() => router.push("/rooms")}
                 >
                   <Search className="mr-2 h-5 w-5" />
-                  Buscar casa de recuperación
+                  {t.searchButton} {/* <-- TRADUCIDO */}
                 </Button>
               </div>
             </div>
@@ -594,10 +647,12 @@ const BookingList = () => {
         </main>
       ) : (
         <div className="space-y-12">
-          <h1 className={`${fraunces.className} text-3xl font-normal text-[#162F40]`}>Mis Reservas</h1>
+          <h1 className={`${fraunces.className} text-3xl font-normal text-[#162F40]`}>
+            {t.myBookingsTitle} {/* <-- TRADUCIDO */}
+          </h1>
 
           {(() => {
-            const { upcoming, past } = separateBookingsByDate(bookings)
+            //const { upcoming, past } = separateBookingsByDate(bookings)
 
             return (
               <>
@@ -609,10 +664,12 @@ const BookingList = () => {
                       </div>
                       <div className="ml-4">
                         <h2 className={`${fraunces.className} text-2xl font-normal text-[#162F40]`}>
-                          Próximas Reservas
+                          {t.upcomingTitle} {/* <-- TRADUCIDO */}
                         </h2>
 
-                        <p className="text-gray-600">Reservas activas y futuras ({upcoming.length})</p>
+                        <p className="text-gray-600">
+                          {t.upcomingSubtitle(upcoming.length)} {/* <-- TRADUCIDO (con contador) */}
+                        </p>
                       </div>
                     </div>
                     <ul className="space-y-6">
@@ -626,6 +683,7 @@ const BookingList = () => {
                               paymentDisplay={paymentDisplay}
                               onCancelBooking={handleCancelBooking}
                               onPayBalance={handlePayBalance}
+                              lang={lang} 
                             />
                           </li>
                         )
@@ -642,27 +700,30 @@ const BookingList = () => {
                       </div>
                       <div className="ml-4">
                         <h2 className={`${fraunces.className} text-2xl font-normal text-[#162F40]`}>
-                          Reservas Pasadas
+                          {t.pastTitle} {/* <-- TRADUCIDO */}
                         </h2>
-                        <p className="text-gray-500">Historial de estadías completadas ({past.length})</p>
+                        <p className="text-gray-500">
+                          {t.pastSubtitle(past.length)} {/* <-- TRADUCIDO (con contador) */}
+                        </p>
                       </div>
                     </div>
                     <ul className="space-y-6">
                     {past.map((booking) => {
-  const paymentDisplay = calculatePaymentDisplay(booking);
-  return (
-    <li key={booking.id}>
-      <BookingCardPast
-        booking={booking}
-        review={booking.review}
-        isPast
-        paymentDisplay={paymentDisplay}
-        onReviewSubmit={handleReviewSubmit}
-        onReviewDelete={handleReviewDelete}
-      />
-    </li>
-  );
-})}
+                      const paymentDisplay = calculatePaymentDisplay(booking);
+                      return (
+                        <li key={booking.id}>
+                          <BookingCardPast
+                            booking={booking}
+                            review={booking.review}
+                            isPast
+                            paymentDisplay={paymentDisplay}
+                            onReviewSubmit={handleReviewSubmit}
+                            onReviewDelete={handleReviewDelete}
+                            lang={lang} 
+                          />
+                        </li>
+                      );
+                    })}
                     </ul>
                   </section>
                 )}

@@ -111,6 +111,8 @@ interface Property {
   postalCode: string;
 }
 
+// Definición simple de tipos de idioma para referencia
+import { type Locale } from "@/lib/i18n" 
 export default function RoomPage() {
   const { id } = useParams();
   const [property, setProperty] = useState<Property | null>(null);
@@ -129,6 +131,11 @@ export default function RoomPage() {
     useState<Room | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const params = useParams();
+  const lang = (params.lang as Locale) || 'es'; // Por defecto 'es'
+
+  const isSpanish = lang === "es";
 
   useEffect(() => {
     const fetchData = async () => {
@@ -439,7 +446,7 @@ export default function RoomPage() {
                   className="rounded-full bg-white hover:bg-gray-100 text-gray-800 px-4 py-2"
                 >
                   <Pencil className="h-4 w-2" />
-                  Editar
+                  {isSpanish ? "Editar" : "Edit"}
                 </Button>
 
                 <Button
@@ -473,7 +480,7 @@ export default function RoomPage() {
                     className="bg-red-900 text-orange-100 border-orange-300"
                   >
                     <AlertCircle className="w-3 h-3 mr-1" />
-                    Foto En Revisión
+                    {isSpanish ? "Foto en revisión" : "Photo under review"}
                   </Badge>
                 ) : (
                   <Badge
@@ -481,7 +488,7 @@ export default function RoomPage() {
                     className="bg-green-100 text-green-800 border-green-300"
                   >
                     <CheckCircle className="w-3 h-3 mr-1" />
-                    Foto Aprobada
+                    {isSpanish ? "Foto aprobada" : "Photo approved"}
                   </Badge>
                 )}
               </div>
@@ -506,7 +513,7 @@ export default function RoomPage() {
             <h2
               className={`${fraunces.className} text-2xl font-normal text-[#162F40] mb-4`}
             >
-              Acerca de esta propiedad
+              {isSpanish ? "Acerca de esta propiedad" : "About this property"}
             </h2>
             <p className="text-lg text-gray-700 mb-6">
               {decodeHtmlAndRemoveTags(property.description)}
@@ -531,7 +538,7 @@ export default function RoomPage() {
                 <h2
                   className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}
                 >
-                  Habitaciones / camas
+                  {isSpanish ? "Habitaciones / camas" : "Rooms / beds"}
                 </h2>
               </div>
 
@@ -542,7 +549,9 @@ export default function RoomPage() {
                 >
                   <Button className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#39759E] text-white hover:bg-green-800 transition">
                     <Plus className="h-5 w-5" />
-                    Agregar Habitación o Cama
+                    {isSpanish
+                      ? "Agregar Habitación o Cama"
+                      : "Add Room or Bed"}
                   </Button>
                 </Link>
               )}
@@ -582,7 +591,9 @@ export default function RoomPage() {
                                     className="bg-red-900 text-orange-100 border-orange-300"
                                   >
                                     <AlertCircle className="w-3 h-3 mr-1" />
-                                    Foto En Revisión
+                                    {isSpanish
+                                      ? "Foto en revisión"
+                                      : "Photo under review"}
                                   </Badge>
                                 ) : (
                                   <Badge
@@ -590,7 +601,9 @@ export default function RoomPage() {
                                     className="bg-green-100 text-green-800 border-green-300"
                                   >
                                     <CheckCircle className="w-3 h-3 mr-1" />
-                                    Foto Aprobada
+                                    {isSpanish
+                                      ? "Foto aprobada"
+                                      : "Photo approved"}
                                   </Badge>
                                 )}
                               </div>
@@ -634,11 +647,16 @@ export default function RoomPage() {
                           <div className="flex justify-between items-center mb-4">
                             <div className="flex items-center text-gray-600">
                               <Bed className="w-5 h-5 mr-2" />
-                              <span>{room.beds} camas</span>
+                              <span>
+                                {room.beds} {isSpanish ? "camas" : "beds"}
+                              </span>
                             </div>
                             <div className="flex items-center text-gray-600">
                               <User className="w-5 h-5 mr-2" />
-                              <span>{room.capacity} huéspedes</span>
+                              <span>
+                                {room.capacity}{" "}
+                                {isSpanish ? "huéspedes" : "guests"}
+                              </span>
                             </div>
                           </div>
 
@@ -647,12 +665,14 @@ export default function RoomPage() {
                               ${room.privateRoomPrice}{" "}
                               <span className="text-sm font-normal text-gray-600">
                                 {" "}
-                                USD / noche
+                                {isSpanish ? "USD / noche" : "USD / night"}
                               </span>
                             </p>
                           </div>
                           <p className="text-sm text-gray-600 mb-4">
-                            Tarifa de limpieza: ${room.privateRoomCleaning} USD
+                            {isSpanish
+                              ? `Tarifa de limpieza: ${room.privateRoomCleaning} USD`
+                              : `Cleaning fee: ${room.privateRoomCleaning} USD`}
                           </p>
                         </>
                       ) : (
@@ -663,12 +683,18 @@ export default function RoomPage() {
                                 <>
                                   <BedDouble size={16} color="#333" />
                                   &nbsp;
-                                  <span>1 cama doble</span>
+                                  <span>
+                                    {isSpanish
+                                      ? "1 cama doble"
+                                      : "1 double bed"}
+                                  </span>
                                 </>
                               ) : (
                                 <>
                                   <BedSingle size={16} color="#333" />
-                                  <span> 1 cama sencilla</span>
+                                  <span>  {isSpanish
+                                      ? "1 cama sencilla"
+                                      : "1 simple bed"}</span>
                                 </>
                               )}
                             </div>
@@ -679,12 +705,14 @@ export default function RoomPage() {
                               ${room.sharedRoomPrice}{" "}
                               <span className="text-sm font-normal text-gray-600">
                                 {" "}
-                                USD / noche
+                                {isSpanish ? "USD / noche" : "USD / night"}
                               </span>
                             </p>
                           </div>
                           <p className="text-sm text-gray-600 mb-4">
-                            Tarifa de limpieza: ${room.sharedRoomCleaning} USD
+                            {isSpanish
+                              ? `Tarifa de limpieza: ${room.sharedRoomCleaning} USD`
+                              : `Cleaning fee: ${room.sharedRoomCleaning} USD`}
                           </p>
                         </>
                       )}
@@ -697,7 +725,7 @@ export default function RoomPage() {
                             className="rounded-full bg-green-900 hover:bg-black text-white px-4 py-2 mt-2 right-0"
                           >
                             <Calendar className="h-4 w-4" />
-                            Calendario
+                            {isSpanish ? "Calendario" : "Calendar"}
                           </Button>
                         </div>
                       )}
@@ -712,10 +740,16 @@ export default function RoomPage() {
                     <Home className="h-8 w-8 text-gray-400" />
                   </div>
                   <h2 className="text-2xl font-semibold text-gray-900">
-                    Sin espacios disponibles
+                    {isSpanish
+                      ? "Sin espacios disponibles"
+                      : "No spaces available"}
                   </h2>
                   <p className="text-gray-600">
-                    El usuario aún no cargó ningún espacio para alquilar
+                    <span>
+                      {isSpanish
+                        ? "El usuario aún no cargó ningún espacio para alquilar"
+                        : "The user has not added any space for rent yet"}
+                    </span>
                   </p>
                 </div>
               </div>
@@ -724,11 +758,16 @@ export default function RoomPage() {
                 <div className="text-center space-y-6">
                   <div className="space-y-3">
                     <h2 className="text-2xl font-semibold text-gray-900">
-                      Aún no hay espacios disponibles
+                      {isSpanish
+                        ? "Sin espacios disponibles"
+                        : "No spaces available"}
                     </h2>
                     <p className="text-gray-600 leading-relaxed">
-                      Para que tu residencia de recuperación sea visible,
-                      necesitas registrar al menos un espacio de alojamiento.
+                      <span>
+                        {isSpanish
+                          ? "Para que tu residencia de recuperación sea visible, necesitas registrar al menos un espacio de alojamiento."
+                          : "For your recovery residence to be visible, you need to register at least one accommodation space."}
+                      </span>
                     </p>
                   </div>
 
@@ -737,10 +776,14 @@ export default function RoomPage() {
                       <Home className="h-5 w-5 text-gray-700 mt-0.5 flex-shrink-0" />
                       <div>
                         <h3 className="font-medium text-gray-900 mb-1">
-                          Habitación Privada
+                          <span>
+                            {isSpanish ? " Habitación Privada" : "Private Room"}
+                          </span>
                         </h3>
                         <p className="text-sm text-gray-600">
-                          Espacio exclusivo. Se reserva la habitación completa.
+                          {isSpanish
+                            ? "Espacio exclusivo. Se reserva la habitación completa."
+                            : "Private space. The entire room is reserved."}
                         </p>
                       </div>
                     </div>
@@ -748,11 +791,16 @@ export default function RoomPage() {
                       <Bed className="h-5 w-5 text-gray-700 mt-0.5 flex-shrink-0" />
                       <div>
                         <h3 className="font-medium text-gray-900 mb-1">
-                          Cama en Habitación Compartida
+                          {isSpanish
+                            ? "Cama en Habitación Compartida"
+                            : "Bed in Shared Room"}
                         </h3>
                         <p className="text-sm text-gray-600">
-                          Se reserva 1 Cama en un espacio compartido con otros
-                          pacientes.
+                          <span>
+                            {isSpanish
+                              ? "Se reserva 1 cama en un espacio compartido con otros pacientes."
+                              : "1 bed is reserved in a shared space with other patients."}
+                          </span>
                         </p>
                       </div>
                     </div>
@@ -761,12 +809,27 @@ export default function RoomPage() {
                   <Alert className="border-blue-200 bg-blue-50 text-left">
                     <Info className="h-4 w-4 text-blue-600" />
                     <AlertDescription className="text-blue-900">
-                      <p className="font-semibold mb-1">Importante:</p>
+                      <p className="font-semibold mb-1">
+                        {isSpanish ? "Importante:" : "Important:"}
+                      </p>
+
                       <p className="text-sm">
-                        Si tu propiedad es un <strong>monoambiente</strong> o{" "}
-                        <strong>apartastudio</strong>, debes cargar igualmente
-                        la habitación o cama para que esté visible para los
-                        visitantes.
+                        {isSpanish ? (
+                          <>
+                            Si tu propiedad es un <strong>monoambiente</strong>{" "}
+                            o <strong>apartastudio</strong>, debes cargar
+                            igualmente la habitación o cama para que esté
+                            visible para los visitantes.
+                          </>
+                        ) : (
+                          <>
+                            If your property is a{" "}
+                            <strong>studio apartment</strong> or{" "}
+                            <strong>single-room unit</strong>, you must still
+                            register the room or bed so it is visible to
+                            visitors.
+                          </>
+                        )}
                       </p>
                     </AlertDescription>
                   </Alert>
@@ -783,7 +846,11 @@ export default function RoomPage() {
                           href={`/mi-panel/propiedades/${property.id}/room/crear`}
                         >
                           <Plus className="h-5 w-5 mr-2" />
-                          Agregar habitación o cama
+                          <span>
+                            {isSpanish
+                              ? "Agregar Habitación o Cama"
+                              : "Add Room or Bed"}
+                          </span>
                         </Link>
                       </Button>
                     </div>
@@ -795,55 +862,68 @@ export default function RoomPage() {
         </div>
       </div>
 
-      {/* Success Dialog */}
-      <Dialog open={showModal} onOpenChange={setShowModal}>
+
+<Dialog open={showModal} onOpenChange={setShowModal}>
         <DialogContent>
           <DialogHeader>
             {updated === "property" ? (
               <>
                 <DialogTitle className="text-xl">
-                  🏡 ¡Propiedad cargada con éxito!
+                  {isSpanish
+                    ? "🏡 ¡Propiedad cargada con éxito!"
+                    : "🏡 Property successfully uploaded!"}
                 </DialogTitle>
                 <DialogDescription className="text-md">
-                  Los moderadores de la plataforma revisarán tus documentos
-                  legales y fotos. Una vez aprobados, recibirás una notificación
-                  por email y tu propiedad quedará activa.
+                  {isSpanish
+                    ? "Los moderadores de la plataforma revisarán tus documentos legales y fotos. Una vez aprobados, recibirás una notificación por email y tu propiedad quedará activa."
+                    : "Platform moderators will review your legal documents and photos. Once approved, you will receive an email notification and your property will become active."}
                   <br />
                   <br />
-                  Mientras tanto, puedes empezar a agregar las habitaciones o
-                  camas. ✨
+                  {isSpanish
+                    ? "Mientras tanto, puedes empezar a agregar las habitaciones o camas. ✨"
+                    : "In the meantime, you can start adding the rooms or beds. ✨"}
                 </DialogDescription>
               </>
             ) : updated === "room" ? (
               <>
                 <DialogTitle className="text-xl">
-                  🛏️ ¡Felitaciones, puedes disfrutar del alojamiento!
+                  {isSpanish
+                    ? "🛏️ ¡Felicitaciones, puedes disfrutar del alojamiento!"
+                    : "🛏️ You can now enjoy the accommodation!"}
                 </DialogTitle>
                 <DialogDescription className="text-md">
-                  Puedes seguir agregando más habitaciones / camas o editar las
-                  que ya creaste.
+                  {isSpanish
+                    ? "Puedes seguir agregando más habitaciones / camas o editar las que ya creaste."
+                    : "You can continue adding more rooms / beds or edit the ones you have already created."}
                   <br />
                   <br />
-                  📸 <strong>Importante:</strong> Si agregaste nuevas fotos,
-                  serán revisadas para asegurar que cumplan con las normas de la
-                  plataforma. Recibirás una notificación cuando sean aprobadas.
+                  📸 <strong>
+                    {isSpanish ? "Importante" : "Important"}
+                    :
+                  </strong>{" "}
+                  {isSpanish
+                    ? "Si agregaste nuevas fotos, serán revisadas para asegurar que cumplan con las normas de la plataforma. Recibirás una notificación cuando sean aprobadas."
+                    : "If you added new photos, they will be reviewed to ensure they comply with platform standards. You will receive a notification when they are approved."}
                 </DialogDescription>
               </>
             ) : (
               <>
                 <DialogTitle className="text-xl">
-                  🔔 Acción no reconocida
+                  {isSpanish
+                    ? "🔔 Acción no reconocida"
+                    : "🔔 Unrecognized Action"}
                 </DialogTitle>
                 <DialogDescription className="text-md">
-                  Parece que ocurrió algo inesperado. Intenta nuevamente o
-                  contacta al soporte si el problema persiste.
+                  {isSpanish
+                    ? "Parece que ocurrió algo inesperado. Intenta nuevamente o contacta al soporte si el problema persiste."
+                    : "It seems something unexpected happened. Please try again or contact support if the problem persists."}
                 </DialogDescription>
               </>
             )}
           </DialogHeader>
 
           <Button className="bg-[#39759E]" onClick={() => setShowModal(false)}>
-            Entendido
+            {isSpanish ? "Entendido" : "Got It"}
           </Button>
         </DialogContent>
       </Dialog>
@@ -853,6 +933,7 @@ export default function RoomPage() {
         isOpen={showCannotDeleteDialog}
         onClose={() => setShowCannotDeleteDialog(false)}
         type={cannotDeleteType}
+        lang={lang}
       />
 
       {/* Confirm Delete Dialog */}
@@ -865,6 +946,7 @@ export default function RoomPage() {
             ? confirmDeleteProperty
             : confirmDeleteRoom
         }
+        lang={lang}
       />
     </div>
   );

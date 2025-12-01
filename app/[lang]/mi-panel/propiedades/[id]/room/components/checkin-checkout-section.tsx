@@ -5,6 +5,70 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { LogIn, LogOut } from "lucide-react"
 
+// --- Translation Interfaces and Data ---
+
+interface TimeOption {
+    value: string;
+    label: string;
+}
+
+interface TimeTranslation {
+    checkinTitle: string;
+    checkoutTitle: string;
+    placeholder: string;
+    checkinOptions: TimeOption[];
+    checkoutOptions: TimeOption[];
+}
+
+const translations: Record<string, TimeTranslation> = {
+    es: {
+        checkinTitle: "Horario de Check-in",
+        checkoutTitle: "Horario de Check-out",
+        placeholder: "Seleccionar horario",
+        checkinOptions: [
+            { value: "12:00", label: "12:00 PM (Mediodía)" },
+            { value: "13:00", label: "1:00 PM" },
+            { value: "14:00", label: "2:00 PM" },
+            { value: "15:00", label: "3:00 PM (Estándar)" },
+            { value: "16:00", label: "4:00 PM" },
+            { value: "17:00", label: "5:00 PM" },
+            { value: "18:00", label: "6:00 PM" },
+        ],
+        checkoutOptions: [
+            { value: "09:00", label: "9:00 AM" },
+            { value: "10:00", label: "10:00 AM" },
+            { value: "11:00", label: "11:00 AM (Estándar)" },
+            { value: "12:00", label: "12:00 PM (Mediodía)" },
+            { value: "13:00", label: "1:00 PM" },
+            { value: "14:00", label: "2:00 PM" },
+        ],
+    },
+    en: {
+        checkinTitle: "Check-in Time",
+        checkoutTitle: "Check-out Time",
+        placeholder: "Select time",
+        checkinOptions: [
+            { value: "12:00", label: "12:00 PM (Noon)" },
+            { value: "13:00", label: "1:00 PM" },
+            { value: "14:00", label: "2:00 PM" },
+            { value: "15:00", label: "3:00 PM (Standard)" },
+            { value: "16:00", label: "4:00 PM" },
+            { value: "17:00", label: "5:00 PM" },
+            { value: "18:00", label: "6:00 PM" },
+        ],
+        checkoutOptions: [
+            { value: "09:00", label: "9:00 AM" },
+            { value: "10:00", label: "10:00 AM" },
+            { value: "11:00", label: "11:00 AM (Standard)" },
+            { value: "12:00", label: "12:00 PM (Noon)" },
+            { value: "13:00", label: "1:00 PM" },
+            { value: "14:00", label: "2:00 PM" },
+        ],
+    },
+}
+
+// --- Component Props Update ---
+
 interface CheckinCheckoutSectionProps {
   checkinTime: string
   setCheckinTime: (value: string) => void
@@ -12,6 +76,8 @@ interface CheckinCheckoutSectionProps {
   setCheckoutTime: (value: string) => void
   defaultCheckinTime?: string
   defaultCheckoutTime?: string
+  // Added 'lang' prop
+  lang: string
 }
 
 export function CheckinCheckoutSection({
@@ -21,7 +87,13 @@ export function CheckinCheckoutSection({
   setCheckoutTime,
   defaultCheckinTime = "15:00",
   defaultCheckoutTime = "11:00",
+  lang,
 }: CheckinCheckoutSectionProps) {
+  
+  // Select the current translation based on the lang prop
+  const currentLangKey = lang.toLowerCase().startsWith("es") ? "es" : "en";
+  const t = translations[currentLangKey];
+  
   // 🔹 Al montar, si vienen vacíos, inicializamos con los defaults
   useEffect(() => {
     if (!checkinTime || checkinTime === "") {
@@ -38,20 +110,18 @@ export function CheckinCheckoutSection({
       <div className="space-y-2">
         <Label className="flex items-center gap-2 text-sm font-medium">
           <LogIn className="h-4 w-4 text-green-600" />
-          Horario de Check-in
+          {t.checkinTitle}
         </Label>
         <Select value={checkinTime} onValueChange={setCheckinTime}>
           <SelectTrigger>
-            <SelectValue placeholder="Seleccionar horario" />
+            <SelectValue placeholder={t.placeholder} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="12:00">12:00 PM (Mediodía)</SelectItem>
-            <SelectItem value="13:00">1:00 PM</SelectItem>
-            <SelectItem value="14:00">2:00 PM</SelectItem>
-            <SelectItem value="15:00">3:00 PM (Estándar)</SelectItem>
-            <SelectItem value="16:00">4:00 PM</SelectItem>
-            <SelectItem value="17:00">5:00 PM</SelectItem>
-            <SelectItem value="18:00">6:00 PM</SelectItem>
+            {t.checkinOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
@@ -60,19 +130,18 @@ export function CheckinCheckoutSection({
       <div className="space-y-2">
         <Label className="flex items-center gap-2 text-sm font-medium">
           <LogOut className="h-4 w-4 text-red-600" />
-          Horario de Check-out
+          {t.checkoutTitle}
         </Label>
         <Select value={checkoutTime} onValueChange={setCheckoutTime}>
           <SelectTrigger>
-            <SelectValue placeholder="Seleccionar horario" />
+            <SelectValue placeholder={t.placeholder} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="09:00">9:00 AM</SelectItem>
-            <SelectItem value="10:00">10:00 AM</SelectItem>
-            <SelectItem value="11:00">11:00 AM (Estándar)</SelectItem>
-            <SelectItem value="12:00">12:00 PM (Mediodía)</SelectItem>
-            <SelectItem value="13:00">1:00 PM</SelectItem>
-            <SelectItem value="14:00">2:00 PM</SelectItem>
+            {t.checkoutOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>

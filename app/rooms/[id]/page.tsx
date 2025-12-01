@@ -179,6 +179,7 @@ interface DiscountData {
   longStayRange: { min: number; max: number | null };
 }
 
+
 const calculateAverage = (ranking: Ranking): number => {
   const values = Object.values(ranking).filter((rating) => rating > 0);
   if (values.length === 0) return 0;
@@ -662,6 +663,7 @@ export default function RoomPage() {
                 extraTags={extraTags}
                 enable="property"
                 roomTags={room.extraTags}
+                lang="es"
               />
             </div>
 
@@ -698,6 +700,7 @@ export default function RoomPage() {
                   hostExperience={hostExperience}
                   averageRating={Number(averageRating.toFixed(1))}
                   totalReviews={totalReviews}
+                  lang="es"
                 />
 
 {typeof totalReviews === "number" && totalReviews > 0 && (

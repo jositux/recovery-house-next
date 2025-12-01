@@ -7,10 +7,14 @@ import { Fraunces } from "next/font/google"
 import { uploadFile } from "@/services/fileUploadService"
 import { deleteFile } from "@/services/deleteFileService"
 import { useToast } from "@/hooks/use-toast"
+// Definición simple de tipos de idioma para referencia 
+import { type Locale } from "@/lib/i18n"
+import { useParams } from "next/navigation";
 
 const fraunces = Fraunces({ subsets: ["latin"] })
 
 import { useRouter } from "next/navigation"
+
 
 export default function RoomPage() {
   const router = useRouter()
@@ -19,6 +23,10 @@ export default function RoomPage() {
   const [newFiles, setNewFiles] = useState<File[]>([])
   const [remainingIds, setRemainingIds] = useState<string[]>([])
   const [markedForDeletion, setMarkedForDeletion] = useState<string[]>([])
+
+  const params = useParams();
+  const lang = (params.lang as Locale) || 'es'; // Por defecto 'es'
+  const isSpanish = lang === "es";
 
   const handleImagesChange = (files: File[], existingIds: string[], marked: string[]) => {
     setNewFiles(files)
@@ -170,7 +178,7 @@ export default function RoomPage() {
   return (
     <div className="min-h-screen bg-[#F8F8F7]">
       <div className="container mx-auto max-w-2xl py-4">
-        <h1 className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}>Editar Habitación / Cama</h1>
+      <h1 className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}>{isSpanish ? "Editar Habitación / Cama": "Edit Room / Bed"}</h1>
         <div className="grid gap-6 mx-auto">
           <div className="container">
             <RoomForm onSubmit={handleFormSubmit} initialValues={initialValues} onImagesChange={handleImagesChange} />

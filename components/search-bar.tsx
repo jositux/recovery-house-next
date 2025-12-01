@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useState, Suspense } from "react";
+import { useState, Suspense, useMemo } from "react";
 import { format, parseISO } from "date-fns";
 import { es, enUS } from "date-fns/locale";
 import { Search, Check, X } from "lucide-react";
@@ -9,7 +9,6 @@ import type { DateRange } from "react-day-picker";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { NumberCounter } from "./number-counter";
-//import { Input } from "@/components/ui/input"
 import LocationAutocomplete from "@/components/ui/location-autocomplete";
 import {
   Popover,
@@ -21,9 +20,33 @@ import styles from "./MedicalSearch.module.css";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 
+// Interface defining the structure for a procedure, including Spanish and English names.
 interface Procedure {
-  name: string;
+  name_es: string; // Spanish name: used as the canonical key for the URL parameter
+  name_en: string; // English name: used for display when lang is 'en'
   icon: string;
+}
+
+// Master list of procedures with names in both languages.
+// name_es is the fixed key for the URL to ensure consistency across languages.
+const ALL_PROCEDURES: Procedure[] = [
+  { name_es: "Cirugía plástica", name_en: "Plastic surgery", icon: "/assets/icons/00.svg" },
+  { name_es: "Cirugía bariátrica", name_en: "Bariatric surgery", icon: "/assets/icons/01.svg" },
+  { name_es: "Implante capilar", name_en: "Hair transplant", icon: "/assets/icons/02.svg" },
+  { name_es: "Salud mental", name_en: "Mental health", icon: "/assets/icons/03.svg" },
+  { name_es: "Rehabilitación", name_en: "Rehabilitation", icon: "/assets/icons/04.svg" },
+  { name_es: "Otro", name_en: "Other", icon: "/assets/icons/05.svg" },
+];
+
+// Utility function to get the procedure name based on the current UI language.
+const getProcedureName = (procedure: Procedure, lang: string) => {
+    return lang === 'es' ? procedure.name_es : procedure.name_en;
+}
+
+// Utility function to find a procedure object by its name in either Spanish or English.
+// This is essential for mapping the displayed name (in state) back to the canonical object (for URL generation).
+const findProcedureByAnyName = (name: string): Procedure | undefined => {
+    return ALL_PROCEDURES.find(p => p.name_es === name || p.name_en === name);
 }
 
 interface SearchParamsHandlerProps {
@@ -31,13 +54,16 @@ interface SearchParamsHandlerProps {
   setLocation: React.Dispatch<React.SetStateAction<string>>;
   setDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
   setTravelers: React.Dispatch<React.SetStateAction<number>>;
+  lang: string; // Current UI language
 }
 
+// Component responsible for reading URL search parameters and initializing the search state.
 function SearchParamsHandler({
   setSelectedProcedures,
   setLocation,
   setDate,
   setTravelers,
+  lang,
 }: SearchParamsHandlerProps) {
   const searchParams = useSearchParams();
 
@@ -49,7 +75,19 @@ function SearchParamsHandler({
     const travelersParam = searchParams.get("travelers");
 
     if (proceduresParam) {
-      setSelectedProcedures(proceduresParam.split(","));
+      const namesFromUrl = proceduresParam.split(",");
+      // CRITICAL LOGIC: Translate the names from the URL (which are always Spanish) 
+      // back into the current UI language ('lang') for display in the input fields.
+      const translatedNames = namesFromUrl
+        .map(name => {
+            // Find the procedure using the Spanish name from the URL.
+            const procedure = findProcedureByAnyName(name); 
+            // Translate the found procedure name to the current UI language (ES or EN)
+            return procedure ? getProcedureName(procedure, lang) : null; 
+        })
+        .filter((name): name is string => name !== null); // Filter out any unknown names
+
+      setSelectedProcedures(translatedNames);
     }
 
     if (locationParam) {
@@ -75,71 +113,93 @@ function SearchParamsHandler({
         setTravelers(travelersCount);
       }
     }
-  }, [searchParams, setDate, setLocation, setSelectedProcedures, setTravelers]);
+  // Rerun when searchParams or 'lang' changes to update displayed names if language is toggled.
+  }, [searchParams, setDate, setLocation, setSelectedProcedures, setTravelers, lang]); 
 
   return null;
 }
 
+// Main search bar component.
 export function SearchBar({ lang = "es" }: { lang?: string }) {
   const [selectedProcedures, setSelectedProcedures] = useState<string[]>([]);
-
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: undefined,
     to: undefined,
   });
-
+  
   const isSpanish = lang === "es";
 
-  const procedures: Procedure[] = [
-    {
-      name: isSpanish ? "Cirugía plástica" : "Plastic surgery",
-      icon: "/assets/icons/00.svg",
-    },
-    {
-      name: isSpanish ? "Cirugía bariátrica" : "Bariatric surgery",
-      icon: "/assets/icons/01.svg",
-    },
-    {
-      name: isSpanish ? "Implante capilar" : "Hair transplant",
-      icon: "/assets/icons/02.svg",
-    },
-    {
-      name: isSpanish ? "Salud mental" : "Mental health",
-      icon: "/assets/icons/03.svg",
-    },
-    {
-      name: isSpanish ? "Rehabilitación" : "Rehabilitation",
-      icon: "/assets/icons/04.svg",
-    },
-    { name: isSpanish ? "Otro" : "Other", icon: "/assets/icons/05.svg" },
-  ];
+  // Use useMemo to efficiently calculate the list of procedures for the UI display,
+  // ensuring the names are always in the current 'lang'.
+  const currentProcedures = useMemo(() => {
+      return ALL_PROCEDURES.map(p => ({
+          name: isSpanish ? p.name_es : p.name_en,
+          icon: p.icon,
+      }));
+  }, [isSpanish]);
+
+  // useEffect to translate the currently selected procedures in the component state 
+  // when the UI language ('lang') changes (e.g., from EN to ES).
+  React.useEffect(() => {
+    setSelectedProcedures(prevSelected => {
+      if (prevSelected.length === 0) return prevSelected;
+
+      const translated = prevSelected
+        .map(oldName => {
+          // Find the procedure object using the existing display name (oldName).
+          const procedure = findProcedureByAnyName(oldName);
+          // Get the new display name in the current 'lang'.
+          return procedure ? getProcedureName(procedure, lang) : oldName;
+        })
+        .filter((name, index, self) => self.indexOf(name) === index);
+
+      return translated;
+    });
+  }, [lang]); 
 
   const [travelers, setTravelers] = React.useState(1);
   const [location, setLocation] = React.useState("");
 
+  // Toggles the selection state. The state holds the name in the CURRENT UI language.
   const toggleProcedure = (procedureName: string) => {
-    setSelectedProcedures((prev) =>
-      prev.includes(procedureName)
+    setSelectedProcedures((prev) => {
+      return prev.includes(procedureName)
         ? prev.filter((name) => name !== procedureName)
-        : [...prev, procedureName]
-    );
+        : [...prev, procedureName];
+    });
   };
 
-  //const resetLocation = () => setLocation("")
   const resetDates = () => setDate(undefined);
   const resetTravelers = () => setTravelers(1);
 
   const router = useRouter();
 
+  // Handles search submission, building the URL with consistent parameters.
   const handleSearch = () => {
     const searchParams = new URLSearchParams();
+    
+    // --- KEY BLOCK: FORCE TRANSLATION TO SPANISH FOR URL CONSISTENCY ---
     if (selectedProcedures.length > 0) {
-      searchParams.append("procedures", selectedProcedures.join(","));
+      const spanishProcedureNames = selectedProcedures
+        .map(displayName => {
+          // 1. Find the master procedure object using the name currently visible in the UI (displayName, which is ES or EN).
+          const procedure = findProcedureByAnyName(displayName);
+          // 2. Return the Spanish name (name_es) for the URL parameter. 
+          // THIS IS THE CORE REQUIREMENT: ensures the URL value is consistently Spanish (e.g., procedures=Cirugía%20plástica)
+          // regardless of whether the user saw "Plastic surgery" or "Cirugía plástica" when clicking the button.
+          return procedure ? procedure.name_es : displayName; 
+        })
+        .filter((name, index, self) => self.indexOf(name) === index); // Ensure uniqueness
+        
+      searchParams.append("procedures", spanishProcedureNames.join(","));
     }
+    // ------------------------------------------------------------------
+    
     if (location) {
       searchParams.append("location", location);
     }
     if (date?.from) {
+      // Store dates in ISO format (YYYY-MM-DD)
       searchParams.append("checkIn", date.from.toISOString().split("T")[0]);
     }
     if (date?.to) {
@@ -149,18 +209,20 @@ export function SearchBar({ lang = "es" }: { lang?: string }) {
       searchParams.append("travelers", travelers.toString());
     }
 
-    const searchUrl = `/rooms?${searchParams.toString()}`;
+    const searchUrl = `rooms?${searchParams.toString()}`;
     router.push(searchUrl);
   };
 
   return (
     <>
+      {/* Suspense wrapper for Next.js hooks */}
       <Suspense fallback={null}>
         <SearchParamsHandler
           setSelectedProcedures={setSelectedProcedures}
           setLocation={setLocation}
           setDate={setDate}
           setTravelers={setTravelers}
+          lang={lang} // Pass the language for proper URL-to-state translation
         />
       </Suspense>
       <div
@@ -169,6 +231,7 @@ export function SearchBar({ lang = "es" }: { lang?: string }) {
         <div className="px-8 bg-[#1B2B3A] rounded-3xl">
           <div className="flex flex-col md:flex-row md:items-center gap-6">
             <h2 className="text-white leading-[1.2rem] font-medium text-sm whitespace-nowrap">
+              {/* Conditional text based on language */}
               {isSpanish ? (
                 <>
                   Motivo médico <br />
@@ -182,7 +245,8 @@ export function SearchBar({ lang = "es" }: { lang?: string }) {
               )}
             </h2>
             <div className="grid grid-cols-6 md:grid-cols-6 gap-10 flex-1">
-              {procedures.map((procedure) => (
+              {/* Procedure selection buttons */}
+              {currentProcedures.map((procedure) => (
                 <Button
                   key={procedure.name}
                   variant="ghost"
@@ -201,9 +265,10 @@ export function SearchBar({ lang = "es" }: { lang?: string }) {
                       height={32}
                       className="w-8 h-8"
                     />
+                    {/* Checkmark icon for selected procedures */}
                     {selectedProcedures.includes(procedure.name) && (
                       <div className="absolute top-2 -right-6 bg-[#69C6FB] rounded-full p-0.5">
-                        <Check className="w-3 h-3 text-white" />
+                        <Check className="h-3 w-3 text-white" />
                       </div>
                     )}
                   </div>
@@ -215,7 +280,7 @@ export function SearchBar({ lang = "es" }: { lang?: string }) {
         </div>
 
         <div className="flex items-center px-6 gap-1 p-2 bg-white rounded-2xl shadow-lg border">
-          {/* Lugar */}
+          {/* Location Input */}
           <div className="relative flex-1">
             <div className="py-1">
               <div className="text-sm font-semibold mb-1">
@@ -228,34 +293,13 @@ export function SearchBar({ lang = "es" }: { lang?: string }) {
                 }}
                 lang={lang}
               />
-              {/*<div className="relative">
-                <Input
-                  type="text"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="Dónde deseas recuperarte?"
-                  className="border-0 p-0 h-6 text-sm focus-visible:ring-0 placeholder:text-muted-foreground pr-6"
-                />
-                {location && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-1/2 -translate-y-1/2 h-4 w-4 p-0"
-                    onClick={resetLocation}
-                  >
-                    <X className="h-3 w-3" />
-                  </Button>
-                )}
-
-
-                </div>*/}
             </div>
           </div>
 
           {/* Separator */}
           <div className="h-8 w-px bg-gray-200" />
 
-          {/* Check-in/Check-out */}
+          {/* Check-in/Check-out Date Picker */}
           <Popover>
             <PopoverTrigger asChild>
               <div className="flex-1 flex cursor-pointer rounded-full hover:bg-gray-100 px-6 py-3 relative">
@@ -289,6 +333,7 @@ export function SearchBar({ lang = "es" }: { lang?: string }) {
                     </div>
                   </div>
                 </div>
+                {/* Reset dates button */}
                 {date && (
                   <Button
                     variant="ghost"
@@ -310,7 +355,7 @@ export function SearchBar({ lang = "es" }: { lang?: string }) {
                 onSelect={setDate}
                 numberOfMonths={2}
                 locale={isSpanish ? es : enUS}
-                disabled={{ before: new Date() }}
+                disabled={{ before: new Date() }} // Disable past dates
               />
             </PopoverContent>
           </Popover>
@@ -318,7 +363,7 @@ export function SearchBar({ lang = "es" }: { lang?: string }) {
           {/* Separator */}
           <div className="h-8 w-px bg-gray-200" />
 
-          {/* Viajeros */}
+          {/* Travelers Counter */}
           <Popover>
             <PopoverTrigger asChild>
               <div className="relative flex-1">
@@ -337,6 +382,7 @@ export function SearchBar({ lang = "es" }: { lang?: string }) {
                       ? "patient"
                       : "patients"}
                   </div>
+                  {/* Reset travelers button */}
                   {travelers > 1 && (
                     <Button
                       variant="ghost"
@@ -353,9 +399,11 @@ export function SearchBar({ lang = "es" }: { lang?: string }) {
             <PopoverContent className="w-80 p-4" align="end">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-medium">Pacientes</div>
+                  <div className="font-medium">
+                    {isSpanish ? "Pacientes" : "Patients"}
+                  </div>
                   <div className="text-sm text-muted-foreground">
-                    Cantidad de personas
+                    {isSpanish ? "Cantidad de personas" : "Number of people"}
                   </div>
                 </div>
                 <NumberCounter

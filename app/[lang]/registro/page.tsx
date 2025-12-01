@@ -3,7 +3,10 @@
 import { useState } from "react"; // Removed useEffect
 import { motion } from "framer-motion"; // Removed AnimatePresence
 // Removed Button import
-import SimpleRegisterForm, { formSchema } from "@/components/forms/SimpleRegisterForm"; // Changed import
+import SimpleRegisterForm, {
+  formSchemaBase, // 👈 Importamos el esquema base estático para tipado
+} from "@/components/forms/SimpleRegisterForm";
+
 // Removed LoginForm import
 import { Fraunces } from "next/font/google";
 import Image from "next/image";
@@ -12,6 +15,10 @@ const fraunces = Fraunces({ subsets: ["latin"] });
 
 import { z } from "zod";
 
+// Definición simple de tipos de idioma para referencia
+import { type Locale } from "@/lib/i18n";
+import { useParams } from "next/navigation";
+
 import {
   simpleRegisterService,
   RegisterCredentials,
@@ -19,9 +26,13 @@ import {
 
 // Removed RegistrationStep type
 // Updated RegistrationData type to use the new formSchema
-type RegistrationData = z.infer<typeof formSchema>;
+type RegistrationData = z.infer<typeof formSchemaBase>;
 
 export default function RegistrationPage() {
+  const params = useParams();
+  const lang = (params.lang as Locale) || "es"; // Por defecto 'es'
+  const isSpanish = lang === "es";
+
   // Removed currentStep and registrationData state
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showVerificationMessage, setShowVerificationMessage] = useState(false); // Added state for verification message
@@ -61,9 +72,7 @@ export default function RegistrationPage() {
       }
     } catch (error) {
       console.error("Registration failed:", error);
-      setSuccessMessage(
-        `${error}`
-      );
+      setSuccessMessage(`${error}`);
       if (error instanceof Error) {
         // Optionally log more details
       }
@@ -79,21 +88,26 @@ export default function RegistrationPage() {
 
         {!showVerificationMessage ? (
           <>
-          <div className="sm:mx-auto sm:w-full sm:max-w-md">
-            <h1 className={`${fraunces.className} text-2xl sm:mx-auto font-medium mb-6`}>
-            Registrate en Recovery Care Solutions
-            </h1>
-            <p className="mb-4">
-            Solo necesitás un correo y una contraseña. Después puedes continuar configurando tu perfil.
-
+            <div className="sm:mx-auto sm:w-full sm:max-w-md">
+              <h1
+                className={`${fraunces.className} text-2xl sm:mx-auto font-medium mb-6`}
+              >
+                {isSpanish
+                  ? "Registrate en Recovery Care Solutions"
+                  : "Register in Recovery Care Solutions"}
+              </h1>
+              <p className="mb-4">
+                {isSpanish
+                  ? "Solo necesitás un correo y una contraseña. Después puedes continuar configurando tu perfil."
+                  : "You only need an email and a password. After that, you can continue setting up your profile."}
               </p>
             </div>
             {/* Use SimpleRegisterForm */}
             <div className="sm:mx-auto p-8 sm:w-full sm:max-w-md bg-white bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-            <SimpleRegisterForm
-              onSubmit={handleRegisterSubmit}
-              // Removed initialValues as they are not relevant for simple form state
-            />
+              <SimpleRegisterForm
+                onSubmit={handleRegisterSubmit}
+                // Removed initialValues as they are not relevant for simple form state
+              />
             </div>
           </>
         ) : (
@@ -108,12 +122,13 @@ export default function RegistrationPage() {
               <h1
                 className={`${fraunces.className} text-2xl text-center font-medium mb-6`}
               >
-                ¡Bienvenido! {/* Simplified welcome message */}
+                {/* Simplified welcome message */}
+                {isSpanish ? "¡Bienvenido!" : "Welcome!"}
               </h1>
               <p className="mb-4">
-                Se ha enviado un email para activar esta cuenta, por favor
-                revisa tu bandeja de entrada y sigue las instrucciones para
-                completar el proceso de activación de tu cuenta.
+                {isSpanish
+                  ? "Se ha enviado un email para activar esta cuenta, por favor revisa tu bandeja de entrada y sigue las instrucciones para completar el proceso de activación de tu cuenta."
+                  : "An email has been sent to activate this account. Please check your inbox and follow the instructions to complete the account activation process."}
               </p>
               <div className="flex justify-center">
                 <Image
@@ -131,8 +146,17 @@ export default function RegistrationPage() {
 
         {/* Keep success/error message display */}
         {successMessage && (
-          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mt-4 mb-4 rounded" role="alert">
-            <p className="font-bold">¡Atención!</p>
+          <div
+            className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mt-4 mb-4 rounded"
+            role="alert"
+          >
+            <p className="font-bold">
+             
+              {isSpanish
+  ? "¡Atención!"
+  : "Attention!"
+}
+            </p>
             <p>{successMessage}</p>
           </div>
         )}

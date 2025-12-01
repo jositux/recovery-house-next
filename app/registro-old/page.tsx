@@ -220,7 +220,7 @@ export default function RegistrationPage() {
                 Bienvenido, {registrationData?.first_name}
               </h1>
               <p className="mb-4">Por favor, inicia sesión para continuar.</p>
-              <LoginForm />
+              <LoginForm lang="es"/>
             </motion.div>
           )}
           
