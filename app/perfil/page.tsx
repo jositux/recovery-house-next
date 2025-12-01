@@ -9,8 +9,9 @@ import type { z } from "zod";
 
 // Import components
 import PerfilRegisterForm, {
-  type complementaryFormSchema,
+  complementaryFormSchemaBase, // 👈 Si necesitas el objeto esquema estático
 } from "@/components/forms/PerfilRegisterForm";
+
 import { ProfileImageSection } from "@/components/profile/ProfileImageSection";
 import { getCurrentUser, type User } from "@/services/userService";
 import {
@@ -32,7 +33,7 @@ import { AlertCircle } from "lucide-react";
 const fraunces = Fraunces({ subsets: ["latin"] });
 
 type RegistrationStep = "details" | "success";
-type RegistrationData = z.infer<typeof complementaryFormSchema>;
+type RegistrationData = z.infer<typeof complementaryFormSchemaBase>;
 
 export default function RegistrationPage() {
   const [currentStep, setCurrentStep] = useState<RegistrationStep>("details");
@@ -143,7 +144,7 @@ export default function RegistrationPage() {
   }, [router]);
 
   const handleRegisterSubmit = (
-    values: z.infer<typeof complementaryFormSchema>
+    values: z.infer<typeof complementaryFormSchemaBase>
   ) => {
     setRegistrationData(values);
   };

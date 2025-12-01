@@ -14,57 +14,71 @@ import {
   LogOut,
 } from "lucide-react"
 
+
+import { type Locale } from "@/lib/i18n" 
+
 interface SidebarContentProps {
   userName: string
+  lang: Locale // Usamos el tipo Locale
   onLogout: () => void
   onNavigate?: () => void
 }
 
-export function SidebarContent({ userName, onLogout, onNavigate }: SidebarContentProps) {
+export function SidebarContent({ userName, lang, onLogout, onNavigate }: SidebarContentProps) {
   const pathname = usePathname()
+  
+  // 1. Lógica de traducción
+  const isSpanish = lang === "es";
+  const t = (es: string, en: string) => isSpanish ? es : en;
 
+  // 2. Definición de elementos de navegación con traducción
   const navItems = [
     {
-      name: "Mi Panel",
+      name: t("Mi Panel", "My Dashboard"),
       href: "/mi-panel",
       icon: LayoutGrid,
     },
     {
-      name: "Mis Propiedades",
+      name: t("Mis Propiedades", "My Properties"),
       href: "/mi-panel/mis-propiedades",
       icon: Building2,
     },
     {
-      name: "Mis Reservas",
+      name: t("Mis Reservas", "My Bookings"),
       href: "/mi-panel/reservas-realizadas",
       icon: CalendarArrowUp,
     },
     {
-      name: "Reservas recibidas",
+      name: t("Reservas recibidas", "Received Bookings"),
       href: "/mi-panel/reservas-recibidas",
       icon: CalendarArrowDown,
     },
     {
-      name: "Mi Servicio",
+      name: t("Mi Servicio", "My Service"),
       href: "/mi-panel/mi-servicio",
       icon: HandHelpingIcon,
     },
     {
-      name: "Nueva Propiedad",
+      name: t("Nueva Propiedad", "New Property"),
       href: "/mi-panel/registrar-propiedad",
       icon: PlusCircle,
     },
     {
-      name: "Nuevo Servicio",
+      name: t("Nuevo Servicio", "New Service"),
       href: "/mi-panel/registrar-servicio",
       icon: PlusCircle,
     },
   ]
 
+  // 3. Textos para el área de usuario y logout
+  //const profileLinkText = t("Mi Perfil", "My Profile");
+  const logoutText = t("Cerrar sesión", "Logout");
+
   return (
     <>
       <nav className="space-y-2 mt-12 lg:mt-0">
         {navItems.map((item) => {
+          // El nombre del ítem ahora está traducido
           const isActive = pathname === item.href
           const Icon = item.icon
 
@@ -106,7 +120,7 @@ export function SidebarContent({ userName, onLogout, onNavigate }: SidebarConten
           className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
         >
           <LogOut className="w-5 h-5" />
-          <span className="font-medium">Cerrar sesión</span>
+          <span className="font-medium">{logoutText}</span>
         </button>
       </div>
     </>

@@ -14,19 +14,90 @@ import { loginService, type LoginCredentials } from "@/services/loginService"
 import { getCurrentUser, type User } from "@/services/userService"
 import Link from "next/link"
 
-export function LoginForm() {
+// --- Translation Interfaces and Data ---
+
+interface LoginTranslation {
+  emailLabel: string
+  passwordLabel: string
+  emailPlaceholder: string
+  passwordPlaceholder: string
+  emailInvalid: string
+  passwordMinLength: string
+  showPassword: string
+  hidePassword: string
+  forgotPassword: string
+  noAccount: string
+  noAccountLink: string
+  submitButton: string
+  loadingButton: string
+  authErrorGeneric: string
+  authError401: string
+  authErrorOther: (status: number | string, text: string) => string
+}
+
+const translations: Record<string, LoginTranslation> = {
+  es: {
+    emailLabel: "Email",
+    passwordLabel: "Contraseña",
+    emailPlaceholder: "tu@email.com",
+    passwordPlaceholder: "Tu contraseña",
+    emailInvalid: "Por favor ingresa un email válido.",
+    passwordMinLength: "La contraseña debe tener al menos 6 caracteres.",
+    showPassword: "Mostrar contraseña",
+    hidePassword: "Ocultar contraseña",
+    forgotPassword: "¿Has olvidado la contraseña?",
+    noAccount: "¿Aún no tienes cuenta?",
+    noAccountLink: "Regístrate",
+    submitButton: "Iniciar sesión",
+    loadingButton: "Iniciando sesión...",
+    authErrorGeneric: "Verifica usuario y/o contraseña",
+    authError401: "Verifica usuario y/o contraseña",
+    authErrorOther: (status, text) => `Error: ${status} - ${text}`,
+  },
+  en: {
+    emailLabel: "Email",
+    passwordLabel: "Password",
+    emailPlaceholder: "your@email.com",
+    passwordPlaceholder: "Your password",
+    emailInvalid: "Please enter a valid email.",
+    passwordMinLength: "The password must be at least 6 characters long.",
+    showPassword: "Show password",
+    hidePassword: "Hide password",
+    forgotPassword: "Forgot your password?",
+    noAccount: "Don't have an account yet?",
+    noAccountLink: "Register",
+    submitButton: "Log in",
+    loadingButton: "Logging in...",
+    authErrorGeneric: "Check username and/or password",
+    authError401: "Check username and/or password",
+    authErrorOther: (status, text) => `Error: ${status} - ${text}`,
+  },
+}
+
+// --- Component Props Update ---
+
+interface LoginFormProps {
+    lang: string;
+}
+
+export function LoginForm({ lang }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [authError, setAuthError] = useState<string | null>(null)
 
   const router = useRouter()
 
+  // Select the current translation object
+  const currentLangKey = lang.toLowerCase().startsWith("es") ? "es" : "en"
+  const t = translations[currentLangKey]
+
+  // Dynamic Zod Schema using translations
   const loginSchema = z.object({
     email: z.string().email({
-      message: "Por favor ingresa un email válido.",
+      message: t.emailInvalid,
     }),
     password: z.string().min(6, {
-      message: "La contraseña debe tener al menos 6 caracteres.",
+      message: t.passwordMinLength,
     }),
   })
 
@@ -86,14 +157,18 @@ export function LoginForm() {
     } catch (error) {
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 401) {
-          setAuthError("Verifica usuario y/o contraseña")
+          setAuthError(t.authError401)
         } else {
           setAuthError(
-            `Error: ${error.response?.status || "Sin código"} - ${error.response?.statusText || "Sin mensaje"}`,
+            t.authErrorOther(
+              error.response?.status || "Sin código",
+              error.response?.statusText || "Sin mensaje"
+            ),
           )
         }
       } else {
-        setAuthError("Verifica usuario y/o contraseña")
+        // Fallback for non-Axios errors
+        setAuthError(t.authErrorGeneric)
       }
     } finally {
       setIsLoading(false)
@@ -108,9 +183,9 @@ export function LoginForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>{t.emailLabel}</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="tu@email.com" {...field} />
+                <Input type="email" placeholder={t.emailPlaceholder} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -121,10 +196,10 @@ export function LoginForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Contraseña</FormLabel>
+              <FormLabel>{t.passwordLabel}</FormLabel>
               <FormControl>
                 <div className="relative">
-                  <Input type={showPassword ? "text" : "password"} placeholder="Tu contraseña" {...field} />
+                  <Input type={showPassword ? "text" : "password"} placeholder={t.passwordPlaceholder} {...field} />
                   <Button
                     type="button"
                     variant="ghost"
@@ -133,7 +208,7 @@ export function LoginForm() {
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    <span className="sr-only">{showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}</span>
+                    <span className="sr-only">{showPassword ? t.hidePassword : t.showPassword}</span>
                   </Button>
                 </div>
               </FormControl>
@@ -148,15 +223,16 @@ export function LoginForm() {
         )}
         <div className="text-sm">
           <Link href="/user/request-password" className="text-[#39759E] hover:underline">
-            ¿Has olvidado la contraseña?
+            {t.forgotPassword}
           </Link>
         </div>
         <Button type="submit" className="w-full bg-[#39759E] hover:bg-[#39759E]" disabled={isLoading}>
-          {isLoading ? "Iniciando sesión..." : "Iniciar sesión"}
+          {isLoading ? t.loadingButton : t.submitButton}
         </Button>
         <div className="text-sm text-center">
+          {t.noAccount}{" "}
           <Link href="/registro" className="text-[#39759E] hover:underline">
-            ¿Aún no tienes cuenta? Regístrate
+            {t.noAccountLink}
           </Link>
         </div>
       </form>

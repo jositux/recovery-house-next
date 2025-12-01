@@ -372,6 +372,7 @@ useEffect(() => {
                 extraTags={extraTags}
                 enable="property"
                 roomTags={room.extraTags}
+                lang="es"
               />
             </div>
 

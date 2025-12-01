@@ -144,7 +144,7 @@ export default function RegistrationPage() {
             >
               <h1 className="text-2xl font-bold mb-6">Bienvenido, {registrationData?.first_name}</h1>
               <p className="mb-4">Por favor, inicia sesión para continuar.</p>
-              <LoginForm />
+              <LoginForm lang="es" />
             </motion.div>
           )}
         </AnimatePresence>

@@ -2,8 +2,11 @@
 
 import { Building2, Calendar, DollarSign, Users } from "lucide-react"
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+// Importamos useParams para obtener el idioma de la URL
+import { useRouter, useParams } from "next/navigation" 
 import { getCurrentUser } from "@/services/userService"
+
+import { type Locale } from "@/lib/i18n" 
 
 interface Booking {
   id: string
@@ -44,8 +47,36 @@ interface Statistics {
   currentMonthBookings: number
 }
 
+// Objeto de traducción simple
+const T_MAP = {
+  'Propiedades': { es: 'Propiedades', en: 'Properties' },
+  'Reservas Recibidas': { es: 'Reservas Recibidas', en: 'Bookings Received' },
+  'Ingresos Totales': { es: 'Ingresos Totales', en: 'Total Revenue' },
+  'Opiniones': { es: 'Opiniones', en: 'Reviews' },
+  'este mes': { es: 'este mes', en: 'this month' },
+  'Error al cargar las estadísticas': { es: 'Error al cargar las estadísticas', en: 'Error loading statistics' },
+  'Error al cargar las reservas': { es: 'Error al cargar las reservas', en: 'Error loading bookings' },
+  'Error al cargar los datos': { es: 'Error al cargar los datos', en: 'Error loading data' },
+  'Propiedad no encontrada': { es: 'Propiedad no encontrada', en: 'Property not found' },
+  'Huésped': { es: 'Huésped', en: 'Guest' },
+  'Pendiente': { es: 'Pendiente', en: 'Pending' },
+  'Pagado 10%': { es: 'Pagado 10%', en: 'Paid 10%' },
+  'Pago total': { es: 'Pago total', en: 'Full payment' },
+  'Reservas Recientes': { es: 'Reservas Recientes', en: 'Recent Bookings' },
+  'No hay reservas recientes': { es: 'No hay reservas recientes', en: 'No recent bookings' },
+};
+
+// Función de traducción
+const t = (key: keyof typeof T_MAP, lang: Locale): string => {
+  return T_MAP[key]?.[lang] || key;
+};
+
 export default function DashboardPage() {
   const router = useRouter()
+  // 1. Obtener el idioma de la URL usando useParams()
+  const params = useParams();
+  const lang = (params.lang as Locale) || 'es'; // Default to 'es' if not found
+
   const [bookings, setBookings] = useState<Booking[]>([])
   const [statistics, setStatistics] = useState<Statistics | null>(null)
   const [loading, setLoading] = useState(true)
@@ -53,9 +84,11 @@ export default function DashboardPage() {
 
   useEffect(() => {
     async function loadDashboardData() {
+      // Mantenemos la obtención del token desde localStorage
       const token = localStorage.getItem("access_token")
 
       if (!token) {
+        // Redirección en el cliente
         router.push("/login")
         return
       }
@@ -83,7 +116,7 @@ export default function DashboardPage() {
           const statsData = await statisticsResponse.json()
           setStatistics(statsData.data || statsData)
         } else {
-          setError("Error al cargar las estadísticas")
+          setError(t('Error al cargar las estadísticas', lang))
         }
 
         if (bookingsResponse.ok) {
@@ -91,47 +124,48 @@ export default function DashboardPage() {
      
           setBookings(bookingsData.data || [])
         } else {
-          setError("Error al cargar las reservas")
+          setError(t('Error al cargar las reservas', lang))
         }
       } catch (err) {
         console.error("Error loading dashboard data:", err)
-        setError("Error al cargar los datos")
+        setError(t('Error al cargar los datos', lang))
       } finally {
         setLoading(false)
       }
     }
 
     loadDashboardData()
-  }, [router])
+  }, [router, lang]) // Añadimos 'lang' al array de dependencias si cambiara dinámicamente
 
+  // --- Aplicamos la traducción con 't' ---
   const stats = [
     {
-      label: "Propiedades",
+      label: t("Propiedades", lang),
       value: statistics?.propertyQuantity?.toString() || "0",
       icon: Building2,
       bgColor: "bg-blue-50",
       iconColor: "text-blue-500",
     },
     {
-      label: "Reservas Recibidas",
+      label: t("Reservas Recibidas", lang),
       value: statistics?.bookingQuantity?.toString() || "0",
       change:
         statistics?.currentMonthBookings && statistics.currentMonthBookings > 0
-          ? `+${statistics.currentMonthBookings} este mes`
+          ? `+${statistics.currentMonthBookings} ${t('este mes', lang)}`
           : undefined,
       icon: Calendar,
       bgColor: "bg-red-50",
       iconColor: "text-red-500",
     },
     {
-      label: "Ingresos Totales",
+      label: t("Ingresos Totales", lang),
       value: `$${statistics?.paymentReceivedAmountSum?.toFixed(0) || "0"}`,
       icon: DollarSign,
       bgColor: "bg-green-50",
       iconColor: "text-green-500",
     },
     {
-      label: "Opiniones",
+      label: t("Opiniones", lang),
       value: statistics?.reviewQuantity?.toString() || "0",
       icon: Users,
       bgColor: "bg-purple-50",
@@ -141,8 +175,7 @@ export default function DashboardPage() {
 
   const recentBookings = bookings.map((booking) => {
     let price = `$${booking.finalPrice}`
-    let status = "Pendiente"
-    const roomName = booking.roomName
+    let status: keyof typeof T_MAP = "Pendiente"
 
     if (booking.paymentState === "pendingRefund") {
       status = "Pagado 10%"
@@ -153,18 +186,19 @@ export default function DashboardPage() {
     }
 
     return {
-      property: booking.room?.propertyId?.name || booking.propertyName || "Propiedad no encontrada",
-      guest: booking.patientName || "Huésped",
-      dates: `${new Date(booking.checkIn).toLocaleDateString("es-ES", {
+      property: booking.room?.propertyId?.name || booking.propertyName || t("Propiedad no encontrada", lang),
+      guest: booking.patientName || t("Huésped", lang),
+      // 2. Usar 'lang' para formatear la fecha
+      dates: `${new Date(booking.checkIn).toLocaleDateString(lang, {
         day: "numeric",
         month: "short",
-      })} - ${new Date(booking.checkOut).toLocaleDateString("es-ES", {
+      })} - ${new Date(booking.checkOut).toLocaleDateString(lang, {
         day: "numeric",
         month: "short",
       })}`,
       price,
-      status,
-      roomName,
+      status: t(status, lang),
+      roomName: booking.roomName,
     }
   })
 
@@ -214,33 +248,33 @@ export default function DashboardPage() {
 
       {/* Recent Bookings */}
       <div className="bg-white rounded-xl p-6 shadow-sm">
-  <h2 className="text-xl font-bold text-gray-900 mb-6">Reservas Recientes</h2>
-  {recentBookings.length > 0 ? (
-    <div className="space-y-4">
-      {recentBookings.map((booking, index) => (
-        <div
-          key={index}
-          className="flex flex-col md:flex-row md:justify-between transition-colors border-b border-gray-200 last:border-0 pb-4"
-        >
-          <div>
-            <h3 className="font-semibold text-gray-900">
-              {booking.roomName} - {booking.property}
-            </h3>
-            <p className="text-sm text-gray-600">
-              {booking.guest} • {booking.dates}
-            </p>
+        <h2 className="text-xl font-bold text-gray-900 mb-6">{t("Reservas Recientes", lang)}</h2>
+        {recentBookings.length > 0 ? (
+          <div className="space-y-4">
+            {recentBookings.map((booking, index) => (
+              <div
+                key={index}
+                className="flex flex-col md:flex-row md:justify-between transition-colors border-b border-gray-200 last:border-0 pb-4"
+              >
+                <div>
+                  <h3 className="font-semibold text-gray-900">
+                    {booking.roomName} - {booking.property}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    {booking.guest} • {booking.dates}
+                  </p>
+                </div>
+                <div className="md:text-right">
+                  <p className="text-lg font-bold text-green-500">{booking.price}</p>
+                  <p className="text-sm text-gray-600">{booking.status}</p>
+                </div>
+              </div>
+            ))}
           </div>
-          <div className="md:text-right">
-            <p className="text-lg font-bold text-green-500">{booking.price}</p>
-            <p className="text-sm text-gray-600">{booking.status}</p>
-          </div>
-        </div>
-      ))}
-    </div>
-  ) : (
-    <p className="text-gray-500 text-center py-8">No hay reservas recientes</p>
-  )}
-</div>
+        ) : (
+          <p className="text-gray-500 text-center py-8">{t("No hay reservas recientes", lang)}</p>
+        )}
+      </div>
 
     </div>
   )

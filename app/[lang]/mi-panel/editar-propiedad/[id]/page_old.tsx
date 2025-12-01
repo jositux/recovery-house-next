@@ -437,6 +437,7 @@ export default function EditPropertyPage({
                     state: form.formState.errors.state?.message,
                     city: form.formState.errors.city?.message,
                   }}
+                  lang="es"
                 />
               )}
               <div className="hidden">
@@ -469,7 +470,7 @@ export default function EditPropertyPage({
                 )}
               />
 
-              <GoogleMapsSelector onLocationSelected={handleLocationSelected} defaultLocation={defaultLocation} />
+              <GoogleMapsSelector onLocationSelected={handleLocationSelected} defaultLocation={defaultLocation} lang="es"/>
 
               <div className="hidden">
                 <FormField

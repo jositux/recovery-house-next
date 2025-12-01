@@ -32,11 +32,10 @@ import { getProvidersByUserId } from "@/services/providerCollectionService";
 import { getExtraTags } from "@/services/extraTagsService";
 //import { getServiceTags } from "@/services/serviceTagsService";
 import { getCurrentUser } from "@/services/userService";
-import { useRouter } from "next/navigation"
-import { Fraunces } from "next/font/google"
+import { useRouter } from "next/navigation";
+import { Fraunces } from "next/font/google";
 
-const fraunces = Fraunces({ subsets: ["latin"] })
-
+const fraunces = Fraunces({ subsets: ["latin"] });
 
 const formSchema = z.object({
   id: z.string(),
@@ -68,7 +67,14 @@ type FormValues = z.infer<typeof formSchema>;
 
 export default function RegisterPropertyBasePage() {
   const [extraTags, setExtraTags] = useState<
-    { id: string; name: string; icon: string; enable_property:boolean; enable_services: boolean; }[]
+    {
+      id: string;
+      name: string;
+      name_en: string;
+      icon: string;
+      enable_property: boolean;
+      enable_services: boolean;
+    }[]
   >([]);
   /*const [servicesTags, setServicesTags] = useState<
     { id: string; name: string; icon: string }[]
@@ -120,11 +126,10 @@ export default function RegisterPropertyBasePage() {
 
   const { setValue } = form;
 
-
   const { errors } = form.formState;
-useEffect(() => {
-  console.log("Errores del formulario:", errors);
-}, [errors]);
+  useEffect(() => {
+    console.log("Errores del formulario:", errors);
+  }, [errors]);
 
   /*useEffect(() => {
     const fetchMemberships = async () => {
@@ -206,7 +211,6 @@ useEffect(() => {
     loadTags();
   }, []);
 
-
   const handleTagsChange = (tags: string[]) => {
     if (JSON.stringify(tags) !== JSON.stringify(selectedExtraTags)) {
       setValue("extraTags", tags, { shouldDirty: true });
@@ -230,7 +234,7 @@ useEffect(() => {
     name: "serviceTags",
   });*/
   const router = useRouter();
-  
+
   const onSubmit = async (values: FormValues) => {
     console.log("Form values before submission:", values);
     if (!values.RNTFile || !values.taxIdEINFile) {
@@ -261,13 +265,10 @@ useEffect(() => {
         price: values.price || "",
       };
 
-      await providerService.updateProvider(
-        providerData.id,
-        providerData
-      );
+      await providerService.updateProvider(providerData.id, providerData);
 
       setSuccessMessage("¡Proveedor actualizado con éxito!");
-      router.push(`/mi-panel/mi-servicio`)
+      router.push(`/mi-panel/mi-servicio`);
     } catch (error) {
       console.error("Error al actualizar el proveedor:", error);
       setSuccessMessage(null);
@@ -309,188 +310,192 @@ useEffect(() => {
   return (
     <div className="min-h-screen bg-[#F8F8F7]">
       <div className="container mx-auto max-w-2xl py-4">
-      <h1 className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}>
-                   Actualizar Servicio
-              </h1>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <div className="space-y-4 p-4 bg-white rounded-xl">
-            <h2 className="text-lg">Información Legal</h2>
-          <FormField
-            control={form.control}
-            name="taxIdEIN"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Número de impuestos ID/EIN</FormLabel>
-                <FormControl>
-                  <Input placeholder="Tax ID/EIN" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          
-            {RNTFileData !== null && (
+        <h1
+          className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}
+        >
+          Actualizar Servicio
+        </h1>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <div className="space-y-4 p-4 bg-white rounded-xl">
+              <h2 className="text-lg">Información Legal</h2>
               <FormField
                 control={form.control}
-                name="RNTFile"
-                render={() => (
+                name="taxIdEIN"
+                render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Archivo RNT</FormLabel>
+                    <FormLabel>Número de impuestos ID/EIN</FormLabel>
                     <FormControl>
-                      <FileUpload
-                        id={RNTFileData.id}
-                        filename_download={RNTFileData.filename_download}
-                        onUploadSuccess={handleRNTFileUpload}
-                        onClearFile={handleRNTFileClear}
-                      />
+                      <Input placeholder="Tax ID/EIN" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            )}
-            {TaxFileData !== null && (
-              <FormField
-                control={form.control}
-                name="taxIdEINFile"
-                render={() => (
-                  <FormItem>
-                    <FormLabel>Archivo de Impuestos TAX ID</FormLabel>
-                    <FormControl>
-                      <FileUpload
-                        id={TaxFileData.id}
-                        filename_download={TaxFileData.filename_download}
-                        onUploadSuccess={handleTaxFileUpload}
-                        onClearFile={handleTaxFileClear}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-          </div>
-          </div>
-        <div className="space-y-4 p-4 bg-white rounded-xl">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nombre del Servicio</FormLabel>
-                <FormControl>
-                  <Input placeholder="Nombre" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="Correo electrónico"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Teléfono</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Número de teléfono"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Describe el servicio que ofreces</FormLabel>
-                <FormControl>
-                  <Textarea className="h-full min-h-[100px]" 
-                    placeholder="Describe las características"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          </div>
-          <div className="space-y-4 p-4 bg-white rounded-xl">
-          {defaultTags && (
-            <FormField
-              control={form.control}
-              name="extraTags"
-              render={() => (
-                <FormItem>
-                  <FormLabel className="text-lg">
-                      Servicios Ofrecidos
-                    </FormLabel>
-                  <Controller
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {RNTFileData !== null && (
+                  <FormField
                     control={form.control}
-                    name="extraTags"
+                    name="RNTFile"
                     render={() => (
-                      <CollectionExtraTags
-                        key={defaultTags.join(',')}
-                        onChange={handleTagsChange}
-                        extraTags={extraTags}
-                        initialSelectedTags={defaultTags}
-                        enable="services"
-                      />
+                      <FormItem>
+                        <FormLabel>Archivo RNT</FormLabel>
+                        <FormControl>
+                          <FileUpload
+                            id={RNTFileData.id}
+                            filename_download={RNTFileData.filename_download}
+                            onUploadSuccess={handleRNTFileUpload}
+                            onClearFile={handleRNTFileClear}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
                   />
-                  <FormMessage />
-                </FormItem>
+                )}
+                {TaxFileData !== null && (
+                  <FormField
+                    control={form.control}
+                    name="taxIdEINFile"
+                    render={() => (
+                      <FormItem>
+                        <FormLabel>Archivo de Impuestos TAX ID</FormLabel>
+                        <FormControl>
+                          <FileUpload
+                            id={TaxFileData.id}
+                            filename_download={TaxFileData.filename_download}
+                            onUploadSuccess={handleTaxFileUpload}
+                            onClearFile={handleTaxFileClear}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+              </div>
+            </div>
+            <div className="space-y-4 p-4 bg-white rounded-xl">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nombre del Servicio</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nombre" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="Correo electrónico"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Teléfono</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Número de teléfono"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Describe el servicio que ofreces</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        className="h-full min-h-[100px]"
+                        placeholder="Describe las características"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="space-y-4 p-4 bg-white rounded-xl">
+              {defaultTags && (
+                <FormField
+                  control={form.control}
+                  name="extraTags"
+                  render={() => (
+                    <FormItem>
+                      <FormLabel className="text-lg">
+                        Servicios Ofrecidos
+                      </FormLabel>
+                      <Controller
+                        control={form.control}
+                        name="extraTags"
+                        render={() => (
+                          <CollectionExtraTags
+                            key={defaultTags.join(",")}
+                            onChange={handleTagsChange}
+                            extraTags={extraTags}
+                            initialSelectedTags={defaultTags}
+                            enable="services"
+                            lang="es"
+                          />
+                        )}
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               )}
-            />
-          )}
-          </div>
+            </div>
 
-          <div className="space-y-4 p-4 bg-white rounded-xl">
-          <h2 className="text-lg">Dónde ofrece su servicio?</h2>
-          {defaultLocation && (
-            <LocationSelector
-              defaultCountry={defaultLocation.country}
-              defaultState={defaultLocation.state}
-              defaultCity={defaultLocation.city}
-              onChange={({ country, state, city }) => {
-                form.setValue("country", country);
-                form.setValue("state", state);
-                form.setValue("city", city);
-              }}
-              error={{
-                country: form.formState.errors.country?.message,
-                state: form.formState.errors.state?.message,
-                city: form.formState.errors.city?.message,
-              }}
-            />
-          )}
-          </div>
-          {/*<FormField
+            <div className="space-y-4 p-4 bg-white rounded-xl">
+              <h2 className="text-lg">Dónde ofrece su servicio?</h2>
+              {defaultLocation && (
+                <LocationSelector
+                  defaultCountry={defaultLocation.country}
+                  defaultState={defaultLocation.state}
+                  defaultCity={defaultLocation.city}
+                  onChange={({ country, state, city }) => {
+                    form.setValue("country", country);
+                    form.setValue("state", state);
+                    form.setValue("city", city);
+                  }}
+                  error={{
+                    country: form.formState.errors.country?.message,
+                    state: form.formState.errors.state?.message,
+                    city: form.formState.errors.city?.message,
+                  }}
+                  lang="es"
+                />
+              )}
+            </div>
+            {/*<FormField
             control={form.control}
             name="membership"
             render={() => (
@@ -507,9 +512,8 @@ useEffect(() => {
               </FormItem>
             )}
             />*/}
-          
 
-    {/*     
+            {/*     
           {defaultServiceTags && (
             <FormField
               control={form.control}
@@ -535,20 +539,25 @@ useEffect(() => {
             />
                     )}*/}
 
-
-          
-          {successMessage && (
-            <div className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded" role="alert">
-              <p className="font-bold">¡Éxito!</p>
-              <p>{successMessage}</p>
-            </div>
-          )}
-          <Button type="submit" className="w-full bg-[#39759E]" disabled={isSubmitting}>
-            {isSubmitting ? "Actualizando..." : "Guardar"}
-          </Button>
-        </form>
-      </Form>
-    </div>
+            {successMessage && (
+              <div
+                className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded"
+                role="alert"
+              >
+                <p className="font-bold">¡Éxito!</p>
+                <p>{successMessage}</p>
+              </div>
+            )}
+            <Button
+              type="submit"
+              className="w-full bg-[#39759E]"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Actualizando..." : "Guardar"}
+            </Button>
+          </form>
+        </Form>
+      </div>
     </div>
   );
 }

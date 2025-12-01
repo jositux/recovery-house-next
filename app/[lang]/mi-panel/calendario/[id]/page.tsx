@@ -4,10 +4,34 @@ import { useParams } from "next/navigation";
 import axios from "axios";
 import { useState, useEffect } from "react";
 import CalendarView from "./calendar";
-import { Loader2 } from "lucide-react"; // Asegúrate de importar el ícono correcto
+import { Loader2 } from "lucide-react";
 import { Fraunces } from "next/font/google";
+import { type Locale } from "@/lib/i18n"; // Importación de Locale
 
 const fraunces = Fraunces({ subsets: ["latin"] });
+
+// --- Translation Data & Helper ---
+
+interface CalendarTranslation {
+  loadingMessage: string;
+  errorMessage: string;
+  defaultRoomName: string;
+}
+
+const translations: Record<string, CalendarTranslation> = {
+  es: {
+    loadingMessage: "Cargando Calendario...",
+    errorMessage: "Error al obtener las reservas",
+    defaultRoomName: "Calendario de Habitación",
+  },
+  en: {
+    loadingMessage: "Loading Calendar...",
+    errorMessage: "Error fetching bookings",
+    defaultRoomName: "Room Calendar",
+  },
+};
+
+// --- Component Interfaces ---
 
 interface Booking {
   id: string;
@@ -27,8 +51,17 @@ interface BookedDay {
   end: string;
 }
 
+// --- Main Component ---
+
 export default function CalendarPage() {
-  const { id } = useParams();
+  const params = useParams();
+  const id = params.id as string;
+  
+  // Obtener 'lang' y 'isSpanish'
+  const lang = (params.lang as Locale) || 'es'; // Default to 'es'
+  const isSpanish = lang.toLowerCase().startsWith('es');
+  const t = translations[isSpanish ? 'es' : 'en'];
+
   const [bookedDays, setBookedDays] = useState<BookedDay[]>([]);
   const [unavailableDates, setUnavailableDates] = useState<string[]>([]);
   const [roomName, setRoomName] = useState<string | null>(null);
@@ -52,7 +85,7 @@ export default function CalendarPage() {
           }
         );
 
-        // Transformar los datos a la estructura deseada
+        // Transformar los datos a la estructura deseada, filtrando canceladas
         const transformedData: BookedDay[] = response.data.data
           .filter((booking: Booking) => {
             return (
@@ -67,7 +100,8 @@ export default function CalendarPage() {
 
         setBookedDays(transformedData);
       } catch (err) {
-        setError("Error al obtener las reservas");
+        // Usar la traducción para el error
+        setError(t.errorMessage);
         console.error("Error fetching bookings:", err);
       } finally {
         setLoading(false);
@@ -75,7 +109,7 @@ export default function CalendarPage() {
     };
 
     fetchBookings();
-  }, [id]);
+  }, [id, t]); // Dependencia 't' para el mensaje de error
 
   useEffect(() => {
     // Obtener `selected_room` desde localStorage
@@ -93,7 +127,7 @@ export default function CalendarPage() {
       // Extraer y guardar el propertyId
       if (parsedRoom?.propertyId) {
         setPropertyId(parsedRoom.propertyId);
-        console.log("Property ID:", parsedRoom.propertyId); // Imprimir el propertyId en la consola
+        console.log("Property ID:", parsedRoom.propertyId); 
       }
 
       const disableDatesString = parsedRoom?.disableDates;
@@ -120,7 +154,7 @@ export default function CalendarPage() {
         <div className="flex justify-center items-center h-screen">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <span className="ml-2 text-lg text-gray-700">
-            Cargando Calendario...
+            {t.loadingMessage}
           </span>
         </div>
       ) : error ? (
@@ -128,14 +162,11 @@ export default function CalendarPage() {
       ) : (
         <>
           <div className="relative container">
-            {roomName && (
-        
-              <h1
+            <h1
               className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}
             >
-              {roomName}
+              {roomName || t.defaultRoomName}
             </h1>
-            )}
           </div>
 
           <CalendarView
@@ -143,6 +174,7 @@ export default function CalendarPage() {
             propertyId={propertyId || ""}
             bookedDays={bookedDays}
             unavailableDates={unavailableDates}
+            lang={lang} // Pasar la variable lang al subcomponente
           />
         </>
       )}

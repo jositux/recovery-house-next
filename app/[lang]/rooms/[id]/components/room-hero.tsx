@@ -6,9 +6,13 @@ interface RoomHeroProps {
   imageSrc: string
   propertyName: string
   images: { src: string; alt: string }[]
+  lang: string
 }
 
-export function RoomHero({ imageSrc, propertyName, images }: RoomHeroProps) {
+export function RoomHero({ imageSrc, propertyName, images, lang }: RoomHeroProps) {
+  
+  const isSpanish = lang === "es";
+
   return (
     <>
       <div className="relative h-[500px] w-full">
@@ -29,7 +33,11 @@ export function RoomHero({ imageSrc, propertyName, images }: RoomHeroProps) {
       {images.length > 1 && (
         <div className="container relative mx-auto px-4 lg:px-20">
           <div className="absolute left-20 bottom-8">
-            <PopupSwiperGallery images={images} buttonText="Ver todas las fotos" autoplay={true} />
+            <PopupSwiperGallery
+  images={images}
+  buttonText={isSpanish ? "Ver todas las fotos" : "View all photos"}
+  autoplay={true}
+/>
           </div>
         </div>
       )}

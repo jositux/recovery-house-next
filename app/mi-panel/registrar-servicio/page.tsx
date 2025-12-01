@@ -55,6 +55,7 @@ export default function RegisterServicePage() {
     {
       id: string
       name: string
+      name_en: string
       icon: string
       enable_property: boolean
       enable_services: boolean
@@ -403,6 +404,7 @@ export default function RegisterServicePage() {
                           extraTags={extraTags}
                           initialSelectedTags={selectedExtraTags}
                           enable="services"
+                          lang="es"
                         />
                       )}
                     />
@@ -424,6 +426,7 @@ export default function RegisterServicePage() {
                   state: form.formState.errors.state?.message,
                   city: form.formState.errors.city?.message,
                 }}
+                lang="es"
               />
             </div>
             <Button type="submit" className="w-full bg-[#39759E]" disabled={isSubmitting}>

@@ -9,9 +9,11 @@ interface PoliciesCardProps {
   prepaymentPercentage: string;
   mediumStayRange: { min: number; max: number | null };
   longStayRange: { min: number; max: number | null };
+  lang: string;
 }
 
 function formatTimeToAMPM(time: string): string {
+  if (!time || time === "00:00:00") return "N/A";
   const [hourStr, minute] = time.split(":");
   let hour = Number.parseInt(hourStr, 10);
   const ampm = hour >= 12 ? "PM" : "AM";
@@ -19,10 +21,10 @@ function formatTimeToAMPM(time: string): string {
   return `${hour}:${minute} ${ampm}`;
 }
 
-function formatDiscount(discount: string): string {
+function formatDiscount(discount: string, isSpanish: boolean): string {
   const num = Number.parseFloat(discount);
   if (isNaN(num) || num === 0) {
-    return "Sin descuento";
+    return isSpanish ? "Sin descuento" : "No discount";
   }
   return `${Math.round(num)}%`;
 }
@@ -35,15 +37,44 @@ export function PoliciesCard({
   prepaymentPercentage,
   mediumStayRange,
   longStayRange,
+  lang,
 }: PoliciesCardProps) {
+  const isSpanish = lang === "es";
+
+  // --- Traducciones ---
+  const texts = {
+    title: isSpanish ? "Políticas del hospedaje" : "Accommodation Policies",
+    subtitle: isSpanish ? "Información importante sobre horarios, descuentos y pagos" : "Important information about schedules, discounts, and payments",
+    checkInTitle: isSpanish ? "Horario de Entrada" : "Check-in Time",
+    checkOutTitle: isSpanish ? "Horario de Salida" : "Check-out Time",
+    discountsTitle: isSpanish ? "Descuentos por Estadía" : "Stay Discounts",
+    mediumStay: isSpanish ? "Estadía Media" : "Medium Stay",
+    longStay: isSpanish ? "Estadía Larga" : "Long Stay",
+    nights: isSpanish ? "noches" : "nights",
+    prepaymentTitle: isSpanish ? "Adelanto de Pago" : "Prepayment",
+    footer: isSpanish ? "Las políticas se aplican solamente a este hospedaje" : "Policies apply only to this accommodation",
+  };
+
+  const formattedMediumDiscount = formatDiscount(mediumStayDiscount, isSpanish);
+  const formattedLongDiscount = formatDiscount(longStayDiscount, isSpanish);
+  const formattedPrepayment = formatDiscount(prepaymentPercentage, isSpanish);
+
+  const longStayRangeText = longStayRange.max === null || longStayRange.max === 10000 
+    ? `${longStayRange.min}+ ${texts.nights}` 
+    : `${longStayRange.min} - ${longStayRange.max} ${texts.nights}`;
+    
+  const mediumStayRangeText = mediumStayRange.max === null
+    ? `${mediumStayRange.min}+ ${texts.nights}` 
+    : `${mediumStayRange.min} - ${mediumStayRange.max} ${texts.nights}`;
+
   return (
     <Card className="w-full max-w-3xl shadow-lg border-0 bg-gradient-to-br from-slate-50 to-white">
       <CardHeader className="pb-6">
         <CardTitle className="text-2xl font-bold text-slate-800">
-          Políticas del hospedaje
+          {texts.title}
         </CardTitle>
         <p className="text-slate-600 mt-2">
-          Información importante sobre horarios, descuentos y pagos
+          {texts.subtitle}
         </p>
       </CardHeader>
 
@@ -56,7 +87,7 @@ export function PoliciesCard({
             </div>
             <div>
               <h3 className="font-semibold text-slate-800">
-                Horario de Entrada
+                {texts.checkInTitle}
               </h3>
               <p className="text-lg font-bold text-blue-600">
                 {formatTimeToAMPM(checkInHour)}
@@ -70,7 +101,7 @@ export function PoliciesCard({
             </div>
             <div>
               <h3 className="font-semibold text-slate-800">
-                Horario de Salida
+                {texts.checkOutTitle}
               </h3>
               <p className="text-lg font-bold text-orange-600">
                 {formatTimeToAMPM(checkOutHour)}
@@ -83,35 +114,35 @@ export function PoliciesCard({
         <div className="space-y-4">
           <h3 className="text-lg font-semibold text-slate-800 flex items-center">
             <Percent className="h-5 w-5 mr-2 text-green-600" />
-            Descuentos por Estadía
+            {texts.discountsTitle}
           </h3>
 
           <div className="grid md:grid-cols-2 gap-4">
             <div className="p-4 bg-green-50 rounded-lg border border-green-100">
               <div className="flex items-center justify-between">
                 <span className="text-slate-700 font-medium">
-                  Estadía Media
+                  {texts.mediumStay}
                 </span>
                 <span className="text-xl font-bold text-green-600">
-                  {formatDiscount(mediumStayDiscount)}
+                  {formattedMediumDiscount}
                 </span>
               </div>
               <p className="text-sm text-slate-600 mt-1">
-                {mediumStayRange.min} - {mediumStayRange.max} noches
+                {mediumStayRangeText}
               </p>
             </div>
 
             <div className="p-4 bg-emerald-50 rounded-lg border border-emerald-100">
               <div className="flex items-center justify-between">
                 <span className="text-slate-700 font-medium">
-                  Estadía Larga
+                  {texts.longStay}
                 </span>
                 <span className="text-xl font-bold text-emerald-600">
-                  {formatDiscount(longStayDiscount)}
+                  {formattedLongDiscount}
                 </span>
               </div>
               <p className="text-sm text-slate-600 mt-1">
-                {longStayRange.min}+ noches
+                {longStayRangeText}
               </p>
             </div>
           </div>
@@ -122,15 +153,29 @@ export function PoliciesCard({
           <div className="flex items-center space-x-3">
             <CreditCard className="h-6 w-6 text-purple-600" />
             <div className="flex-1">
-              <h3 className="font-semibold text-slate-800">Adelanto de Pago</h3>
+              <h3 className="font-semibold text-slate-800">{texts.prepaymentTitle}</h3>
               <p className="text-slate-600">
-                Puedes reservar con un anticipo del{" "}
-                <span className="font-bold text-purple-600">
-                  {formatDiscount(prepaymentPercentage)}
-                </span>{" "}
-                del total. Solo aplican si faltan más de 72 horas para el
-                check-in. Para ingresos dentro de las próximas 72 horas, deberás
-                abonar el monto total.
+                {/* Lógica de traducción segura y sin duplicados */}
+                {isSpanish ? (
+                  <>
+                    Puedes reservar con un anticipo del{" "}
+                    <span className="font-bold text-purple-600">
+                      {formattedPrepayment}
+                    </span>{" "}
+                    del total. Solo aplican si faltan más de 72 horas para el
+                    check-in. Para ingresos dentro de las próximas 72 horas, deberás
+                    abonar el monto total.
+                  </>
+                ) : (
+                  <>
+                    You can reserve with a prepayment of{" "}
+                    <span className="font-bold text-purple-600">
+                      {formattedPrepayment}
+                    </span>{" "}
+                    of the total. Only applies if check-in is more than 72 hours away.
+                    For check-ins within the next 72 hours, the full amount must be paid.
+                  </>
+                )}
               </p>
             </div>
           </div>
@@ -139,7 +184,7 @@ export function PoliciesCard({
         {/* Additional Info */}
         <div className="text-center pt-4 border-t border-slate-200">
           <p className="text-sm text-slate-500">
-            Las políticas se aplican solamente a este hospedaje
+            {texts.footer}
           </p>
         </div>
       </CardContent>

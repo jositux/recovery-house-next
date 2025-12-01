@@ -1,64 +1,41 @@
-"use client"
-
 import type React from "react"
+// Importamos el tipo Locale desde la biblioteca de i18n
+import { type Locale } from "@/lib/i18n" 
+// Importamos el componente de cliente que contiene la lógica del layout
+// Ajusta la ruta si DashboardLayoutClient no está en el directorio 'components' relativo a este layout.
+import LayoutClient from "./LayoutClient"
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-//import { MobileSidebar } from "./components/MobileSidebar"
-import { DesktopSidebar } from "./components/DesktopSidebar"
-import { logoutUser } from "@/services/LogoutService"
+// ----------------------------------------------------------------------
+// 1. Tipado del Server Component (LayoutWrapper)
+// ----------------------------------------------------------------------
 
-export default function DashboardLayout({
+
+
+/**
+ * @component LayoutWrapper
+ * @description Wrapper de Layout (SERVIDOR). Este es el 'default' export que Next.js espera.
+ * Captura el parámetro 'lang' de la ruta y lo pasa al componente de cliente.
+ */
+ export default async function LayoutWrapper({
   children,
-}: {
+  params,
+}: Readonly<{
   children: React.ReactNode
-}) {
-  const [userName, setUserName] = useState("")
-  const router = useRouter()
+  // Debe ser Promise<{ lang: Locale }>
+  params: Promise<{ lang: Locale }>
+}>) {
 
-  useEffect(() => {
-    const checkAuth = () => {
-      const rawName = localStorage.getItem("nombre")
-      const name = rawName && rawName !== "null" && rawName.trim() !== "" ? rawName : "Usuario sin nombre"
-
-      setUserName(name)
-    }
-
-    checkAuth()
-    window.addEventListener("storage", checkAuth)
-
-    return () => {
-      window.removeEventListener("storage", checkAuth)
-    }
-  }, [])
-
-  const handleLogout = async () => {
-    try {
-      const refreshToken = localStorage.getItem("refresh_token")
-      if (!refreshToken) {
-        console.error("No se encontró el token de refresco")
-        return
-      }
-
-      await logoutUser(refreshToken)
-      window.dispatchEvent(new Event("storage"))
-      router.push("/login")
-    } catch (error) {
-      console.error("Error al cerrar sesión:", error)
-    }
-  }
-
+  const { lang } = await params // El 'await' es necesario
+  // Aquí no necesitamos esperar (await) si params no es una Promise.
+  // Si la ruta es app/[lang]/mi-panel, 'lang' se extrae directamente de params.
+  
+  
+  // --------------------------------------------------------------------
+  // 2. Renderiza el Client Component con la prop 'lang'
+  // --------------------------------------------------------------------
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar mobile 
-      <MobileSidebar userName={userName} onLogout={handleLogout} />
-*/}
-
-      {/* Sidebar desktop */}
-      <DesktopSidebar userName={userName} onLogout={handleLogout} />
-
-      {/* Contenido principal */}
-      <main className="flex-1 p-4 pt-4 md:pt-16 lg:p-8 lg:pt-8">{children}</main>
-    </div>
-  )
+    <LayoutClient lang={lang}>
+      {children}
+    </LayoutClient>
+  );
 }

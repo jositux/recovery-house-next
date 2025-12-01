@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation"; // ✅ Añadido useParams
 import {
   getProvidersByUserId,
   type Provider,
@@ -34,9 +34,92 @@ import {
 } from "lucide-react";
 import { Fraunces } from "next/font/google";
 
+// Tipos de idioma (asumo que existe este path)
+import { type Locale } from "@/lib/i18n"; 
+
 const fraunces = Fraunces({ subsets: ["latin"] });
+
+
+// ===============================================================
+// 📚 Objeto de Traducciones
+// ===============================================================
+
+type TranslationText = {
+  pageTitle: string;
+  loadingMessage: string;
+  errorLoadingData: string;
+  noServiceTitle: string;
+  noServiceText: string;
+  registerButton: string;
+  taxIdLabel: string;
+  approvedBadge: string;
+  inReviewBadge: string;
+  phoneLabel: string;
+  locationLabel: string;
+  RNTLabel: string;
+  notUploaded: string;
+  amenitiesTitle: string;
+  editButton: string;
+  dialogTitle: string;
+  dialogDescription: string;
+  dialogCancel: string;
+  dialogDelete: string;
+};
+
+const translations: Record<string, TranslationText> = {
+  es: {
+    pageTitle: "Mi Servicio",
+    loadingMessage: "Cargando...",
+    errorLoadingData: "Error al cargar los datos del proveedor. Por favor, intente de nuevo más tarde.",
+    noServiceTitle: "Aún no has registrado ningún servicio",
+    noServiceText: "Registra tu servicio para pacientes y comienza a recibir reservas.",
+    registerButton: "Registrar mi Servicio",
+    taxIdLabel: "Tax ID/EIN",
+    approvedBadge: "Aprobado",
+    inReviewBadge: "En Revisión",
+    phoneLabel: "Teléfono",
+    locationLabel: "Ubicación",
+    RNTLabel: "RNT",
+    notUploaded: "No cargado",
+    amenitiesTitle: "Servicios",
+    editButton: "Editar",
+    dialogTitle: "¿Eliminar servicio?",
+    dialogDescription: "Esta acción eliminará permanentemente tu servicio y cancelará cualquier suscripción activa. Esta acción no se puede deshacer.",
+    dialogCancel: "Cancelar",
+    dialogDelete: "Eliminar servicio",
+  },
+  en: {
+    pageTitle: "My Service",
+    loadingMessage: "Loading...",
+    errorLoadingData: "Error loading provider data. Please try again later.",
+    noServiceTitle: "You haven't registered any service yet",
+    noServiceText: "Register your service for patients and start receiving bookings.",
+    registerButton: "Register My Service",
+    taxIdLabel: "Tax ID/EIN",
+    approvedBadge: "Approved",
+    inReviewBadge: "In Review",
+    phoneLabel: "Phone",
+    locationLabel: "Location",
+    RNTLabel: "RNT",
+    notUploaded: "Not uploaded",
+    amenitiesTitle: "Services",
+    editButton: "Edit",
+    dialogTitle: "Delete service?",
+    dialogDescription: "This action will permanently delete your service and cancel any active subscription. This action cannot be undone.",
+    dialogCancel: "Cancel",
+    dialogDelete: "Delete service",
+  },
+};
+
+
 export default function ProviderDataPage() {
   const router = useRouter();
+  
+  // 🌐 Lógica de Idioma
+  const params = useParams();
+  const lang = (params.lang as Locale) || "es";
+  const texts = translations[lang as keyof typeof translations] || translations.en;
+  
   const [providers, setProviders] = useState<Provider[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -62,16 +145,14 @@ export default function ProviderDataPage() {
         setProviders(data);
       } catch (error) {
         console.error("Error al cargar los datos del proveedor:", error);
-        setError(
-          "Error al cargar los datos del proveedor. Por favor, intente de nuevo más tarde."
-        );
+        setError(texts.errorLoadingData); // 👈 Traducido
       } finally {
         setLoading(false);
       }
     };
 
     checkAuthAndFetchData();
-  }, [router]);
+  }, [router, texts]); // Dependencia de 'texts' para el mensaje de error de carga
 
   {
     /* const handleDeleteService = (providerId: string) => {
@@ -104,7 +185,7 @@ export default function ProviderDataPage() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        Cargando...
+        {texts.loadingMessage} {/* 👈 Traducido */}
       </div>
     );
   }
@@ -127,11 +208,10 @@ export default function ProviderDataPage() {
               <h1
             className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-8`}
           >
-             Aún no has registrado ningún servicio
+             {texts.noServiceTitle} {/* 👈 Traducido */}
           </h1>
               <p className="text-base text-gray-600 max-w-md mx-auto">
-                Registra tu servicio para pacientes y comienza a recibir
-                reservas.
+                {texts.noServiceText} {/* 👈 Traducido */}
               </p>
             </div>
 
@@ -141,7 +221,7 @@ export default function ProviderDataPage() {
               style={{ backgroundColor: "#39759E" }}
               onClick={() => router.push("/mi-panel/registrar-servicio")}
             >
-              Registrar mi Servicio
+              {texts.registerButton} {/* 👈 Traducido */}
             </Button>
           </div>
         </div>
@@ -154,7 +234,7 @@ export default function ProviderDataPage() {
       <h1
         className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-4`}
       >
-        Mi Servicio
+        {texts.pageTitle} {/* 👈 Traducido */}
       </h1>
       <div className="space-y-6">
         {providers.map((provider) => (
@@ -180,7 +260,7 @@ export default function ProviderDataPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-gray-500">
-                    Tax ID/EIN
+                    {texts.taxIdLabel} {/* 👈 Traducido */}
                   </p>
                   <p className="font-semibold text-gray-900">
                     {provider.taxIdEIN}
@@ -191,7 +271,7 @@ export default function ProviderDataPage() {
                       className="bg-green-100 text-green-800 border-green-300"
                     >
                       <CheckCircle className="w-3 h-3 mr-1" />
-                      Aprobado
+                      {texts.approvedBadge} {/* 👈 Traducido */}
                     </Badge>
                   ) : (
                     <Badge
@@ -199,7 +279,7 @@ export default function ProviderDataPage() {
                       className="bg-orange-100 text-orange-800 border-orange-300"
                     >
                       <AlertCircle className="w-3 h-3 mr-1" />
-                      En Revisión
+                      {texts.inReviewBadge} {/* 👈 Traducido */}
                     </Badge>
                   )}
                 </div>
@@ -207,7 +287,7 @@ export default function ProviderDataPage() {
                 <div className="space-y-3">
                   <div>
                     <p className="text-sm font-medium text-gray-500 mb-1">
-                      Teléfono
+                      {texts.phoneLabel} {/* 👈 Traducido */}
                     </p>
                     <div className="flex items-center text-gray-900">
                       <Phone className="w-4 h-4 mr-2 text-gray-400" />
@@ -218,7 +298,7 @@ export default function ProviderDataPage() {
 
                 <div>
                   <p className="text-sm font-medium text-gray-500 mb-1">
-                    Ubicación
+                    {texts.locationLabel} {/* 👈 Traducido */}
                   </p>
                   <div className="flex items-center text-gray-900">
                     <MapPin className="w-4 h-4 mr-2 text-gray-400" />
@@ -231,7 +311,7 @@ export default function ProviderDataPage() {
                 <div className="flex items-center flex-1 p-3 bg-gray-50 rounded-lg">
                   <FileText className="w-4 h-4 mr-2 text-gray-400" />
                   <div>
-                    <p className="text-sm font-medium text-gray-700">RNT</p>
+                    <p className="text-sm font-medium text-gray-700">{texts.RNTLabel}</p> {/* 👈 Traducido */}
                     {provider.RNTFile ? (
                       <a
                         href={`/webapi/assets/${provider.RNTFile.id}`}
@@ -242,7 +322,7 @@ export default function ProviderDataPage() {
                         {provider.RNTFile.filename_download}
                       </a>
                     ) : (
-                      <p className="text-xs text-gray-500">No cargado</p>
+                      <p className="text-xs text-gray-500">{texts.notUploaded}</p> 
                     )}
                   </div>
                 </div>
@@ -251,7 +331,7 @@ export default function ProviderDataPage() {
                   <FileText className="w-4 h-4 mr-2 text-gray-400" />
                   <div>
                     <p className="text-sm font-medium text-gray-700">
-                      Tax ID/EIN
+                      {texts.taxIdLabel} {/* 👈 Traducido */}
                     </p>
                     {provider.taxIdEINFile ? (
                       <a
@@ -263,7 +343,7 @@ export default function ProviderDataPage() {
                         {provider.taxIdEINFile.filename_download}
                       </a>
                     ) : (
-                      <p className="text-xs text-gray-500">No cargado</p>
+                      <p className="text-xs text-gray-500">{texts.notUploaded}</p> 
                     )}
                   </div>
                 </div>
@@ -276,12 +356,13 @@ export default function ProviderDataPage() {
                     <h2
                       className={`${fraunces.className} text-xl font-normal text-[#162F40] mb-4`}
                     >
-                      Servicios
+                      {texts.amenitiesTitle} {/* 👈 Traducido */}
                     </h2>
                     <CollectionExtraTagsService
                       extraTags={extraTags}
                       enable="services"
                       roomTags={provider.extraTags}
+                      lang={lang}
                     />
                   </div>
                 )}
@@ -293,7 +374,7 @@ export default function ProviderDataPage() {
                   onClick={() => router.push("/mi-panel/editar-servicio")}
                 >
                   <Pencil className="h-4 w-4 mr-2" />
-                  Editar
+                  {texts.editButton} {/* 👈 Traducido */}
                 </Button>
                 {/*<Button variant="destructive" size="sm" onClick={() => handleDeleteService(provider.id)}>
                     <Trash2 className="h-4 w-4" />
@@ -308,10 +389,9 @@ export default function ProviderDataPage() {
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>¿Eliminar servicio?</DialogTitle>
+            <DialogTitle>{texts.dialogTitle}</DialogTitle> {/* 👈 Traducido */}
             <DialogDescription>
-              Esta acción eliminará permanentemente tu servicio y cancelará
-              cualquier suscripción activa. Esta acción no se puede deshacer.
+              {texts.dialogDescription} {/* 👈 Traducido */}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -319,10 +399,10 @@ export default function ProviderDataPage() {
               variant="outline"
               onClick={() => setShowDeleteDialog(false)}
             >
-              Cancelar
+              {texts.dialogCancel} {/* 👈 Traducido */}
             </Button>
             <Button variant="destructive" onClick={confirmDelete}>
-              Eliminar servicio
+              {texts.dialogDelete} {/* 👈 Traducido */}
             </Button>
           </DialogFooter>
         </DialogContent>

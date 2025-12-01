@@ -221,7 +221,7 @@ export default function ComplementaryRegisterForm({ onSubmit, initialValues }: C
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <CalendarBirth onChange={field.onChange} initialValue={field.value} />
+                  <CalendarBirth onChange={field.onChange} initialValue={field.value} lang="es" />
                 </FormControl>
                 <FormMessage />
               </FormItem>

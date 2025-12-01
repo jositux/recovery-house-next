@@ -54,14 +54,16 @@ export function RoomCardShared({
               <BedDouble size={16} color="#333" />
             )}
             <span className="text-sm text-gray-800">
+            {isSpanish ? "Habitación compartida" : "Shared Room"}
+              {/*
               {isSpanish ? "1 Cama" : "1 Bed"}{" "}
               {bedType === "single"
                 ? isSpanish
-                  ? "Sencilla"
-                  : "Single"
+                  ? "Sencilla - Hab. compartida"
+                  : "Single - Shared Room"
                 : isSpanish
-                ? "Doble"
-                : "Double"}
+                ? "Doble - Hab. compartida"
+            : "Double - Sahred Room"}*/}
             </span>
           </div>
         </div>

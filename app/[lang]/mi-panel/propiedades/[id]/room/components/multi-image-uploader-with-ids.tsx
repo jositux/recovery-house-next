@@ -2,9 +2,57 @@
 
 import type React from "react";
 import { useState, useEffect, useRef } from "react";
-import { X, Upload, ImageIcon } from "lucide-react";
+import { X, Upload, ImageIcon, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+
+// --- Translation Interfaces and Data ---
+
+interface ImageUploaderTranslation {
+  uploadButton: string;
+  imageCountLabel: string;
+  existingCount: string;
+  newCount: string;
+  removeAria: string;
+  noImagesTitle: string;
+  noImagesSubtitle: (max: number) => string;
+  maxReachedError: (max: number) => string;
+  invalidFileError: (filename: string) => string;
+  errorTitle: string;
+}
+
+const translations: Record<string, ImageUploaderTranslation> = {
+  es: {
+    uploadButton: "Cargar Fotos",
+    imageCountLabel: "fotos",
+    existingCount: "existentes",
+    newCount: "nuevas",
+    removeAria: "Eliminar foto",
+    noImagesTitle: "No hay fotos",
+    noImagesSubtitle: (max: number) => `Puedes subir hasta ${max} fotos`,
+    maxReachedError: (max: number) =>
+      `Límite alcanzado. Solo puedes tener ${max} fotos en total.`,
+    invalidFileError: (filename: string) =>
+      `${filename} no es una imagen válida.`,
+    errorTitle: "Error de Carga",
+  },
+  en: {
+    uploadButton: "Upload Photos",
+    imageCountLabel: "photos",
+    existingCount: "existing",
+    newCount: "new",
+    removeAria: "Remove photo",
+    noImagesTitle: "No photos uploaded yet",
+    noImagesSubtitle: (max: number) => `You can upload up to ${max} photos`,
+    maxReachedError: (max: number) =>
+      `Limit reached. You can only have ${max} photos in total.`,
+    invalidFileError: (filename: string) =>
+      `${filename} is not a valid image.`,
+    errorTitle: "Upload Error",
+  },
+};
+
+// --- Component Interfaces and Types (Kept as is) ---
 
 interface MultiImageUploaderWithIdsProps {
   maxImages?: number;
@@ -14,6 +62,8 @@ interface MultiImageUploaderWithIdsProps {
     markedForDeletion: string[]
   ) => void;
   defaultImageIds?: string[];
+  // Added 'lang' prop
+  lang: string;
 }
 
 type NewFile = {
@@ -30,8 +80,14 @@ export function MultiImageUploaderWithIds({
   maxImages = 6,
   onImagesChange,
   defaultImageIds = [],
+  lang,
 }: MultiImageUploaderWithIdsProps) {
-  // useRef para mantener los IDs existentes sin necesidad de estado reactivo
+  
+  // Select the current translation object
+  const currentLangKey = lang.toLowerCase().startsWith("es") ? "es" : "en";
+  const t = translations[currentLangKey];
+  
+  // Refs and States
   const existingIdsRef = useRef<string[]>(defaultImageIds);
   const existingIds = existingIdsRef.current;
 
@@ -39,6 +95,7 @@ export function MultiImageUploaderWithIds({
   const [markedForDeletion, setMarkedForDeletion] = useState<Set<string>>(
     new Set()
   );
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   // Notificar al componente padre cada vez que cambien los archivos o los marcados para borrar
   useEffect(() => {
@@ -58,6 +115,8 @@ export function MultiImageUploaderWithIds({
   }, [newFiles]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUploadError(null); // Clear previous errors
+
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
 
@@ -66,15 +125,34 @@ export function MultiImageUploaderWithIds({
     ).length;
     const totalCurrentImages = visibleExistingCount + newFiles.length;
     const remainingSlots = Math.max(0, maxImages - totalCurrentImages);
-
+    
+    // Check if max capacity is reached before processing files
     if (remainingSlots === 0) {
+      setUploadError(t.maxReachedError(maxImages));
       e.target.value = "";
       return;
     }
 
-    const validFiles = files
-      .slice(0, remainingSlots)
-      .filter((file) => file.type.startsWith("image/"));
+    const filesToProcess = files.slice(0, remainingSlots);
+    
+    const validFiles: File[] = [];
+    let hasInvalidFile = false;
+    let invalidFileName = "";
+
+    filesToProcess.forEach((file) => {
+      if (file.type.startsWith("image/")) {
+        validFiles.push(file);
+      } else {
+        if (!hasInvalidFile) {
+          invalidFileName = file.name;
+        }
+        hasInvalidFile = true;
+      }
+    });
+
+    if (hasInvalidFile) {
+        setUploadError(t.invalidFileError(invalidFileName));
+    }
 
     if (validFiles.length === 0) {
       e.target.value = "";
@@ -92,6 +170,8 @@ export function MultiImageUploaderWithIds({
   };
 
   const handleRemoveImage = (index: number) => {
+    setUploadError(null); // Clear errors when interacting
+    
     const visibleExisting = existingIds.filter(
       (id) => !markedForDeletion.has(id)
     );
@@ -119,8 +199,9 @@ export function MultiImageUploaderWithIds({
 
   return (
     <div className="space-y-4">
-      {canUploadMore && (
-        <div className="flex items-center gap-4">
+      {/* Upload Button Section */}
+      <div className="flex items-center gap-4">
+        {canUploadMore && (
           <Button
             type="button"
             variant="outline"
@@ -128,27 +209,37 @@ export function MultiImageUploaderWithIds({
             onClick={() => document.getElementById("image-upload-ids")?.click()}
           >
             <Upload className="mr-2 h-4 w-4" />
-            Cargar
+            {t.uploadButton}
           </Button>
-          <span className="text-sm text-muted-foreground">
-            {totalImages} / {maxImages} fotos
-            {visibleExisting.length > 0 && (
-              <span className="ml-2 text-xs">
-                ({visibleExisting.length} existentes, {newFiles.length} nuevas)
-              </span>
-            )}
-          </span>
-          <input
-            id="image-upload-ids"
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            onChange={handleFileChange}
-          />
+        )}
+        <span className="text-sm text-muted-foreground">
+          {totalImages} / {maxImages} {t.imageCountLabel}
+          {(visibleExisting.length > 0 || newFiles.length > 0) && (
+            <span className="ml-2 text-xs">
+              ({visibleExisting.length} {t.existingCount}, {newFiles.length}{" "}
+              {t.newCount})
+            </span>
+          )}
+        </span>
+        <input
+          id="image-upload-ids"
+          type="file"
+          accept="image/*"
+          multiple
+          className="hidden"
+          onChange={handleFileChange}
+        />
+      </div>
+
+      {/* Error Message Display */}
+      {uploadError && (
+        <div className="flex items-center p-3 text-sm text-red-700 bg-red-100 border border-red-200 rounded-lg">
+          <AlertTriangle className="h-4 w-4 mr-2" />
+          <span className="font-semibold">{t.errorTitle}:</span> {uploadError}
         </div>
       )}
 
+      {/* Image Previews */}
       {totalImages > 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 transition-all duration-300">
           {visibleExisting.map((id, index) => (
@@ -156,6 +247,7 @@ export function MultiImageUploaderWithIds({
               key={`existing-${id}`}
               className="relative aspect-square rounded-lg border border-border overflow-hidden group transition-all duration-300 ease-in-out animate-in fade-in zoom-in"
             >
+              {/* NOTE: Assuming the base URL for existing images */}
               <Image
                 src={`/webapi/assets/${id}?key=medium`}
                 alt={`Existing image ${index + 1}`}
@@ -166,7 +258,7 @@ export function MultiImageUploaderWithIds({
                 type="button"
                 onClick={() => handleRemoveImage(index)}
                 className="absolute top-2 right-2 rounded-full p-1.5 transition-colors shadow-md bg-white text-gray-700 hover:bg-gray-100"
-                aria-label="Remove"
+                aria-label={t.removeAria}
               >
                 <X className="h-4 w-4" />
               </button>
@@ -190,7 +282,7 @@ export function MultiImageUploaderWithIds({
                   type="button"
                   onClick={() => handleRemoveImage(displayIndex)}
                   className="absolute top-2 right-2 rounded-full p-1.5 transition-colors shadow-md bg-white text-gray-700 hover:bg-gray-100"
-                  aria-label="Remove"
+                  aria-label={t.removeAria}
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -204,9 +296,9 @@ export function MultiImageUploaderWithIds({
           onClick={() => document.getElementById("image-upload-ids")?.click()}
         >
           <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-          <p className="text-sm text-muted-foreground mb-2">No hay fotos</p>
+          <p className="text-sm text-muted-foreground mb-2">{t.noImagesTitle}</p>
           <p className="text-xs text-muted-foreground">
-            Puedes subir hasta {maxImages}
+            {t.noImagesSubtitle(maxImages)}
           </p>
         </div>
       )}

@@ -1,13 +1,13 @@
-// app/forgot-password/page.tsx
-'use client'; // Marca este componente como un Client Component
+'use client';
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useRouter } from 'next/navigation';
-import Image from "next/image"
+import { useRouter, useParams } from 'next/navigation';
+import Image from "next/image";
 import { Fraunces } from "next/font/google";
+import { type Locale } from '@/lib/i18n';
 
 const fraunces = Fraunces({ subsets: ["latin"] });
 
@@ -16,6 +16,9 @@ export default function ForgotPassword() {
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
+  const params = useParams();
+  const lang = (params.lang as Locale) || "es";
+  const isSpanish = lang === "es";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,7 +26,7 @@ export default function ForgotPassword() {
     
     try {
       const directusUrl = process.env.NEXT_PUBLIC_SITE_BACKEND_URL;
-      const response = await fetch(`${directusUrl}/auth/password/request` , {
+      const response = await fetch(`${directusUrl}/auth/password/request`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -35,12 +38,12 @@ export default function ForgotPassword() {
       });
       
       if (response.ok) {
-        router.push('/login?message=reset'); // Redirige al usuario a la página de inicio de sesión
+        router.push(isSpanish ? '/login?message=reset' : '/login?message=reset'); // Puedes usar query distinto si quieres
       } else {
-        
+        // Manejar error si es necesario
       }
     } catch (error) {
-     console.log(error)
+      console.log(error);
     } finally {
       setIsLoading(false);
     }
@@ -56,24 +59,24 @@ export default function ForgotPassword() {
         />
       <div className="w-full max-w-md m-8 p-8 bg-white rounded-lg shadow-md">
         <div>
-        <h2
-                  className={`${fraunces.className} text-2xl text-center font-medium mb-6`}
-                >
-            Restablecer contraseña
+          <h2
+            className={`${fraunces.className} text-2xl text-center font-medium mb-6`}
+          >
+            {isSpanish ? "Restablecer contraseña" : "Reset Password"}
           </h2>
         </div>
        
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
-            
             <div>
               <Label htmlFor="email" className="sr-only">
-                Correo electrónico
+                {isSpanish ? "Correo electrónico" : "Email"}
               </Label>
               <p className="mt-2 text-center text-sm text-[#162F40] py-6">
-            Atención: Se enviará un correo electrónico a la dirección proporcionada con instrucciones para restablecer tu
-            contraseña.
-          </p>
+                {isSpanish
+                  ? "Atención: Se enviará un correo electrónico a la dirección proporcionada con instrucciones para restablecer tu contraseña."
+                  : "Attention: An email will be sent to the provided address with instructions to reset your password."}
+              </p>
               <Input
                 id="email"
                 name="email"
@@ -81,7 +84,7 @@ export default function ForgotPassword() {
                 autoComplete="email"
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-[#162F40] rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Correo electrónico"
+                placeholder={isSpanish ? "Correo electrónico" : "Email"}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -93,7 +96,9 @@ export default function ForgotPassword() {
               className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#39759E] hover:bg-[#39759E] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               disabled={isLoading}
             >
-              {isLoading ? 'Enviando...' : 'Enviar'}
+              {isLoading
+                ? isSpanish ? 'Enviando...' : 'Sending...'
+                : isSpanish ? 'Enviar' : 'Send'}
             </Button>
           </div>
         </form>

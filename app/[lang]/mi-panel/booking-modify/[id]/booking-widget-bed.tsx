@@ -5,10 +5,45 @@ import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { format, addDays, parseISO } from "date-fns"
-import { es } from "date-fns/locale"
+import { es, enUS } from "date-fns/locale" // Importamos enUS
 import { CalendarIcon, X } from "lucide-react"
 import { useSearchParams } from "next/navigation"
 import styles from "./BookingWidget.module.css"
+import { type Locale } from "@/lib/i18n";
+
+// --- Objeto de Traducción (Simulación de I18n) ---
+const translations = {
+  es: {
+    perNight: "/noche",
+    checkIn: "Llegada",
+    checkOut: "Salida",
+    longStay: "estadía larga",
+    mediumStay: "estadía media",
+    considerStaying: (minNights: number) =>
+      `¡Considera quedarte ${minNights} noches o más para obtener descuentos especiales!`,
+    youChose: (nights: number) => `Elegiste ${nights} noches que equivale a una`,
+    withDiscount: (percentage: number) => `con un descuento del ${percentage}%`,
+    nightsLabel: (nights: number) => `${nights} noche(s)`,
+    cleaningFee: "Tarifa de limpieza",
+    total: "Total",
+    modifyReservation: "Modificar reserva",
+  },
+  en: {
+    perNight: "/night",
+    checkIn: "Check-in",
+    checkOut: "Check-out",
+    longStay: "long stay",
+    mediumStay: "medium stay",
+    considerStaying: (minNights: number) =>
+      `Consider staying ${minNights} nights or more for special discounts!`,
+    youChose: (nights: number) => `You chose ${nights} nights, which is considered a`,
+    withDiscount: (percentage: number) => `with a ${percentage}% discount`,
+    nightsLabel: (nights: number) => `${nights} night(s)`,
+    cleaningFee: "Cleaning fee",
+    total: "Total",
+    modifyReservation: "Modify reservation",
+  },
+}
 
 interface BookingData {
   checkIn: string
@@ -45,6 +80,7 @@ interface BookingWidgetProps {
   disableDates: string
   defaultCheckIn?: string
   defaultCheckOut?: string
+  lang: Locale // <-- Nuevo parámetro de idioma
   onSubmit?: (bookingData: BookingData) => void
 }
 
@@ -61,9 +97,16 @@ export function BookingWidgetBed({
   disableDates,
   defaultCheckIn,
   defaultCheckOut,
+  lang = 'es', // <-- Usamos 'es' como valor por defecto
   onSubmit,
 }: BookingWidgetProps) {
   const searchParams = useSearchParams()
+
+  // Hook para acceder a las traducciones
+  const t = useMemo(() => translations[lang], [lang])
+  
+  // Hook para acceder al locale de date-fns
+  const dateFnsLocale = useMemo(() => (lang === 'en' ? enUS : es), [lang])
 
   const [checkIn, setCheckIn] = useState<Date | undefined>(() => {
     if (defaultCheckIn) return parseISO(defaultCheckIn)
@@ -203,13 +246,16 @@ export function BookingWidgetBed({
 
     onSubmit(formattedBooking)
   }
+  
+  // Usamos el locale correcto para la moneda
+  const currencyLocale = lang === 'en' ? 'en-US' : 'es-CO';
 
   return (
     <div className="border rounded-lg p-6 space-y-6 shadow-md bg-white">
       <div className="flex justify-between items-center">
         <div>
-          <span className="text-3xl font-bold text-[#39759E]">${price.toLocaleString("es-CO")} USD</span>
-          <span className="text-[#162F40] ml-2">/noche</span>
+          <span className="text-3xl font-bold text-[#39759E]">${price.toLocaleString(currencyLocale)} USD</span>
+          <span className="text-[#162F40] ml-2">{t.perNight}</span> {/* <-- Traducido */}
         </div>
       </div>
 
@@ -222,7 +268,8 @@ export function BookingWidgetBed({
                 className={`w-full justify-start text-left font-normal ${!checkIn && "text-muted-foreground"}`}
               >
                 <CalendarIcon className="mr-0 h-4 w-4" />
-                {checkIn ? format(checkIn, "PP", { locale: es }) : "Llegada"}
+                {/* Usamos dateFnsLocale para el formato de fecha */}
+                {checkIn ? format(checkIn, "PP", { locale: dateFnsLocale }) : t.checkIn} {/* <-- Traducido */}
               </Button>
               {checkIn && (
                 <X
@@ -249,6 +296,7 @@ export function BookingWidgetBed({
               modifiersClassNames={{
                 reserved: styles.reservedDate,
               }}
+              locale={dateFnsLocale} // <-- Usamos dateFnsLocale
             />
           </PopoverContent>
         </Popover>
@@ -260,7 +308,8 @@ export function BookingWidgetBed({
                 className={`w-full justify-start text-left font-normal ${!checkOut && "text-muted-foreground"}`}
               >
                 <CalendarIcon className="mr-0 h-4 w-4" />
-                {checkOut ? format(checkOut, "PP", { locale: es }) : "Salida"}
+                {/* Usamos dateFnsLocale para el formato de fecha */}
+                {checkOut ? format(checkOut, "PP", { locale: dateFnsLocale }) : t.checkOut} {/* <-- Traducido */}
               </Button>
               {checkIn && (
                 <X
@@ -287,6 +336,7 @@ export function BookingWidgetBed({
               modifiersClassNames={{
                 reserved: styles.reservedDate,
               }}
+              locale={dateFnsLocale} // <-- Usamos dateFnsLocale
             />
           </PopoverContent>
         </Popover>
@@ -298,23 +348,24 @@ export function BookingWidgetBed({
             <p className="text-sm text-blue-800 font-medium">
               {nights >= minLongStayRange && nights <= maxLongStayRange ? (
                 <>
-                  Elegiste <span className="font-bold">{nights} noches</span> que equivale a una
-                  <span className="font-bold text-blue-900"> estadía larga </span>
-                  con un descuento del{" "}
-                  <span className="font-bold text-green-600">{discount_percentage_long_stay}%</span>
+                  {/* Lógica de traducción para estadía larga */}
+                  {t.youChose(nights)}{" "}
+                  <span className="font-bold text-blue-900"> {t.longStay} </span>
+                  {t.withDiscount(discount_percentage_long_stay)}
                 </>
               ) : nights >= minMediumStayRange && nights <= maxMediumStayRange ? (
                 <>
-                  Elegiste <span className="font-bold">{nights} noches</span> que equivale a una
-                  <span className="font-bold text-blue-900"> estadía media </span>
-                  con un descuento del{" "}
-                  <span className="font-bold text-green-600">{discount_percentage_medium_stay}%</span>
+                  {/* Lógica de traducción para estadía media */}
+                  {t.youChose(nights)}{" "}
+                  <span className="font-bold text-blue-900"> {t.mediumStay} </span>
+                  {t.withDiscount(discount_percentage_medium_stay)}
                 </>
               ) : (
                 <>
+                  {/* Lógica de traducción para estadía corta */}
                   {nights < minMediumStayRange && (
                     <span className="text-blue-700">
-                      ¡Considera quedarte {minMediumStayRange} noches o más para obtener descuentos especiales!
+                      {t.considerStaying(minMediumStayRange)}
                     </span>
                   )}
                 </>
@@ -329,29 +380,30 @@ export function BookingWidgetBed({
           <div className="space-y-2 bg-gray-50 p-4 rounded-md">
             <div className="flex justify-between items-center text-sm">
               <span className="text-[#162F40]">
-                ${price.toLocaleString("es-CO")} x {nights} noche(s)
+                ${price.toLocaleString(currencyLocale)} x {t.nightsLabel(nights)} {/* <-- Traducido */}
               </span>
               <span className="font-semibold">
-                ${(price * nights).toLocaleString("es-CO")} <span className="font-semibold text-[#162F40]">USD</span>
+                ${(price * nights).toLocaleString(currencyLocale)} <span className="font-semibold text-[#162F40]">USD</span>
               </span>
             </div>
             {calculateDiscount > 0 && (
               <div className="flex justify-between items-center text-sm">
                 <span className="text-green-600">
-                  Estadía {nights >= minLongStayRange ? "larga" : "media"} (-{calculateDiscount}%)
+                  {/* Traducción dinámica del tipo de estadía */}
+                  {lang === 'es' ? 'Estadía' : 'Stay'} {nights >= minLongStayRange ? t.longStay : t.mediumStay} (-{calculateDiscount}%)
                 </span>
                 <span className="font-semibold text-green-600">
-                  -${((price * nights * calculateDiscount) / 100).toLocaleString("es-CO")} USD
+                  -${((price * nights * calculateDiscount) / 100).toLocaleString(currencyLocale)} USD
                 </span>
               </div>
             )}
             <div className="flex justify-between items-center text-sm">
-              <span className="text-[#162F40]">Tarifa de limpieza</span>
-              <span className="font-semibold">${cleaning.toLocaleString("es-CO")} USD</span>
+              <span className="text-[#162F40]">{t.cleaningFee}</span> {/* <-- Traducido */}
+              <span className="font-semibold">${cleaning.toLocaleString(currencyLocale)} USD</span>
             </div>
             <div className="flex justify-between items-center text-sm pt-2 border-t">
-              <span className="text-[#162F40] font-semibold">Total</span>
-              <span className="font-bold text-lg">${totalPrice.toLocaleString("es-CO")} USD</span>
+              <span className="text-[#162F40] font-semibold">{t.total}</span> {/* <-- Traducido */}
+              <span className="font-bold text-lg">${totalPrice.toLocaleString(currencyLocale)} USD</span>
             </div>
           </div>
         )}
@@ -362,7 +414,7 @@ export function BookingWidgetBed({
         disabled={!isReservationEnabled}
         onClick={handleSubmit}
       >
-        Modificar reserva
+        {t.modifyReservation} {/* <-- Traducido */}
       </Button>
     </div>
   )

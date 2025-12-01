@@ -8,10 +8,26 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { CancellationPolicyDialogContent } from "./cancellation-policy-dialog-content"
-import { ModificationPolicyDialogContent } from "./modification-policy-dialog-content"
+import { CancellationPolicyDialogContent } from "@/components/popups/cancellation-policy-dialog-content"
+import { ModificationPolicyDialogContent } from "@/components/popups/modification-policy-dialog-content"
 
-export function PolicyDialogButtons() {
+interface PolicyDialogButtonsProps {
+  lang: string
+}
+
+export function PolicyDialogButtons({ lang }: PolicyDialogButtonsProps) {
+  const isSpanish = lang === "es";
+
+  const texts = {
+    cancellationButton: isSpanish ? "Ver Políticas de Anulación" : "View Cancellation Policies",
+    cancellationTitle: isSpanish ? "Políticas de Anulación de Reserva" : "Reservation Cancellation Policies",
+    cancellationDescription: isSpanish ? "Detalles sobre las condiciones de cancelación para diferentes tipos de estadía." : "Details about cancellation conditions for different stay types.",
+
+    modificationButton: isSpanish ? "Ver Políticas de Modificación" : "View Modification Policies",
+    modificationTitle: isSpanish ? "Políticas de Modificación de Reserva" : "Reservation Modification Policies",
+    modificationDescription: isSpanish ? "Detalles sobre las condiciones para modificar una reserva existente." : "Details about conditions for modifying an existing reservation.",
+  };
+
   return (
     <div className="flex flex-col md:flex-row gap-3 mb-16 w-full">
       {/* Botón para Políticas de Anulación */}
@@ -19,17 +35,17 @@ export function PolicyDialogButtons() {
         <DialogTrigger asChild>
           <Button variant="outline" className="flex-1 bg-transparent">
             <AlertCircle className="h-4 w-4 mr-2" />
-            Ver Políticas de Anulación
+            {texts.cancellationButton}
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Políticas de Anulación de Reserva</DialogTitle>
+            <DialogTitle>{texts.cancellationTitle}</DialogTitle>
             <DialogDescription>
-              Detalles sobre las condiciones de cancelación para diferentes tipos de estadía.
+              {texts.cancellationDescription}
             </DialogDescription>
           </DialogHeader>
-          <CancellationPolicyDialogContent />
+          <CancellationPolicyDialogContent lang={lang} />
         </DialogContent>
       </Dialog>
 
@@ -38,15 +54,15 @@ export function PolicyDialogButtons() {
         <DialogTrigger asChild>
           <Button variant="outline" className="flex-1 bg-transparent">
             <Edit className="h-4 w-4 mr-2" />
-            Ver Políticas de Modificación
+            {texts.modificationButton}
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Políticas de Modificación de Reserva</DialogTitle>
-            <DialogDescription>Detalles sobre las condiciones para modificar una reserva existente.</DialogDescription>
+            <DialogTitle>{texts.modificationTitle}</DialogTitle>
+            <DialogDescription>{texts.modificationDescription}</DialogDescription>
           </DialogHeader>
-          <ModificationPolicyDialogContent />
+          <ModificationPolicyDialogContent lang={lang} />
         </DialogContent>
       </Dialog>
     </div>

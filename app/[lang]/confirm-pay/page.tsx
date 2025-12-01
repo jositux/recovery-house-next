@@ -1,17 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent } from "@/components/ui/card";
 import { CalendarDays, Users, CheckCircle2, AlertCircle } from "lucide-react";
 import Image from "next/image";
 import { format } from "date-fns";
-import { es } from "date-fns/locale";
+// Importamos 'enUS' para el formato de fecha en inglés
+import { es, enUS } from "date-fns/locale";
 import { toZonedTime } from "date-fns-tz";
-import Link from 'next/link'
-
-
+import Link from "next/link";
+import { type Locale } from "@/lib/i18n";
+import { useParams } from "next/navigation";
 
 interface BookingData {
   checkIn: string;
@@ -40,6 +41,81 @@ interface BookingData {
 
 type PaymentType = "fullpayment" | "prepayment";
 
+// -----------------------------------------------------------
+//             OBJETO DE TRADUCCIONES (I18N)
+// -----------------------------------------------------------
+
+const translations = {
+  es: {
+    loadingData: "Cargando datos de reserva...",
+    noData: "No se encontraron datos de reserva.",
+    back: "Volver",
+    confirmAndPay: "Confirmar y pagar",
+    paymentOptions: "Opciones de Pago",
+    fullPayment: "Pago Total",
+    fullPaymentDesc: "Paga el monto completo ahora",
+    prepayment: (percentage: number) => `Pago Anticipado (${percentage}%)`,
+    prepaymentDesc: (percentage: number) =>
+      `Paga solo el ${percentage}% ahora, el resto antes del check-in`,
+    remainingBalance: (amount: string, deadline: string) =>
+      `Saldo restante: ${amount} (debe pagarse antes del ${deadline})`,
+    cancellationPolicyTitle: "Política de anulación de reserva:",
+    cancellationPolicyAlert:
+      "Anulación gratuita hasta 72 horas antes del check-in. Después de este período, no hay reembolso disponible.",
+    acceptTerms: "Acepto la",
+    refundPolicy: "Política de Reembolso para Huéspedes",
+    paymentButton: (amount: string) => `Confirmar y pagar ${amount}`,
+    summaryTitleFull: "Total",
+    summaryTitlePre: "Pago Anticipado",
+    summaryOwner: "Propietario",
+    summaryGuest: (count: number) => `${count} huésped${count > 1 ? "es" : ""}`,
+    summaryNight: (count: number) => `${count} noche${count > 1 ? "s" : ""}`,
+    summaryDiscount: (percent: number) => `Descuento (${percent}%)`,
+    summaryCleaning: "Limpieza",
+    // ✅ CORRECCIÓN: El argumento 'percent' se elimina porque la función no lo usa.
+    summaryAnticipo: () => `Anticipo:`,
+    summaryAnticipoPercent: (percent: number) => `(${percent}% del total)`,
+    summaryPending: "Saldo pendiente:",
+    summaryTotalReservation: "Total de la reserva:",
+  },
+  en: {
+    loadingData: "Loading booking data...",
+    noData: "No booking data found.",
+    back: "Go back",
+    confirmAndPay: "Confirm & Pay",
+    paymentOptions: "Payment Options",
+    fullPayment: "Full Payment",
+    fullPaymentDesc: "Pay the full amount now",
+    prepayment: (percentage: number) => `Prepayment (${percentage}%)`,
+    prepaymentDesc: (percentage: number) =>
+      `Pay only ${percentage}% now, the rest before check-in`,
+    remainingBalance: (amount: string, deadline: string) =>
+      `Remaining balance: ${amount} (must be paid before ${deadline})`,
+    cancellationPolicyTitle: "Cancellation Policy:",
+    cancellationPolicyAlert:
+      "Free cancellation up to 72 hours before check-in. After this period, no refund is available.",
+    acceptTerms: "I accept the",
+    refundPolicy: "Guest Refund Policy",
+    paymentButton: (amount: string) => `Confirm & Pay ${amount}`,
+    summaryTitleFull: "Total",
+    summaryTitlePre: "Prepayment",
+    summaryOwner: "Owner",
+    summaryGuest: (count: number) => `${count} guest${count !== 1 ? "s" : ""}`,
+    summaryNight: (count: number) => `${count} night${count !== 1 ? "s" : ""}`,
+    summaryDiscount: (percent: number) => `Discount (${percent}%)`,
+    summaryCleaning: "Cleaning Fee",
+    // ✅ CORRECCIÓN: El argumento 'percent' se elimina porque la función no lo usa.
+    summaryAnticipo: () => `Prepayment:`,
+    summaryAnticipoPercent: (percent: number) => `(${percent}% of total)`,
+    summaryPending: "Pending balance:",
+    summaryTotalReservation: "Total reservation amount:",
+  },
+};
+
+type Translations = typeof translations.es;
+
+// -----------------------------------------------------------
+
 export default function NewConfirmAndPay() {
   const [selectedDiscountOption, setSelectedDiscountOption] = useState<
     "no-discount" | "with-discount"
@@ -47,8 +123,31 @@ export default function NewConfirmAndPay() {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [bookingData, setBookingData] = useState<BookingData | null>(null);
 
+  const params = useParams();
+  const lang = (params.lang as Locale) || "es"; // Default to 'es'
+  const isSpanish = lang === "es";
+
+  // Determinar el objeto de traducción y la locale de date-fns
+  const { t, dateFnsLocale } = useMemo(() => {
+    const currentLang = isSpanish ? "es" : "en";
+    return {
+      t: translations[currentLang] as Translations,
+      dateFnsLocale: isSpanish ? es : enUS,
+    };
+  }, [isSpanish]);
+
   const formatCurrency = (value: number) =>
-    value.toLocaleString("es-CO", { style: "currency", currency: "COP" });
+    value.toLocaleString(isSpanish ? "es-CO" : "en-US", {
+      style: "currency",
+      currency: isSpanish ? "COP" : "USD",
+    });
+
+  // Función de formato de moneda local pero sin símbolo (para usar en descripciones)
+  /*const formatAmountNoSymbol = (value: number) =>
+    value.toLocaleString(isSpanish ? "es-CO" : "en-US", { 
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    });*/
 
   // 🔹 Formateo universal de fechas
   const formatDate = (dateString: string) => {
@@ -57,14 +156,14 @@ export default function NewConfirmAndPay() {
     const zonedDate = toZonedTime(dateString, timeZone);
     const hasTime = dateString.includes("T");
     return format(zonedDate, hasTime ? "d MMM yyyy, HH:mm" : "d MMM yyyy", {
-      locale: es,
+      locale: dateFnsLocale, // Usar locale dinámica
     });
   };
 
   const getCurrentIsoTime = () =>
     new Date().toISOString().split("T")[1].split(".")[0] + "Z";
 
-  // 🔹 Montos
+  // 🔹 Montos (sin cambios)
   const getSubtotal = (b: BookingData) => b.nights * b.guests * b.price;
   const getBaseAmount = (b: BookingData) =>
     getSubtotal(b) - b.discountStayAmount + b.cleaning;
@@ -74,23 +173,27 @@ export default function NewConfirmAndPay() {
   // 🔹 Fecha límite pago (72h antes del check-in)
   const getPaymentDeadline = (b: BookingData) => {
     if (!b.checkIn) return "";
-  
+
     const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  
+
     // 🔹 Combinar fecha y hora
     const dateTimeString = b.checkInHour
       ? `${b.checkIn}T${b.checkInHour}`
       : `${b.checkIn}T00:00:00`;
-  
+
     // 🔹 Convertir a zona horaria local
     const checkInZoned = toZonedTime(dateTimeString, timeZone);
-  
+
     // 🔹 Restar 72 horas (3 días)
     const deadline = new Date(checkInZoned);
     deadline.setHours(deadline.getHours() - 72);
-  
+
     // 🔹 Formatear salida
-    return format(deadline, "d MMM yyyy, h:mm a", { locale: es });
+    return format(
+      deadline,
+      isSpanish ? "d MMM yyyy, h:mm a" : "MMM d yyyy, h:mm a",
+      { locale: dateFnsLocale }
+    );
   };
   const getCurrentAmount = (b: BookingData) => {
     return selectedDiscountOption === "with-discount"
@@ -116,11 +219,9 @@ export default function NewConfirmAndPay() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-xl font-semibold text-gray-800 mb-2">
-            Cargando datos de reserva...
+            {t.loadingData}
           </h2>
-          <p className="text-gray-600">
-            No se encontraron datos de reserva en el localStorage.
-          </p>
+          <p className="text-gray-600">{t.noData}</p>
         </div>
       </div>
     );
@@ -134,6 +235,9 @@ export default function NewConfirmAndPay() {
     selectedDiscountOption === "with-discount"
       ? bookingData.totalPrice - prepaymentAmount
       : 0;
+
+  const paymentDeadlineText = getPaymentDeadline(bookingData);
+  const remainingBalanceAmount = formatCurrency(baseAmount - prepaymentAmount);
 
   const handleConfirmAndPay = () => {
     const storedData = localStorage.getItem("booking");
@@ -149,8 +253,9 @@ export default function NewConfirmAndPay() {
           patient: bookingData.patientId,
           ownerId: bookingData.ownerId,
           guests: bookingData.guests,
-          checkInDateHour: bookingData.checkIn + "T" + getCurrentIsoTime(),
-          checkOutDateHour: bookingData.checkOut + "T" + getCurrentIsoTime(),
+          // Se recomienda usar el formato completo con la hora de check-in si está disponible
+          checkInDateHour: bookingData.checkIn + "T" + bookingData.checkInHour,
+          checkOutDateHour: bookingData.checkOut + "T" + getCurrentIsoTime(), // Hora actual, esto podría requerir revisión
           price: bookingData.price,
           cleaning: bookingData.cleaning,
           discountStayType: bookingData.discountStayType,
@@ -165,7 +270,9 @@ export default function NewConfirmAndPay() {
           finalPrice: bookingData.totalPrice,
         };
         localStorage.setItem("booking", JSON.stringify(updatedData));
-        window.location.href = "/checkout";
+
+        // Redirigir usando el idioma
+        window.location.href = `/${lang}/checkout`;
       } catch (error) {
         console.error("Error updating booking data:", error);
       }
@@ -179,48 +286,48 @@ export default function NewConfirmAndPay() {
         <div className="lg:col-span-2 space-y-8">
           <div className="text-sm text-gray-500">
             <span className="font-medium">
-             
-              <a href={`/rooms/${bookingData.room}`}>Volver</a>
+              <Link href={`/${lang}/rooms/${bookingData.room}`}>{t.back}</Link>{" "}
+              {/* TRADUCIDO */}
             </span>
             <span className="mx-2">&gt;</span>
             <span className="font-semibold text-gray-800">
-              Confirmar y pagar
+              {t.confirmAndPay} {/* TRADUCIDO */}
             </span>
           </div>
-
-          <h1 className="text-3xl font-bold text-gray-900">Confirmar y pagar</h1>
-
+          <h1 className="text-3xl font-bold text-gray-900">
+            {t.confirmAndPay}
+          </h1>{" "}
+          {/* TRADUCIDO */}
           <div className="space-y-4">
             <h2 className="text-xl font-semibold text-gray-800">
-              Opciones de Pago
+              {t.paymentOptions} {/* TRADUCIDO */}
             </h2>
 
             <PaymentOption
               selected={selectedDiscountOption === "no-discount"}
               onClick={() => setSelectedDiscountOption("no-discount")}
-              label="Pago Total"
-              description="Paga el monto completo ahora"
+              label={t.fullPayment}
+              description={t.fullPaymentDesc}
               amount={baseAmount}
               color="blue"
+              formatCurrency={formatCurrency}
             />
 
             <PaymentOption
               selected={selectedDiscountOption === "with-discount"}
               onClick={() => setSelectedDiscountOption("with-discount")}
-              label={`Pago Anticipado (${bookingData.prepayment_percentage}%)`}
-              description={`Paga solo el ${bookingData.prepayment_percentage}% ahora, el resto antes del check-in`}
-              extraInfo={`Saldo restante: ${formatCurrency(
-                baseAmount - prepaymentAmount
-              )} (debe pagarse antes del ${getPaymentDeadline(bookingData)})`}
+              label={t.prepayment(bookingData.prepayment_percentage)}
+              description={t.prepaymentDesc(bookingData.prepayment_percentage)}
+              extraInfo={t.remainingBalance(
+                remainingBalanceAmount,
+                paymentDeadlineText
+              )}
               amount={prepaymentAmount}
               color="green"
+              formatCurrency={formatCurrency}
             />
           </div>
-
-          <CancellationPolicy
-           
-          />
-
+          <CancellationPolicy t={t} /> {/* PASAR T */}
           <div className="flex items-start space-x-2">
             <Checkbox
               id="terms"
@@ -232,19 +339,23 @@ export default function NewConfirmAndPay() {
               htmlFor="terms"
               className="text-sm text-gray-700 leading-relaxed cursor-pointer"
             >
-              Acepto la{" "}
-              <Link href="/policy" className="text-blue-600 hover:underline"> Política de Reembolso para Huéspedes</Link>
-             
-              
+              {t.acceptTerms} {/* TRADUCIDO */}
+              <Link
+                href={`/${lang}/policy`}
+                className="text-blue-600 hover:underline"
+              >
+                {" "}
+                {t.refundPolicy}
+              </Link>{" "}
+              {/* TRADUCIDO + LANG */}
             </label>
           </div>
-
           <Button
             className="w-full md:w-auto bg-blue-500 hover:bg-blue-500 text-white font-semibold py-6 px-6 rounded-lg text-lg"
             disabled={!agreedToTerms}
             onClick={handleConfirmAndPay}
           >
-            Confirmar y pagar {formatCurrency(currentAmount)}
+            {t.paymentButton(formatCurrency(currentAmount))} {/* TRADUCIDO */}
           </Button>
         </div>
 
@@ -259,6 +370,7 @@ export default function NewConfirmAndPay() {
           selectedDiscountOption={selectedDiscountOption}
           formatCurrency={formatCurrency}
           formatDate={formatDate}
+          t={t} // PASAR T
         />
       </div>
     </div>
@@ -273,6 +385,7 @@ function PaymentOption({
   extraInfo,
   amount,
   color,
+  formatCurrency, // Recibir formatCurrency como prop
 }: {
   selected: boolean;
   onClick: () => void;
@@ -281,6 +394,7 @@ function PaymentOption({
   extraInfo?: string;
   amount: number;
   color: "blue" | "green";
+  formatCurrency: (value: number) => string;
 }) {
   const border = selected
     ? `border-${color}-500 bg-${color}-50`
@@ -308,35 +422,32 @@ function PaymentOption({
           </div>
         </div>
         <span className="font-semibold text-gray-900">
-          {amount.toLocaleString("es-CO")}
+          {formatCurrency(amount)} {/* USAR formatCurrency */}
         </span>
       </div>
     </div>
   );
 }
 
-function CancellationPolicy() {
+function CancellationPolicy({ t }: { t: Translations }) {
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold text-gray-800">
-        Política de anulación de reserva:
+        {t.cancellationPolicyTitle}
       </h2>
       <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
         <div className="flex items-start gap-2">
           <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5" />
           <div className="text-sm text-amber-800">
             <p>
-              Anulación gratuita hasta 72 horas antes del check-in. Después de
-              este período, no hay reembolso disponible.
+              {t.cancellationPolicyAlert} {/* TRADUCIDO */}
             </p>
-          
           </div>
         </div>
       </div>
     </div>
   );
 }
-
 
 function BookingSummary({
   bookingData,
@@ -349,6 +460,7 @@ function BookingSummary({
   selectedDiscountOption,
   formatCurrency,
   formatDate,
+  t, // Recibir t
 }: {
   bookingData: BookingData;
   subtotal: number;
@@ -360,6 +472,7 @@ function BookingSummary({
   selectedDiscountOption: string;
   formatCurrency: (value: number) => string;
   formatDate: (value: string) => string;
+  t: Translations;
 }) {
   return (
     <div className="lg:col-span-1">
@@ -370,57 +483,66 @@ function BookingSummary({
               <h3 className="font-semibold text-gray-900 text-lg leading-tight">
                 {bookingData.roomName}
               </h3>
-              <p className="text-sm text-gray-600">{bookingData.propertyName}</p>
+              <p className="text-sm text-gray-600">
+                {bookingData.propertyName}
+              </p>
               <p className="text-xs text-gray-500 mt-1">
-                Propietario: {bookingData.ownerName}
+                {t.summaryOwner}: {bookingData.ownerName}
               </p>
             </div>
-            <Image
-              src={
-                bookingData.photo
-                  ? `/webapi/assets/${bookingData.photo}?key=full`
-                  : "/placeholder.jpg"
-              }
-              alt={bookingData.roomName || "Foto de habitación"}
-              width={96}
-              height={64}
-              className="object-cover rounded-md"
-            />
+            <div className="w-[90px] aspect-[3/2] relative rounded-md overflow-hidden">
+  <Image
+    src={
+      bookingData.photo
+        ? `/webapi/assets/${bookingData.photo}?key=medium`
+        : "/assets/empty.jpg"
+    }
+    alt={bookingData.roomName || "Foto de habitación"}
+    fill
+    className="object-cover object-center"
+  />
+</div>
           </div>
 
           <div className="space-y-3 text-sm text-gray-700">
             <div className="flex items-center gap-2">
               <CalendarDays className="h-4 w-4 text-gray-500" />
               <span>
-                {formatDate(bookingData.checkIn)} → {formatDate(bookingData.checkOut)}
+                {formatDate(bookingData.checkIn)} →{" "}
+                {formatDate(bookingData.checkOut)}
               </span>
             </div>
             <div className="flex items-center gap-2">
               <Users className="h-4 w-4 text-gray-500" />
               <span>
-                {bookingData.guests} huésped
-                {bookingData.guests > 1 ? "es" : ""} x {bookingData.nights} noche
-                {bookingData.nights > 1 ? "s" : ""} = {formatCurrency(subtotal)}
+                {t.summaryGuest(bookingData.guests)} x{" "}
+                {t.summaryNight(bookingData.nights)} ={" "}
+                {formatCurrency(subtotal)}
               </span>
             </div>
             {discount > 0 && (
               <div className="flex items-center gap-2">
                 <Users className="h-4 w-4 text-gray-500" />
                 <span>
-                  Descuento ({discountLabel}%) = - {formatCurrency(discount)}
+                  {t.summaryDiscount(discountLabel)} = -{" "}
+                  {formatCurrency(discount)}
                 </span>
               </div>
             )}
             <div className="flex items-center gap-2">
               <Users className="h-4 w-4 text-gray-500" />
-              <span>Limpieza = {formatCurrency(bookingData.cleaning)}</span>
+              <span>
+                {t.summaryCleaning} = {formatCurrency(bookingData.cleaning)}
+              </span>
             </div>
           </div>
 
           <div className="border-t border-gray-200 pt-4 space-y-2">
             <div className="flex justify-between items-center">
               <span className="font-semibold text-gray-800">
-                {selectedDiscountOption === "with-discount" ? "Pago Anticipado" : "Total"}
+                {selectedDiscountOption === "with-discount"
+                  ? t.summaryTitlePre
+                  : t.summaryTitleFull}
               </span>
               <div className="text-right">
                 <span className="font-bold text-gray-900 text-lg">
@@ -432,14 +554,15 @@ function BookingSummary({
             {selectedDiscountOption === "with-discount" && (
               <>
                 <div className="text-sm text-blue-600">
-                  Anticipo: {formatCurrency(prepaymentAmount)} (
-                  {bookingData.prepayment_percentage}% del total)
+                  {t.summaryAnticipo()} {formatCurrency(prepaymentAmount)}{" "}
+                  {t.summaryAnticipoPercent(bookingData.prepayment_percentage)}
                 </div>
                 <div className="text-sm text-gray-600">
-                  Saldo pendiente: {formatCurrency(baseAmount - prepaymentAmount)}
+                  {t.summaryPending}{" "}
+                  {formatCurrency(baseAmount - prepaymentAmount)}
                 </div>
                 <div className="text-xs text-gray-500">
-                  Total de la reserva: {formatCurrency(baseAmount)}
+                  {t.summaryTotalReservation} {formatCurrency(baseAmount)}
                 </div>
               </>
             )}

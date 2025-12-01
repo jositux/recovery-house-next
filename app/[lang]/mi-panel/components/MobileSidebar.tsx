@@ -46,7 +46,7 @@ export function MobileSidebar({ userName, onLogout }: MobileSidebarProps) {
         </button>
 
         {/* Contenido del sidebar */}
-        <SidebarContent userName={userName} onLogout={onLogout} onNavigate={() => setIsOpen(false)} />
+        <SidebarContent userName={userName} onLogout={onLogout} onNavigate={() => setIsOpen(false)} lang="es" />
       </aside>
     </>
   )

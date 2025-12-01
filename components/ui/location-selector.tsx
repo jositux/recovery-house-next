@@ -15,6 +15,7 @@ interface LocationSelectorProps {
     state?: string
     city?: string
   }
+  lang: string
 }
 
 export function LocationSelector({
@@ -23,10 +24,13 @@ export function LocationSelector({
   defaultState,
   defaultCity,
   error,
+  lang,
 }: LocationSelectorProps) {
   const [country, setCountry] = useState<string>(defaultCountry || "")
   const [state, setState] = useState<string>(defaultState || "")
   const [city, setCity] = useState<string>(defaultCity || "")
+
+  const isSpanish = lang === "es"
 
   useEffect(() => {
     if (country && state && city) {
@@ -59,16 +63,19 @@ export function LocationSelector({
     return []
   }
 
+  // Lista de países ordenada alfabéticamente
+  const sortedCountries = Object.values(countriesData).sort((a, b) => a.name.localeCompare(b.name))
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div>
-        <Label htmlFor="country">País</Label>
+        <Label htmlFor="country">{isSpanish ? "País" : "Country"}</Label>
         <Select onValueChange={handleCountryChange} value={country}>
           <SelectTrigger id="country" className={error?.country ? "border-red-500" : ""}>
-            <SelectValue placeholder="Selecciona un país" />
+            <SelectValue placeholder={isSpanish ? "Selecciona un país" : "Select Country"} />
           </SelectTrigger>
           <SelectContent>
-            {Object.values(countriesData).map((countryData) => (
+            {sortedCountries.map((countryData) => (
               <SelectItem key={countryData.name} value={countryData.name}>
                 {countryData.name}
               </SelectItem>
@@ -79,10 +86,10 @@ export function LocationSelector({
       </div>
 
       <div>
-        <Label htmlFor="state">Estado</Label>
+        <Label htmlFor="state">{isSpanish ? "Estado" : "State"}</Label>
         <Select onValueChange={handleStateChange} value={state}>
           <SelectTrigger id="state" className={error?.state ? "border-red-500" : ""}>
-            <SelectValue placeholder="Selecciona un estado" />
+            <SelectValue placeholder={isSpanish ? "Selecciona un estado" : "Select State"} />
           </SelectTrigger>
           <SelectContent>
             {country &&
@@ -97,10 +104,10 @@ export function LocationSelector({
       </div>
 
       <div>
-        <Label htmlFor="city">Ciudad</Label>
+        <Label htmlFor="city">{isSpanish ? "Ciudad" : "City"}</Label>
         <Select onValueChange={setCity} value={city}>
           <SelectTrigger id="city" className={error?.city ? "border-red-500" : ""}>
-            <SelectValue placeholder="Selecciona una ciudad" />
+            <SelectValue placeholder={isSpanish ? "Selecciona una ciudad" : "Select City"} />
           </SelectTrigger>
           <SelectContent>
             {country &&
@@ -117,4 +124,3 @@ export function LocationSelector({
     </div>
   )
 }
-

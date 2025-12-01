@@ -5,6 +5,7 @@ import { TagButton } from "@/components/ui/tag-button-room"
 interface ExtraTag {
   id: string
   name: string
+  name_en: string
   icon: string
   enable_property: boolean
   enable_services: boolean
@@ -20,9 +21,13 @@ interface ExtraTagsSelectorProps {
   extraTags: ExtraTag[] | null
   enable: string
   roomTags: RoomTag[]
+  lang: string
 }
 
-export function CollectionExtraTags({ extraTags, enable, roomTags }: ExtraTagsSelectorProps) {
+export function CollectionExtraTags({ extraTags, enable, roomTags, lang }: ExtraTagsSelectorProps) {
+  
+  const isSpanish = lang === "es";
+  
   if (!extraTags) {
     return null // or return a loading state or placeholder
   }
@@ -45,8 +50,12 @@ export function CollectionExtraTags({ extraTags, enable, roomTags }: ExtraTagsSe
       aria-label="Lista de etiquetas adicionales"
     >
       {filteredTags.map((tag) => (
-        <TagButton key={tag.id} id={tag.id} icon={tag.icon} label={tag.name} />
-      ))}
+ <TagButton
+ key={tag.id}
+ id={tag.id}
+ icon={tag.icon}
+ label={isSpanish ? tag.name : tag.name_en}
+/>      ))}
     </div>
   )
 }

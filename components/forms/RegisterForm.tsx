@@ -233,7 +233,7 @@ export default function RegisterForm({ onSubmit, initialValues }: RegisterFormPr
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <CalendarBirth onChange={field.onChange} initialValue={field.value} />
+                  <CalendarBirth onChange={field.onChange} initialValue={field.value} lang="es" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
