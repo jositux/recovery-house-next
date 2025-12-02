@@ -32,14 +32,14 @@ const translations = {
     message: "Se ha procesado el pago de lo pendiente. Tu reserva está confirmada y lista para que disfrutes de una experiencia inolvidable.",
     status: "Pago pendiente realizado",
     viewBookings: "Ver tus reservas",
-    exploreRooms: "Explorar más alojamientos",
+    exploreRooms: "Explorar más",
   },
   en: {
     title: "We look forward to your stay!",
     message: "The pending payment has been processed. Your booking is confirmed and ready for you to enjoy an unforgettable experience.",
     status: "Pending payment completed",
     viewBookings: "View Your Bookings",
-    exploreRooms: "Explore More Accommodations",
+    exploreRooms: "Explore More",
   },
 };
 

@@ -52,7 +52,7 @@ export function PopupSwiperGallery({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="flex items-center gap-2 bg-primary hover:bg-primary/90">
+        <Button className="flex gap-2 bg-primary hover:bg-primary/90">
           <ImageIcon className="h-4 w-4" />
           {buttonText}
         </Button>
