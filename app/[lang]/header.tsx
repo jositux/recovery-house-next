@@ -130,7 +130,7 @@ export function Header({ lang = "es", availableLocations = [] }:
             className="bg-white overflow-hidden"
           >
             <div className="container mx-auto">
-              <MedicalSearchMobile onSearch={() => setIsSearchOpen(false)} lang={lang}/>
+              <MedicalSearchMobile onSearch={() => setIsSearchOpen(false)} lang={lang} availableLocations={availableLocations}/>
             </div>
           </motion.div>
         )}
