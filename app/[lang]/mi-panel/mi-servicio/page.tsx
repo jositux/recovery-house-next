@@ -219,7 +219,7 @@ export default function ProviderDataPage() {
               size="lg"
               className="mt-4 px-8 hover:opacity-90 transition-opacity"
               style={{ backgroundColor: "#39759E" }}
-              onClick={() => router.push("/mi-panel/registrar-servicio")}
+              onClick={() => router.push(`/${lang}/mi-panel/registrar-servicio`)}
             >
               {texts.registerButton} {/* 👈 Traducido */}
             </Button>
