@@ -58,7 +58,7 @@ const translations = {
     emptyTitle: "Get ready to welcome your guests!", // Adapted for Host
     emptyMessage:
       "You haven't received any bookings yet. Once you receive one, it will appear here.", // Adapted for Host
-    searchButton: "Explore Accommodations (For guests)", // Keep only if host can switch to guest view
+    searchButton: "Explore More", // Keep only if host can switch to guest view
     modifySuccessTitle: "Modification Successful!",
     modifySuccessMessage:
       "The booking has been successfully modified. You can view all the reservations you've received.",
