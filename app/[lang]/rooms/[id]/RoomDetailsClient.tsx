@@ -584,7 +584,7 @@ export function RoomDetailsClient({ lang }: RoomDetailsClientProps) {
               lang={lang}
             />
 
-            {room.isPrivate === false && <SharedBedAlert />}
+            {room.isPrivate === false && <SharedBedAlert lang={lang} />}
 
             <RoomDescription description={room.description} />
 
