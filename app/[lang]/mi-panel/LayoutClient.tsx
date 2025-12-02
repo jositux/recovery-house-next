@@ -61,10 +61,10 @@ export default function LayoutClient({
       localStorage.removeItem("nombre")
       
       window.dispatchEvent(new Event("storage"))
-      router.push("/login")
+      router.push(`/${lang}/login`)
     } catch (error) {
       console.error("Error al cerrar sesión:", error)
-      router.push("/login")
+      router.push(`/${lang}/login`)
     }
   }
 

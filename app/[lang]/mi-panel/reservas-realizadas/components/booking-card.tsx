@@ -361,7 +361,7 @@ export const BookingCard = ({
 
           <div
             className="absolute inset-0 cursor-pointer"
-            onClick={() => router.push(`/rooms/${booking.room.id}`)}
+            onClick={() => router.push(`/${lang}/rooms/${booking.room.id}`)}
           />
         </div>
 

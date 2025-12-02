@@ -324,7 +324,7 @@ export default function BookingModifyPage() {
   const handleConfirmWithPayment = () => {
     if (!pendingBookingData || !currentUser || !booking || !room) {
       console.error("Missing data or user");
-      router.push("/login");
+      router.push(`/${lang}/login`);
       return;
     }
 
@@ -373,9 +373,9 @@ export default function BookingModifyPage() {
       localStorage.setItem("booking", JSON.stringify(formattedBookingModify));
 
       if (booking?.paymentState === "prepayment") {
-        router.push("/confirm-pay-modify");
+        router.push(`/${lang}/confirm-pay-modify`);
       } else {
-        router.push("/checkout-modify");
+        router.push(`/${lang}/checkout-modify`);
       }
     } catch (error) {
       console.error("Error guardando datos de modificación", error);
