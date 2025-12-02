@@ -529,7 +529,7 @@ export function RoomDetailsClient({ lang }: RoomDetailsClientProps) {
           JSON.stringify(formattedBookingForConfirm)
         );
 
-        router.push(`/confirm-pay?rel=${room.id}`);
+        router.push(`/${lang}/confirm-pay?rel=${room.id}`);
       }
     } catch (error) {
       console.error("Error during reservation process:", error);
@@ -608,7 +608,7 @@ export function RoomDetailsClient({ lang }: RoomDetailsClientProps) {
             <PolicyDialogButtons lang={lang}/>
 
             {/* Booking Widget for mobile */}
-            <div className="mb-4 lg:hidden">
+            <div className="mb-16 lg:hidden">
               {room.isPrivate === false ? (
                 <BookingWidgetBed
                   price={Number.parseInt(room.sharedRoomPrice, 10)}

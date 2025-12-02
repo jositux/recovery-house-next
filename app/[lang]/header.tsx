@@ -106,7 +106,7 @@ export function Header({ lang = "es", availableLocations = [] }:
                 className="bg-gray-800 text-white hover:bg-gray-700"
                 asChild
               >
-                <Link href="/login">
+                <Link href={`/${lang}/login`}>
                   {isSpanish ? "Ingresar" : "Login"}
                 </Link>
               </Button>
