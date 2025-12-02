@@ -268,7 +268,7 @@ export const BookingCard = ({
   const router = useRouter();
 
   const handleModify = () => {
-    router.push(`/mi-panel/booking-modify/${booking.id}`);
+    router.push(`/${lang}/mi-panel/booking-modify/${booking.id}`);
   };
 
   const getPaymentBadge = () => {
@@ -359,7 +359,7 @@ export const BookingCard = ({
 
           <div
             className="absolute inset-0 cursor-pointer"
-            onClick={() => router.push(`/rooms/${booking.room.id}`)}
+            onClick={() => router.push(`/${lang}/rooms/${booking.room.id}`)}
           />
         </div>
 
