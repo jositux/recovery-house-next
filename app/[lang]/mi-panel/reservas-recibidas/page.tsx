@@ -40,7 +40,7 @@ const translations = {
     emptyTitle: "¡Prepárate para recibir a tus huéspedes!", // Adaptado para Host
     emptyMessage:
       "Aún no tienes reservas recibidas. Una vez que recibas una, aparecerá aquí.", // Adaptado para Host
-    searchButton: "Explorar Alojamientos (Para el huésped)", // Mantener solo si el host puede cambiar a vista huésped
+    searchButton: "Explorar", // Mantener solo si el host puede cambiar a vista huésped
     modifySuccessTitle: "¡Modificación Exitosa!",
     modifySuccessMessage:
       "Se ha modificado la reserva exitosamente. Puedes ver todas las reservas que has recibido.",
