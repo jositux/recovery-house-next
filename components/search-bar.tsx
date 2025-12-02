@@ -209,7 +209,7 @@ export function SearchBar({ lang = "es" }: { lang?: string }) {
       searchParams.append("travelers", travelers.toString());
     }
 
-    const searchUrl = `rooms?${searchParams.toString()}`;
+    const searchUrl = `/${lang}/rooms?${searchParams.toString()}`;
     router.push(searchUrl);
   };
 
