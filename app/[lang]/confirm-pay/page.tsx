@@ -411,16 +411,22 @@ function PaymentOption({
       onClick={onClick}
     >
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          {icon}
-          <div className="flex flex-col">
-            <span className="font-medium text-gray-800">{label}</span>
-            <p className="text-sm text-gray-600">{description}</p>
-            {extraInfo && (
-              <p className="text-xs text-blue-600 mt-1">{extraInfo}</p>
-            )}
-          </div>
-        </div>
+      <div className="flex items-center space-x-3">
+  <div className="block md:block">
+    <div className="md:h-auto md:w-auto h-4 w-4">
+      {icon}
+    </div>
+  </div>
+
+  <div className="flex flex-col">
+    <span className="font-medium text-gray-800">{label}</span>
+    <p className="text-sm text-gray-600">{description}</p>
+    {extraInfo && (
+      <p className="text-xs text-blue-600 mt-1">{extraInfo}</p>
+    )}
+  </div>
+</div>
+
         <span className="font-semibold text-gray-900">
           {formatCurrency(amount)} {/* USAR formatCurrency */}
         </span>
@@ -491,17 +497,17 @@ function BookingSummary({
               </p>
             </div>
             <div className="w-[90px] aspect-[3/2] relative rounded-md overflow-hidden">
-  <Image
-    src={
-      bookingData.photo
-        ? `/webapi/assets/${bookingData.photo}?key=medium`
-        : "/assets/empty.jpg"
-    }
-    alt={bookingData.roomName || "Foto de habitación"}
-    fill
-    className="object-cover object-center"
-  />
-</div>
+              <Image
+                src={
+                  bookingData.photo
+                    ? `/webapi/assets/${bookingData.photo}?key=medium`
+                    : "/assets/empty.jpg"
+                }
+                alt={bookingData.roomName || "Foto de habitación"}
+                fill
+                className="object-cover object-center"
+              />
+            </div>
           </div>
 
           <div className="space-y-3 text-sm text-gray-700">
