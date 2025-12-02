@@ -7,20 +7,29 @@ import { useRouter } from "next/navigation"
 import { syncAuthCookies } from "@/utils/syncAuthCookies"
 
 
-export function MenuActions({ lang = "es" }: { lang?: string }) {
+export function MenuActions({ lang = "es" }: { lang?: string }) { // Usamos directamente la prop 'lang'
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  
+  // 1. Eliminamos el estado 'currentLang' y su inicialización
   const menuRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
 
+  // 2. Variable booleana derivada de la prop 'lang'
   const isSpanish = lang === "es"
+
+  // 3. Eliminamos el useEffect que manejaba localStorage
+
 
   const toggleMenu = () => setIsMenuOpen((prev) => !prev)
   const closeMenu = () => setIsMenuOpen(false)
 
+  // 4. Función de navegación que usa la prop 'lang' para el prefijo de ruta
   const navigateWithAuth = (path: string) => {
     closeMenu()
     syncAuthCookies()
-    router.push(path)
+    // Construye la ruta con el prefijo de idioma: /es/mi-panel/... o /en/mi-panel/...
+    const finalPath = `/${lang}${path}`; // Usamos la prop 'lang'
+    router.push(finalPath)
   }
 
   useEffect(() => {
@@ -41,6 +50,7 @@ export function MenuActions({ lang = "es" }: { lang?: string }) {
       <button
         className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-800 text-white hover:bg-gray-700 focus:outline-none"
         onClick={toggleMenu}
+        aria-label={isSpanish ? "Menú de acciones" : "Actions menu"}
       >
         <Plus className="w-5 h-5" />
       </button>
@@ -53,7 +63,8 @@ export function MenuActions({ lang = "es" }: { lang?: string }) {
         <ul className="text-sm text-[#162F40]">
           <li className="px-4 py-2 hover:bg-gray-100 rounded-lg cursor-pointer">
             <button
-              onClick={() => navigateWithAuth("/mi-panel/registrar-propiedad")}
+              // La ruta aquí no necesita el prefijo, lo añade navigateWithAuth
+              onClick={() => navigateWithAuth("/mi-panel/registrar-propiedad")} 
               className="flex items-center gap-2 w-full text-left"
             >
               <Building className="w-4 h-4" />
@@ -63,7 +74,8 @@ export function MenuActions({ lang = "es" }: { lang?: string }) {
 
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
             <button
-              onClick={() => navigateWithAuth("/mi-panel/registrar-servicio")}
+              // La ruta aquí no necesita el prefijo, lo añade navigateWithAuth
+              onClick={() => navigateWithAuth("/mi-panel/registrar-servicio")} 
               className="flex items-center gap-2 w-full text-left"
             >
               <HandHeart className="w-4 h-4" />
@@ -72,7 +84,8 @@ export function MenuActions({ lang = "es" }: { lang?: string }) {
           </li>
 
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-            <Link href="/rooms" className="flex items-center gap-2" onClick={closeMenu}>
+            {/* 5. Enlaces estáticos deben usar el prefijo directamente con la prop 'lang' */}
+            <Link href={`/${lang}/rooms`} className="flex items-center gap-2" onClick={closeMenu}>
               <Search className="w-4 h-4" />
               {isSpanish ? "Buscar Alojamiento" : "Search Room"}
             </Link>

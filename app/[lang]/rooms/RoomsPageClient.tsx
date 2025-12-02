@@ -101,7 +101,7 @@ const normalizeString = (str: string) =>
 // --- FIN DE TIPOS MOVIDOS ---
 
 // Renombramos y exportamos el componente, que ahora es el Cliente
-export function RoomsPageClient({ lang = "es" }: { lang?: string }) {
+export function RoomsPageClient({ lang: initialLang = "es" }: { lang?: string }) {
   const searchParams = useSearchParams();
   const [properties, setProperties] = useState<Property[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -116,7 +116,26 @@ export function RoomsPageClient({ lang = "es" }: { lang?: string }) {
 
   const prevPropertiesRef = useRef<Property[]>([]);
 
-  const isSpanish = lang === "es";
+  // 1. Nuevo estado para manejar el idioma que se utilizará en el renderizado
+  const [currentLang, setCurrentLang] = useState(initialLang);
+
+  // 2. useEffect para darle prioridad al valor de localStorage una vez montado
+  useEffect(() => {
+    try {
+      const storedLang = localStorage.getItem('user-language-preference');
+      console.log("stored", storedLang);
+      // Si hay un valor guardado y es válido ('es' o 'en'), actualizamos el estado.
+      // Esto forzará un re-renderizado con el idioma de localStorage.
+      if (storedLang && (storedLang === 'es' || storedLang === 'en')) {
+        setCurrentLang(storedLang);
+      }
+    } catch (e) {
+      console.error("No se pudo acceder a localStorage", e);
+    }
+  }, []); // Se ejecuta solo una vez al montar
+
+  // 3. Derivamos la variable booleana del estado
+  const isSpanish = currentLang === "es";
 
   const handleSelectionChange = (newSelection: string[]) => {
     setSelectedOptions(newSelection);
@@ -536,7 +555,8 @@ export function RoomsPageClient({ lang = "es" }: { lang?: string }) {
                       country={room.propertyLocation?.country || ""}
                       state={room.propertyLocation?.state || ""}
                       city={room.propertyLocation?.city || ""}
-                      lang={lang}
+                      // 🛑 Usar el idioma del estado
+                      lang={currentLang} 
                     />
                   ) : (
                     <RoomCard
@@ -553,7 +573,8 @@ export function RoomsPageClient({ lang = "es" }: { lang?: string }) {
                       country={room.propertyLocation?.country || ""}
                       state={room.propertyLocation?.state || ""}
                       city={room.propertyLocation?.city || ""}
-                      lang={lang}
+                      // 🛑 Usar el idioma del estado
+                      lang={currentLang}
                     />
                   )}
                 </div>
@@ -562,7 +583,9 @@ export function RoomsPageClient({ lang = "es" }: { lang?: string }) {
           </div>
           {filteredRooms.length === 0 && (
             <p className="text-center text-[#162F40] mt-8">
-              No se encontraron habitaciones que coincidan con tu búsqueda.
+              {isSpanish
+                ? "No se encontraron habitaciones que coincidan con tu búsqueda."
+                : "No rooms were found that match your search."}
             </p>
           )}
           {filteredRooms.length > 0 && (
@@ -577,7 +600,7 @@ export function RoomsPageClient({ lang = "es" }: { lang?: string }) {
                         ? "bg-[#39759E] text-white"
                         : "bg-gray-200 text-[#162F40]"
                     } flex items-center justify-center`}
-                    aria-label={`Página ${page}`}
+                    aria-label={isSpanish ? `Página ${page}` : `Page ${page}`}
                     aria-current={page === currentPage ? "page" : undefined}
                   >
                     {page}

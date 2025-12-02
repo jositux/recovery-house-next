@@ -93,7 +93,8 @@ export function MenuProfile({ name, lang = "es" }: { name: string; lang?: string
       await logoutUser(refreshToken)
 
       window.dispatchEvent(new Event("storage")) 
-      router.push("/login")
+      // 🛑 CAMBIO: Redirección de logout prefijada con el idioma
+      router.push(`/${lang}/login`)
     } catch (error) {
       console.error(texts.logoutError, error)
     }
@@ -118,9 +119,9 @@ export function MenuProfile({ name, lang = "es" }: { name: string; lang?: string
         <ul className="text-sm text-[#162F40]">
 
           <li className="px-4 py-2 hover:bg-gray-100 rounded-lg cursor-pointer">
-            {/* 🛑 CAMBIO: Usamos navigateWithAuth en lugar de Link directo */}
+            {/* 🛑 CAMBIO: Prefijo de idioma agregado al path */}
             <button
-              onClick={() => navigateWithAuth("/mi-panel/")}
+              onClick={() => navigateWithAuth(`/${lang}/mi-panel/`)}
               className="flex items-center gap-2 w-full text-left"
             >
               <LayoutGrid className="w-4 h-4" />
@@ -129,9 +130,9 @@ export function MenuProfile({ name, lang = "es" }: { name: string; lang?: string
           </li>
 
           <li className="px-4 py-2 hover:bg-gray-100 rounded-lg cursor-pointer">
-             {/* 🛑 CAMBIO: Usamos navigateWithAuth en lugar de Link directo */}
+             {/* 🛑 CAMBIO: Prefijo de idioma agregado al path */}
              <button
-              onClick={() => navigateWithAuth("/mi-panel/mis-propiedades")}
+              onClick={() => navigateWithAuth(`/${lang}/mi-panel/mis-propiedades`)}
               className="flex items-center gap-2 w-full text-left"
             >
               <Building className="w-4 h-4" />
@@ -140,9 +141,9 @@ export function MenuProfile({ name, lang = "es" }: { name: string; lang?: string
           </li>
 
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-             {/* 🛑 CAMBIO: Usamos navigateWithAuth en lugar de Link directo */}
+             {/* 🛑 CAMBIO: Prefijo de idioma agregado al path */}
              <button
-              onClick={() => navigateWithAuth("/mi-panel/reservas-realizadas")}
+              onClick={() => navigateWithAuth(`/${lang}/mi-panel/reservas-realizadas`)}
               className="flex items-center gap-2 w-full text-left"
             >
               <CalendarClock className="w-4 h-4" />
@@ -151,9 +152,9 @@ export function MenuProfile({ name, lang = "es" }: { name: string; lang?: string
           </li>
 
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-             {/* 🛑 CAMBIO: Usamos navigateWithAuth en lugar de Link directo */}
+             {/* 🛑 CAMBIO: Prefijo de idioma agregado al path */}
              <button
-              onClick={() => navigateWithAuth("/mi-panel/reservas-recibidas")}
+              onClick={() => navigateWithAuth(`/${lang}/mi-panel/reservas-recibidas`)}
               className="flex items-center gap-2 w-full text-left"
             >
               <SquareArrowDown className="w-4 h-4" />
@@ -162,9 +163,9 @@ export function MenuProfile({ name, lang = "es" }: { name: string; lang?: string
           </li>
 
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-             {/* 🛑 CAMBIO: Usamos navigateWithAuth en lugar de Link directo */}
+             {/* 🛑 CAMBIO: Prefijo de idioma agregado al path */}
              <button
-              onClick={() => navigateWithAuth("/mi-panel/mi-servicio")}
+              onClick={() => navigateWithAuth(`/${lang}/mi-panel/mi-servicio`)}
               className="flex items-center gap-2 w-full text-left"
             >
               <HandHelping className="w-4 h-4" />
@@ -173,9 +174,9 @@ export function MenuProfile({ name, lang = "es" }: { name: string; lang?: string
           </li>
 
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-            {/* 🛑 CAMBIO: Usamos navigateWithAuth en lugar de Link directo */}
+            {/* 🛑 CAMBIO: Prefijo de idioma agregado al path */}
             <button
-              onClick={() => navigateWithAuth("/mi-panel/mi-perfil")}
+              onClick={() => navigateWithAuth(`/${lang}/mi-panel/mi-perfil`)}
               className="flex items-center gap-2 w-full text-left"
             >
               <User className="w-4 h-4" />

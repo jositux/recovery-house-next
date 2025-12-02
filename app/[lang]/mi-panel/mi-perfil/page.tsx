@@ -110,7 +110,7 @@ export default function CombinedProfilePage() {
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     if (!token) {
-      router.push("/login");
+      router.push(`/${lang}/login`)
       return;
     }
 
@@ -137,7 +137,7 @@ export default function CombinedProfilePage() {
         if (errorMessage.includes("Token")) {
           showTemporaryMessage(null, texts.errorToken); // 👈 Traducido
           setTimeout(() => {
-            router.push("/login");
+            router.push(`/${lang}/login`)
           }, 2000);
         }
       } finally {
@@ -200,7 +200,7 @@ export default function CombinedProfilePage() {
         const refreshToken = localStorage.getItem("refresh_token");
 
         if (!refreshToken) {
-          router.push("/login");
+          router.push(`/${lang}/login`)
           return;
         }
 
@@ -211,7 +211,7 @@ export default function CombinedProfilePage() {
         );
 
         setTimeout(() => {
-          router.push("/login");
+          router.push(`/${lang}/login`)
         }, 4000);
       } else {
         const nombre = ((values.first_name || '') + ' ' + (values.last_name || '')).trim();

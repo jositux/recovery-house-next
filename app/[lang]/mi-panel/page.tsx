@@ -89,7 +89,7 @@ export default function DashboardPage() {
 
       if (!token) {
         // Redirección en el cliente
-        router.push("/login")
+        router.push(`/${lang}/login`)
         return
       }
 

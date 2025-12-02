@@ -137,33 +137,34 @@ export default function RegistrationPage() {
   // Función de mapeo de mensajes de diálogo, ahora traducida con useMemo
   const getUserCompletionMessage = useCallback(
     (relParam: string): { message: string; cancelRoute: string } => {
+      // 🛑 CAMBIO: Prefijo de idioma agregado a las rutas de cancelación
       const routes: Record<string, { message: string; cancelRoute: string }> = {
         "registrar-propiedad": {
           message: texts.relProperty,
-          cancelRoute: "/mi-panel/mis-propiedades",
+          cancelRoute: `/${lang}/mi-panel/mis-propiedades`,
         },
         "registrar-servicio": {
           message: texts.relService,
-          cancelRoute: "/mi-panel/mi-servicio",
+          cancelRoute: `/${lang}/mi-panel/mi-servicio`,
         },
         checkout: {
           message: texts.relCheckout,
-          cancelRoute: "/checkout",
+          cancelRoute: `/${lang}/checkout`,
         },
         "mi-perfil": {
           message: texts.relProfile,
-          cancelRoute: "/rooms", // Mejor ruta si cancela desde mi-perfil? O un sitio seguro.
+          cancelRoute: `/${lang}/rooms`, // Ruta segura con idioma
         },
       };
 
       return (
         routes[relParam] || {
           message: texts.relDefault,
-          cancelRoute: `/rooms/${relParam}`,
+          cancelRoute: `/${lang}/rooms/${relParam}`,
         }
       );
     },
-    [texts]
+    [texts, lang] // Dependencia de lang agregada
   );
   
   // Función para obtener el texto del botón de acción
@@ -196,7 +197,8 @@ export default function RegistrationPage() {
   useEffect(() => {
     const token = localStorage.getItem("access_token");
     if (!token) {
-      router.push("/login");
+      // 🛑 CAMBIO: Prefijo de idioma agregado a la ruta de login
+      router.push(`/${lang}/login`);
       return;
     }
 
@@ -212,7 +214,8 @@ export default function RegistrationPage() {
 
         if (error instanceof Error && error.message.includes("Token")) {
           setTimeout(() => {
-            router.push("/login");
+            // 🛑 CAMBIO: Prefijo de idioma agregado a la ruta de login
+            router.push(`/${lang}/login`);
           }, 2000);
         }
       } finally {
@@ -221,7 +224,7 @@ export default function RegistrationPage() {
     };
 
     fetchUserData();
-  }, [router]);
+  }, [router, lang]); // Dependencia de lang agregada
 
   const handleRegisterSubmit = (
     values: z.infer<typeof complementaryFormSchemaBase>
@@ -314,6 +317,7 @@ export default function RegistrationPage() {
 
   const handleDialogCancel = () => {
     if (relDialogConfig) {
+      // La ruta ya está prefijada con el idioma en getUserCompletionMessage
       router.push(relDialogConfig.cancelRoute);
     }
   };
@@ -322,21 +326,23 @@ export default function RegistrationPage() {
     const relParam = searchParams.get("rel");
 
     if (!relParam) {
-      window.location.href = "/rooms";
+      // 🛑 CAMBIO: Prefijo de idioma agregado a la ruta por defecto
+      window.location.href = `/${lang}/rooms`;
       return;
     }
 
+    // 🛑 CAMBIO: Prefijo de idioma agregado a todas las rutas
     const routes: Record<string, string> = {
-      "registrar-propiedad": "/mi-panel/registrar-propiedad",
-      "registrar-servicio": "/mi-panel/registrar-servicio",
-      checkout: "/checkout",
-      "mi-perfil": "/mi-panel/mi-perfil"
+      "registrar-propiedad": `/${lang}/mi-panel/registrar-propiedad`,
+      "registrar-servicio": `/${lang}/mi-panel/registrar-servicio`,
+      checkout: `/${lang}/checkout`,
+      "mi-perfil": `/${lang}/mi-panel/mi-perfil`
     };
 
-    const targetRoute = routes[relParam] || `/rooms/${relParam}`;
+    const targetRoute = routes[relParam] || `/${lang}/rooms/${relParam}`;
     
     window.location.href = targetRoute;
-  }, [searchParams]);
+  }, [searchParams, lang]); // Dependencia de lang agregada
 
   // 🖼️ RENDERIZADO Y TRADUCCIÓN EN JSX
   return (

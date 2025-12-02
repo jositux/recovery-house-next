@@ -73,7 +73,7 @@ const PropertiesPage: React.FC = () => {
         const token = localStorage.getItem("access_token")
         if (!token) {
           // Redirección en el cliente
-          router.push("/login")
+          router.push(`/${lang}/login`)
           return
         }
 

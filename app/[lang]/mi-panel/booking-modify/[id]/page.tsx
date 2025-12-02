@@ -385,7 +385,7 @@ export default function BookingModifyPage() {
 
   const handleConfirmNoPayment = async () => {
     if (!pendingBookingData || !currentUser) {
-      router.push("/login");
+      router.push(`/${lang}/login`);
       return;
     }
 

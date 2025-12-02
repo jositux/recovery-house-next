@@ -133,7 +133,7 @@ export default function ProviderDataPage() {
     const checkAuthAndFetchData = async () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
-        router.push("/login");
+        router.push(`/${lang}/login`)
         return;
       }
 

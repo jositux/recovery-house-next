@@ -23,6 +23,8 @@ export default async function RoomPage({
    const resolvedParams = await params;
    const { lang } = resolvedParams;
 
+  
+
   return (
     <main className="flex flex-col min-h-screen lg:pl-8 md:pl-8">
       {/* 3. Encapsulamos el Cliente Component en Suspense */}
