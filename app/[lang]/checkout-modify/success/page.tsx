@@ -52,7 +52,7 @@ const SuccessPageContent = () => {
       const accessToken = localStorage.getItem("access_token");
       if (!accessToken) {
         // En un entorno de producción, podrías mostrar un toast con t.loginError
-        router.push("/login");
+        router.push(`/${lang}/login`);
         return;
       }
 
@@ -124,12 +124,12 @@ const SuccessPageContent = () => {
           </CardContent>
           <CardFooter className="bg-gray-50 p-6">
             <div className="w-full space-y-3">
-              <Link href="/mi-panel/reservas-realizadas" passHref className="block w-full">
+              <Link href={`/${lang}/mi-panel/reservas-realizadas`} passHref className="block w-full">
                 <Button className="w-full bg-[#39759E] hover:bg-blue-600 text-white transition duration-300">
                   {t.viewBookings} {/* <-- TRADUCIDO */}
                 </Button>
               </Link>
-              <Link href="/rooms" passHref className="block w-full">
+              <Link href={`/${lang}/rooms`} passHref className="block w-full">
                 <Button
                   variant="outline"
                   className="w-full border-blue-500 text-blue-500 hover:bg-blue-50 transition duration-300 bg-transparent"

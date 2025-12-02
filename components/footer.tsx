@@ -29,6 +29,9 @@ const socialLinks = [
 
 export function Footer({ lang }: FooterProps) {
   const isSpanish = lang === "es";
+  
+  // Eliminamos la función auxiliar localizePath
+  // const localizePath = (path: string) => `/${lang}${path}`;
 
   return (
     <footer className="bg-[#E5EEF6] pt-16 pb-8">
@@ -37,7 +40,8 @@ export function Footer({ lang }: FooterProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 mb-12">
           {/* Company Info - 40% Width (5 columns out of 12) */}
           <div className="md:col-span-2 lg:col-span-5">
-            <Link href="/" className="flex items-center gap-2 mb-6">
+            {/* 1. Enlace del Logo: Prefijado con el idioma (ya era correcto) */}
+            <Link href={`/${lang}`} className="flex items-center gap-2 mb-6">
               <Image
                 src="/assets/logo2.svg"
                 alt="Recovery Care Solutions"
@@ -76,8 +80,9 @@ export function Footer({ lang }: FooterProps) {
               <ul className="space-y-3">
                 {assistanceLinks.map((link, index) => (
                   <li key={index}>
+                    {/* 2. Enlaces de Asistencia: Aplicando el prefijo directamente */}
                     <Link
-                      href={link.href}
+                      href={`/${lang}${link.href}`}
                       className="text-[#162F40] hover:text-[#39759E]"
                     >
                       {isSpanish
@@ -106,8 +111,9 @@ export function Footer({ lang }: FooterProps) {
               </h3>
               <ul className="space-y-3">
                 <li>
+                  {/* 3. Enlace de Anfitrión: Aplicando el prefijo directamente */}
                   <Link
-                    href="/registro"
+                    href={`/${lang}/registro`}
                     className="text-[#162F40] hover:text-[#39759E]"
                   >
                     {isSpanish ? "Pon tu espacio" : "List your space"}
@@ -126,6 +132,7 @@ export function Footer({ lang }: FooterProps) {
               <ul className="space-y-3">
                 {socialLinks.map((link) => (
                   <li key={link.title}>
+                    {/* Los enlaces sociales se mantienen sin prefijo si son externos (href="#") */}
                     <Link
                       href={link.href}
                       className="flex items-center gap-2 text-[#162F40] hover:text-[#39759E]"

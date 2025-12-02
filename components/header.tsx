@@ -59,7 +59,7 @@ export function Header({ lang = "es" }: { lang?: string }) {
         <div className="container mx-auto flex items-center justify-between">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="{`/${lang}`}" className="flex items-center gap-2">
             <div className="hidden sm:block">
               <Image
                 src="/assets/logo.svg"
@@ -96,7 +96,7 @@ export function Header({ lang = "es" }: { lang?: string }) {
                 className="bg-gray-800 text-white hover:bg-gray-700"
                 asChild
               >
-                <Link href="/login">
+                <Link href={`/${lang}/login`}>
                   {isSpanish ? "Ingresar" : "Login"}
                 </Link>
               </Button>
@@ -120,7 +120,7 @@ export function Header({ lang = "es" }: { lang?: string }) {
             className="bg-white overflow-hidden"
           >
             <div className="container mx-auto">
-              <MedicalSearchMobile onSearch={() => setIsSearchOpen(false)} />
+              <MedicalSearchMobile onSearch={() => setIsSearchOpen(false)} lang={lang}/>
             </div>
           </motion.div>
         )}

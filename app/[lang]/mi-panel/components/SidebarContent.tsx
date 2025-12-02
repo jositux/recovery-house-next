@@ -35,37 +35,44 @@ export function SidebarContent({ userName, lang, onLogout, onNavigate }: Sidebar
   const navItems = [
     {
       name: t("Mi Panel", "My Dashboard"),
-      href: "/mi-panel",
+      // Rutas corregidas para incluir el prefijo de idioma
+      href: `/${lang}/mi-panel`, 
       icon: LayoutGrid,
     },
     {
       name: t("Mis Propiedades", "My Properties"),
-      href: "/mi-panel/mis-propiedades",
+      // Rutas corregidas para incluir el prefijo de idioma
+      href: `/${lang}/mi-panel/mis-propiedades`,
       icon: Building2,
     },
     {
       name: t("Mis Reservas", "My Bookings"),
-      href: "/mi-panel/reservas-realizadas",
+      // Rutas corregidas para incluir el prefijo de idioma
+      href: `/${lang}/mi-panel/reservas-realizadas`,
       icon: CalendarArrowUp,
     },
     {
       name: t("Reservas recibidas", "Received Bookings"),
-      href: "/mi-panel/reservas-recibidas",
+      // Rutas corregidas para incluir el prefijo de idioma
+      href: `/${lang}/mi-panel/reservas-recibidas`,
       icon: CalendarArrowDown,
     },
     {
       name: t("Mi Servicio", "My Service"),
-      href: "/mi-panel/mi-servicio",
+      // Rutas corregidas para incluir el prefijo de idioma
+      href: `/${lang}/mi-panel/mi-servicio`,
       icon: HandHelpingIcon,
     },
     {
       name: t("Nueva Propiedad", "New Property"),
-      href: "/mi-panel/registrar-propiedad",
+      // Rutas corregidas para incluir el prefijo de idioma
+      href: `/${lang}/mi-panel/registrar-propiedad`,
       icon: PlusCircle,
     },
     {
       name: t("Nuevo Servicio", "New Service"),
-      href: "/mi-panel/registrar-servicio",
+      // Rutas corregidas para incluir el prefijo de idioma
+      href: `/${lang}/mi-panel/registrar-servicio`,
       icon: PlusCircle,
     },
   ]
@@ -78,7 +85,7 @@ export function SidebarContent({ userName, lang, onLogout, onNavigate }: Sidebar
     <>
       <nav className="space-y-2 mt-12 lg:mt-0">
         {navItems.map((item) => {
-          // El nombre del ítem ahora está traducido
+          // Para que el enlace activo funcione correctamente con las rutas localizadas
           const isActive = pathname === item.href
           const Icon = item.icon
 
@@ -101,7 +108,8 @@ export function SidebarContent({ userName, lang, onLogout, onNavigate }: Sidebar
       <div className="border-t border-gray-200 pt-4 space-y-2">
         {/* Perfil de usuario */}
         <Link
-          href="/mi-panel/mi-perfil"
+          // Rutas corregidas para incluir el prefijo de idioma
+          href={`/${lang}/mi-panel/mi-perfil`}
           onClick={onNavigate}
           className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-gray-100 transition-colors group"
         >

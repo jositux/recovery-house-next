@@ -268,7 +268,7 @@ export const BookingCard = ({
   const router = useRouter();
 
   const handleModify = () => {
-    router.push(`/mi-panel/booking-modify/${booking.id}`);
+    router.push(`/${lang}/mi-panel/booking-modify/${booking.id}`);
   };
 
   const getPaymentBadge = () => {

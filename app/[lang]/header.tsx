@@ -26,6 +26,8 @@ export function Header({ lang = "es", availableLocations = [] }:
   const [userName, setUserName] = useState("")
   const pathname = usePathname()
 
+  
+
   const isSpanish = lang === "es"
 
   // La lógica para mostrar la barra de búsqueda se mantiene igual
@@ -33,6 +35,7 @@ export function Header({ lang = "es", availableLocations = [] }:
   pathname === `/`||
   pathname === `/rooms`||
   pathname === `/es`||
+  pathname === `/en`||
   pathname === `/${lang}` ||
   pathname === `/${lang}/rooms`;
 
@@ -66,7 +69,7 @@ export function Header({ lang = "es", availableLocations = [] }:
         <div className="container mx-auto flex items-center justify-between">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
+          <Link href={`/${lang}`} className="flex items-center gap-2">
             <div className="hidden sm:block">
               <Image
                 src="/assets/logo.svg"
@@ -127,7 +130,7 @@ export function Header({ lang = "es", availableLocations = [] }:
             className="bg-white overflow-hidden"
           >
             <div className="container mx-auto">
-              <MedicalSearchMobile onSearch={() => setIsSearchOpen(false)} />
+              <MedicalSearchMobile onSearch={() => setIsSearchOpen(false)} lang={lang}/>
             </div>
           </motion.div>
         )}

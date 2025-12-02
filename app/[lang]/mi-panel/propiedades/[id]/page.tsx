@@ -224,17 +224,17 @@ export default function RoomPage() {
 
   const handleEditBanner = (property: Property) => {
     localStorage.setItem("selected_property", JSON.stringify(property));
-    router.push(`/mi-panel/editar-propiedad/${id}/`);
+    router.push(`/${lang}/mi-panel/editar-propiedad/${id}/`);
   };
 
   const handleEditRoom = (room: Room) => {
     localStorage.setItem("selected_room", JSON.stringify(room));
-    router.push(`/mi-panel/propiedades/${id}/room/editar`);
+    router.push(`/${lang}/mi-panel/propiedades/${id}/room/editar`);
   };
 
   const handleCalendarRoom = (room: Room) => {
     localStorage.setItem("selected_room", JSON.stringify(room));
-    router.push(`/mi-panel/calendario/${room.id}/`);
+    router.push(`/${lang}/mi-panel/calendario/${room.id}/`);
   };
 
   const confirmDeleteProperty = async () => {
@@ -273,7 +273,7 @@ export default function RoomPage() {
       console.log(`🏠 Propiedad ${property.id} eliminada`);
 
       // 4️⃣ Redireccionar a la lista de propiedades
-      router.push("/mi-panel/mis-propiedades");
+      router.push("/${lang}/mi-panel/mis-propiedades");
     } catch (error) {
       console.error("❌ Error al eliminar la propiedad:", error);
     }

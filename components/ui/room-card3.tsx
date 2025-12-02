@@ -37,7 +37,7 @@ export function RoomCardShared({
 
   return (
     <Card className="overflow-hidden h-full rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
-      <Link href={`/rooms/${id}`}>
+      <Link href={`/${lang}/rooms/${id}`}>
         <div className="relative h-48 w-full">
           <Image
             src={image || "/placeholder.svg"}
@@ -102,7 +102,7 @@ export function RoomCardShared({
             </div>
           )}
         </div>
-        <Link href={`/rooms/${id}`}>
+        <Link href={`/${lang}/rooms/${id}`}>
           <Button variant="outline" className="rounded-full">
             {isSpanish ? "Ver" : "View"}
           </Button>

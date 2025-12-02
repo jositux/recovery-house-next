@@ -1,11 +1,12 @@
 "use client";
 
-import type React from "react";
-
-import { useState, useEffect } from "react";
+import * as React from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { format, parse } from "date-fns";
+// Importar ambos locales
+import { es, enUS } from "date-fns/locale"; 
 import { Button } from "@/components/ui/button";
-//import { Input } from "@/components/ui/input"
 import { Search, ChevronDown, Check, X } from "lucide-react";
 import Image from "next/image";
 import { Calendar } from "@/components/ui/calendar";
@@ -19,33 +20,51 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { format, parse } from "date-fns";
-import { es } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { NumberInput } from "@/components/number-input";
 import LocationAutocomplete from "@/components/ui/location-autocomplete";
 
+// 🛑 Interfaz de procedimiento actualizada: canónico (ES) y traducción (EN)
 interface Procedure {
-  name: string;
+  name_es: string;
+  name_en: string;
   icon: string;
 }
 
-const procedures: Procedure[] = [
-  { name: "Cirugía plástica", icon: "/assets/icons/00.svg" },
-  { name: "Cirugía bariátrica", icon: "/assets/icons/01.svg" },
-  { name: "Implante capilar", icon: "/assets/icons/02.svg" },
-  { name: "Salud mental", icon: "/assets/icons/03.svg" },
-  { name: "Rehabilitación", icon: "/assets/icons/04.svg" },
-  { name: "Otro", icon: "/assets/icons/05.svg" },
+// 🛑 Lista maestra de procedimientos actualizada
+const ALL_PROCEDURES: Procedure[] = [
+  { name_es: "Cirugía plástica", name_en: "Plastic surgery", icon: "/assets/icons/00.svg" },
+  { name_es: "Cirugía bariátrica", name_en: "Bariatric surgery", icon: "/assets/icons/01.svg" },
+  { name_es: "Implante capilar", name_en: "Hair transplant", icon: "/assets/icons/02.svg" },
+  { name_es: "Salud mental", name_en: "Mental health", icon: "/assets/icons/03.svg" },
+  { name_es: "Rehabilitación", name_en: "Rehabilitation", icon: "/assets/icons/04.svg" },
+  { name_es: "Otro", name_en: "Other", icon: "/assets/icons/05.svg" },
 ];
+
+// --- Utilidades de Traducción ---
+
+// Obtiene el nombre del procedimiento según el idioma actual
+const getProcedureName = (procedure: Procedure, lang: string) => {
+    return lang === 'es' ? procedure.name_es : procedure.name_en;
+}
+
+// Encuentra el objeto Procedure usando el nombre en cualquier idioma
+const findProcedureByAnyName = (name: string): Procedure | undefined => {
+    return ALL_PROCEDURES.find(p => p.name_es === name || p.name_en === name);
+}
+
+// --- Componente Principal ---
 
 interface MedicalSearchMobileProps {
   onSearch: () => void;
+  // 🛑 Ahora recibe el idioma como prop
+  lang: string; 
 }
 
-let travelers = 1;
+// Variable global removida, patientCount ahora se maneja por estado.
+// let travelers = 1; 
 
-const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
+const MedicalSearchMobile = ({ onSearch, lang = "es" }: MedicalSearchMobileProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -54,14 +73,36 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
   const [startDate, setStartDate] = useState<Date | undefined>();
   const [endDate, setEndDate] = useState<Date | undefined>();
   const [patientCount, setPatientCount] = useState(1);
+  
+  const isSpanish = lang === "es";
+  const currentLocale = isSpanish ? es : enUS;
 
+  // 🛑 Mapear los procedimientos para la visualización de la UI
+  const currentProcedures = useMemo(() => {
+    return ALL_PROCEDURES.map(p => ({
+        name: isSpanish ? p.name_es : p.name_en,
+        icon: p.icon,
+    }));
+  }, [isSpanish]);
+  
+
+  // 🛑 1. Inicializar estado desde URL y traducir (Se ejecuta con searchParams o lang)
   useEffect(() => {
-    // Initialize state from URL parameters
     const proceduresParam = searchParams.get("procedures");
+    
     if (proceduresParam) {
-      setSelectedProcedures(proceduresParam.split(","));
-    }
+      const namesFromUrl = proceduresParam.split(",");
+      // CRITICAL LOGIC: Traducir de español (canónico de URL) al idioma de la UI
+      const translatedNames = namesFromUrl
+        .map(name => {
+            const procedure = findProcedureByAnyName(name); 
+            return procedure ? getProcedureName(procedure, lang) : null; 
+        })
+        .filter((name): name is string => name !== null);
 
+      setSelectedProcedures(translatedNames);
+    }
+    
     const locationParam = searchParams.get("location");
     if (locationParam) {
       setLocation(locationParam);
@@ -69,6 +110,7 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
 
     const checkInParam = searchParams.get("checkIn");
     if (checkInParam) {
+      // Usar parseISO o parse para mantener consistencia
       setStartDate(parse(checkInParam, "yyyy-MM-dd", new Date()));
     }
 
@@ -79,11 +121,31 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
 
     const travelersParam = searchParams.get("travelers");
     if (travelersParam) {
-      travelers = Number.parseInt(travelersParam, 10);
-      setPatientCount(travelers > 0 ? travelers : 1);
-      console.log(travelers, patientCount);
+      const travelersCount = Number.parseInt(travelersParam, 10);
+      if (!isNaN(travelersCount) && travelersCount > 0) {
+        setPatientCount(travelersCount);
+      }
     }
-  }, [searchParams]);
+  }, [searchParams, lang]); // Dependencia en lang para re-traducir si el idioma cambia
+
+
+  // 🛑 2. Traducir el estado de procedimientos cuando el idioma (prop lang) cambia
+  React.useEffect(() => {
+    setSelectedProcedures(prevSelected => {
+      if (prevSelected.length === 0) return prevSelected;
+
+      const translated = prevSelected
+        .map(oldName => {
+          // Usar el nombre actual (en el idioma viejo) para encontrar el objeto
+          const procedure = findProcedureByAnyName(oldName);
+          // Obtener el nuevo nombre en el idioma actual (lang)
+          return procedure ? getProcedureName(procedure, lang) : oldName;
+        })
+        .filter((name, index, self) => self.indexOf(name) === index);
+
+      return translated;
+    });
+  }, [lang]); 
 
   const toggleProcedure = (procedureName: string) => {
     setSelectedProcedures((prev) =>
@@ -104,9 +166,20 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
   const handleSearch = () => {
     const params = new URLSearchParams();
 
+    // 🛑 CORE I18N LOGIC: Traducir de vuelta a la clave canónica (name_es) para la URL
     if (selectedProcedures.length > 0) {
-      params.append("procedures", selectedProcedures.join(","));
+      const spanishProcedureNames = selectedProcedures
+        .map(displayName => {
+          // Buscar el objeto Procedure usando el nombre que el usuario ve
+          const procedure = findProcedureByAnyName(displayName);
+          // Devolver el nombre en español (name_es) para la URL
+          return procedure ? procedure.name_es : displayName; 
+        })
+        .filter((name, index, self) => self.indexOf(name) === index);
+        
+      params.append("procedures", spanishProcedureNames.join(","));
     }
+    // ------------------------------------------------------------------
 
     if (location) {
       params.append("location", location);
@@ -122,13 +195,14 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
 
     params.append("travelers", patientCount.toString());
 
-    router.push(`/rooms?${params.toString()}`);
+    router.push(`/${lang}/rooms?${params.toString()}`); // Añadir lang a la ruta
     onSearch();
   };
 
+  // 🛑 Usar el locale correcto para formatear la fecha
   const formatDate = (date: Date | undefined) => {
     if (!date) return "";
-    return format(date, "d MMM", { locale: es });
+    return format(date, isSpanish ? "d MMM" : "MMM d", { locale: currentLocale });
   };
 
   const resetStartDate = (e: React.MouseEvent) => {
@@ -146,7 +220,10 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
   return (
     <div className="md:hidden w-full max-w-[850px] mx-auto p-4 space-y-3 bg-[#39759E] rounded-b-xl">
       <div className="w-full">
-        <label className="block text-sm mb-1 text-white">Motivo médico</label>
+        <label className="block text-sm mb-1 text-white">
+
+          {isSpanish ? "Motivo médico" : "Medical reason"}
+        </label>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -154,16 +231,22 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
               className="w-full justify-between bg-white hover:bg-white"
             >
               <span className="text-[#162F40]">
+                {/* 🛑 Texto traducido para el contador */}
                 {selectedProcedures.length > 0
-                  ? `${selectedProcedures.length} seleccionados`
-                  : "Tipo de intervención"}
+                  ? isSpanish 
+                    ? `${selectedProcedures.length} seleccionados` 
+                    : `${selectedProcedures.length} selected`
+                  : isSpanish 
+                    ? "Tipo de intervención" 
+                    : "Type of intervention"}
               </span>
               <ChevronDown className="h-4 w-4 opacity-50" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-[calc(100vw-2rem)] bg-[#162F40] border-0">
             <div className="grid grid-cols-3 gap-2">
-              {procedures.map((procedure) => (
+              {/* 🛑 Usar currentProcedures (ya traducido) */}
+              {currentProcedures.map((procedure) => (
                 <Button
                   key={procedure.name}
                   variant="ghost"
@@ -204,51 +287,27 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
       </div>
 
       <div className="w-full">
-        {/*<label className="block text-sm mb-1 text-white">Lugar</label>
-        <Input
-          type="text"
-          placeholder="¿Dónde deseas recuperarte?"
-          className="bg-white text-sm"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-        />*/}
-
         <div className="py-1">
-          <label className="block text-sm mb-1 text-white">Lugar</label>
+          <label className="block text-sm mb-1 text-white">
+          
+            {isSpanish ? "Lugar" : "Location"}
+          </label>
           <LocationAutocomplete
             value={location}
             onChange={(newLocation) => {
               setLocation(newLocation);
             }}
-            lang="es"
+            lang={lang} 
           />
-          {/*<div className="relative">
-                <Input
-                  type="text"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="Dónde deseas recuperarte?"
-                  className="border-0 p-0 h-6 text-sm focus-visible:ring-0 placeholder:text-muted-foreground pr-6"
-                />
-                {location && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-1/2 -translate-y-1/2 h-4 w-4 p-0"
-                    onClick={resetLocation}
-                  >
-                    <X className="h-3 w-3" />
-                  </Button>
-                )}
-
-
-                </div>*/}
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div className="relative">
-          <label className="block text-sm mb-1 text-white">Llegada</label>
+          <label className="block text-sm mb-1 text-white">
+            {/* 🛑 Texto traducido */}
+            {isSpanish ? "Llegada" : "Check-in"}
+          </label>
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -258,7 +317,8 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
                   !startDate && "text-muted-foreground"
                 )}
               >
-                {startDate ? formatDate(startDate) : "Elegir fecha"}
+
+                {startDate ? formatDate(startDate) : isSpanish ? "Elegir fecha" : "Choose date"}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -268,6 +328,7 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
                 onSelect={handleStartDateSelect}
                 initialFocus
                 disabled={(date) => date < new Date()}
+                locale={currentLocale} 
               />
             </PopoverContent>
           </Popover>
@@ -284,7 +345,10 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
         </div>
 
         <div className="relative">
-          <label className="block text-sm mb-1 text-white">Salida</label>
+          <label className="block text-sm mb-1 text-white">
+           
+            {isSpanish ? "Salida" : "Check-out"}
+          </label>
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -294,7 +358,8 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
                   !endDate && "text-muted-foreground"
                 )}
               >
-                {endDate ? formatDate(endDate) : "Elegir fecha"}
+                {/* 🛑 Placeholder traducido */}
+                {endDate ? formatDate(endDate) : isSpanish ? "Elegir fecha" : "Choose date"}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -304,6 +369,7 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
                 onSelect={handleEndDateSelect}
                 initialFocus
                 disabled={(date) => date <= (startDate || new Date())}
+                locale={currentLocale} 
               />
             </PopoverContent>
           </Popover>
@@ -322,14 +388,15 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
 
       <div className="w-full mx-auto flex flex-col items-center text-center mt-2">
         <label className="block text-sm mb-1 text-white">
-          Cantidad de personas
+         
+          {isSpanish ? "Cantidad de personas" : "Number of people"}
         </label>
         <div className="rounded-md px-3 py-2">
           <NumberInput
             min={1}
             max={50}
-            defaultValue={travelers}
-            onChange={(value) => setPatientCount(value)}
+            defaultValue={patientCount} // Usar el estado inicializado
+            onChange={setPatientCount}
             className="text-white"
           />
         </div>
@@ -340,7 +407,7 @@ const MedicalSearchMobile = ({ onSearch }: MedicalSearchMobileProps) => {
         onClick={handleSearch}
       >
         <Search className="w-5 h-5" />
-        Buscar
+        {isSpanish ? "Buscar" : "Search"} 
       </Button>
     </div>
   );

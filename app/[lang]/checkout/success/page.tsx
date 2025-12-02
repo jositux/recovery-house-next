@@ -15,8 +15,6 @@ import { motion } from "framer-motion";
 import { useRouter, useSearchParams, useParams } from "next/navigation"; // Importar useParams
 import { createBooking } from "@/services/BookingService3";
 
-// Simulación de la importación de Locale y la interfaz Booking
-// import { type Locale } from "@/lib/i18n"; 
 import { type Locale } from "@/lib/i18n"; // Importación de Locale
 
 interface Booking {
@@ -193,12 +191,12 @@ const SuccessPageContent = () => {
           </CardContent>
           <CardFooter className="bg-gray-50 p-6">
             <div className="w-full space-y-3">
-              <Link href={`/mi-panel/reservas-realizadas`} passHref className="block w-full"> {/* Usar /${lang}/ */}
+              <Link href={`/${lang}/mi-panel/reservas-realizadas`} passHref className="block w-full"> {/* Usar /${lang}/ */}
                 <Button className="w-full bg-[#39759E] hover:bg-blue-600 text-white transition duration-300">
                   {t.viewBookings}
                 </Button>
               </Link>
-              <Link href={`/rooms`} passHref className="block w-full"> {/* Usar /${lang}/ */}
+              <Link href={`/${lang}/rooms`} passHref className="block w-full"> {/* Usar /${lang}/ */}
                 <Button
                   variant="outline"
                   className="w-full border-blue-500 text-blue-500 hover:bg-blue-50 transition duration-300 bg-transparent"

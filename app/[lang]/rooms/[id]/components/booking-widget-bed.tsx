@@ -225,7 +225,7 @@ export function BookingWidgetBed({
 
       const accessToken = localStorage.getItem("access_token")
       if (!accessToken) {
-        router.push("/login")
+        router.push(`/${lang}/login`)
         return
       }
 

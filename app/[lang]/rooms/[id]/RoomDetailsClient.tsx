@@ -494,7 +494,7 @@ export function RoomDetailsClient({ lang }: RoomDetailsClientProps) {
         };
 
         localStorage.setItem("booking", JSON.stringify(formattedBooking));
-        router.push(`/checkout`);
+        router.push(`/${lang}/checkout`);
       } else {
         // Lógica de Pre-pago / Confirmación (Reservas no Urgentes)
         const formattedBookingDataForConfirm = {
