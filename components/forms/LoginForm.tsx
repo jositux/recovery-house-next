@@ -222,7 +222,7 @@ export function LoginForm({ lang }: LoginFormProps) {
           </p>
         )}
         <div className="text-sm">
-          <Link href="/user/request-password" className="text-[#39759E] hover:underline">
+          <Link href={`/${lang}/user/request-password`} className="text-[#39759E] hover:underline">
             {t.forgotPassword}
           </Link>
         </div>
@@ -231,7 +231,7 @@ export function LoginForm({ lang }: LoginFormProps) {
         </Button>
         <div className="text-sm text-center">
           {t.noAccount}{" "}
-          <Link href="/registro" className="text-[#39759E] hover:underline">
+          <Link href={`/${lang}/registro`} className="text-[#39759E] hover:underline">
             {t.noAccountLink}
           </Link>
         </div>
