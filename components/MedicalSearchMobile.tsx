@@ -22,7 +22,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { NumberInput } from "@/components/number-input";
-import LocationAutocomplete from "@/components/ui/location-autocomplete";
+import LocationAutocomplete from "@/components/ui/location-autocomplete2";
+
+// 🛑 Importar el tipo LocationOption para la nueva prop
+import type { LocationOption } from "@/services/LocationService"; 
 
 // 🛑 Interfaz de procedimiento actualizada: canónico (ES) y traducción (EN)
 interface Procedure {
@@ -59,12 +62,16 @@ interface MedicalSearchMobileProps {
   onSearch: () => void;
   // 🛑 Ahora recibe el idioma como prop
   lang: string; 
+  // ✅ NUEVA PROP para pasar las ubicaciones disponibles
+  availableLocations: LocationOption[]; 
 }
 
-// Variable global removida, patientCount ahora se maneja por estado.
-// let travelers = 1; 
-
-const MedicalSearchMobile = ({ onSearch, lang = "es" }: MedicalSearchMobileProps) => {
+const MedicalSearchMobile = ({ 
+  onSearch, 
+  lang = "es", 
+  // ✅ Destructurar la nueva prop
+  availableLocations = [] 
+}: MedicalSearchMobileProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -298,6 +305,8 @@ const MedicalSearchMobile = ({ onSearch, lang = "es" }: MedicalSearchMobileProps
               setLocation(newLocation);
             }}
             lang={lang} 
+            // ✅ PASAR LA NUEVA PROP
+            availableLocations={availableLocations} 
           />
         </div>
       </div>
