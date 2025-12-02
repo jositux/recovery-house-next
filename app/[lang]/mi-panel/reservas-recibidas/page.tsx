@@ -324,7 +324,7 @@ const BookingList = () => {
         setSelectedPaymentBookingId(null);
         setSelectedBalanceAmount("");
 
-        router.push("/checkout-balanced");
+        router.push(`/${lang}/checkout-balanced`);
       } catch (error) {
         console.error("Error processing payment:", error);
       }
@@ -700,7 +700,7 @@ const BookingList = () => {
                   size="lg"
                   className="mt-4 px-8 hover:opacity-90 transition-opacity"
                   style={{ backgroundColor: "#39759E" }}
-                  onClick={() => router.push("/rooms")}
+                  onClick={() => router.push(`/${lang}/rooms`)}
                 >
                   <Search className="mr-2 h-5 w-5" />
                   {t.searchButton} {/* <-- TRADUCIDO */}
