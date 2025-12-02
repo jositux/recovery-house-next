@@ -28,6 +28,8 @@ interface ProfileImageCropperProps {
   selectedFile: FileWithPreview | null;
   setSelectedFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>>;
   onCroppedImage: (croppedImage: string) => void;
+  // 🌐 Nueva prop para el idioma
+  lang: string;
 }
 
 export function ProfileImageCropper({
@@ -36,8 +38,27 @@ export function ProfileImageCropper({
   selectedFile,
   setSelectedFile,
   onCroppedImage,
+  lang, // Recibimos el idioma como prop
 }: ProfileImageCropperProps) {
   const aspect = 1;
+
+  // 🌐 Lógica de Idioma
+  const isSpanish = lang === "es";
+
+  // Textos localizados
+  const texts = {
+    cancelButton: isSpanish ? "Cancelar" : "Cancel",
+    cropButton: isSpanish ? "Recortar" : "Crop",
+    errorCropProcess: isSpanish
+      ? "Ocurrió un error al procesar el recorte. Por favor, inténtelo de nuevo."
+      : "An error occurred while processing the crop. Please try again.",
+    errorCropRequired: isSpanish
+      ? "Por favor, recorte la imagen antes de guardar."
+      : "Please crop the image before saving.",
+    errorSaving: isSpanish
+      ? "Ocurrió un error al guardar la imagen recortada. Por favor, inténtelo de nuevo."
+      : "An error occurred while saving the cropped image. Please try again.",
+  };
 
   const imgRef = React.useRef<HTMLImageElement | null>(null);
 
@@ -58,7 +79,8 @@ export function ProfileImageCropper({
         setCroppedImageUrl(croppedImageUrl);
       } catch (error) {
         console.error("Error in onCropComplete:", error);
-        alert("An error occurred while processing the crop. Please try again.");
+        // Eliminado alert(), usando console.error/log
+        console.log(`[Error al recortar] ${texts.errorCropProcess}`); 
       }
     }
   }
@@ -95,7 +117,8 @@ export function ProfileImageCropper({
   function handleCrop() {
     if (!croppedImageUrl) {
       console.error("No cropped image URL available");
-      alert("Please crop the image before saving.");
+      // Eliminado alert(), usando console.error/log
+      console.log(`[Validación de recorte] ${texts.errorCropRequired}`);
       return;
     }
 
@@ -104,9 +127,8 @@ export function ProfileImageCropper({
       setIsOpen(false);
     } catch (error) {
       console.error("Error during crop:", error);
-      alert(
-        "An error occurred while saving the cropped image. Please try again."
-      );
+      // Eliminado alert(), usando console.error/log
+      console.log(`[Error al guardar] ${texts.errorSaving}`);
     }
   }
 
@@ -163,7 +185,7 @@ export function ProfileImageCropper({
       onClick={handleCancel}
     >
       <Trash2Icon className="mr-1.5 size-4" />
-      Cancelar
+      {texts.cancelButton} {/* Texto traducido */}
     </Button>
   </DialogClose>
   <Button
@@ -173,7 +195,7 @@ export function ProfileImageCropper({
     onClick={handleCrop}
   >
     <CropIcon className="mr-1.5 size-4" />
-    Recortar
+    {texts.cropButton} {/* Texto traducido */}
   </Button>
 </DialogFooter>
 

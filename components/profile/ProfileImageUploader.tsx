@@ -13,17 +13,28 @@ import { Button } from "@/components/ui/button";
 interface ProfileImageUploaderProps {
   onImageCropped: (croppedImage: string) => void;
   existingAvatarId?: string;
+  // 🌐 Nueva prop para el idioma
+  lang: string; 
 }
 
 export function ProfileImageUploader({
   onImageCropped,
   existingAvatarId,
+  lang, // Recibimos el idioma como prop
 }: ProfileImageUploaderProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(null);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const [avatarSrc, setAvatarSrc] = useState<string | undefined>(undefined);
   
+  // 🌐 Lógica de Idioma
+  const isSpanish = lang === "es";
+
+  // Textos localizados
+  const texts = {
+    buttonText: isSpanish ? "Subir foto" : "Upload photo",
+  };
+
   // Use existing avatar if provided
   useEffect(() => {
     if (existingAvatarId) {
@@ -65,7 +76,7 @@ export function ProfileImageUploader({
         className="w-full mb-4 bg-[#39759E] hover:bg-[#39759E]"
         onClick={() => document.getElementById("profile-image-upload")?.click()}
       >
-        Subir foto
+        {texts.buttonText} {/* Texto traducido */}
       </Button>
 
       <input
@@ -83,6 +94,7 @@ export function ProfileImageUploader({
           selectedFile={selectedFile}
           setSelectedFile={setSelectedFile}
           onCroppedImage={handleCroppedImage}
+          lang={lang}
         />
       )}
     </div>

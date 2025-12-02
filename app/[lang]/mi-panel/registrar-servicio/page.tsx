@@ -151,7 +151,7 @@ const translations: Record<string, RegisterServiceTranslation> = {
     validationTaxIdEINFile: "El archivo TAX ID es obligatorio.",
   },
   en: {
-    pageTitle: "Register your service",
+    pageTitle: "Add your service",
     loadingServiceCheck: "Checking services...",
 
     cardTitle: "Service Loaded",

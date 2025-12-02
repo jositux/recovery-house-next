@@ -63,7 +63,7 @@ const T_MAP = {
   'Por favor carga el archivo TAX ID': { es: 'Por favor carga el archivo TAX ID', en: 'Please upload the TAX ID file' },
   'Error al registrar la propiedad. Por favor intenta de nuevo.': { es: 'Error al registrar la propiedad. Por favor intenta de nuevo.', en: 'Error registering property. Please try again.' },
   // UI Texto
-  'Registra tu propiedad': { es: 'Registra tu propiedad', en: 'Register Your Property' },
+  'Registra tu propiedad': { es: 'Registra tu propiedad', en: 'Add your Property' },
   'Documentos Legales': { es: 'Documentos Legales', en: 'Legal Documents' },
   'Número de Impuestos Tax ID/EIN': { es: 'Número de Impuestos Tax ID/EIN', en: 'Tax ID/EIN Number' },
   'Archivo RNT': { es: 'Archivo RNT', en: 'RNT File' },

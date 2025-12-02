@@ -1,19 +1,22 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { ProfileImageUploader } from "@/app/profile/ProfileImageUploader";
+import { ProfileImageUploader } from "./ProfileImageUploader";
 import { uploadBase64ToDirectus } from "@/services/uploadAvatarService";
 
 interface ProfileImageSectionProps {
   userId: string;
   accessToken: string;
   existingAvatarId?: string | null;
+  // 🌐 Nueva prop para el idioma
+  lang: string; 
 }
 
 export function ProfileImageSection({
   userId,
   accessToken,
   existingAvatarId,
+  lang, // Recibimos el idioma como prop
 }: ProfileImageSectionProps) {
   const [croppedImageUrl, setCroppedImageUrl] = useState<string | null>(null);
   const [avatarId, setAvatarId] = useState<string | null>(existingAvatarId ?? null);
@@ -21,6 +24,22 @@ export function ProfileImageSection({
   const [imageSuccessMessage, setImageSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const processedImages = useRef(new Set<string>());
+
+  // 🌐 Lógica de Idioma
+  const isSpanish = lang === "es";
+
+  // Textos localizados
+  const texts = {
+    successMessage: isSpanish 
+      ? "Imagen de perfil actualizada exitosamente" 
+      : "Profile image updated successfully",
+    defaultError: isSpanish 
+      ? "Error al subir la imagen" 
+      : "Error uploading image",
+    uploadingMessage: isSpanish 
+      ? "Subiendo imagen de perfil..." 
+      : "Uploading profile image...",
+  };
 
   // Handle when the user crops a new image
   const handleCroppedImage = (image: string) => {
@@ -61,13 +80,16 @@ export function ProfileImageSection({
           
           await updateUserAvatar(userId, id, accessToken);
           
-          showTemporaryMessage("Imagen de perfil actualizada exitosamente", null);
+          // Usamos el texto traducido
+          showTemporaryMessage(texts.successMessage, null); 
         }
       } catch (error) {
         console.error("Error uploading avatar:", error);
-        let errorMessage = "Error al subir la imagen";
+        // Usamos el texto traducido por defecto, pero permitimos el mensaje del error
+        let errorMessage = texts.defaultError; 
         if (error instanceof Error) {
-          errorMessage = error.message;
+          // Si el error es una instancia de Error, usamos su mensaje
+          errorMessage = error.message; 
         }
         showTemporaryMessage(null, errorMessage);
       } finally {
@@ -76,7 +98,7 @@ export function ProfileImageSection({
     };
 
     uploadAvatar();
-  }, [croppedImageUrl, accessToken, userId, isUploading]);
+  }, [croppedImageUrl, accessToken, userId, isUploading, texts.successMessage, texts.defaultError]);
 
   // Default implementation of updating user avatar
   const updateUserAvatar = async (
@@ -110,11 +132,12 @@ export function ProfileImageSection({
         <ProfileImageUploader
           onImageCropped={handleCroppedImage}
           existingAvatarId={avatarId || undefined}
+          lang={lang} 
         />
         {isUploading && (
           <div className="mt-2 p-2 bg-blue-50 text-blue-700 rounded text-sm text-center">
             <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-            Subiendo imagen de perfil...
+            {texts.uploadingMessage} {/* Texto traducido */}
           </div>
         )}
         {imageSuccessMessage && (

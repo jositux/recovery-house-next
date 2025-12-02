@@ -255,6 +255,7 @@ export default function CombinedProfilePage() {
             userId={user.id} 
             accessToken={accessToken}
             existingAvatarId={avatarId}
+            lang={lang}
           />
         )}
 
