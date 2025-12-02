@@ -36,7 +36,7 @@ const translations = {
     pastSubtitle: (count: number) => `Historial de estadías completadas (${count})`,
     emptyTitle: "¡Encuentra tu espacio ideal para una recuperación tranquila!",
     emptyMessage: "Aún no tienes reservas, pero estamos aquí para ayudarte a encontrar la casa de recuperación perfecta para tu proceso de sanación y bienestar.",
-    searchButton: "Buscar casa de recuperación",
+    searchButton: "Buscar",
     modifySuccessTitle: "¡Modificación Exitosa!",
     modifySuccessMessage: "Se ha modificado la reserva exitosamente. Puedes ver todas las reservas que tienes hechas.",
     viewBookingsButton: "Ver Reservas",
@@ -51,7 +51,7 @@ const translations = {
     pastSubtitle: (count: number) => `History of completed stays (${count})`,
     emptyTitle: "Find your ideal space for a quiet recovery!",
     emptyMessage: "You don't have any bookings yet, but we are here to help you find the perfect recovery house for your healing and wellness journey.",
-    searchButton: "Search recovery house",
+    searchButton: "Search",
     modifySuccessTitle: "Modification Successful!",
     modifySuccessMessage: "The booking has been successfully modified. You can view all your current reservations.",
     viewBookingsButton: "View Bookings",
@@ -636,7 +636,7 @@ const BookingList = () => {
                   size="lg"
                   className="mt-4 px-8 hover:opacity-90 transition-opacity"
                   style={{ backgroundColor: "#39759E" }}
-                  onClick={() => router.push("/rooms")}
+                  onClick={() => router.push(`/${lang}/rooms`)}
                 >
                   <Search className="mr-2 h-5 w-5" />
                   {t.searchButton} {/* <-- TRADUCIDO */}
