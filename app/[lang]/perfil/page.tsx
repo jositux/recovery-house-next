@@ -413,6 +413,7 @@ export default function RegistrationPage() {
                     userId={user.id}
                     accessToken={accessToken}
                     existingAvatarId={user.avatar}
+                    lang={lang}
                   />
                 </div>
               )}

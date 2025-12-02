@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckoutForm } from "@/app/checkout/CheckoutForm";
+import { CheckoutForm } from "./CheckoutForm";
 import React, { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";

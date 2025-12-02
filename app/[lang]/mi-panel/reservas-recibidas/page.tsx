@@ -685,9 +685,9 @@ const BookingList = () => {
                 </div>
 
                 <div className="space-y-3">
-                  <h1
-                    className={`${fraunces.className} text-2xl md:text-3xl font-semibold text-gray-900`}
-                  >
+                <h1
+            className={`${fraunces.className} text-3xl font-normal text-[#162F40] mb-8`}
+          >
                     {t.emptyTitle} {/* <-- TRADUCIDO */}
                   </h1>
                   <p className="text-base text-gray-600 max-w-md mx-auto">
