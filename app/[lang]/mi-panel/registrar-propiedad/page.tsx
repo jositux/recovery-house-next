@@ -724,7 +724,7 @@ export default function RegisterPropertyPage() {
                         <FormLabel className="text-sm font-normal cursor-pointer">
                           {t("He leído y acepto los", lang)}{" "}
                           <a
-                            href="/terms" // Asumimos que esta ruta se maneja globalmente o se adapta en un componente superior
+                            href={`/${lang}/terms`} // Asumimos que esta ruta se maneja globalmente o se adapta en un componente superior
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-[#39759E] hover:text-[#3a5a77] underline font-medium"

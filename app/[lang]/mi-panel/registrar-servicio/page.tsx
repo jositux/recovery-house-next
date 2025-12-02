@@ -263,7 +263,8 @@ export default function RegisterServicePage() {
       if (!token) {
         // Mejor usar console.error y redirigir
         console.error(t.errorNoToken); 
-        router.push("/login")
+        router.push(`/${lang}/login`)
+
         return
       }
 
@@ -273,7 +274,7 @@ export default function RegisterServicePage() {
 
         if (data.length > 0) {
           setHasExistingService(true)
-          router.push(`/mi-panel/mi-servicio`)
+          router.push(`/${lang}/mi-panel/mi-servicio`)
         }
       } catch (error) {
         console.error("Error al cargar los datos del proveedor:", error)
@@ -365,7 +366,7 @@ export default function RegisterServicePage() {
     const accessToken = localStorage.getItem("access_token")
     if (!accessToken) {
       console.error(t.errorNoToken)
-      router.push("/login")
+      router.push(`/${lang}/login`)
       setIsSubmitting(false)
       return
     }
@@ -447,7 +448,7 @@ export default function RegisterServicePage() {
 
       localStorage.setItem("new_service", JSON.stringify(providerData))
       // router.push(`/mi-panel/mi-servicio`) // Descomentar al integrar la API real
-      router.push(`/subscriptions`)
+      router.push(`/${lang}/subscriptions`)
 
     } catch (error) {
       console.error("Error al registrar el servicio o manejar archivos:", error)
@@ -506,13 +507,13 @@ export default function RegisterServicePage() {
           </CardContent>
           <CardFooter className="bg-gray-50 p-6">
             <div className="grid grid-cols-2 gap-4 w-full">
-              <Link href="/mi-panel/mi-servicio" passHref className="w-full">
+              <Link href={`/${lang}/mi-panel/mi-servicio`} passHref className="w-full">
                 <Button variant="outline" className="w-full bg-transparent">
                   <Eye className="mr-2" size={16} />
                  {t.viewButton}
                 </Button>
               </Link>
-              <Link href="/mi-panel/editar-servicio" passHref className="w-full">
+              <Link href={`/${lang}/mi-panel/editar-servicio`} passHref className="w-full">
                 <Button variant="default" className="w-full">
                   <Edit className="mr-2" size={16} />
                   {t.editButton}
