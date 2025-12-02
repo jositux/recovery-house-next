@@ -273,7 +273,7 @@ export default function RoomPage() {
       console.log(`🏠 Propiedad ${property.id} eliminada`);
 
       // 4️⃣ Redireccionar a la lista de propiedades
-      router.push("/${lang}/mi-panel/mis-propiedades");
+      router.push(`/${lang}/mi-panel/mis-propiedades`);
     } catch (error) {
       console.error("❌ Error al eliminar la propiedad:", error);
     }
@@ -565,7 +565,7 @@ export default function RoomPage() {
                     className="bg-white relative border pb-8 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
                   >
                     <div className="relative w-full h-48">
-                      <Link href={`/rooms/${room.id}`} passHref>
+                      <Link href={`/${lang}/rooms/${room.id}`} passHref>
                         <div className="relative w-full h-full">
                           <Image
                             src={
