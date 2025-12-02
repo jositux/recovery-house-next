@@ -101,7 +101,7 @@ const normalizeString = (str: string) =>
 // --- FIN DE TIPOS MOVIDOS ---
 
 // Renombramos y exportamos el componente, que ahora es el Cliente
-export function RoomsPageClient({ lang: initialLang = "es" }: { lang?: string }) {
+export function RoomsPageClient({ lang = "es" }: { lang?: string }) {
   const searchParams = useSearchParams();
   const [properties, setProperties] = useState<Property[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -116,26 +116,8 @@ export function RoomsPageClient({ lang: initialLang = "es" }: { lang?: string })
 
   const prevPropertiesRef = useRef<Property[]>([]);
 
-  // 1. Nuevo estado para manejar el idioma que se utilizará en el renderizado
-  const [currentLang, setCurrentLang] = useState(initialLang);
-
-  // 2. useEffect para darle prioridad al valor de localStorage una vez montado
-  useEffect(() => {
-    try {
-      const storedLang = localStorage.getItem('user-language-preference');
-      console.log("stored", storedLang);
-      // Si hay un valor guardado y es válido ('es' o 'en'), actualizamos el estado.
-      // Esto forzará un re-renderizado con el idioma de localStorage.
-      if (storedLang && (storedLang === 'es' || storedLang === 'en')) {
-        setCurrentLang(storedLang);
-      }
-    } catch (e) {
-      console.error("No se pudo acceder a localStorage", e);
-    }
-  }, []); // Se ejecuta solo una vez al montar
-
-  // 3. Derivamos la variable booleana del estado
-  const isSpanish = currentLang === "es";
+ 
+  const isSpanish = lang === "es";
 
   const handleSelectionChange = (newSelection: string[]) => {
     setSelectedOptions(newSelection);
@@ -558,7 +540,7 @@ export function RoomsPageClient({ lang: initialLang = "es" }: { lang?: string })
                       state={room.propertyLocation?.state || ""}
                       city={room.propertyLocation?.city || ""}
                       // 🛑 Usar el idioma del estado
-                      lang={currentLang} 
+                      lang={lang} 
                     />
                   ) : (
                     <RoomCard
@@ -576,7 +558,7 @@ export function RoomsPageClient({ lang: initialLang = "es" }: { lang?: string })
                       state={room.propertyLocation?.state || ""}
                       city={room.propertyLocation?.city || ""}
                       // 🛑 Usar el idioma del estado
-                      lang={currentLang}
+                      lang={lang}
                     />
                   )}
                 </div>
