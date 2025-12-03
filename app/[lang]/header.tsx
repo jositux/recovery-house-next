@@ -11,48 +11,49 @@ import { Search } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { SearchBar } from "@/components/search-bar2"
 import MedicalSearchMobile from "@/components/MedicalSearchMobile"
-// 🛑 Importar el tipo de dato para las ubicaciones
-import type { LocationOption } from "@/services/LocationService"; 
+import type { LocationOption } from "@/services/LocationService"
 
-// 🛑 MODIFICAR LA INTERFAZ DE PROPS
-export function Header({ lang = "es", availableLocations = [] }: 
-    { 
-        lang?: string; 
-        availableLocations?: LocationOption[]; // ✅ Nueva prop
-    }
-) {
+export function Header({
+  lang = "es",
+  availableLocations = []
+}: {
+  lang?: string
+  availableLocations?: LocationOption[]
+}) {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [isReady, setIsReady] = useState(false) // evita parpadeo + salto
   const [userName, setUserName] = useState("")
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+
   const pathname = usePathname()
-
-  
-
   const isSpanish = lang === "es"
 
-  // La lógica para mostrar la barra de búsqueda se mantiene igual
   const showSearchBar =
-  pathname === `/`||
-  pathname === `/rooms`||
-  pathname === `/es`||
-  pathname === `/en`||
-  pathname === `/${lang}` ||
-  pathname === `/${lang}/rooms`;
+    pathname === `/` ||
+    pathname === `/rooms` ||
+    pathname === `/${lang}` ||
+    pathname === `/${lang}/rooms`
 
   useEffect(() => {
     const checkAuth = () => {
-      const token = localStorage.getItem("access_token")
+      try {
+        const token = localStorage.getItem("access_token")
 
-      const rawName = localStorage.getItem("nombre")
-      const name =
-        rawName && rawName !== "null" && rawName.trim() !== ""
-          ? rawName
-          : isSpanish
-          ? "Usuario sin nombre"
-          : "Unnamed user"
+        const rawName = localStorage.getItem("nombre")
+        const name =
+          rawName && rawName.trim() !== "" && rawName !== "null"
+            ? rawName
+            : isSpanish
+            ? "Usuario sin nombre"
+            : "Unnamed user"
 
-      setIsLoggedIn(!!token)
-      setUserName(name)
+        setIsLoggedIn(!!token)
+        setUserName(name)
+      } catch (e) {
+        console.error("Auth check failed:", e)
+      }
+
+      setIsReady(true) // 💥 evita salto
     }
 
     checkAuth()
@@ -68,7 +69,7 @@ export function Header({ lang = "es", availableLocations = [] }:
       <header className="bg-[#39759E] p-4 relative z-1">
         <div className="container mx-auto flex items-center justify-between">
 
-          {/* Logo */}
+          {/* ------------------------- LOGO ------------------------- */}
           <Link href={`/${lang}`} className="flex items-center gap-2">
             <div className="hidden sm:block">
               <Image
@@ -88,9 +89,10 @@ export function Header({ lang = "es", availableLocations = [] }:
             </div>
           </Link>
 
+          {/* ------------------ AUTH / MENU SECTION ------------------ */}
           <div className="flex items-center gap-4">
 
-            {/* Search mobile */}
+            {/* Mobile Search */}
             <Button
               size="icon"
               variant="ghost"
@@ -100,7 +102,16 @@ export function Header({ lang = "es", availableLocations = [] }:
               <Search className="h-5 w-5 text-[#39759E]" />
             </Button>
 
-            {!isLoggedIn ? (
+            {/* ----------------------------------------------
+                🔥 NO SALTO, NO PARPADEO:
+                Usa un placeholder INVISIBLE mientras carga.
+               ---------------------------------------------- */}
+            {!isReady ? (
+              <div className="opacity-0 pointer-events-none flex items-center gap-4">
+                <MenuProfile name="placeholder" lang={lang} />
+                <MenuActions lang={lang} />
+              </div>
+            ) : !isLoggedIn ? (
               <Button
                 variant="secondary"
                 className="bg-gray-800 text-white hover:bg-gray-700"
@@ -112,14 +123,16 @@ export function Header({ lang = "es", availableLocations = [] }:
               </Button>
             ) : (
               <>
-                <MenuProfile name={userName} lang={lang}/>
+                <MenuProfile name={userName} lang={lang} />
                 <MenuActions lang={lang} />
               </>
             )}
+
           </div>
         </div>
       </header>
 
+      {/* ------------------ MOBILE SEARCH DROPDOWN ------------------ */}
       <AnimatePresence>
         {isSearchOpen && (
           <motion.div
@@ -130,14 +143,21 @@ export function Header({ lang = "es", availableLocations = [] }:
             className="bg-white overflow-hidden"
           >
             <div className="container mx-auto">
-              <MedicalSearchMobile onSearch={() => setIsSearchOpen(false)} lang={lang} availableLocations={availableLocations}/>
+              <MedicalSearchMobile
+                onSearch={() => setIsSearchOpen(false)}
+                lang={lang}
+                availableLocations={availableLocations}
+              />
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* 🛑 PASAR EL PROP availableLocations a SearchBar */}
-      {showSearchBar && <SearchBar lang={lang} availableLocations={availableLocations} />}
+      {/* ----------------------- DESKTOP SEARCH --------------------- */}
+      
+      {showSearchBar && (
+        <SearchBar lang={lang} availableLocations={availableLocations} />
+      )}
     </>
   )
 }

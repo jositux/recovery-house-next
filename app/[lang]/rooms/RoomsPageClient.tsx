@@ -602,7 +602,7 @@ export function RoomsPageClient({ lang = "es" }: { lang?: string }) {
           }`}
         >
           <div className="h-[calc(100vh-0px)] rounded-lg sticky top-0">
-            <MapRooms markers={mapMarkers} />
+            <MapRooms markers={mapMarkers} lang={lang}/>
           </div>
         </div>
       </div>

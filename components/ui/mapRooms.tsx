@@ -17,6 +17,7 @@ interface MapMarker {
 
 interface MapProps {
   markers: MapMarker[]
+  lang: string
 }
 
 const containerStyle = {
@@ -31,7 +32,9 @@ const colombiaCenter = {
 
 const MIN_ZOOM = 3
 
-export function MapRooms({ markers }: MapProps) {
+export function MapRooms({ markers, lang }: MapProps) {
+  const isSpanish = lang === "es"
+
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
@@ -107,7 +110,7 @@ export function MapRooms({ markers }: MapProps) {
           onCloseClick={() => setSelectedMarker(null)}
           options={{ disableAutoPan: false }}
         >
-          <div className="relative max-w-xs bg-white rounded-lg shadow-lg overflow-hidden p-0">
+          <div className="relative max-w-[200px] bg-white rounded-lg shadow-lg overflow-hidden p-0">
             <button
               onClick={() => setSelectedMarker(null)}
               className="absolute top-2 right-2 bg-gray-200 hover:bg-gray-300 rounded-full p-1 transition-colors duration-200"
@@ -120,7 +123,7 @@ export function MapRooms({ markers }: MapProps) {
               {selectedMarker.image && (
                 <div className="w-full aspect-[16/9]">
                   <Image
-                    src={`${selectedMarker.image}?key=small`}
+                    src={`${selectedMarker.image}?key=medium`}
                     alt={selectedMarker.name}
                     width={200}
                     height={112}
@@ -129,12 +132,15 @@ export function MapRooms({ markers }: MapProps) {
                 </div>
               )}
               <div className="px-4">
-                <h3 className="font-bold text-lg text-[#39759E] hover:underline transition-all duration-200">
+                <h3 className="font-medium text-lg text-[#39759E] hover:underline leading-none transition-all duration-200">
                   {selectedMarker.name}
                 </h3>
                 <p className="text-[#162F40] mt-2">
-                  <span className="font-bold">{selectedMarker.rooms}</span> habitación(es) disponible(s)
-                </p>
+<span className="font-bold">{selectedMarker.rooms}</span>{" "}
+{isSpanish
+  ? `habitación${selectedMarker.rooms === 1 ? "" : "es"} disponible${selectedMarker.rooms === 1 ? "" : "s"}`
+  : `room${selectedMarker.rooms === 1 ? "" : "s"} available`
+}                </p>
               </div>
             </Link>
           </div>
