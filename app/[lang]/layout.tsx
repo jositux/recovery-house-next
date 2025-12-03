@@ -4,6 +4,7 @@ import { Header } from "./header";
 import { Footer } from "@/components/footer";
 import { PageTracker } from "react-page-tracker";
 import { fetchAvailableLocations, type LocationOption } from "@/services/LocationService";
+import { FadeWrapper } from "./FadeWrapper"; // ⬅️ AGREGADO
 
 // 💡 Simulamos una función para obtener traducciones de metadata
 async function getMetadataByLang(lang: Locale): Promise<{ title: string; description: string }> {
@@ -32,11 +33,8 @@ export async function generateMetadata({
     const translatedMetadata = await getMetadataByLang(lang);
 
     return {
-        // La metadata dinámica se fusiona con la estática del layout raíz
         title: translatedMetadata.title,
         description: translatedMetadata.description,
-        
-        // El resto de la metadata (icons, etc.) se hereda del layout raíz.
     };
 }
 
@@ -50,21 +48,26 @@ export default async function LocaleLayout({
   params: { lang: Locale } 
 }>) {
   
-  const { lang } = params 
+  const { lang } = params;
 
-  // LLAMADA AL SERVICIO
   const availableLocations: LocationOption[] = await fetchAvailableLocations();
   
   return (
     <> 
-      {/* El atributo lang debe ser establecido en el <html> del layout raíz,
-          pero el middleware se asegura de que el contenido use este lang. */}
-      <Header lang={lang} availableLocations={availableLocations} /> 
-      <main className="max-auto relative z-0">
-        <PageTracker />
-        {children}
-      </main>
+      {/* HEADER con fade in */}
+      <FadeWrapper delay={0.2}>
+        <Header lang={lang} availableLocations={availableLocations} /> 
+      </FadeWrapper>
+
+      {/* MAIN con fade in */}
+      <FadeWrapper delay={1}>
+        <main className="max-auto relative z-0">
+          <PageTracker />
+          {children}
+        </main>
+      </FadeWrapper>
        
+      {/* FOOTER (sin animación, o le agregamos si querés) */}
       <Footer lang={lang} />
     </>
   );
