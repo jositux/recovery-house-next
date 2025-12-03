@@ -14,6 +14,7 @@ interface CheckoutFormProps {
     description?: string
     unit_amount: number
   }
+  lang: string
 }
 
 // Función para limpiar HTML y dejar solo texto plano
@@ -36,7 +37,7 @@ const cleanHtmlDescription = (htmlString: string): string => {
   ) // Fallback si queda vacío
 }
 
-export const CheckoutForm = ({ bookingData }: CheckoutFormProps) => {
+export const CheckoutForm = ({ bookingData, lang }: CheckoutFormProps) => {
   // Función para obtener el clientSecret
   const fetchClientSecret = useCallback(async () => {
     if (!bookingData || Object.keys(bookingData).length === 0) {
@@ -47,6 +48,7 @@ export const CheckoutForm = ({ bookingData }: CheckoutFormProps) => {
         name: bookingData.name || "Sin nombre",
         description: cleanHtmlDescription(bookingData.description || ""),
         unit_amount: bookingData.unit_amount,
+        lang: lang
       })
       return stripeResponse.clientSecret
     } catch (error) {

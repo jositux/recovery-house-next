@@ -173,7 +173,8 @@ export function middleware(request: NextRequest) {
     path.startsWith('/webapi/items/Stay') ||
     path.startsWith('/webapi/items/Prepayment_Config') || 
     path.startsWith('/webapi/auth/password/request') ||
-    path.startsWith('/webapi/auth/password/reset') ||    
+    path.startsWith('/webapi/auth/password/reset') || 
+    path.startsWith('/webapi/items/Available_Locations') ||    
     path.startsWith('/webapi/users/register');
     
   // Get auth token from cookies

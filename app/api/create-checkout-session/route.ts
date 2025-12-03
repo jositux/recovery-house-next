@@ -7,9 +7,13 @@ const stripe = new Stripe(process.env.NEXT_STRIPE_KEY!, {
 })
 
 export async function POST(request: Request) {
-  const { priceId } = await request.json();
-
-  console.log(priceId)
+    
+    const body = await request.json();
+    const { priceId, lang } = body; 
+  
+    if (!priceId || !lang) {
+        return NextResponse.json({ error: 'Missing priceId or lang' }, { status: 400 });
+    }
 
   try {
     const session = await stripe.checkout.sessions.create({
@@ -21,8 +25,8 @@ export async function POST(request: Request) {
           quantity: 1,
         },
       ],
-      success_url: `${request.headers.get('origin')}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${request.headers.get('origin')}/subscriptions`,
+      success_url: `${request.headers.get('origin')}/${lang}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${request.headers.get('origin')}/${lang}/subscriptions`,
     });
 
     console.log(session.id)

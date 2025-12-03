@@ -11,6 +11,7 @@ interface NewSessionOptions {
   name: string;
   description: string;
   unit_amount: number;
+  lang: string
 }
 
 export const postStripeSession = async ({
@@ -18,10 +19,11 @@ export const postStripeSession = async ({
   name,
   description,
   unit_amount,
+  lang
 }: NewSessionOptions) => {
   const returnUrl =
-  "https://recoverycaresolutions.com/checkout-return-modify?session_id={CHECKOUT_SESSION_ID}";
-  //"http://localhost:3000/checkout-return-modify?session_id={CHECKOUT_SESSION_ID}";
+  `"https://recoverycaresolutions.com/${lang}/checkout-return-modify?session_id={CHECKOUT_SESSION_ID}`;
+  //`http://localhost:3000/${lang}/checkout-return-modify?session_id={CHECKOUT_SESSION_ID}`;
 
   const session = await stripe.checkout.sessions.create({
     ui_mode: "embedded",

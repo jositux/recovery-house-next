@@ -94,7 +94,7 @@ function SubscriptionPlans() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ priceId }),
+        body: JSON.stringify({ priceId, lang }),
       });
 
       const { sessionId } = await response.json();
