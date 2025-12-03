@@ -319,7 +319,7 @@ export default function ProviderDataPage() {
               <div className="flex flex-col md:flex-row flex-wrap gap-4">
                 
                 {/* Bloque RNT */}
-                <div className="flex items-start flex-1 p-3 bg-gray-50 rounded-lg border border-gray-200 min-w-[300px]">
+                <div className="flex items-start flex-1 p-3 bg-gray-50 rounded-lg border border-gray-200 min-w-[200px]">
                     <FileText className="w-4 h-4 mt-1 mr-2 text-blue-500 flex-shrink-0" />
                     <div>
                         <p className="text-sm font-medium text-gray-700">{texts.RNTLabel}</p>
@@ -347,7 +347,7 @@ export default function ProviderDataPage() {
                 </div>
 
                 {/* Bloque Tax ID */}
-                <div className="flex items-start flex-1 p-3 bg-gray-50 rounded-lg border border-gray-200 min-w-[300px]">
+                <div className="flex items-start flex-1 p-3 bg-gray-50 rounded-lg border border-gray-200 min-w-[200px]">
                     <FileText className="w-4 h-4 mt-1 mr-2 text-blue-500 flex-shrink-0" />
                     <div>
                         <p className="text-sm font-medium text-gray-700">
