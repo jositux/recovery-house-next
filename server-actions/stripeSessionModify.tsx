@@ -22,7 +22,7 @@ export const postStripeSession = async ({
   lang
 }: NewSessionOptions) => {
   const returnUrl =
-  `"https://recoverycaresolutions.com/${lang}/checkout-return-modify?session_id={CHECKOUT_SESSION_ID}`;
+  `https://recoverycaresolutions.com/${lang}/checkout-return-modify?session_id={CHECKOUT_SESSION_ID}`;
   //`http://localhost:3000/${lang}/checkout-return-modify?session_id={CHECKOUT_SESSION_ID}`;
 
   const session = await stripe.checkout.sessions.create({
