@@ -30,7 +30,9 @@ import {
   MapPin,
   FileText,
   Pencil,
-  HandHelping
+  HandHelping,
+  Download,
+  AlertTriangle,
 } from "lucide-react";
 import { Fraunces } from "next/font/google";
 
@@ -111,6 +113,13 @@ const translations: Record<string, TranslationText> = {
   },
 };
 
+const truncateFilename = (filename: string, maxLength: number = 20): string => {
+  if (filename.length > maxLength) {
+    // 17 caracteres visibles + "..." = 20 caracteres totales
+    return filename.substring(0, maxLength - 3) + '...'; 
+  }
+  return filename;
+};
 
 export default function ProviderDataPage() {
   const router = useRouter();
@@ -308,46 +317,64 @@ export default function ProviderDataPage() {
               </div>
 
               <div className="flex flex-col md:flex-row flex-wrap gap-4">
-                <div className="flex items-center flex-1 p-3 bg-gray-50 rounded-lg">
-                  <FileText className="w-4 h-4 mr-2 text-gray-400" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">{texts.RNTLabel}</p> {/* 👈 Traducido */}
-                    {provider.RNTFile ? (
-                      <a
-                        href={`/webapi/assets/${provider.RNTFile.id}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-gray-800 hover:underline"
-                      >
-                        {provider.RNTFile.filename_download}
-                      </a>
-                    ) : (
-                      <p className="text-xs text-gray-500">{texts.notUploaded}</p> 
-                    )}
-                  </div>
+                
+                {/* Bloque RNT */}
+                <div className="flex items-start flex-1 p-3 bg-gray-50 rounded-lg border border-gray-200 min-w-[300px]">
+                    <FileText className="w-4 h-4 mt-1 mr-2 text-blue-500 flex-shrink-0" />
+                    <div>
+                        <p className="text-sm font-medium text-gray-700">{texts.RNTLabel}</p>
+                        
+                        {provider.RNTFile ? (
+                            <a
+                                href={`/webapi/assets/${provider.RNTFile.id}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center text-sm font-semibold text-blue-700 bg-blue-100 py-1 px-2 rounded-md hover:bg-blue-200 transition duration-150 group"
+                            >
+                                <span className="mr-1">
+                                    {truncateFilename(provider.RNTFile.filename_download)}
+                                </span>
+                                {/* Icono para indicar que es clicable/descargable */}
+                                <Download className="w-3 h-3 text-blue-600 group-hover:scale-110" />
+                            </a>
+                        ) : (
+                            <p className="text-xs text-gray-500 flex items-center">
+                                <AlertTriangle className="w-3 h-3 mr-1 text-yellow-500" />
+                                {texts.notUploaded}
+                            </p> 
+                        )}
+                    </div>
                 </div>
 
-                <div className="flex items-center flex-1 p-3 bg-gray-50 rounded-lg">
-                  <FileText className="w-4 h-4 mr-2 text-gray-400" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">
-                      {texts.taxIdLabel} {/* 👈 Traducido */}
-                    </p>
-                    {provider.taxIdEINFile ? (
-                      <a
-                        href={`/webapi/assets/${provider.taxIdEINFile.id}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-gray-800 hover:underline"
-                      >
-                        {provider.taxIdEINFile.filename_download}
-                      </a>
-                    ) : (
-                      <p className="text-xs text-gray-500">{texts.notUploaded}</p> 
-                    )}
-                  </div>
+                {/* Bloque Tax ID */}
+                <div className="flex items-start flex-1 p-3 bg-gray-50 rounded-lg border border-gray-200 min-w-[300px]">
+                    <FileText className="w-4 h-4 mt-1 mr-2 text-blue-500 flex-shrink-0" />
+                    <div>
+                        <p className="text-sm font-medium text-gray-700">
+                            {texts.taxIdLabel}
+                        </p>
+                        {provider.taxIdEINFile ? (
+                            <a
+                                href={`/webapi/assets/${provider.taxIdEINFile.id}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center text-sm font-semibold text-blue-700 bg-blue-100 py-1 px-2 rounded-md hover:bg-blue-200 transition duration-150 group"
+                            >
+                                <span className="mr-1">
+                                    {truncateFilename(provider.taxIdEINFile.filename_download)}
+                                </span>
+                                {/* Icono para indicar que es clicable/descargable */}
+                                <Download className="w-3 h-3 text-blue-600 group-hover:scale-110" />
+                            </a>
+                        ) : (
+                            <p className="text-xs text-gray-500 flex items-center">
+                                <AlertTriangle className="w-3 h-3 mr-1 text-yellow-500" />
+                                {texts.notUploaded}
+                            </p> 
+                        )}
+                    </div>
                 </div>
-              </div>
+            </div>
 
               {/* Amenities */}
               {Array.isArray(provider?.extraTags) &&
@@ -371,7 +398,7 @@ export default function ProviderDataPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => router.push("/mi-panel/editar-servicio")}
+                  onClick={() => router.push(`/${lang}/mi-panel/editar-servicio`)}
                 >
                   <Pencil className="h-4 w-4 mr-2" />
                   {texts.editButton} {/* 👈 Traducido */}
