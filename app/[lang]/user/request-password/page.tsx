@@ -33,12 +33,12 @@ export default function ForgotPassword() {
         },
         body: JSON.stringify({
           email, 
-          reset_url: "https://recoverycaresolutions.com/user/reset-password"
+          reset_url: `https://recoverycaresolutions.com/${lang}/user/reset-password`
         }),
       });
       
       if (response.ok) {
-        router.push(isSpanish ? '/login?message=reset' : '/login?message=reset'); // Puedes usar query distinto si quieres
+        router.push(isSpanish ? `/${lang}/login?message=reset` : `/${lang}/login?message=reset`); // Puedes usar query distinto si quieres
       } else {
         // Manejar error si es necesario
       }

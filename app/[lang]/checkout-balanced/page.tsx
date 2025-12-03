@@ -3,10 +3,16 @@
 import { CheckoutForm } from "./CheckoutForm";
 import React, { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
+import { type Locale } from "@/lib/i18n"; // Importación de Locale
 
 const CheckoutPage = () => {
   const router = useRouter();
+  const params = useParams();
+  
+  // Obtener 'lang' y 'isSpanish'
+  const lang = (params.lang as Locale) || 'es'; // Default to 'es'
+
   const [bookingData, setBookingData] = useState<{
     name?: string;
     description?: string;
@@ -30,7 +36,7 @@ const CheckoutPage = () => {
           console.error("Error parsing booking data from localStorage:", error);
         }
       } else {
-        router.push("/rooms"); // Redirigir si no hay booking
+        router.push(`/${lang}/rooms`);
       }
     };
 
@@ -41,7 +47,7 @@ const CheckoutPage = () => {
     <main>
       <div className="max-w-screen-lg mx-auto my-8">
         {bookingData && Object.keys(bookingData).length > 0 ? (
-          <CheckoutForm bookingData={bookingData} />
+          <CheckoutForm bookingData={bookingData} lang={lang} />
         ) : (
           <div className="flex justify-center items-center h-screen">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />

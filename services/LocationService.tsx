@@ -1,6 +1,7 @@
 // src/services/locationService.ts
 
-import axios from 'axios'; // 🛑 Asegúrate de tener 'axios' instalado
+import axios from 'axios'; 
+
 
 const API_URL = "https://us-east-1a.recoverycaresolutions.com/items/Available_Locations"
 

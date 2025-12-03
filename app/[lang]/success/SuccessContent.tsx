@@ -1,13 +1,14 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, useParams } from "next/navigation"
 import { CheckCircle, XCircle, Loader2, Edit, Home } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 import { Fraunces } from "next/font/google"
 import { motion } from "framer-motion"
+import { type Locale } from "@/lib/i18n"; // Importación de Locale
 
 const fraunces = Fraunces({ subsets: ["latin"] })
 
@@ -16,9 +17,13 @@ import { providerService } from "@/services/providerService"
 
 export function SuccessContent() {
   const [status, setStatus] = useState("loading")
-  const [customerEmail, setCustomerEmail] = useState("")
+  //const [customerEmail, setCustomerEmail] = useState("")
   const searchParams = useSearchParams()
   const sessionId = searchParams.get("session_id")
+
+  const params = useParams();
+  const lang = (params.lang as Locale) || 'es'; // Default to 'es' if not found
+  const isSpanish = lang === "es";
 
   useEffect(() => {
     if (sessionId) {
@@ -44,9 +49,9 @@ export function SuccessContent() {
     }
 
     setStatus(session.status)
-    setCustomerEmail(session.customer_email)
+    //setCustomerEmail(session.customer_email)
 
-    console.log(customerEmail)
+    //console.log(customerEmail)
 
     // If there's no error, read data from localStorage and create property
     if (!error) {
@@ -73,11 +78,14 @@ export function SuccessContent() {
         return (
           <Card className="w-full max-w-md mx-auto">
             <CardHeader>
-              <CardTitle className="text-center">Procesando su suscripción</CardTitle>
+              <CardTitle className="text-center">{isSpanish ? "Procesando su suscripción": "Processing"}</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center">
               <Loader2 className="h-16 w-16 text-blue-500 animate-spin mb-4" />
-              <CardDescription>Por favor espere mientras confirmamos su suscripción...</CardDescription>
+              <CardDescription>{isSpanish
+  ? "Por favor espere mientras confirmamos su suscripción..."
+  : "Please wait while we confirm your subscription..."}
+</CardDescription>
             </CardContent>
           </Card>
         )
@@ -85,11 +93,15 @@ export function SuccessContent() {
         return (
           <Card className="w-full max-w-md mx-auto">
             <CardHeader>
-              <CardTitle className="text-center text-red-600">Error en la suscripción</CardTitle>
+              <CardTitle className="text-center text-red-600">{isSpanish
+  ? "Error en la suscripción"
+  : "Subscription error"}</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center">
               <XCircle className="h-16 w-16 text-red-500 mb-4" />
-              <CardDescription>No se pudo procesar la suscripción. Por favor, inténtelo de nuevo.</CardDescription>
+              <CardDescription>{isSpanish
+  ? "No se pudo procesar la suscripción. Por favor, inténtelo de nuevo."
+  : "The subscription could not be processed. Please try again."}</CardDescription>
             </CardContent>
           </Card>
         )
@@ -107,12 +119,16 @@ export function SuccessContent() {
                   <CheckCircle className="h-10 w-10 text-green-500 mx-auto mb-4" />
                 </motion.div>
                 <CardTitle className={`${fraunces.className} text-2xl text-center font-normal mb-2 text-gray-800`}>
-                  ¡Gracias por registrar su servicio!
+                {isSpanish
+  ? "¡Gracias por registrar su servicio!"
+  : "Thank you for registering your service!"}
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col items-center px-8">
                 <CardDescription className="text-center text-sm text-gray-600 mb-6">
-                Su servicio está en proceso de revisión. Le notificaremos por e-mail en cuanto esté disponible para su uso. ¡Estamos contentos que pronto pueda disfrutar de los beneficios de Recovery Care Solutions!
+                {isSpanish
+  ? "Su servicio está en proceso de revisión. Le notificaremos por e-mail en cuanto esté disponible para su uso. ¡Estamos contentos de que pronto pueda disfrutar de los beneficios de Recovery Care Solutions!"
+  : "Your service is under review. We will notify you by email as soon as it becomes available. We are excited that you will soon be able to enjoy the benefits of Recovery Care Solutions!"}
 
 </CardDescription>
                <motion.div
@@ -121,22 +137,24 @@ export function SuccessContent() {
   animate={{ opacity: 1 }}
   transition={{ delay: 0.4 }}
 >
-<Link href="/" passHref className="w-full">
+<Link href={`/${lang}`} passHref className="w-full">
     <Button variant="outline" className="w-full py-6 text-lg font-semibold text-sm" size="lg">
-      <Home className="mr-2 h-5 w-5" /> Volver al Inicio
+      <Home className="mr-2 h-5 w-5" /> {isSpanish ? "Volver al Home": "Back to Home"}
     </Button>
   </Link>
-  <Link href="/mi-panel/mi-servicio" passHref className="w-full">
+  <Link href={`/${lang}/mi-panel/mi-servicio`} passHref className="w-full">
     <Button className="w-full py-6 text-lg font-semibold text-sm bg-[#39759E]" size="lg">
-      <Edit className="mr-2 h-5 w-5" /> Ver Mi Servicio
-    </Button>
+      <Edit className="mr-2 h-5 w-5" /> {isSpanish ? "Ver mi servicio": "View Service"}
+      </Button>
   </Link>
  
 </motion.div>
 
               </CardContent>
               <CardFooter className="bg-gray-50 mt-6 py-4 text-center text-sm text-gray-500">
-                ¿Necesita ayuda? Contáctenos en info@recoverycaresolutions.com
+              {isSpanish
+        ? "¿Necesita ayuda? Contáctenos en manager@recoverycaresolutions.com"
+        : "Need help? Contact us at manager@recoverycaresolutions.com"}
               </CardFooter>
             </Card>
           </motion.div>
