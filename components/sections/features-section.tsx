@@ -113,13 +113,13 @@ export function FeaturesSection({ lang = "en" }: FeaturesSectionProps) {
 
         {/* ✅ Botones con traducción */}
         <div className="flex justify-center gap-4">
-          <Link href="/rooms">
+          <Link href={`/${lang}/rooms`}>
             <Button className="bg-[#39759E] hover:bg-[#39759E] flex items-center gap-2">
               <Search size={16} />
               {isSpanish ? "Buscar" : "Search"}
             </Button>
           </Link>
-          <Link href="/registro">
+          <Link href={`/${lang}/registro`}>
             <Button variant="outline">
               {isSpanish ? "Registrarse" : "Sign up"}
             </Button>
