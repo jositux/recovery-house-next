@@ -47,7 +47,7 @@ export function HostCTASection({ lang = "es" }: HostCTASectionProps) {
             : "Turn your home into your next opportunity"}
         </p>
 
-        <Link href="/registro">
+        <Link href={`/${lang}/registro`}>
           <Button
             className="bg-white text-[#162F40] hover:bg-white/90 w-fit"
             size="lg"

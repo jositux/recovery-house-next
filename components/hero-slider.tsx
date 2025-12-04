@@ -45,7 +45,7 @@ export function HeroSlider({ lang = "es"}: HeroSliderProps) {
           : "We connect patients with recovery homes around the world!",
       image: "/assets/hero/2.png?height=600&width=600",
       backgroundImage: "/assets/hero/background.jpg?height=1080&width=1920",
-      url: "/rooms",
+      url: `/${lang}/rooms`,
     },
     {
       title:
@@ -54,7 +54,7 @@ export function HeroSlider({ lang = "es"}: HeroSliderProps) {
           : "Experience facilitators will take care of your recovery",
       image: "/assets/hero/1.png?height=600&width=600",
       backgroundImage: "/assets/hero/background.jpg?height=1080&width=1920",
-      url: "/rooms",
+      url: `/${lang}/rooms`,
     },
     {
       title:
@@ -63,7 +63,7 @@ export function HeroSlider({ lang = "es"}: HeroSliderProps) {
           : "Health providers from all over the world are ready to assist you",
       image: "/assets/hero/2.png?height=600&width=600",
       backgroundImage: "/assets/hero/background.jpg?height=1080&width=1920",
-      url: "/rooms",
+      url: `/${lang}/rooms`,
     },
   ]
 
