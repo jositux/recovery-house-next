@@ -6,6 +6,9 @@ import { type Locale } from "@/lib/i18n";
 import { useParams } from "next/navigation";
 import { format } from "date-fns";
 import { es, enUS } from "date-fns/locale";
+import { Fraunces } from "next/font/google";
+
+const fraunces = Fraunces({ subsets: ["latin"] });
 
 export default function TermsAndConditionsPage() {
   const params = useParams();
@@ -23,7 +26,7 @@ export default function TermsAndConditionsPage() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-12 max-w-4xl">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">
+          <h1 className={`${fraunces.className} text-4xl font-normal mb-4`}>
             {isSpanish ? "Términos y Condiciones de Uso" : "Terms and Conditions of Use"}
           </h1>
           <p className="text-xl text-muted-foreground">
@@ -32,7 +35,7 @@ export default function TermsAndConditionsPage() {
         </div>
 
         <div className="mb-8 pb-8 border-b">
-          <h2 className="text-2xl font-bold mb-4">
+          <h2 className={`${fraunces.className} text-2xl font-normal mb-4`}>
             {isSpanish ? "1. Aceptación de los Términos" : "1. Acceptance of Terms"}
           </h2>
           <div className="space-y-4">
@@ -55,7 +58,7 @@ export default function TermsAndConditionsPage() {
         </div>
 
         <div className="mb-8 pb-8 border-b">
-          <h2 className="text-2xl font-bold mb-4">
+          <h2 className={`${fraunces.className} text-2xl font-normal mb-4`}>
             {isSpanish ? "2. Objeto de la Plataforma" : "2. Platform Purpose"}
           </h2>
           <div className="space-y-4">
@@ -73,7 +76,7 @@ export default function TermsAndConditionsPage() {
         </div>
 
         <div className="mb-8 pb-8 border-b">
-          <h2 className="text-2xl font-bold mb-4">
+          <h2 className={`${fraunces.className} text-2xl font-normal mb-4`}>
             {isSpanish ? "3. Registro de Usuarios" : "3. User Registration"}
           </h2>
           <div className="space-y-4">
@@ -96,7 +99,7 @@ export default function TermsAndConditionsPage() {
         </div>
 
         <div className="mb-8 pb-8 border-b">
-          <h2 className="text-2xl font-bold mb-4">
+          <h2 className={`${fraunces.className} text-2xl font-normal mb-4`}>
             {isSpanish ? "4. Definición y Alcance" : "4. Definition and Scope"}
           </h2>
           <div className="space-y-4">
@@ -114,7 +117,7 @@ export default function TermsAndConditionsPage() {
         </div>
 
         <div className="mb-8 pb-8 border-b">
-          <h2 className="text-2xl font-bold mb-4">
+          <h2 className={`${fraunces.className} text-2xl font-normal mb-4`}>
             {isSpanish ? "5. Políticas de Anulación de Reserva" : "5. Booking Cancellation Policies"}
           </h2>
           <div className="space-y-6">
@@ -300,7 +303,7 @@ export default function TermsAndConditionsPage() {
               <ul className="space-y-2 list-disc list-inside">
                 <li className="leading-relaxed">
                   {isSpanish
-                    ? "Las anulaciones deben realizarse exclusivamente a través de la plataforma."
+                    ? "Las縫anulaciones deben realizarse exclusivamente a través de la plataforma."
                     : "Cancellations must be made exclusively through the platform."}
                 </li>
                 <li className="leading-relaxed">
@@ -319,7 +322,7 @@ export default function TermsAndConditionsPage() {
         </div>
 
         <div className="mb-8 pb-8 border-b">
-          <h2 className="text-2xl font-bold mb-4">
+          <h2 className={`${fraunces.className} text-2xl font-normal mb-4`}>
             {isSpanish ? "6. Formas de Pago" : "6. Payment Methods"}
           </h2>
           <div className="space-y-6">
@@ -380,7 +383,7 @@ export default function TermsAndConditionsPage() {
         </div>
 
         <div className="mb-8 pb-8 border-b">
-          <h2 className="text-2xl font-bold mb-4">
+          <h2 className={`${fraunces.className} text-2xl font-normal mb-4`}>
             {isSpanish ? "7. Políticas de Modificación de Reserva" : "7. Booking Modification Policies"}
           </h2>
           <div className="space-y-6">
@@ -470,7 +473,7 @@ export default function TermsAndConditionsPage() {
         </div>
 
         <div className="mb-8 pb-8 border-b">
-          <h2 className="text-2xl font-bold mb-4">
+          <h2 className={`${fraunces.className} text-2xl font-normal mb-4`}>
             {isSpanish ? "8. Consideraciones Adicionales" : "8. Additional Considerations"}
           </h2>
           <ul className="space-y-3 list-disc list-inside">
@@ -493,7 +496,7 @@ export default function TermsAndConditionsPage() {
         </div>
 
         <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">
+          <h2 className={`${fraunces.className} text-2xl font-normal mb-4`}>
             {isSpanish ? "9. Contacto" : "9. Contact"}
           </h2>
           <p className="mb-4 leading-relaxed">

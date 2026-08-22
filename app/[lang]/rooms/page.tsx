@@ -26,7 +26,7 @@ export default async function RoomPage({
   
 
   return (
-    <main className="flex flex-col min-h-screen lg:pl-8 md:pl-8">
+    <main className="flex flex-col min-h-screen lg:pl-8 md:pl-8 bg-[#f8f8f7]">
       {/* 3. Encapsulamos el Cliente Component en Suspense */}
       <Suspense
         fallback={

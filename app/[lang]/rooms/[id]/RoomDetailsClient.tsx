@@ -569,6 +569,7 @@ export function RoomDetailsClient({ lang }: RoomDetailsClientProps) {
       />
 
       {/* Content */}
+      <div className="bg-[#f8f8f7]">
       <div className="container mx-auto px-4 lg:px-20 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
@@ -794,6 +795,7 @@ export function RoomDetailsClient({ lang }: RoomDetailsClientProps) {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }

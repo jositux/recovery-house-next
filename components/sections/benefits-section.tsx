@@ -16,7 +16,7 @@ export function BenefitsSection({ lang }: BenefitsSectionProps) {
 console.log(isSpanish)
 
   return (
-    <section className="py-16 bg-white px-4">
+    <section className="py-16 bg-[#f8f8f7] px-4">
       <div className="container mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
 

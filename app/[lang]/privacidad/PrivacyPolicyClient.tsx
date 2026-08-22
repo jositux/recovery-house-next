@@ -1,13 +1,12 @@
-"use client"
+"use client";
 
 import { Mail, Globe } from "lucide-react";
-import { type Locale } from "@/lib/i18n"; // Asegúrate de que esta importación sea correcta
+import { type Locale } from "@/lib/i18n";
+import { Fraunces } from "next/font/google";
 
+const fraunces = Fraunces({ subsets: ["latin"] });
 
-// 🛑 El componente debe ser SÍNCRONO (sin 'async' aquí)
 export function PrivacyPolicyClient({ lang }: { lang: Locale }) {
-
-  // La lógica es ahora síncrona
   const isSpanish = lang === "es";
 
   return (
@@ -15,7 +14,7 @@ export function PrivacyPolicyClient({ lang }: { lang: Locale }) {
       <div className="container mx-auto px-4 py-12 max-w-4xl">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">
+          <h1 className={`${fraunces.className} text-4xl font-normal mb-4`}>
             {isSpanish ? "Política de Privacidad" : "Privacy Policy"}
           </h1>
           <p className="text-xl text-muted-foreground">
@@ -27,7 +26,7 @@ export function PrivacyPolicyClient({ lang }: { lang: Locale }) {
 
         {/* 1. Aceptación de la Política */}
         <div className="mb-8 pb-8 border-b">
-          <h2 className="text-2xl font-bold mb-4">
+          <h2 className={`${fraunces.className} text-2xl font-normal mb-4`}>
             {isSpanish ? "1. Aceptación de la Política" : "1. Acceptance of Policy"}
           </h2>
           <div className="space-y-4">
@@ -51,7 +50,7 @@ export function PrivacyPolicyClient({ lang }: { lang: Locale }) {
 
         {/* 2. Información Recopilada */}
         <div className="mb-8 pb-8 border-b">
-          <h2 className="text-2xl font-bold mb-4">
+          <h2 className={`${fraunces.className} text-2xl font-normal mb-4`}>
             {isSpanish ? "2. Información Recopilada" : "2. Information Collected"}
           </h2>
           <div className="space-y-4">
@@ -70,7 +69,7 @@ export function PrivacyPolicyClient({ lang }: { lang: Locale }) {
 
         {/* 3. Uso de la Información */}
         <div className="mb-8 pb-8 border-b">
-          <h2 className="text-2xl font-bold mb-4">
+          <h2 className={`${fraunces.className} text-2xl font-normal mb-4`}>
             {isSpanish ? "3. Uso de la Información" : "3. Use of Information"}
           </h2>
           <div className="space-y-4">
@@ -106,7 +105,7 @@ export function PrivacyPolicyClient({ lang }: { lang: Locale }) {
 
         {/* 4. Compartición de Datos */}
         <div className="mb-8 pb-8 border-b">
-          <h2 className="text-2xl font-bold mb-4">
+          <h2 className={`${fraunces.className} text-2xl font-normal mb-4`}>
             {isSpanish ? "4. Compartición de Datos" : "4. Data Sharing"}
           </h2>
           <div className="space-y-4">
@@ -142,7 +141,7 @@ export function PrivacyPolicyClient({ lang }: { lang: Locale }) {
 
         {/* 5. Seguridad de la Información */}
         <div className="mb-8 pb-8 border-b">
-          <h2 className="text-2xl font-bold mb-4">
+          <h2 className={`${fraunces.className} text-2xl font-normal mb-4`}>
             {isSpanish ? "5. Seguridad de la Información" : "5. Information Security"}
           </h2>
           <div className="space-y-4">
@@ -161,7 +160,7 @@ export function PrivacyPolicyClient({ lang }: { lang: Locale }) {
 
         {/* 6. Derechos del Usuario */}
         <div className="mb-8 pb-8 border-b">
-          <h2 className="text-2xl font-bold mb-4">
+          <h2 className={`${fraunces.className} text-2xl font-normal mb-4`}>
             {isSpanish ? "6. Derechos del Usuario" : "6. User Rights"}
           </h2>
           <div className="space-y-4">
@@ -197,7 +196,7 @@ export function PrivacyPolicyClient({ lang }: { lang: Locale }) {
 
         {/* 7. Cookies y Tecnologías Similares */}
         <div className="mb-8 pb-8 border-b">
-          <h2 className="text-2xl font-bold mb-4">
+          <h2 className={`${fraunces.className} text-2xl font-normal mb-4`}>
             {isSpanish ? "7. Cookies y Tecnologías Similares" : "7. Cookies and Similar Technologies"}
           </h2>
           <div className="space-y-4">
@@ -216,7 +215,9 @@ export function PrivacyPolicyClient({ lang }: { lang: Locale }) {
 
         {/* 8. Contacto */}
         <div className="mb-8">
-          <h2 className="text-2xl font-bold mb-4">{isSpanish ? "8. Contacto" : "8. Contact"}</h2>
+          <h2 className={`${fraunces.className} text-2xl font-normal mb-4`}>
+            {isSpanish ? "8. Contacto" : "8. Contact"}
+          </h2>
           <p className="mb-4 leading-relaxed">
             {isSpanish
               ? "Para consultas, solicitudes de acceso, rectificación o eliminación de datos, puede comunicarse con:"

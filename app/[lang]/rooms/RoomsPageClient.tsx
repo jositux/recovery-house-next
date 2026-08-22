@@ -460,7 +460,7 @@ export function RoomsPageClient({ lang = "es" }: { lang?: string }) {
   }
 
   return (
-    <div className="mx-auto w-full">
+    <div className="mx-auto w-full bg-[#f8f8f7]">
       <div className="flex py-8 hidden">
         <SelectionSearch
           initialSelected={selectedOptions}

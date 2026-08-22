@@ -41,7 +41,7 @@ export function NewsSection({ lang = "es" }: NewsSectionProps) {
   ]
 
   return (
-    <section className="py-16 bg-white px-4 lg:px-0">
+    <section className="py-16 px-4 lg:px-0">
       <div className="container mx-auto">
         <div className="flex justify-between items-center mb-12">
           <div>

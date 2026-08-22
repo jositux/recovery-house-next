@@ -3,6 +3,7 @@ import { HeroSliderMobile } from "@/components/HeroSliderMobile"
 import { WelcomeSection } from "@/components/sections/welcome-section"
 import { FeaturesSection } from "@/components/sections/features-section"
 import { TestimonialsSection } from "@/components/sections/testimonials-section"
+import BannerImage from "@/components/sections/image-section";
 import { HowToUseSection } from "@/components/sections/how-to-use-section"
 import { BenefitsSection } from "@/components/sections/benefits-section"
 import { HostCTASection } from "@/components/sections/host-cta-section"
@@ -36,9 +37,9 @@ export default async function Home({
 
   return (
     
-    <main>
+    <div>
      
-      <div className={`${styles.Container} hidden mt-[-124px] pt-[50px] md:block px-4`}>
+      <div className={`${styles.Container} hidden mt-[-124px] pt-[50px] md:block px-4 bg-[#f8f8f7]`}>
         <HeroSlider lang={lang} /> 
       </div>
       <div className="md:hidden px-4">
@@ -47,10 +48,12 @@ export default async function Home({
       <WelcomeSection lang={lang} />
       <FeaturesSection lang={lang} />
       <HowToUseSection lang={lang} />
+      
       <BenefitsSection lang={lang} />
+      <BannerImage />
       <TestimonialsSection lang={lang} />
       <HostCTASection lang={lang} />
       <NewsSection lang={lang} />
-    </main>
+    </div>
   )
 }

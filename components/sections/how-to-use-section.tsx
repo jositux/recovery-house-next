@@ -57,61 +57,64 @@ export function HowToUseSection({ lang = "en" }: HowToUseSectionProps) {
       ];
 
   return (
-    <section className="py-16 bg-gray-50">
-      <div className="container mx-auto px-4 lg:px-0">
-        <div className="grid md:grid-cols-2 gap-12 items-start">
-          {/* Columna izquierda */}
-          <div>
-            <h2
-              className={`${fraunces.className} text-3xl md:text-4xl text-[#162F40] mb-4`}
+    <section className="py-16 bg-[#f8f8f7]">
+  <div className="container mx-auto px-4 lg:px-0">
+    {/* Grilla basada en 12 columnas para desktop */}
+    <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
+      
+      {/* Columna izquierda: 33% (4 de 12) */}
+      <div className="md:col-span-4">
+        <h2
+          className={`${fraunces.className} text-3xl md:text-4xl text-[#162F40] mb-4`}
+        >
+          {isSpanish
+            ? "Cómo utilizar nuestra plataforma de recuperación"
+            : "How to use our recovery platform"}
+        </h2>
+        <p className="text-[#162F40]">
+          {isSpanish
+            ? "Nuestra plataforma de recuperación te permite encontrar una casa de recuperación de manera fácil y rápida. Sigue estos pasos para utilizarla:"
+            : "Our recovery platform allows you to easily find a recovery home. Follow these steps to get started:"}
+        </p>
+      </div>
+
+      {/* Columna derecha: 66% (8 de 12) */}
+      <div className="md:col-span-8 space-y-8">
+        {steps.map((step, index) => (
+          <div key={index} className="flex gap-4">
+            <div
+              className={`${fraunces.className} flex items-center justify-center w-20 h-20 text-7xl font-medium text-[#162F40] flex-shrink-0`}
             >
-              {isSpanish
-                ? "Cómo utilizar nuestra plataforma de recuperación"
-                : "How to use our recovery platform"}
-            </h2>
-            <p className="text-[#162F40]">
-              {isSpanish
-                ? "Nuestra plataforma de recuperación te permite encontrar una casa de recuperación de manera fácil y rápida. Sigue estos pasos para utilizarla:"
-                : "Our recovery platform allows you to easily find a recovery home. Follow these steps to get started:"}
-            </p>
-          </div>
-
-          {/* Columna derecha */}
-          <div className="space-y-8">
-            {steps.map((step, index) => (
-              <div key={index} className="flex gap-4">
-                <div
-                  className={`${fraunces.className} flex items-center justify-center w-20 h-20 text-7xl font-medium text-[#162F40] flex-shrink-0`}
-                >
-                  {step.number}
-                </div>
-                <div>
-                  <h3
-                    className={`${fraunces.className} text-xl font-medium text-[#162F40] mb-2`}
-                  >
-                    {step.title}
-                  </h3>
-                  <p className="text-[#162F40]">{step.description}</p>
-                </div>
-              </div>
-            ))}
-
-            <div className="flex gap-4 sm:justify-start justify-center">
-              <Link href={`/${lang}/rooms`}>
-                <Button className="bg-[#3184B4] hover:bg-[#39759E] flex items-center gap-2">
-                  <Search size={16} />
-                  {isSpanish ? "Buscar" : "Search"}
-                </Button>
-              </Link>
-              <Link href={`/${lang}/registro`}>
-                <Button variant="outline">
-                  {isSpanish ? "Registrarse" : "Sign up"}
-                </Button>
-              </Link>
+              {step.number}
+            </div>
+            <div>
+              <h3
+                className={`${fraunces.className} text-xl font-medium text-[#162F40] mb-2`}
+              >
+                {step.title}
+              </h3>
+              <p className="text-[#162F40]">{step.description}</p>
             </div>
           </div>
+        ))}
+
+        <div className="flex gap-4 sm:justify-start justify-center">
+          <Link href={`/${lang}/rooms`}>
+            <Button className="bg-[#3184B4] hover:bg-[#39759E] flex items-center gap-2">
+              <Search size={16} />
+              {isSpanish ? "Buscar" : "Search"}
+            </Button>
+          </Link>
+          <Link href={`/${lang}/registro`}>
+            <Button variant="outline">
+              {isSpanish ? "Registrarse" : "Sign up"}
+            </Button>
+          </Link>
         </div>
       </div>
-    </section>
+
+    </div>
+  </div>
+</section>
   );
 }

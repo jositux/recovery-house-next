@@ -9,3 +9,7 @@
     border-bottom-left-radius: 20px; /* Bordes redondeados */
     border-bottom-right-radius: 20px;
 }
+
+body {
+    background: #f8f8f7;
+}

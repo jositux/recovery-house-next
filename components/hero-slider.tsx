@@ -44,7 +44,7 @@ export function HeroSlider({ lang = "es"}: HeroSliderProps) {
           ? "¡Conectamos pacientes con casas de recuperación en todo el mundo!"
           : "We connect patients with recovery homes around the world!",
       image: "/assets/hero/2.png?height=600&width=600",
-      backgroundImage: "/assets/hero/background.jpg?height=1080&width=1920",
+      backgroundImage: "/assets/hero/hero-bg.jpg?height=1080&width=1920",
       url: `/${lang}/rooms`,
     },
     {
@@ -53,7 +53,7 @@ export function HeroSlider({ lang = "es"}: HeroSliderProps) {
           ? "Los facilitadores de experiencia se encargarán de tu cuidado"
           : "Experience facilitators will take care of your recovery",
       image: "/assets/hero/1.png?height=600&width=600",
-      backgroundImage: "/assets/hero/background.jpg?height=1080&width=1920",
+      backgroundImage: "/assets/hero/hero-bg.jpg?height=1080&width=1920",
       url: `/${lang}/rooms`,
     },
     {

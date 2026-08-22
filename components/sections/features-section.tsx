@@ -56,7 +56,7 @@ export function FeaturesSection({ lang = "en" }: FeaturesSectionProps) {
       ]
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-16 bg-[#f8f8f7]">
       <div className="container mx-auto px-4 lg:px-0">
         {/* ✅ Título principal */}
         <div className="max-w-3xl mx-auto md:text-center mb-12">

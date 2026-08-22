@@ -36,7 +36,7 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
       </head>
-      <body className="font-dm-sans">
+      <body className="font-dm-sans bg-[#f8f8f7]">
         {children}
       </body>
     </html>

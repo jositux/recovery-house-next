@@ -13,6 +13,7 @@ const assistanceLinks = [
   { href: "/terms" },
   { href: "/policy" },
   { href: "/privacidad" },
+  { href: "/about" },
 ];
 
 const socialLinks = [
@@ -29,18 +30,14 @@ const socialLinks = [
 
 export function Footer({ lang }: FooterProps) {
   const isSpanish = lang === "es";
-  
-  // Eliminamos la función auxiliar localizePath
-  // const localizePath = (path: string) => `/${lang}${path}`;
 
   return (
     <footer className="bg-[#E5EEF6] pt-16 pb-8">
       <div className="container mx-auto p-4">
-        {/* Main Grid: 40% (5 cols) + 60% (7 cols) = 12 columns total on lg screen */}
+        {/* Main Grid: 33% (4 cols) + 66% (8 cols) = 12 columns */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 mb-12">
-          {/* Company Info - 40% Width (5 columns out of 12) */}
-          <div className="md:col-span-2 lg:col-span-5">
-            {/* 1. Enlace del Logo: Prefijado con el idioma (ya era correcto) */}
+          {/* Company Info - 33% Width (4 columns out of 12) */}
+          <div className="md:col-span-2 lg:col-span-4">
             <Link href={`/${lang}`} className="flex items-center gap-2 mb-6">
               <Image
                 src="/assets/logo2.svg"
@@ -67,9 +64,8 @@ export function Footer({ lang }: FooterProps) {
             </p>
           </div>
 
-          {/* Assistance, Host, Social, Language - 60% Width (7 columns out of 12) */}
-          {/* Inner Grid: Divides the 7 columns into 4 equal sections for the links. */}
-          <div className="lg:col-span-7 grid grid-cols-2 sm:grid-cols-4 gap-8">
+          {/* Links Section - 66% Width (8 columns out of 12) */}
+          <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8">
             {/* Assistance */}
             <div>
               <h3
@@ -80,7 +76,6 @@ export function Footer({ lang }: FooterProps) {
               <ul className="space-y-3">
                 {assistanceLinks.map((link, index) => (
                   <li key={index}>
-                    {/* 2. Enlaces de Asistencia: Aplicando el prefijo directamente */}
                     <Link
                       href={`/${lang}${link.href}`}
                       className="text-[#162F40] hover:text-[#39759E]"
@@ -90,11 +85,13 @@ export function Footer({ lang }: FooterProps) {
                             "Términos y condiciones",
                             "Políticas de uso",
                             "Política de privacidad",
+                            "Acerca de",
                           ][index]
                         : [
                             "Terms & Conditions",
                             "Usage Policies",
                             "Privacy Policy",
+                            "About",
                           ][index]}
                     </Link>
                   </li>
@@ -111,7 +108,6 @@ export function Footer({ lang }: FooterProps) {
               </h3>
               <ul className="space-y-3">
                 <li>
-                  {/* 3. Enlace de Anfitrión: Aplicando el prefijo directamente */}
                   <Link
                     href={`/${lang}/registro`}
                     className="text-[#162F40] hover:text-[#39759E]"
@@ -132,7 +128,6 @@ export function Footer({ lang }: FooterProps) {
               <ul className="space-y-3">
                 {socialLinks.map((link) => (
                   <li key={link.title}>
-                    {/* Los enlaces sociales se mantienen sin prefijo si son externos (href="#") */}
                     <Link
                       href={link.href}
                       className="flex items-center gap-2 text-[#162F40] hover:text-[#39759E]"
@@ -152,7 +147,7 @@ export function Footer({ lang }: FooterProps) {
               >
                 {isSpanish ? "Idioma" : "Language"}
               </h3>
-              {<LanguageSwitcher lang={lang} />}
+              <LanguageSwitcher lang={lang} />
             </div>
           </div>
         </div>
@@ -161,7 +156,7 @@ export function Footer({ lang }: FooterProps) {
         <div className="border-t border-gray-300 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-[#162F40] text-sm">
-              © 2025 Recovery Care Solutions.{" "}
+              © 2026 Recovery Care Solutions.{" "}
               {isSpanish
                 ? "Todos los derechos reservados."
                 : "All rights reserved."}
