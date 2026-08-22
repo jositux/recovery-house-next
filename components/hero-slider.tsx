@@ -43,8 +43,8 @@ export function HeroSlider({ lang = "es"}: HeroSliderProps) {
         lang === "es"
           ? "¡Conectamos pacientes con casas de recuperación en todo el mundo!"
           : "We connect patients with recovery homes around the world!",
-      image: "/assets/hero/2.png?height=600&width=600",
-      backgroundImage: "/assets/hero/hero-bg.jpg?height=1080&width=1920",
+      image: "/assets/hero/2.png",
+      backgroundImage: "/assets/hero/hero-bg.jpg",
       url: `/${lang}/rooms`,
     },
     {
@@ -52,8 +52,8 @@ export function HeroSlider({ lang = "es"}: HeroSliderProps) {
         lang === "es"
           ? "Los facilitadores de experiencia se encargarán de tu cuidado"
           : "Experience facilitators will take care of your recovery",
-      image: "/assets/hero/1.png?height=600&width=600",
-      backgroundImage: "/assets/hero/hero-bg.jpg?height=1080&width=1920",
+      image: "/assets/hero/1.png",
+      backgroundImage: "/assets/hero/hero-bg.jpg",
       url: `/${lang}/rooms`,
     },
     {
@@ -61,8 +61,8 @@ export function HeroSlider({ lang = "es"}: HeroSliderProps) {
         lang === "es"
           ? "Proveedores de todo el mundo en áreas de salud esperan para atenderte"
           : "Health providers from all over the world are ready to assist you",
-      image: "/assets/hero/2.png?height=600&width=600",
-      backgroundImage: "/assets/hero/background.jpg?height=1080&width=1920",
+      image: "/assets/hero/2.png",
+      backgroundImage: "/assets/hero/background.jpg",
       url: `/${lang}/rooms`,
     },
   ]
@@ -125,7 +125,7 @@ export function HeroSlider({ lang = "es"}: HeroSliderProps) {
             <div className={styles.contentContainer}>
               <div className={styles.textContent}>
                 <h1
-                  className={`${fraunces.className} ${styles.hContent} text-3xl text-[#162F40] md:text-4xl lg:text-5xl mb-6`}
+                  className={`${fraunces.className} ${styles.hContent} text-3xl text-[#162F40] md:text-4xl lg:text-5xl mb-6 font-normal`}
                 >
                   {slides[slideIndex].title}
                 </h1>

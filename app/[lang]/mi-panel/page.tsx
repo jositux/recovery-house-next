@@ -2,7 +2,6 @@
 
 import { Building2, Calendar, DollarSign, Users } from "lucide-react"
 import { useEffect, useState } from "react"
-// Importamos useParams para obtener el idioma de la URL
 import { useRouter, useParams } from "next/navigation" 
 import { getCurrentUser } from "@/services/userService"
 
@@ -73,9 +72,12 @@ const t = (key: keyof typeof T_MAP, lang: Locale): string => {
 
 export default function DashboardPage() {
   const router = useRouter()
-  // 1. Obtener el idioma de la URL usando useParams()
-  const params = useParams();
-  const lang = (params.lang as Locale) || 'es'; // Default to 'es' if not found
+  const params = useParams()
+
+  // 🛑 Solución al error de TypeScript:
+  // Validamos explícitamente que sea 'en' o 'es', si no lo es, cae en 'es' como fallback.
+  const rawLang = Array.isArray(params?.lang) ? params.lang[0] : params?.lang;
+  const lang: Locale = rawLang === "en" ? "en" : "es";
 
   const [bookings, setBookings] = useState<Booking[]>([])
   const [statistics, setStatistics] = useState<Statistics | null>(null)
@@ -84,11 +86,9 @@ export default function DashboardPage() {
 
   useEffect(() => {
     async function loadDashboardData() {
-      // Mantenemos la obtención del token desde localStorage
       const token = localStorage.getItem("access_token")
 
       if (!token) {
-        // Redirección en el cliente
         router.push(`/${lang}/login`)
         return
       }
@@ -121,7 +121,6 @@ export default function DashboardPage() {
 
         if (bookingsResponse.ok) {
           const bookingsData = await bookingsResponse.json()
-     
           setBookings(bookingsData.data || [])
         } else {
           setError(t('Error al cargar las reservas', lang))
@@ -135,9 +134,8 @@ export default function DashboardPage() {
     }
 
     loadDashboardData()
-  }, [router, lang]) // Añadimos 'lang' al array de dependencias si cambiara dinámicamente
+  }, [router, lang])
 
-  // --- Aplicamos la traducción con 't' ---
   const stats = [
     {
       label: t("Propiedades", lang),
@@ -188,11 +186,10 @@ export default function DashboardPage() {
     return {
       property: booking.room?.propertyId?.name || booking.propertyName || t("Propiedad no encontrada", lang),
       guest: booking.patientName || t("Huésped", lang),
-      // 2. Usar 'lang' para formatear la fecha
-      dates: `${new Date(booking.checkIn).toLocaleDateString(lang, {
+      dates: `${new Date(booking.checkIn).toLocaleDateString(lang === "es" ? "es-ES" : "en-US", {
         day: "numeric",
         month: "short",
-      })} - ${new Date(booking.checkOut).toLocaleDateString(lang, {
+      })} - ${new Date(booking.checkOut).toLocaleDateString(lang === "es" ? "es-ES" : "en-US", {
         day: "numeric",
         month: "short",
       })}`,
