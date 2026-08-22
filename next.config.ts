@@ -5,28 +5,31 @@ const nextConfig: NextConfig = {
   transpilePackages: ['react-leaflet'],
 
   images: {
+    localPatterns: [
+      {
+        pathname: "/assets/**",
+      },
+      {
+        pathname: "/webapi/assets/**",
+      },
+    ],
     remotePatterns: [
       {
         protocol: "https",
-        //hostname: "localtunnel.elcanoso.lat",
         hostname: "us-east-1a.recoverycaresolutions.com", 
         pathname: "/**",
       },
     ],
   },
 
-
   async rewrites() {  
     return [  
       {  
         source: '/webapi/:path*',  
-        //destination: 'https://localtunnel.elcanoso.lat/:path*',
-        destination: 'https://us-east-1a.recoverycaresolutions.com/:path*'
+        destination: 'https://us-east-1a.recoverycaresolutions.com/:path*',
       },  
     ];  
   },
-
-  
 };
 
 export default nextConfig;

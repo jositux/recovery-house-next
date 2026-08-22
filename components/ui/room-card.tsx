@@ -30,14 +30,19 @@ export function RoomCard({
 }: RoomCardProps) {
   const isSpanish = lang === "es";
 
+  // Asegura una URL válida de fallback
+  const imageUrl = image && image.trim() !== "" ? image : "/placeholder.svg";
+
   return (
     <Card className="overflow-hidden h-full rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
       <Link href={`/${lang}/rooms/${id}`}>
         <div className="relative h-48 w-full">
           <Image
-            src={image || "/placeholder.svg"}
+            src={imageUrl}
             alt={name}
             fill
+            unoptimized
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover rounded-t-xl"
           />
 
@@ -55,8 +60,8 @@ export function RoomCard({
         <p className="text-sm text-gray-600 mb-2">{propertyName}</p>
 
         <div className="flex items-center text-sm text-gray-500">
-          <MapPin size={16} className="mr-1" />
-          <span>{`${city}, ${state}, ${country}`}</span>
+          <MapPin size={16} className="mr-1 shrink-0" />
+          <span className="truncate">{`${city}, ${state}, ${country}`}</span>
         </div>
       </CardContent>
 
