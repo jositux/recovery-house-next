@@ -46,7 +46,7 @@
     "leaflet-control-geocoder": "^3.1.0",
     "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.471.1",
-    "next": "^15.1.5",
+    "next": "15.1.11",
     "next-auth": "^4.24.11",
     "react": "19.0.0-rc-66855b96-20241106",
     "react-day-picker": "8.10.1",
