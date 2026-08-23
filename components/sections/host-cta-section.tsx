@@ -13,7 +13,7 @@ export function HostCTASection({ lang = "es" }: HostCTASectionProps) {
   const isSpanish = lang === "es";
 
   return (
-<section className="container mx-auto mt-16 p-8 rounded-3xl relative h-[380px] md:h-[600px] w-full overflow-hidden">      {/* Background Image */}
+<section className="container mx-auto mt-16 p-8 rounded-3xl relative h-[480px] md:h-[600px] w-full overflow-hidden">      {/* Background Image */}
       <Image
         src="/assets/cta/0.jpg"
         alt="Background"
@@ -26,7 +26,7 @@ export function HostCTASection({ lang = "es" }: HostCTASectionProps) {
         src="/assets/cta/1.jpg"
         alt="Background mobile"
         fill
-        className="object-contain md:hidden"
+        className="object-cover md:hidden"
         priority
       />
 
