@@ -42,7 +42,7 @@ export default async function Home({
       <div className={`${styles.Container} hidden mt-[-124px] pt-[50px] md:block px-4 bg-[#f8f8f7]`}>
         <HeroSlider lang={lang} /> 
       </div>
-      <div className="md:hidden px-4">
+      <div className="md:hidden mt-2 pl-4">
         <HeroSliderMobile lang={lang} />
       </div>
       <WelcomeSection lang={lang} />

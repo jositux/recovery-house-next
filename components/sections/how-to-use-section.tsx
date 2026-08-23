@@ -98,7 +98,15 @@ export function HowToUseSection({ lang = "en" }: HowToUseSectionProps) {
           </div>
         ))}
 
-        <div className="flex gap-4 sm:justify-start justify-center">
+       
+      </div>
+
+    </div>
+
+    
+  </div>
+
+   <div className="flex gap-4 sm:justify-center justify-center mt-8">
           <Link href={`/${lang}/rooms`}>
             <Button className="bg-[#3184B4] hover:bg-[#39759E] flex items-center gap-2">
               <Search size={16} />
@@ -111,10 +119,6 @@ export function HowToUseSection({ lang = "en" }: HowToUseSectionProps) {
             </Button>
           </Link>
         </div>
-      </div>
-
-    </div>
-  </div>
 </section>
   );
 }
