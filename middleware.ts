@@ -158,7 +158,8 @@ export function middleware(request: NextRequest) {
     path === '/user' ||  
     path === '/terms' ||  
     path === '/policy' ||  
-    path === '/privacidad' ||    
+    path === '/privacidad' ||   
+    path === '/about' ||     
     path === '/webapi/auth/login' ||
     path === '/webapi/users' ||    
     path.startsWith('/admin/users/') ||
