@@ -40,7 +40,7 @@ export function TestimonialsSection({ lang = "en" }: TestimonialsSectionProps) {
   return (
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4 lg:px-0">
-        <div className="text-center mb-12">
+        <div className="mb-12">
           <h2
             className={`${fraunces.className} text-4xl md:text-4xl text-[#162F40] mb-4`}
           >
