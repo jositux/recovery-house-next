@@ -3,7 +3,7 @@
 import { useRef, useState, useEffect, useCallback } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Fraunces } from "next/font/google"
-import Link from "next/link"
+//import Link from "next/link"
 
 const fraunces = Fraunces({ subsets: ["latin"] })
 
@@ -139,7 +139,6 @@ export function HeroSliderMobile({ lang = "es" }: HeroSliderMobileProps) {
           >
             <Card className="w-full border-none shadow-none bg-transparent">
               <CardContent className="p-0 flex flex-col">
-                <Link href={card.url} className="block w-full">
                   <div className="w-full aspect-[4/3] relative overflow-hidden rounded-2xl bg-[#E0EDF6]">
                     <img
                       src={card.imageSrc}
@@ -150,12 +149,12 @@ export function HeroSliderMobile({ lang = "es" }: HeroSliderMobileProps) {
                   </div>
                   <div className="mt-4">
                     <p
-                      className={`${fraunces.className} text-left text-[12px] font-regular leading-[1.2] text-[#162F40]`}
+                      className={`${fraunces.className} text-left text-[xl] font-normal leading-[1.2] text-[#162F40]`}
                     >
                       {card.title}
                     </p>
                   </div>
-                </Link>
+               
               </CardContent>
             </Card>
           </div>

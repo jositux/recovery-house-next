@@ -29,10 +29,10 @@ const variants = {
 }
 
 interface HeroSliderProps {
-  lang?: string // por ejemplo "es" o "en"
+  lang?: string
 }
 
-export function HeroSlider({ lang = "es"}: HeroSliderProps) {
+export function HeroSlider({ lang = "es" }: HeroSliderProps) {
   const [[page, direction], setPage] = useState<[number, number]>([0, 0])
   const sliderRef = useRef<HTMLDivElement>(null)
   const controls = useAnimation()
@@ -80,9 +80,9 @@ export function HeroSlider({ lang = "es"}: HeroSliderProps) {
     const draggedDistance = info.offset.x
     const draggedVelocity = info.velocity.x
 
-    if (draggedDistance > 100 || draggedVelocity > 500) {
+    if (draggedDistance > 80 || draggedVelocity > 400) {
       paginate(-1)
-    } else if (draggedDistance < -100 || draggedVelocity < -500) {
+    } else if (draggedDistance < -80 || draggedVelocity < -400) {
       paginate(1)
     } else {
       controls.start({ x: 0 })
@@ -90,16 +90,16 @@ export function HeroSlider({ lang = "es"}: HeroSliderProps) {
   }
 
   return (
-    <div className={`${styles.sliderContainer} container mx-auto rounded-3xl`}>
+    <div className={`${styles.sliderContainer} container mx-auto rounded-3xl overflow-hidden cursor-grab active:cursor-grabbing`}>
       <motion.div
         ref={sliderRef}
-        className="w-full h-full"
+        className="w-full h-full relative"
         drag="x"
         dragConstraints={{ left: 0, right: 0 }}
-        dragElastic={0.2}
+        dragElastic={0.08}
         onDragEnd={handleDragEnd}
       >
-        <AnimatePresence initial={false} custom={direction}>
+        <AnimatePresence initial={false} custom={direction} mode="popLayout">
           <motion.div
             key={page}
             custom={direction}
@@ -108,12 +108,12 @@ export function HeroSlider({ lang = "es"}: HeroSliderProps) {
             animate="center"
             exit="exit"
             transition={{
-              x: { type: "spring", stiffness: 300, damping: 30 },
-              opacity: { duration: 0.2 },
+              x: { type: "tween", ease: [0.25, 1, 0.5, 1], duration: 0.65 },
+              opacity: { duration: 0.4 },
             }}
             className={styles.slide}
           >
-            <div className={styles.backgroundImage}>
+            <div className={`${styles.backgroundImage} pointer-events-none select-none`}>
               <Image
                 src={slides[slideIndex].backgroundImage}
                 alt=""
@@ -125,23 +125,32 @@ export function HeroSlider({ lang = "es"}: HeroSliderProps) {
             <div className={styles.contentContainer}>
               <div className={styles.textContent}>
                 <h1
-                  className={`${fraunces.className} ${styles.hContent} text-3xl text-[#162F40] md:text-4xl lg:text-5xl mb-6 font-normal`}
+                  className={`${fraunces.className} ${styles.hContent} text-3xl text-[#162F40] md:text-4xl lg:text-5xl mb-6 font-normal select-none`}
                 >
                   {slides[slideIndex].title}
                 </h1>
-                <Link href={slides[slideIndex].url}>
-                  <Button className="bg-[#39759E] hover:bg-[#39759E] w-fit">
-                    {lang === "es" ? "Ver más" : "See more"}
-                  </Button>
-                </Link>
+
+                {/* 🛑 Detiene la propagación del evento de arrastre sobre el botón */}
+                <div 
+                  className="w-fit cursor-pointer"
+                  onPointerDownCapture={(e) => e.stopPropagation()}
+                >
+                  <Link href={slides[slideIndex].url}>
+                    <Button className="bg-[#39759E] hover:bg-[#39759E] w-fit">
+                      {lang === "es" ? "Ver más" : "See more"}
+                    </Button>
+                  </Link>
+                </div>
               </div>
-              <div className={styles.imageContainer}>
+
+              <div className={`${styles.imageContainer} pointer-events-none select-none`}>
                 <Image
                   src={slides[slideIndex].image}
                   alt="Hero"
                   fill
                   className="object-contain"
                   priority
+                  draggable={false}
                 />
               </div>
             </div>
@@ -149,6 +158,7 @@ export function HeroSlider({ lang = "es"}: HeroSliderProps) {
         </AnimatePresence>
       </motion.div>
 
+      {/* Botones de navegación */}
       <button
         onClick={() => paginate(-1)}
         className={`${styles.navigationButton} ${styles.navigationButtonLeft}`}
