@@ -61,7 +61,7 @@ export function FeaturesSection({ lang = "en" }: FeaturesSectionProps) {
         {/* ✅ Título principal */}
         <div className="max-w-3xl mx-auto md:text-center mb-12">
           <h2
-            className={`${fraunces.className} text-2xl sm:text-6xl md:hidden text-[#162F40] mb-4`}
+            className={`${fraunces.className} text-3xl sm:text-6xl md:hidden text-[#162F40] mb-4`}
           >
             {isSpanish
               ? (

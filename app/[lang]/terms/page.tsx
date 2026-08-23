@@ -8,22 +8,24 @@ const fraunces = Fraunces({ subsets: ["latin"] });
 
 export default function TermsAndConditionsPage() {
   const params = useParams();
-  const lang = (params.lang as Locale) || "es"; // Default to 'es'
+  const lang = (params.lang as Locale) || "es";
   const isSpanish = lang === "es";
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#F8F8F7] text-[#162F40]">
       <div className="container mx-auto px-4 py-16 max-w-4xl">
-        <div className="mb-12">
-          <h1 className={`${fraunces.className} text-4xl md:text-5xl font-normal mb-6 text-balance`}>
-            {isSpanish ? "Condiciones Generales de" : "General Conditions of"}
+        <div className="mb-12 border-b border-gray-200 pb-8">
+          <h1 className={`${fraunces.className} text-2xl md:text-4xl font-normal mb-3 text-[#162F40]`}>
+            {isSpanish ? "Condiciones Generales de Uso" : "General Terms of Use"}
           </h1>
-          <h3 className={`${fraunces.className} text-xl font-normal`}>www.recoverycaresolutions.com</h3>
+          <h3 className={`${fraunces.className} text-[16px] md:text-xl font-normal text-[#39759E]`}>
+            www.recoverycaresolutions.com
+          </h3>
         </div>
 
-        <div className="prose prose-neutral dark:prose-invert max-w-none">
+        <div className="prose prose-neutral max-w-none text-gray-700">
           <section className="mb-12">
-            <h2 className={`${fraunces.className} text-3xl font-normal mb-4`}>
+            <h2 className={`${fraunces.className} text-2xl font-normal mb-4 text-[#162F40]`}>
               {isSpanish ? "Introducción" : "Introduction"}
             </h2>
 
@@ -39,35 +41,39 @@ export default function TermsAndConditionsPage() {
                 : "Users must read this document carefully."}
             </p>
 
-            <p className="leading-relaxed mb-4">
+            <div className="bg-white p-6 rounded-2xl border border-gray-200 leading-relaxed mb-4">
               {isSpanish ? (
                 <>
-                  Esta Aplicación es ofrecida por:
+                  <strong className="text-[#162F40]">Esta Aplicación es ofrecida por:</strong>
                   <br />
                   Recovery Care Solutions
                   <br />
-                  14331 sw 120th st 101 Miami Fl 33186
+                  14331 SW 120th St #101, Miami, FL 33186
                   <br />
-                  <strong>Correo electrónico de contacto del Titular</strong>:
-                  manager@recoverycaresolutions.com
+                  <strong className="text-[#162F40]">Correo electrónico de contacto del Titular:</strong>{" "}
+                  <a href="mailto:manager@recoverycaresolutions.com" className="text-[#39759E] hover:underline">
+                    manager@recoverycaresolutions.com
+                  </a>
                 </>
               ) : (
                 <>
-                  This Application is provided by:
+                  <strong className="text-[#162F40]">This Application is provided by:</strong>
                   <br />
                   Recovery Care Solutions
                   <br />
-                  14331 sw 120th st 101 Miami Fl 33186
+                  14331 SW 120th St #101, Miami, FL 33186
                   <br />
-                  <strong>Owner contact email</strong>:
-                  manager@recoverycaresolutions.com
+                  <strong className="text-[#162F40]">Owner contact email:</strong>{" "}
+                  <a href="mailto:manager@recoverycaresolutions.com" className="text-[#39759E] hover:underline">
+                    manager@recoverycaresolutions.com
+                  </a>
                 </>
               )}
-            </p>
+            </div>
           </section>
 
           <section className="mb-12">
-            <h2 className={`${fraunces.className} text-3xl font-normal mb-4`}>
+            <h2 className={`${fraunces.className} text-2xl font-normal mb-4 text-[#162F40]`}>
               {isSpanish
                 ? "Lo que el Usuario debería saber de un vistazo"
                 : "What Users Should Know at a Glance"}
@@ -75,12 +81,11 @@ export default function TermsAndConditionsPage() {
 
             <p className="leading-relaxed mb-4">
               {isSpanish ? (
-                <strong>
-                  La utilización de esta Aplicación y del Servicio está
-                  restringida en función de la edad
+                <strong className="text-[#162F40]">
+                  La utilización de esta Aplicación y del Servicio está restringida en función de la edad
                 </strong>
               ) : (
-                <strong>
+                <strong className="text-[#162F40]">
                   The use of this Application and the Service is age-restricted
                 </strong>
               )}
@@ -97,9 +102,9 @@ export default function TermsAndConditionsPage() {
           </section>
 
           <section className="mb-12">
-            <h1 className={`${fraunces.className} text-4xl font-normal mb-4`}>
+            <h2 className={`${fraunces.className} text-2xl font-normal mb-4 text-[#162F40]`}>
               {isSpanish ? "CONDICIONES DE USO" : "TERMS OF USE"}
-            </h1>
+            </h2>
 
             <p className="leading-relaxed mb-4">
               {isSpanish
@@ -134,7 +139,7 @@ export default function TermsAndConditionsPage() {
           </section>
 
           <section className="mb-12">
-            <h2 className={`${fraunces.className} text-3xl font-normal mb-4`}>
+            <h2 className={`${fraunces.className} text-2xl font-normal mb-4 text-[#162F40]`}>
               {isSpanish
                 ? "Contenido en esta Aplicación"
                 : "Content in this Application"}
@@ -151,10 +156,8 @@ export default function TermsAndConditionsPage() {
                 ? "El Titular se compromete a actuar con la máxima diligencia para velar por que los contenidos proporcionados en esta Aplicación no infrinjan ninguna disposición legal ni vulneren los derechos de terceros. Sin embargo, no siempre será posible conseguir dicho objetivo. En tales supuestos, sin perjuicio de las prerrogativas legales de que dispongan los Usuarios para hacer cumplir sus derechos, se ruega a los Usuarios que comuniquen las quejas en este sentido utilizando los datos de contacto facilitados en el presente documento."
                 : "The Owner commits to act with the utmost diligence to ensure that the content provided on this Application does not violate any legal provision or infringe the rights of third parties. However, achieving this goal may not always be possible. In such cases, without prejudice to the legal rights of Users to enforce their rights, Users are requested to report complaints using the contact information provided in this document."}
             </p>
-          </section>
 
-          <section className="mb-12">
-            <h3 className={`${fraunces.className} text-xl font-normal mb-3`}>
+            <h3 className={`${fraunces.className} text-2xl font-normal mb-3 text-[#162F40]`}>
               {isSpanish
                 ? "Derechos relativos a los contenidos en esta Aplicación"
                 : "Rights Regarding Content on this Application"}
@@ -192,7 +195,7 @@ export default function TermsAndConditionsPage() {
           </section>
 
           <section className="mb-12">
-            <h2 className={`${fraunces.className} text-3xl font-normal mb-4`}>
+            <h2 className={`${fraunces.className} text-2xl font-normal mb-4 text-[#162F40]`}>
               {isSpanish
                 ? "Acceso a recursos externos"
                 : "Access to External Resources"}
@@ -212,7 +215,7 @@ export default function TermsAndConditionsPage() {
           </section>
 
           <section className="mb-12">
-            <h2 className={`${fraunces.className} text-3xl font-normal mb-4`}>
+            <h2 className={`${fraunces.className} text-2xl font-normal mb-4 text-[#162F40]`}>
               {isSpanish ? "Usos aceptables" : "Acceptable Uses"}
             </h2>
 
@@ -259,11 +262,11 @@ export default function TermsAndConditionsPage() {
           </section>
 
           <section className="mb-12">
-            <h1 className={`${fraunces.className} text-4xl font-normal mb-4`}>
+            <h2 className={`${fraunces.className} text-2xl font-normal mb-4 text-[#162F40]`}>
               {isSpanish
                 ? "Responsabilidad y exención de responsabilidad"
                 : "Liability and Disclaimer"}
-            </h1>
+            </h2>
 
             <p className="leading-relaxed mb-4">
               {isSpanish
@@ -271,7 +274,7 @@ export default function TermsAndConditionsPage() {
                 : "Unless expressly stated or agreed otherwise with Users, the Owner's liability for damages related to the performance of the Contract is excluded, limited, and/or reduced to the maximum extent permitted by applicable law."}
             </p>
 
-            <h3 className={`${fraunces.className} text-2xl font-normal mb-3`}>
+            <h3 className={`${fraunces.className} text-2xl font-normal mb-3 text-[#162F40]`}>
               {isSpanish ? "Exención de responsabilidad" : "Disclaimer"}
             </h3>
             <p className="leading-relaxed mb-4">
@@ -286,7 +289,7 @@ export default function TermsAndConditionsPage() {
                 : "The above also applies to any claims made by third parties (including, by way of example and not limitation, the Owner’s customers or consumers) against the Owner regarding Digital Products supplied by the User, such as claims relating to conformity."}
             </p>
 
-            <h3 className={`${fraunces.className} text-2xl font-normal mb-3`}>
+            <h3 className={`${fraunces.className} text-2xl font-normal mb-3 text-[#162F40]`}>
               {isSpanish
                 ? "Limitación de responsabilidad"
                 : "Limitation of Liability"}
@@ -299,7 +302,7 @@ export default function TermsAndConditionsPage() {
 
             <p className="leading-relaxed mb-4">
               {isSpanish
-                ? "Lo anterior no será aplicable a los daños que afecten a la vida, la salud o la integridad física, los daños y perjuicios resultantes del incumplimiento de las obligaciones contractuales sustantivas, como cualquier obligación que sea strictly necesaria para lograr el objetivo del contrato, y/o a los daños y perjuicios resultantes del dolo o la negligencia grave, siempre y cuando el Usuario haya utilizado esta Aplicación de forma apropiada y correcta."
+                ? "Lo anterior no será aplicable a los daños que afecten a la vida, la salud o la integridad física, los daños y perjuicios resultantes del incumplimiento de las obligaciones contractuales sustantivas, como cualquier obligación que sea estrictamente necesaria para lograr el objetivo del contrato, y/o a los daños y perjuicios resultantes del dolo o la negligencia grave, siempre y cuando el Usuario haya utilizado esta Aplicación de forma apropiada y correcta."
                 : "The above does not apply to damages affecting life, health, or physical integrity, damages resulting from the breach of substantive contractual obligations, such as any obligation strictly necessary to achieve the purpose of the contract, and/or damages resulting from willful misconduct or gross negligence, provided the User has used this Application appropriately and correctly."}
             </p>
 
@@ -311,11 +314,11 @@ export default function TermsAndConditionsPage() {
           </section>
 
           <section className="mb-12">
-            <h2 className={`${fraunces.className} text-3xl font-normal mb-4`}>
+            <h2 className={`${fraunces.className} text-2xl font-normal mb-4 text-[#162F40]`}>
               {isSpanish ? "Usuarios australianos" : "Australian Users"}
             </h2>
 
-            <h3 className={`${fraunces.className} text-2xl font-normal mb-3`}>
+            <h3 className={`${fraunces.className} text-2xl font-normal mb-3 text-[#162F40]`}>
               {isSpanish
                 ? "Limitación de responsabilidad"
                 : "Limitation of Liability"}
@@ -329,11 +332,11 @@ export default function TermsAndConditionsPage() {
           </section>
 
           <section className="mb-12">
-            <h2 className={`${fraunces.className} text-3xl font-normal mb-4`}>
+            <h2 className={`${fraunces.className} text-2xl font-normal mb-4 text-[#162F40]`}>
               {isSpanish ? "Usuarios de EE.UU." : "U.S. Users"}
             </h2>
 
-            <h3 className={`${fraunces.className} text-2xl font-normal mb-3`}>
+            <h3 className={`${fraunces.className} text-2xl font-normal mb-3 text-[#162F40]`}>
               {isSpanish
                 ? "Exclusión de garantías"
                 : "Disclaimer of Warranties"}
@@ -369,7 +372,7 @@ export default function TermsAndConditionsPage() {
                 : "Federal, state, and other jurisdictional laws do not allow the exclusion or limitation of certain implied warranties. Some of the above exclusions may not apply to Users. These Terms grant specific legal rights to Users, and Users may have other rights which vary from state to state. The disclaimers and exclusions under these Terms will not apply to the extent prohibited by applicable law."}
             </p>
 
-            <h3 className={`${fraunces.className} text-2xl font-normal mb-3`}>
+            <h3 className={`${fraunces.className} text-2xl font-normal mb-3 text-[#162F40]`}>
               {isSpanish
                 ? "Limitaciones de responsabilidad"
                 : "Limitation of Liability"}
@@ -447,7 +450,7 @@ export default function TermsAndConditionsPage() {
                 : "Some jurisdictions do not allow the exclusion or limitation of incidental or consequential damages; therefore, the above limitations or exclusions may not apply to the User. These Terms grant the User specific legal rights, and the User may also have other rights, which vary by jurisdiction. The disclaimers, exclusions, and limitations of liability under these Terms will not apply to the extent prohibited by applicable law."}
             </p>
 
-            <h3 className={`${fraunces.className} text-2xl font-normal mb-3`}>
+            <h3 className={`${fraunces.className} text-2xl font-normal mb-3 text-[#162F40]`}>
               {isSpanish ? "Exención de responsabilidad" : "Indemnification"}
             </h3>
 
@@ -490,18 +493,18 @@ export default function TermsAndConditionsPage() {
               </li>
               <li>
                 {isSpanish
-                  ? "la infracción de cualquier disposición legal por parte del Usuario o de sus sociedades afiliadas, directivos, administradores, agentes, cotitulares de marcas, socios, proveedores y empleados en la máxima medida de lo permitido por la ley aplicable."
+                  ? "la infracción de cualquier disposición legal por parte del Usuario o de sus sociedades afiliadas, directivos, administradores, agentes, cotitulares de marcas, socios, proveedores y empleados en la máxima medida de lo permitted por la ley aplicable."
                   : "the User’s violation of any legal provision or by their affiliates, directors, officers, agents, co-owners of trademarks, partners, suppliers, and employees to the maximum extent permitted by applicable law."}
               </li>
             </ul>
           </section>
 
           <section className="mb-12">
-            <h1 className={`${fraunces.className} text-4xl font-normal mb-4`}>
+            <h2 className={`${fraunces.className} text-2xl font-normal mb-4 text-[#162F40]`}>
               {isSpanish ? "Disposiciones comunes" : "General Provisions"}
-            </h1>
+            </h2>
 
-            <h3 className={`${fraunces.className} text-2xl font-normal mb-3`}>
+            <h3 className={`${fraunces.className} text-2xl font-normal mb-3 text-[#162F40]`}>
               {isSpanish ? "No renuncia" : "No Waiver"}
             </h3>
             <p className="leading-relaxed mb-4">
@@ -510,7 +513,7 @@ export default function TermsAndConditionsPage() {
                 : "Failure to exercise any right or to invoke any provision under these Terms shall not constitute a waiver of such right or provision. No waiver shall constitute a further or continuing waiver of such term or any other term."}
             </p>
 
-            <h3 className={`${fraunces.className} text-2xl font-normal mb-3`}>
+            <h3 className={`${fraunces.className} text-2xl font-normal mb-3 text-[#162F40]`}>
               {isSpanish ? "Interrupción del servicio" : "Service Interruption"}
             </h3>
             <p className="leading-relaxed mb-4">
@@ -529,7 +532,7 @@ export default function TermsAndConditionsPage() {
                 : "Additionally, the Service may be unavailable due to reasons beyond the Owner's reasonable control, such as 'force majeure' (e.g., infrastructure failures or power outages, etc.)."}
             </p>
 
-            <h3 className={`${fraunces.className} text-2xl font-normal mb-3`}>
+            <h3 className={`${fraunces.className} text-2xl font-normal mb-3 text-[#162F40]`}>
               {isSpanish ? "Reventa del Servicio" : "Resale of the Service"}
             </h3>
             <p className="leading-relaxed mb-4">
@@ -538,7 +541,7 @@ export default function TermsAndConditionsPage() {
                 : "Users shall not reproduce, duplicate, copy, sell, resell, or exploit any part of this Application or its Service without prior express written permission from the Owner, either directly or through a legitimate resale program."}
             </p>
 
-            <h3 className={`${fraunces.className} text-2xl font-normal mb-3`}>
+            <h3 className={`${fraunces.className} text-2xl font-normal mb-3 text-[#162F40]`}>
               {isSpanish ? "Política de privacidad" : "Privacy Policy"}
             </h3>
             <p className="leading-relaxed mb-4">
@@ -547,7 +550,7 @@ export default function TermsAndConditionsPage() {
                 : "For more information on the use of your personal data, Users may refer to the privacy policy of this Application."}
             </p>
 
-            <h3 className={`${fraunces.className} text-2xl font-normal mb-3`}>
+            <h3 className={`${fraunces.className} text-2xl font-normal mb-3 text-[#162F40]`}>
               {isSpanish
                 ? "Derechos de propiedad intelectual"
                 : "Intellectual Property Rights"}
@@ -563,7 +566,7 @@ export default function TermsAndConditionsPage() {
                 : "All registered trademarks—whether word or design marks—and any other trademarks, trade names, service marks, designations, illustrations, images, or logos appearing in connection with this Application are and shall remain the exclusive property of the Owner or its licensors and are protected by applicable trademark laws and related international treaties."}
             </p>
 
-            <h3 className={`${fraunces.className} text-2xl font-normal mb-3`}>
+            <h3 className={`${fraunces.className} text-2xl font-normal mb-3 text-[#162F40]`}>
               {isSpanish
                 ? "Cambios de las presentes Condiciones"
                 : "Changes to These Terms"}
@@ -594,7 +597,7 @@ export default function TermsAndConditionsPage() {
                 : "Where required by law, the Owner will provide Users with advance notice of the date on which the modified Terms will take effect."}
             </p>
 
-            <h3 className={`${fraunces.className} text-2xl font-normal mb-3`}>
+            <h3 className={`${fraunces.className} text-2xl font-normal mb-3 text-[#162F40]`}>
               {isSpanish
                 ? "Cesión del contrato"
                 : "Assignment of the Agreement"}
@@ -615,7 +618,7 @@ export default function TermsAndConditionsPage() {
                 : "Users may not assign or transfer their rights or obligations under these Terms in any manner, except with the Owner’s written permission."}
             </p>
 
-            <h3 className={`${fraunces.className} text-2xl font-normal mb-3`}>
+            <h3 className={`${fraunces.className} text-2xl font-normal mb-3 text-[#162F40]`}>
               {isSpanish ? "Contacto" : "Contact"}
             </h3>
             <p className="leading-relaxed mb-4">
@@ -624,7 +627,7 @@ export default function TermsAndConditionsPage() {
                 : "All communications regarding the use of this Application should be sent using the contact details provided herein."}
             </p>
 
-            <h3 className={`${fraunces.className} text-2xl font-normal mb-3`}>
+            <h3 className={`${fraunces.className} text-2xl font-normal mb-3 text-[#162F40]`}>
               {isSpanish
                 ? "Posibilidad de separar una disposición"
                 : "Severability"}
@@ -637,7 +640,7 @@ export default function TermsAndConditionsPage() {
           </section>
 
           <section className="mb-12">
-            <h2 className={`${fraunces.className} text-3xl font-normal mb-4`}>
+            <h2 className={`${fraunces.className} text-2xl font-normal mb-4 text-[#162F40]`}>
               {isSpanish ? "Usuarios de EE.UU." : "U.S. Users"}
             </h2>
             <p className="leading-relaxed mb-4">
@@ -648,7 +651,7 @@ export default function TermsAndConditionsPage() {
           </section>
 
           <section className="mb-12">
-            <h2 className={`${fraunces.className} text-3xl font-normal mb-4`}>
+            <h2 className={`${fraunces.className} text-2xl font-normal mb-4 text-[#162F40]`}>
               {isSpanish
                 ? "Usuarios de la Unión Europea"
                 : "European Union Users"}
@@ -661,7 +664,7 @@ export default function TermsAndConditionsPage() {
           </section>
 
           <section className="mb-12">
-            <h2 className={`${fraunces.className} text-3xl font-normal mb-4`}>
+            <h2 className={`${fraunces.className} text-2xl font-normal mb-4 text-[#162F40]`}>
               {isSpanish ? "Ley aplicable" : "Governing Law"}
             </h2>
             <p className="leading-relaxed mb-4">
@@ -670,7 +673,7 @@ export default function TermsAndConditionsPage() {
                 : "These Terms are governed by the laws of the place where the Owner is headquartered, as stated in the relevant section of this document, without regard to conflict of law principles."}
             </p>
 
-            <h3 className={`${fraunces.className} text-2xl font-normal mb-3`}>
+            <h3 className={`${fraunces.className} text-2xl font-normal mb-3 text-[#162F40]`}>
               {isSpanish
                 ? "Primacía del Derecho nacional"
                 : "Supremacy of National Law"}
@@ -681,7 +684,7 @@ export default function TermsAndConditionsPage() {
                 : "However, notwithstanding the above, if the law of the country in which the User is located establishes higher applicable consumer protection standards, those higher standards shall prevail."}
             </p>
 
-            <h3 className={`${fraunces.className} text-2xl font-normal mb-3`}>
+            <h3 className={`${fraunces.className} text-2xl font-normal mb-3 text-[#162F40]`}>
               {isSpanish
                 ? "Excepción para los Consumidores situados en Suiza"
                 : "Exception for Consumers located in Switzerland"}
@@ -692,7 +695,7 @@ export default function TermsAndConditionsPage() {
                 : "If the User qualifies as a Consumer located in Switzerland, Swiss law shall apply."}
             </p>
 
-            <h3 className={`${fraunces.className} text-2xl font-normal mb-3`}>
+            <h3 className={`${fraunces.className} text-2xl font-normal mb-3 text-[#162F40]`}>
               {isSpanish
                 ? "Excepción para Consumidores en Brasil"
                 : "Exception for Consumers in Brazil"}
@@ -705,7 +708,7 @@ export default function TermsAndConditionsPage() {
           </section>
 
           <section className="mb-12">
-            <h2 className={`${fraunces.className} text-3xl font-normal mb-4`}>
+            <h2 className={`${fraunces.className} text-2xl font-normal mb-4 text-[#162F40]`}>
               {isSpanish ? "Fuero jurisdiccional" : "Jurisdiction"}
             </h2>
             <p className="leading-relaxed mb-4">
@@ -714,7 +717,7 @@ export default function TermsAndConditionsPage() {
                 : "The exclusive jurisdiction to resolve any disputes arising from or related to these Terms lies with the courts of the location where the Owner's registered office is situated, as stated in the relevant section of this document."}
             </p>
 
-            <h3 className={`${fraunces.className} text-2xl font-normal mb-3`}>
+            <h3 className={`${fraunces.className} text-2xl font-normal mb-3 text-[#162F40]`}>
               {isSpanish
                 ? "Excepción para Consumidores situados en Europa"
                 : "Exception for Consumers located in Europe"}
@@ -725,7 +728,7 @@ export default function TermsAndConditionsPage() {
                 : "The above provisions shall not apply to Users who qualify as European Consumers, nor to Consumers residing in the United Kingdom, Switzerland, Norway, or Iceland."}
             </p>
 
-            <h3 className={`${fraunces.className} text-2xl font-normal mb-3`}>
+            <h3 className={`${fraunces.className} text-2xl font-normal mb-3 text-[#162F40]`}>
               {isSpanish
                 ? "Excepción para Consumidores en Brasil"
                 : "Exception for Consumers in Brazil"}
@@ -737,9 +740,9 @@ export default function TermsAndConditionsPage() {
             </p>
           </section>
 
-          <section className="mt-16 pt-8 border-t">
-            <p className="text-center">
-              <strong>
+          <section className="mt-16 pt-8 border-t border-gray-200">
+            <p className="text-center text-sm text-gray-500">
+              <strong className="text-[#162F40] font-semibold">
                 {isSpanish
                   ? "Definiciones y referencias legales"
                   : "Definitions and Legal References"}
