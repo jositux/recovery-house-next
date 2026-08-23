@@ -48,7 +48,7 @@ export default function TermsAndConditionsPage() {
                   <br />
                   Recovery Care Solutions
                   <br />
-                  14331 SW 120th St #101, Miami, FL 33186
+                 55 SW 9th Street, Miami, FL 33130
                   <br />
                   <strong className="text-[#162F40]">Correo electrónico de contacto del Titular:</strong>{" "}
                   <a href="mailto:manager@recoverycaresolutions.com" className="text-[#39759E] hover:underline">
@@ -61,11 +61,11 @@ export default function TermsAndConditionsPage() {
                   <br />
                   Recovery Care Solutions
                   <br />
-                  14331 SW 120th St #101, Miami, FL 33186
+                 55 SW 9th Street, Miami, FL 33130
                   <br />
                   <strong className="text-[#162F40]">Owner contact email:</strong>{" "}
                   <a href="mailto:manager@recoverycaresolutions.com" className="text-[#39759E] hover:underline">
-                    manager@recoverycaresolutions.com
+                    admin@recoverycaresolutions.com
                   </a>
                 </>
               )}

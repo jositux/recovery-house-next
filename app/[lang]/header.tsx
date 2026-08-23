@@ -31,8 +31,8 @@ const fraunces = Fraunces({ subsets: ["latin"] })
 const assistanceLinks = [
   { 
     href: "/about", 
-    labelEs: "Acerca de RCS", 
-    labelEn: "About RCS", 
+    labelEs: "Acerca de", 
+    labelEn: "About Us", 
     icon: Info 
   },
   { 
@@ -316,11 +316,11 @@ export function Header({
                   {isSpanish ? "Contáctenos:" : "Contact us:"}
                 </p>
                 <a
-                  href="mailto:manager@recoverycaresolutions.com"
+                  href="mailto:admin@recoverycaresolutions.com"
                   className="text-xs font-semibold text-[#39759E] hover:underline flex items-center gap-1.5"
                 >
                   <Mail className="h-4 w-4 shrink-0" />
-                  manager@recoverycaresolutions.com
+                  admin@recoverycaresolutions.com
                 </a>
               </div>
             </motion.aside>

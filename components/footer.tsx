@@ -56,10 +56,10 @@ export function Footer({ lang }: FooterProps) {
             <p className="text-[#162F40]">
               {isSpanish ? "Contáctenos:" : "Contact us:"}{" "}
               <Link
-                href="mailto:manager@recoverycaresolutions.com"
+                href="mailto:admin@recoverycaresolutions.com"
                 className="hover:text-[#39759E] font-medium"
               >
-                manager@recoverycaresolutions.com
+                admin@recoverycaresolutions.com
               </Link>
             </p>
           </div>
