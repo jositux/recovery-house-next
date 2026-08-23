@@ -51,7 +51,7 @@ export default function TermsAndConditionsPage() {
                  55 SW 9th Street, Miami, FL 33130
                   <br />
                   <strong className="text-[#162F40]">Correo electrónico de contacto del Titular:</strong>{" "}
-                  <a href="mailto:manager@recoverycaresolutions.com" className="text-[#39759E] hover:underline">
+                  <a href="mailto:admin@recoverycaresolutions.com" className="text-[#39759E] hover:underline">
                     manager@recoverycaresolutions.com
                   </a>
                 </>
@@ -64,7 +64,7 @@ export default function TermsAndConditionsPage() {
                  55 SW 9th Street, Miami, FL 33130
                   <br />
                   <strong className="text-[#162F40]">Owner contact email:</strong>{" "}
-                  <a href="mailto:manager@recoverycaresolutions.com" className="text-[#39759E] hover:underline">
+                  <a href="mailto:admin@recoverycaresolutions.com" className="text-[#39759E] hover:underline">
                     admin@recoverycaresolutions.com
                   </a>
                 </>
