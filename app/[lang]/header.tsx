@@ -23,12 +23,16 @@ import { SearchBar } from "@/components/search-bar2"
 import MedicalSearchMobile from "@/components/MedicalSearchMobile"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import type { LocationOption } from "@/services/LocationService"
+import { Fraunces } from "next/font/google"
+
+// 🛑 Carga de la fuente Fraunces
+const fraunces = Fraunces({ subsets: ["latin"] })
 
 const assistanceLinks = [
   { 
     href: "/about", 
-    labelEs: "Acerca de", 
-    labelEn: "About Us", 
+    labelEs: "Acerca de RCS", 
+    labelEn: "About RCS", 
     icon: Info 
   },
   { 
@@ -59,7 +63,7 @@ export function Header({
   availableLocations?: LocationOption[]
 }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [isReady, setIsReady] = useState(false) // evita parpadeo + salto
+  const [isReady, setIsReady] = useState(false)
   const [userName, setUserName] = useState("")
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -93,7 +97,7 @@ export function Header({
         console.error("Auth check failed:", e)
       }
 
-      setIsReady(true) // 💥 evita salto
+      setIsReady(true)
     }
 
     checkAuth()
@@ -114,7 +118,7 @@ export function Header({
       <header className="bg-[#39759E] p-4 relative z-1">
         <div className="container mx-auto flex items-center justify-between">
 
-          {/* ------------------------- LOGO ------------------------- */}
+          {/* LOGO */}
           <Link href={`/${lang}`} className="flex items-center gap-2">
             <div className="hidden sm:block">
               <Image
@@ -134,10 +138,9 @@ export function Header({
             </div>
           </Link>
 
-          {/* ------------------ AUTH / MENU SECTION ------------------ */}
+          {/* AUTH / MENU SECTION */}
           <div className="flex items-center gap-4">
 
-            {/* Mobile Search */}
             <Button
               size="icon"
               variant="ghost"
@@ -169,7 +172,6 @@ export function Header({
               </>
             )}
 
-            {/* Hamburguesa añadida al final, solo visible en mobile/tablet */}
             <Button
               size="icon"
               variant="ghost"
@@ -184,7 +186,7 @@ export function Header({
         </div>
       </header>
 
-      {/* ------------------ MOBILE SEARCH DROPDOWN ------------------ */}
+      {/* MOBILE SEARCH DROPDOWN */}
       <AnimatePresence>
         {isSearchOpen && (
           <motion.div
@@ -205,12 +207,12 @@ export function Header({
         )}
       </AnimatePresence>
 
-      {/* ----------------------- DESKTOP SEARCH --------------------- */}
+      {/* DESKTOP SEARCH */}
       {showSearchBar && (
         <SearchBar lang={lang} availableLocations={availableLocations} />
       )}
 
-      {/* ------------------ SLIDE-OVER HAMBURGUESA (SÓLO MOBILE) ------------------ */}
+      {/* SLIDE-OVER HAMBURGUESA */}
       <AnimatePresence>
         {isMenuOpen && (
           <div className="fixed inset-0 z-[100] md:hidden">
@@ -247,9 +249,9 @@ export function Header({
                   </Button>
                 </div>
 
-                {/* 🛑 SECCIÓN CONFIGURACIÓN Y LEGAL */}
+                {/* 🛑 TÍTULO CON FUENTE FRAUNCES */}
                 <div>
-                  <h3 className="text-sm font-bold text-[#162F40] uppercase tracking-wider mb-4">
+                  <h3 className={`${fraunces.className} text-xl font-normal text-[#162F40] mb-4`}>
                     {isSpanish ? "Configuración y legal" : "Settings and legal"}
                   </h3>
                   <ul className="space-y-4">
@@ -271,7 +273,7 @@ export function Header({
                 </div>
 
                 <div className="border-t pt-4">
-                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
+                  <h3 className={`${fraunces.className} text-xl font-normal text-[#162F40] mb-3`}>
                     {isSpanish ? "Anfitrión" : "Host"}
                   </h3>
                   <Link
@@ -284,7 +286,7 @@ export function Header({
                 </div>
 
                 <div className="border-t pt-4">
-                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
+                  <h3 className={`${fraunces.className} text-xl font-normal text-[#162F40] mb-3`}>
                     {isSpanish ? "Síguenos" : "Follow us"}
                   </h3>
                   <Link
@@ -299,7 +301,7 @@ export function Header({
                 </div>
 
                 <div className="border-t pt-4">
-                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">
+                  <h3 className={`${fraunces.className} text-xl font-normal text-[#162F40] mb-3`}>
                     {isSpanish ? "Idioma" : "Language"}
                   </h3>
                   <div className="flex items-center gap-3">

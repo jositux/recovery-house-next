@@ -9,11 +9,11 @@ type FooterProps = {
   lang: "es" | "en";
 };
 
-const assistanceLinks = [
-  { href: "/terms" },
-  { href: "/policy" },
-  { href: "/privacidad" },
-  { href: "/about" },
+const legalLinks = [
+  { href: "/about", labelEs: "Acerca de", labelEn: "About Us" },
+  { href: "/terms", labelEs: "Términos y condiciones", labelEn: "Terms & Conditions" },
+  { href: "/policy", labelEs: "Políticas de uso", labelEn: "Usage Policies" },
+  { href: "/privacidad", labelEs: "Política de privacidad", labelEn: "Privacy Policy" },
 ];
 
 const socialLinks = [
@@ -36,7 +36,7 @@ export function Footer({ lang }: FooterProps) {
       <div className="container mx-auto p-4">
         {/* Main Grid: 33% (4 cols) + 66% (8 cols) = 12 columns */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 mb-12">
-          {/* Company Info - 33% Width (4 columns out of 12) */}
+          {/* Company Info */}
           <div className="md:col-span-2 lg:col-span-4">
             <Link href={`/${lang}`} className="flex items-center gap-2 mb-6">
               <Image
@@ -57,52 +57,40 @@ export function Footer({ lang }: FooterProps) {
               {isSpanish ? "Contáctenos:" : "Contact us:"}{" "}
               <Link
                 href="mailto:manager@recoverycaresolutions.com"
-                className="hover:text-[#39759E]"
+                className="hover:text-[#39759E] font-medium"
               >
                 manager@recoverycaresolutions.com
               </Link>
             </p>
           </div>
 
-          {/* Links Section - 66% Width (8 columns out of 12) */}
+          {/* Links Section */}
           <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8">
-            {/* Assistance */}
+            {/* Configuración y legal */}
             <div>
               <h3
-                className={`${fraunces.className} font-semibold text-lg mb-4`}
+                className={`${fraunces.className} font-semibold text-lg text-[#162F40] mb-4`}
               >
-                {isSpanish ? "Asistencia" : "Support"}
+                {isSpanish ? "Configuración y legal" : "Settings and legal"}
               </h3>
               <ul className="space-y-3">
-                {assistanceLinks.map((link, index) => (
-                  <li key={index}>
+                {legalLinks.map((link) => (
+                  <li key={link.href}>
                     <Link
                       href={`/${lang}${link.href}`}
-                      className="text-[#162F40] hover:text-[#39759E]"
+                      className="text-[#162F40] hover:text-[#39759E] transition-colors"
                     >
-                      {isSpanish
-                        ? [
-                            "Términos y condiciones",
-                            "Políticas de uso",
-                            "Política de privacidad",
-                            "Acerca de",
-                          ][index]
-                        : [
-                            "Terms & Conditions",
-                            "Usage Policies",
-                            "Privacy Policy",
-                            "About",
-                          ][index]}
+                      {isSpanish ? link.labelEs : link.labelEn}
                     </Link>
                   </li>
                 ))}
               </ul>
             </div>
 
-            {/* Host */}
+            {/* Anfitrión */}
             <div>
               <h3
-                className={`${fraunces.className} font-semibold text-lg mb-4`}
+                className={`${fraunces.className} font-semibold text-lg text-[#162F40] mb-4`}
               >
                 {isSpanish ? "Anfitrión" : "Host"}
               </h3>
@@ -110,7 +98,7 @@ export function Footer({ lang }: FooterProps) {
                 <li>
                   <Link
                     href={`/${lang}/registro`}
-                    className="text-[#162F40] hover:text-[#39759E]"
+                    className="text-[#162F40] hover:text-[#39759E] transition-colors"
                   >
                     {isSpanish ? "Pon tu espacio" : "List your space"}
                   </Link>
@@ -118,10 +106,10 @@ export function Footer({ lang }: FooterProps) {
               </ul>
             </div>
 
-            {/* Social */}
+            {/* Síguenos */}
             <div>
               <h3
-                className={`${fraunces.className} font-semibold text-lg mb-4`}
+                className={`${fraunces.className} font-semibold text-lg text-[#162F40] mb-4`}
               >
                 {isSpanish ? "Síguenos" : "Follow us"}
               </h3>
@@ -130,7 +118,7 @@ export function Footer({ lang }: FooterProps) {
                   <li key={link.title}>
                     <Link
                       href={link.href}
-                      className="flex items-center gap-2 text-[#162F40] hover:text-[#39759E]"
+                      className="flex items-center gap-2 text-[#162F40] hover:text-[#39759E] transition-colors"
                     >
                       {link.icon}
                       {link.title}
@@ -140,10 +128,10 @@ export function Footer({ lang }: FooterProps) {
               </ul>
             </div>
 
-            {/* Language */}
+            {/* Idioma */}
             <div>
               <h3
-                className={`${fraunces.className} font-semibold text-lg mb-4`}
+                className={`${fraunces.className} font-semibold text-lg text-[#162F40] mb-4`}
               >
                 {isSpanish ? "Idioma" : "Language"}
               </h3>
