@@ -3,7 +3,6 @@
 import { useRef, useState, useEffect, useCallback } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Fraunces } from "next/font/google"
-//import Link from "next/link"
 
 const fraunces = Fraunces({ subsets: ["latin"] })
 
@@ -38,16 +37,16 @@ export function HeroSliderMobile({ lang = "es" }: HeroSliderMobileProps) {
     },
   ]
 
-  // Multiplicamos para crear el buffer de loop infinito
   const cards = [...baseCards, ...baseCards, ...baseCards]
 
   const sliderRef = useRef<HTMLDivElement>(null)
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [startX, setStartX] = useState(0)
   const [scrollLeft, setScrollLeft] = useState(0)
   const isAdjustingRef = useRef(false)
 
-  // Loop infinito silencioso al hacer scroll
+  // Loop infinito silencioso al scrollear
   const checkInfiniteLoop = useCallback(() => {
     const slider = sliderRef.current
     if (!slider || isAdjustingRef.current) return
@@ -80,81 +79,106 @@ export function HeroSliderMobile({ lang = "es" }: HeroSliderMobileProps) {
     }
   }, [])
 
-  // Autoplay continuo
-  useEffect(() => {
-    const interval = setInterval(() => {
+  // Iniciar autoplay
+  const startAutoplay = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current)
+
+    timerRef.current = setInterval(() => {
       const slider = sliderRef.current
       if (slider && !isDragging) {
         slider.style.scrollBehavior = "smooth"
-        // Avanza el ancho exacto de una tarjeta + el gap
         const step = slider.clientWidth * 0.82 + 16
         slider.scrollBy({ left: step, behavior: "smooth" })
       }
-    }, 3500)
-
-    return () => clearInterval(interval)
+    }, 4000)
   }, [isDragging])
 
-  // Soporte Drag para mouse
-  const handleMouseDown = (e: React.MouseEvent) => {
+  useEffect(() => {
+    startAutoplay()
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current)
+    }
+  }, [startAutoplay])
+
+  // Obtener coordenada X unificada para Mouse y Touch
+  const getPageX = (e: React.MouseEvent | React.TouchEvent) => {
+    if ("touches" in e) {
+      return e.touches[0].pageX
+    }
+    return e.pageX
+  }
+
+  // Handlers unificados
+  const handleDragStart = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
     if (!sliderRef.current) return
+    if (timerRef.current) clearInterval(timerRef.current)
+
     setIsDragging(true)
     sliderRef.current.style.scrollBehavior = "auto"
-    setStartX(e.pageX - sliderRef.current.offsetLeft)
+    sliderRef.current.style.scrollSnapType = "none"
+    
+    const pageX = getPageX(e)
+    setStartX(pageX - sliderRef.current.offsetLeft)
     setScrollLeft(sliderRef.current.scrollLeft)
   }
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handleDragMove = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
     if (!isDragging || !sliderRef.current) return
-    e.preventDefault()
-    const x = e.pageX - sliderRef.current.offsetLeft
-    const walk = (x - startX) * 1.5
+    
+    const pageX = getPageX(e)
+    const x = pageX - sliderRef.current.offsetLeft
+    const walk = x - startX
     sliderRef.current.scrollLeft = scrollLeft - walk
     checkInfiniteLoop()
   }
 
-  const handleMouseUp = () => setIsDragging(false)
+  const handleDragEnd = () => {
+    if (!isDragging) return
+    setIsDragging(false)
+
+    if (sliderRef.current) {
+      sliderRef.current.style.scrollSnapType = "x mandatory"
+    }
+
+    startAutoplay()
+  }
 
   return (
     <div className="relative w-full overflow-hidden py-2">
       <div
         ref={sliderRef}
         onScroll={checkInfiniteLoop}
-        /* 
-           pl-4 pr-12: Padding izquierdo para alinear la primera tarjeta con el margen del sitio
-           gap-4: Espaciado entre la tarjeta visible y el "peek" de la siguiente
-           [scrollbar-width:none] / [&::-webkit-scrollbar]:hidden: Oculta la barra de scroll completamente
-        */
         className="flex w-full overflow-x-auto snap-x snap-mandatory gap-4 pl-4 pr-12 select-none cursor-grab active:cursor-grabbing [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
+        onMouseDown={handleDragStart}
+        onMouseMove={handleDragMove}
+        onMouseUp={handleDragEnd}
+        onMouseLeave={handleDragEnd}
+        onTouchStart={handleDragStart}
+        onTouchMove={handleDragMove}
+        onTouchEnd={handleDragEnd}
       >
         {cards.map((card, index) => (
           <div
             key={index}
-            /* 🛑 w-[82vw] hace que ocupe el 82% del ancho y deje asomar un ~15% de la tarjeta a la derecha */
             className="w-[82vw] flex-shrink-0 snap-start"
           >
             <Card className="w-full border-none shadow-none bg-transparent">
               <CardContent className="p-0 flex flex-col">
-                  <div className="w-full aspect-[4/3] relative overflow-hidden rounded-2xl bg-[#E0EDF6]">
-                    <img
-                      src={card.imageSrc}
-                      alt={card.title}
-                      className="w-full h-full object-cover rounded-2xl"
-                      draggable={false}
-                    />
-                  </div>
-                  <div className="mt-4">
-                    <p
-                      className={`${fraunces.className} text-left text-[xl] font-normal leading-[1.2] text-[#162F40]`}
-                    >
-                      {card.title}
-                    </p>
-                  </div>
-               
+                <div className="w-full aspect-[4/3] relative overflow-hidden rounded-2xl bg-[#E0EDF6]">
+                  <img
+                    src={card.imageSrc}
+                    alt={card.title}
+                    className="w-full h-full object-cover rounded-2xl"
+                    draggable={false}
+                  />
+                </div>
+                <div className="mt-4">
+                  <p
+                    className={`${fraunces.className} text-left text-xl font-normal leading-[1.2] text-[#162F40]`}
+                  >
+                    {card.title}
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </div>
