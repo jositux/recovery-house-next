@@ -38,7 +38,7 @@ export function TestimonialsSection({ lang = "en" }: TestimonialsSectionProps) {
   ]
 
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-16">
       <div className="container mx-auto px-4 lg:px-0">
         <div className="mb-12">
           <h2
