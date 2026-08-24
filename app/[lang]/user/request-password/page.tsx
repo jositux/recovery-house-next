@@ -14,6 +14,7 @@ const fraunces = Fraunces({ subsets: ["latin"] });
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
   const params = useParams();
@@ -23,27 +24,38 @@ export default function ForgotPassword() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+    setError(null);
+
     try {
-      const directusUrl = process.env.NEXT_PUBLIC_SITE_BACKEND_URL;
-      const response = await fetch(`${directusUrl}/auth/password/request`, {
+      // Ruta relativa (no la URL absoluta de NEXT_PUBLIC_SITE_BACKEND_URL): así el
+      // navegador la ve same-origin y pasa por el rewrite /webapi/* del propio Next.js
+      // en vez de pegarle directo al dominio público (que en local da CORS).
+      const response = await fetch(`/webapi/auth/password/request`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email, 
-          reset_url: `https://recoverycaresolutions.com/${lang}/user/reset-password`
+          email,
+          reset_url: `${window.location.origin}/${lang}/user/reset-password`
         }),
       });
       
       if (response.ok) {
         router.push(isSpanish ? `/${lang}/login?message=reset` : `/${lang}/login?message=reset`); // Puedes usar query distinto si quieres
       } else {
-        // Manejar error si es necesario
+        setError(
+          isSpanish
+            ? 'No pudimos procesar la solicitud. Verifica el correo e intenta de nuevo.'
+            : "We couldn't process the request. Check the email and try again."
+        );
       }
-    } catch (error) {
-      console.log(error);
+    } catch {
+      setError(
+        isSpanish
+          ? 'Ocurrió un error de conexión. Intenta de nuevo.'
+          : 'A connection error occurred. Please try again.'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -90,6 +102,11 @@ export default function ForgotPassword() {
               />
             </div>
           </div>
+          {error && (
+            <p className="text-sm text-red-600 text-center" role="alert">
+              {error}
+            </p>
+          )}
           <div>
             <Button
               type="submit"
