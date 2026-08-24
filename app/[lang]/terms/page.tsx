@@ -52,7 +52,7 @@ export default function TermsAndConditionsPage() {
                   <br />
                   <strong className="text-[#162F40]">Correo electrónico de contacto del Titular:</strong>{" "}
                   <a href="mailto:admin@recoverycaresolutions.com" className="text-[#39759E] hover:underline">
-                    manager@recoverycaresolutions.com
+                    admin@recoverycaresolutions.com
                   </a>
                 </>
               ) : (
