@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react"
 import { Input } from "@/components/ui/input"
-import { Loader2 } from "lucide-react"
+import { Loader2, MapPin, Search } from "lucide-react"
 import { useLoadScript, GoogleMap, Marker } from "@react-google-maps/api"
 import type { Libraries } from "@react-google-maps/api"
 
@@ -100,11 +100,23 @@ export default function GoogleMapsSelector({ onLocationSelected, defaultLocation
     [map, marker, onLocationSelected],
   )
 
+  // Mantiene siempre la versión más reciente disponible para el listener de abajo,
+  // sin necesidad de recrear el Autocomplete cada vez que cambia (evita duplicarlo).
+  const updateLocationDetailsRef = useRef(updateLocationDetails)
   useEffect(() => {
-    if (isLoaded && map) {
+    updateLocationDetailsRef.current = updateLocationDetails
+  }, [updateLocationDetails])
+
+  useEffect(() => {
+    // Guard: sin esto, el efecto se re-ejecutaba apenas cargaba el marcador
+    // (porque updateLocationDetails cambiaba de referencia) y creaba una SEGUNDA
+    // instancia de Autocomplete sobre el mismo input, con comportamiento errático.
+    if (isLoaded && map && !autocompleteRef.current) {
       const autocomplete = new window.google.maps.places.Autocomplete(
         document.getElementById("pac-input") as HTMLInputElement,
-        { types: ["address"] },
+        // "geocode" en vez de "address": "address" es demasiado estricto y no
+        // devuelve resultados para ciudades, barrios o direcciones informales.
+        { types: ["geocode"] },
       )
       autocomplete.bindTo("bounds", map)
       autocompleteRef.current = autocomplete
@@ -118,10 +130,10 @@ export default function GoogleMapsSelector({ onLocationSelected, defaultLocation
           return
         }
 
-        updateLocationDetails(place)
+        updateLocationDetailsRef.current(place)
       })
     }
-  }, [isLoaded, map, t.noGeometry, updateLocationDetails])
+  }, [isLoaded, map, t.noGeometry])
 
   const handleMarkerDrag = useCallback((event: google.maps.MapMouseEvent) => {
     if (event.latLng) {
@@ -155,26 +167,8 @@ export default function GoogleMapsSelector({ onLocationSelected, defaultLocation
   if (!isLoaded) return <div>{t.loadingMaps}</div>
 
   return (
-    <div className="space-y-4">
-      <div className="relative">
-        <Input
-          id="pac-input"
-          type="text"
-          value={searchInput}
-          onChange={(e) => {
-            setSearchInput(e.target.value)
-            if (e.target.value === "") {
-              setIsLoading(false)
-            } else {
-              setIsLoading(true)
-            }
-          }}
-          placeholder={t.searchPlaceholder}
-          className="w-full pr-10"
-        />
-        {isLoading && <Loader2 className="absolute right-3 top-3 h-4 w-4 animate-spin text-gray-400" />}
-      </div>
-      <div className="h-[400px] w-full relative">
+    <div className="space-y-2">
+      <div className="h-[400px] w-full relative rounded-lg overflow-hidden border">
         <GoogleMap
           mapContainerStyle={{ height: "100%", width: "100%" }}
           center={position}
@@ -195,6 +189,33 @@ export default function GoogleMapsSelector({ onLocationSelected, defaultLocation
             onLoad={(marker) => setMarker(marker)}
           />
         </GoogleMap>
+
+        {/* Buscador flotante sobre el mapa: deja claro que la búsqueda ubica el punto abajo */}
+        <div className="absolute top-3 left-3 right-3 z-10">
+          <div className="relative flex items-center bg-white rounded-full shadow-lg border border-gray-200 focus-within:ring-2 focus-within:ring-[#39759E] transition-shadow">
+            <MapPin className="absolute left-3.5 h-4 w-4 text-[#39759E] shrink-0" />
+            <Input
+              id="pac-input"
+              type="text"
+              value={searchInput}
+              onChange={(e) => {
+                setSearchInput(e.target.value)
+                if (e.target.value === "") {
+                  setIsLoading(false)
+                } else {
+                  setIsLoading(true)
+                }
+              }}
+              placeholder={t.searchPlaceholder}
+              className="w-full pl-10 pr-10 border-0 shadow-none rounded-full focus-visible:ring-0 focus-visible:ring-offset-0"
+            />
+            {isLoading ? (
+              <Loader2 className="absolute right-3.5 h-4 w-4 animate-spin text-gray-400 shrink-0" />
+            ) : (
+              <Search className="absolute right-3.5 h-4 w-4 text-gray-400 shrink-0" />
+            )}
+          </div>
+        </div>
       </div>
     </div>
   )
