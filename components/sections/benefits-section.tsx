@@ -13,8 +13,6 @@ interface BenefitsSectionProps {
 export function BenefitsSection({ lang }: BenefitsSectionProps) {
   const isSpanish = lang === "es"
 
-console.log(isSpanish)
-
   return (
     <section className="py-16 bg-[#f8f8f7] px-4">
       <div className="container mx-auto">
@@ -56,14 +54,14 @@ console.log(isSpanish)
             </p>
 
             <div className="flex gap-4 sm:justify-start justify-center">
-              <Link href="/rooms">
+              <Link href={`/${lang}/rooms`}>
                 <Button className="bg-[#39759E] hover:bg-[#39759E] flex items-center gap-2">
                   <Search size={16} />
                   {isSpanish ? "Buscar" : "Search"}
                 </Button>
               </Link>
 
-              <Link href="/registro">
+              <Link href={`/${lang}/registro`}>
                 <Button variant="outline">
                   {isSpanish ? "Registrarse" : "Register"}
                 </Button>

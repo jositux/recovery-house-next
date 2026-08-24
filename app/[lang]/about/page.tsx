@@ -19,9 +19,8 @@ export default function AboutUsClient() {
       <div className="container mx-auto px-4 py-16 max-w-4xl">
         <div className="mb-12">
           <h1
-            className={`${fraunces.className} text-3xl font-normal mb-6  text-[#162F40]`}
+            className={`${fraunces.className} text-3xl font-normal mb-6 text-[#162F40]`}
           >
-          
             {isSpanish ? "Sobre Nosotros" : "About Us"}
           </h1>
         </div>
@@ -29,12 +28,26 @@ export default function AboutUsClient() {
         <div className="prose prose-neutral dark:prose-invert max-w-none">
           {/* Historia / Introducción */}
           <section className="mb-12">
+            {/* Primer Párrafo */}
             <p className="leading-relaxed mb-6">
               {isSpanish
                 ? "Fundados en 2025, comenzamos con una idea simple: transformar y mejorar la experiencia del turismo médico a nivel mundial. Imaginamos una plataforma integral donde los pacientes pudieran acceder a todo lo necesario para su viaje de salud, bienestar y belleza dentro de un ecosistema seguro, confiable y completamente equipado. Al reunir a clínicas líderes, profesionales de la salud, alojamientos y proveedores de servicios complementarios, facilitamos a los pacientes la navegación por las complejidades de recibir atención lejos de casa."
                 : "Founded in 2025, we began with a simple idea: to transform and improve the medical tourism experience worldwide. We envisioned a one-stop platform where patients could access everything they need for their health, wellness, and beauty journey within one secure, trusted, and well-equipped ecosystem. By bringing together leading clinics, healthcare professionals, accommodations, and complementary service providers, we make it easier for patients to navigate the complexities of receiving care away from home."}
             </p>
 
+            {/* 🎬 Video de YouTube (Ubicado debajo del primer párrafo) */}
+            <div className="my-8 overflow-hidden rounded-[14px] shadow-lg aspect-video w-full not-prose">
+              <iframe
+                className="w-full h-full border-0"
+                src="https://www.youtube.com/embed/qqNjnkc7Vrs"
+                title="About Us Video"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              />
+            </div>
+
+            {/* Segundo Párrafo */}
             <p className="leading-relaxed">
               {isSpanish
                 ? "Atrás quedaron los días de sentirse inseguro o desprotegido al explorar el turismo médico. Nos encargamos de la logística que rodea tu estadía y te conectamos con algunas de las mejores clínicas y proveedores de servicios que ofrece cada destino, permitiéndote concentrarte en lo más importante: tu salud, bienestar y experiencia. Dondequiera que te lleve tu viaje, nuestro objetivo es brindarte la confianza, la conveniencia y el apoyo que necesitas para perseguir tus metas de bienestar de manera segura y cómoda en cualquier lugar del mundo."
@@ -45,7 +58,9 @@ export default function AboutUsClient() {
           {/* Misión y Visión */}
           <section className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12 not-prose">
             <div className="bg-card border border-border p-6 rounded-xl shadow-sm">
-              <h2 className={`${fraunces.className} text-xl md:text-2xl font-normal mb-3 text-foreground`}>
+              <h2
+                className={`${fraunces.className} text-xl md:text-2xl font-normal mb-3 text-foreground`}
+              >
                 {isSpanish ? "Misión" : "Mission"}
               </h2>
               <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
@@ -56,7 +71,9 @@ export default function AboutUsClient() {
             </div>
 
             <div className="bg-card border border-border p-6 rounded-xl shadow-sm">
-              <h2 className={`${fraunces.className} text-xl md:text-2xl font-normal mb-3 text-foreground`}>
+              <h2
+                className={`${fraunces.className} text-xl md:text-2xl font-normal mb-3 text-foreground`}
+              >
                 {isSpanish ? "Visión" : "Vision"}
               </h2>
               <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
@@ -66,18 +83,6 @@ export default function AboutUsClient() {
               </p>
             </div>
           </section>
-
-          {/* 🎬 Video de YouTube oculto (display: none via Tailwind 'hidden') */}
-          <div className="mt-8 overflow-hidden rounded-[14px] shadow-lg aspect-video w-full">
-            <iframe
-              className="w-full h-full border-0"
-              src="https://www.youtube.com/embed/qqNjnkc7Vrs"
-              title="About Us Video"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerPolicy="strict-origin-when-cross-origin"
-              allowFullScreen
-            />
-          </div>
         </div>
       </div>
     </div>
