@@ -32,7 +32,7 @@ export function RoomHero({ imageSrc, propertyName, images, lang }: RoomHeroProps
 
       {images.length > 1 && (
         <div className="container relative mx-auto px-4 lg:px-20">
-          <div className="absolute left-20 bottom-8">
+          <div className="absolute left-1/2 -translate-x-1/2 bottom-8">
             <PopupSwiperGallery
   images={images}
   buttonText={isSpanish ? "Ver todas las fotos" : "View all photos"}
