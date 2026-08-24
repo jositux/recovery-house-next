@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 export async function POST(request: Request) {
     try {
         // Destructure new fields from the request body
-        const {email, password } = await request.json();
+        const {email, password, lang } = await request.json();
 
         // --- Server-side validation (Step 3) ---
         // Validate all required fields
@@ -92,9 +92,16 @@ export async function POST(request: Request) {
             verification_url: verification_url,
         };
 
+        // Directus manda el email de verificación en el idioma indicado por este header
+        // (confirmado con el equipo de backend: espera 'es-AR' / 'en-US', no 'es'/'en').
+        const userLanguage = lang === 'en' ? 'en-US' : 'es-AR';
+
         const response = await fetch(`${directusUrl}/users/register`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'X-User-Language': userLanguage,
+            },
             body: JSON.stringify(payload),
         });
 

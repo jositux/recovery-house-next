@@ -57,6 +57,7 @@ export default function RegistrationPage() {
         password: values.password, // From form
         initialRole: "Patient", // Default role
         verification_url: "https://recoverycaresolutions.com/user/verify", // Keep verification URL
+        lang, // Para que Directus mande el email de verificación en el idioma correcto
       };
 
       const response = await simpleRegisterService.register(registerData);

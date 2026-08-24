@@ -15,7 +15,8 @@ export interface RegisterCredentials {
   email: string;
   password: string;
   initialRole: "Patient" | "PropertyOwner" | "ServiceProvider";
-  verification_url: string
+  verification_url: string;
+  lang?: string;
 }
 
 export interface RegisterResponse {
