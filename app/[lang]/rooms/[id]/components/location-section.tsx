@@ -9,7 +9,7 @@ export function LocationSection({ latitude, longitude }: LocationSectionProps) {
   return (
     <div className="mb-8">
        <div className="h-[300px] w-full relative rounded-lg overflow-hidden">
-        <GoogleMap lat={latitude} lng={longitude} />
+        <GoogleMap lat={latitude} lng={longitude} showMarker={false} />
       </div>
     </div>
   )

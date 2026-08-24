@@ -7,9 +7,10 @@ interface GoogleMapProps {
   lat: number
   lng: number
   apiKey?: string
+  showMarker?: boolean
 }
 
-export function GoogleMap({ lat, lng, apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }: GoogleMapProps) {
+export function GoogleMap({ lat, lng, apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY, showMarker = true }: GoogleMapProps) {
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstance = useRef<google.maps.Map | null>(null)
   const markerInstance = useRef<google.maps.Marker | null>(null)
@@ -38,22 +39,24 @@ export function GoogleMap({ lat, lng, apiKey = process.env.NEXT_PUBLIC_GOOGLE_MA
             zoomControl: true,
           })
 
-          // Crear el marcador
-          markerInstance.current = new google.maps.Marker({
-            position: { lat, lng },
-            map: mapInstance.current,
-            title: "Ubicación seleccionada",
-            animation: google.maps.Animation.DROP,
-          })
+          if (showMarker) {
+            // Crear el marcador
+            markerInstance.current = new google.maps.Marker({
+              position: { lat, lng },
+              map: mapInstance.current,
+              title: "Ubicación seleccionada",
+              animation: google.maps.Animation.DROP,
+            })
 
-          // Agregar InfoWindow al marcador
-          const infoWindow = new google.maps.InfoWindow({
-            content: "Ubicación seleccionada",
-          })
+            // Agregar InfoWindow al marcador
+            const infoWindow = new google.maps.InfoWindow({
+              content: "Ubicación seleccionada",
+            })
 
-          markerInstance.current.addListener("click", () => {
-            infoWindow.open(mapInstance.current, markerInstance.current)
-          })
+            markerInstance.current.addListener("click", () => {
+              infoWindow.open(mapInstance.current, markerInstance.current)
+            })
+          }
         } else {
           // Actualizar posición del mapa y marcador
           const newPosition = { lat, lng }
@@ -79,7 +82,7 @@ export function GoogleMap({ lat, lng, apiKey = process.env.NEXT_PUBLIC_GOOGLE_MA
         mapInstance.current = null
       }
     }
-  }, [lat, lng, apiKey])
+  }, [lat, lng, apiKey, showMarker])
 
   if (!apiKey) {
     return (
