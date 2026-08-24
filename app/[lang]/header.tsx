@@ -175,7 +175,7 @@ export function Header({
             <Button
               size="icon"
               variant="ghost"
-              className="md:hidden h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 text-white shrink-0"
+              className="h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 text-white shrink-0"
               onClick={toggleMenu}
               aria-label="Abrir menú"
             >
@@ -215,7 +215,7 @@ export function Header({
       {/* SLIDE-OVER HAMBURGUESA */}
       <AnimatePresence>
         {isMenuOpen && (
-          <div className="fixed inset-0 z-[100] md:hidden">
+          <div className="fixed inset-0 z-[100]">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

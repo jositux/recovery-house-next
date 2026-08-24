@@ -14,17 +14,14 @@ const fraunces = Fraunces({ subsets: ["latin"] })
 const variants = {
   enter: (direction: number) => ({
     x: direction > 0 ? "100%" : "-100%",
-    opacity: 0,
   }),
   center: {
     zIndex: 1,
     x: 0,
-    opacity: 1,
   },
   exit: (direction: number) => ({
     zIndex: 0,
     x: direction < 0 ? "100%" : "-100%",
-    opacity: 0,
   }),
 }
 
@@ -109,7 +106,6 @@ export function HeroSlider({ lang = "es" }: HeroSliderProps) {
             exit="exit"
             transition={{
               x: { type: "tween", ease: [0.25, 1, 0.5, 1], duration: 0.65 },
-              opacity: { duration: 0.4 },
             }}
             className={styles.slide}
           >
