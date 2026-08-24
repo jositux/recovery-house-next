@@ -44,8 +44,8 @@ const CheckoutPage = () => {
   }, [router]);
 
   return (
-    <main>
-      <div className="max-w-screen-lg mx-auto my-8">
+   <main className="bg-white">
+      <div className="max-w-screen-lg mx-auto py-8">
         {bookingData && Object.keys(bookingData).length > 0 ? (
           <CheckoutForm bookingData={bookingData} lang={lang}/>
         ) : (
