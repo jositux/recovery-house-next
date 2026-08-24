@@ -68,10 +68,10 @@ export default function AboutUsClient() {
           </section>
 
           {/* 🎬 Video de YouTube oculto (display: none via Tailwind 'hidden') */}
-          <div className="hidden mt-8 overflow-hidden rounded-[14px] shadow-lg aspect-video w-full">
+          <div className="mt-8 overflow-hidden rounded-[14px] shadow-lg aspect-video w-full">
             <iframe
               className="w-full h-full border-0"
-              src="https://www.youtube.com/embed/uclDGx0GLz8"
+              src="https://www.youtube.com/embed/qqNjnkc7Vrs"
               title="About Us Video"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               referrerPolicy="strict-origin-when-cross-origin"
