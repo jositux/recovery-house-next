@@ -59,7 +59,7 @@ export function HeroSlider({ lang = "es" }: HeroSliderProps) {
           ? "Proveedores de todo el mundo en áreas de salud esperan para atenderte"
           : "Health providers from all over the world are ready to assist you",
       image: "/assets/hero/3.png",
-      backgroundImage: "/assets/hero/background.jpg",
+      backgroundImage: "/assets/hero/hero-bg.jpg",
       url: `/${lang}/rooms`,
     },
     {
@@ -68,7 +68,7 @@ export function HeroSlider({ lang = "es" }: HeroSliderProps) {
           ? "Un espacio pensado para tu recuperación, bienestar y tranquilidad en cada paso"
           : "A space designed for your recovery, wellness, and peace of mind at every step",
       image: "/assets/hero/4.png",
-      backgroundImage: "/assets/hero/background.jpg",
+      backgroundImage: "/assets/hero/hero-bg.jpg",
       url: `/${lang}/rooms`,
     },
   ]
