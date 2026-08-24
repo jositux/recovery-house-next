@@ -62,6 +62,15 @@ export function HeroSlider({ lang = "es" }: HeroSliderProps) {
       backgroundImage: "/assets/hero/background.jpg",
       url: `/${lang}/rooms`,
     },
+    {
+      title:
+        lang === "es"
+          ? "Un espacio pensado para tu recuperación, bienestar y tranquilidad en cada paso"
+          : "A space designed for your recovery, wellness, and peace of mind at every step",
+      image: "/assets/hero/4.png",
+      backgroundImage: "/assets/hero/background.jpg",
+      url: `/${lang}/rooms`,
+    },
   ]
 
   const slideIndex = Math.abs(page) % slides.length
@@ -127,7 +136,7 @@ export function HeroSlider({ lang = "es" }: HeroSliderProps) {
                 </h1>
 
                 {/* 🛑 Detiene la propagación del evento de arrastre sobre el botón */}
-                <div 
+                <div
                   className="w-fit cursor-pointer"
                   onPointerDownCapture={(e) => e.stopPropagation()}
                 >

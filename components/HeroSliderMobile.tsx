@@ -35,6 +35,13 @@ export function HeroSliderMobile({ lang = "es" }: HeroSliderMobileProps) {
       imageSrc: "/assets/hero-mobile/3.jpg",
       url: `/${lang}/rooms`,
     },
+    {
+      title: isSpanish
+        ? "Un espacio pensado para tu recuperación, bienestar y tranquilidad en cada paso"
+        : "A space designed for your recovery, wellness, and peace of mind at every step",
+      imageSrc: "/assets/hero-mobile/4.jpg",
+      url: `/${lang}/rooms`,
+    },
   ]
 
   const cards = [...baseCards, ...baseCards, ...baseCards]
@@ -116,7 +123,7 @@ export function HeroSliderMobile({ lang = "es" }: HeroSliderMobileProps) {
     setIsDragging(true)
     sliderRef.current.style.scrollBehavior = "auto"
     sliderRef.current.style.scrollSnapType = "none"
-    
+
     const pageX = getPageX(e)
     setStartX(pageX - sliderRef.current.offsetLeft)
     setScrollLeft(sliderRef.current.scrollLeft)
@@ -124,7 +131,7 @@ export function HeroSliderMobile({ lang = "es" }: HeroSliderMobileProps) {
 
   const handleDragMove = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
     if (!isDragging || !sliderRef.current) return
-    
+
     const pageX = getPageX(e)
     const x = pageX - sliderRef.current.offsetLeft
     const walk = x - startX
