@@ -15,7 +15,7 @@ export default function TermsAndConditionsPage() {
     <div className="min-h-screen bg-[#F8F8F7] text-[#162F40]">
       <div className="container mx-auto px-4 py-16 max-w-4xl">
         <div className="mb-12 border-b border-gray-200 pb-8">
-          <h1 className={`${fraunces.className} text-2xl md:text-4xl font-normal mb-3 text-[#162F40]`}>
+          <h1 className={`${fraunces.className} text-3xl md:text-3xl font-normal mb-3 text-[#162F40]`}>
             {isSpanish ? "Condiciones Generales de Uso" : "General Terms of Use"}
           </h1>
           <h3 className={`${fraunces.className} text-[16px] md:text-xl font-normal text-[#39759E]`}>

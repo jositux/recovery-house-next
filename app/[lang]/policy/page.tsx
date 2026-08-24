@@ -32,7 +32,7 @@ export default function TermsAndConditionsPage() {
         {/* Header Principal */}
         <div className="mb-12">
           <h1
-            className={`${fraunces.className} text-2xl md:text-4xl font-normal mb-6 text-balance`}
+            className={`${fraunces.className} text-3xl md:text-3xl font-normal mb-6 text-[#162F40]`}
           >
             {isSpanish
               ? "Términos y Condiciones de Uso"

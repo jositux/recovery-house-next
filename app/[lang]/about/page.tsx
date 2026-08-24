@@ -19,8 +19,9 @@ export default function AboutUsClient() {
       <div className="container mx-auto px-4 py-16 max-w-4xl">
         <div className="mb-12">
           <h1
-            className={`${fraunces.className} text-2xl md:text-4xl font-normal mb-6 text-balance`}
+            className={`${fraunces.className} text-3xl font-normal mb-6  text-[#162F40]`}
           >
+          
             {isSpanish ? "Sobre Nosotros" : "About Us"}
           </h1>
         </div>
