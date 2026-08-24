@@ -7,7 +7,7 @@ import { format, parse } from "date-fns";
 // Importar ambos locales
 import { es, enUS } from "date-fns/locale"; 
 import { Button } from "@/components/ui/button";
-import { Search, ChevronDown, Check, X } from "lucide-react";
+import { Search, ChevronDown, Check, X, RotateCcw } from "lucide-react";
 import Image from "next/image";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -212,6 +212,16 @@ const MedicalSearchMobile = ({
     return format(date, isSpanish ? "d MMM" : "MMM d", { locale: currentLocale });
   };
 
+  const handleReset = () => {
+    setSelectedProcedures([]);
+    setLocation("");
+    setStartDate(undefined);
+    setEndDate(undefined);
+    setPatientCount(1);
+    router.push(`/${lang}/rooms`);
+    onSearch();
+  };
+
   const resetStartDate = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -404,20 +414,32 @@ const MedicalSearchMobile = ({
           <NumberInput
             min={1}
             max={50}
-            defaultValue={patientCount} // Usar el estado inicializado
+            value={patientCount} // Controlado: siempre refleja el estado actual (URL o interacción)
             onChange={setPatientCount}
             className="text-white"
           />
         </div>
       </div>
 
-      <Button
-        className="w-full h-12 mt-4 bg-[#1B2B3A] hover:bg-[#2C3E50] text-white flex items-center justify-center gap-2"
-        onClick={handleSearch}
-      >
-        <Search className="w-5 h-5" />
-        {isSpanish ? "Buscar" : "Search"} 
-      </Button>
+      <div className="flex gap-2 mt-4">
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className="h-12 w-12 shrink-0 bg-white hover:bg-gray-100 text-[#162F40] border-0"
+          onClick={handleReset}
+          aria-label={isSpanish ? "Restablecer filtros" : "Reset filters"}
+        >
+          <RotateCcw className="w-5 h-5" />
+        </Button>
+        <Button
+          className="flex-1 h-12 bg-[#1B2B3A] hover:bg-[#2C3E50] text-white flex items-center justify-center gap-2"
+          onClick={handleSearch}
+        >
+          <Search className="w-5 h-5" />
+          {isSpanish ? "Buscar" : "Search"}
+        </Button>
+      </div>
     </div>
   );
 };

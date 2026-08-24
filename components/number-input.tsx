@@ -7,6 +7,9 @@ import { Plus, Minus } from 'lucide-react'
 interface NumberInputProps {
   min?: number
   max?: number
+  // Si se pasa `value`, el componente queda controlado por el padre (siempre
+  // muestra ese valor). `defaultValue` solo se usa como semilla cuando no hay `value`.
+  value?: number
   defaultValue?: number
   onChange?: (value: number) => void
   className?: string // Agregamos el prop className
@@ -15,21 +18,24 @@ interface NumberInputProps {
 export function NumberInput({
   min = 1,
   max = 50,
+  value,
   defaultValue = 1,
   onChange,
   className // Desestructuramos el prop className
 }: NumberInputProps) {
-  const [value, setValue] = useState(defaultValue)
+  const [internalValue, setInternalValue] = useState(defaultValue)
+  const isControlled = value !== undefined
+  const currentValue = isControlled ? value : internalValue
 
   const handleIncrement = () => {
-    const newValue = Math.min(max, value + 1)
-    setValue(newValue)
+    const newValue = Math.min(max, currentValue + 1)
+    if (!isControlled) setInternalValue(newValue)
     onChange?.(newValue)
   }
 
   const handleDecrement = () => {
-    const newValue = Math.max(min, value - 1)
-    setValue(newValue)
+    const newValue = Math.max(min, currentValue - 1)
+    if (!isControlled) setInternalValue(newValue)
     onChange?.(newValue)
   }
 
@@ -40,7 +46,7 @@ export function NumberInput({
         variant="outline"
         size="icon"
         onClick={handleDecrement}
-        disabled={value <= min}
+        disabled={currentValue <= min}
         className="w-6 h-6 rounded-full border-gray-400 text-[#162F40] hover:bg-gray-200"
       >
         <Minus className="h-5 w-5" />
@@ -48,7 +54,7 @@ export function NumberInput({
 
       {/* Aplicamos el className al div que contiene el valor */}
       <div className={`w-8 text-center text-xl font-medium ${className}`}>
-        {value}
+        {currentValue}
       </div>
 
       <Button
@@ -56,7 +62,7 @@ export function NumberInput({
         variant="outline"
         size="icon"
         onClick={handleIncrement}
-        disabled={value >= max}
+        disabled={currentValue >= max}
         className="w-6 h-6 rounded-full border-gray-400 text-[#162F40] hover:bg-gray-200"
       >
         <Plus className="h-5 w-5" />
