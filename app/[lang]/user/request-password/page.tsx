@@ -37,7 +37,10 @@ export default function ForgotPassword() {
         },
         body: JSON.stringify({
           email,
-          reset_url: `${window.location.origin}/${lang}/user/reset-password`
+          // Sin el segmento de idioma: así coincide con las entradas de
+          // PASSWORD_RESET_URL_ALLOW_LIST en Directus (no tienen /es//en/).
+          // El middleware detecta el idioma y redirige preservando el ?token=.
+          reset_url: `${window.location.origin}/user/reset-password`
         }),
       });
       
