@@ -1,5 +1,6 @@
 // app/api/register/route.ts
 import { NextResponse } from 'next/server';
+import { DIRECTUS_URL } from '@/lib/directus';
 
 // Mensaje único para cualquier caso de "no se puede registrar con este email"
 // (ya activo, suspendido, o duplicado en Directus), para no revelar el estado
@@ -27,14 +28,16 @@ export async function POST(request: Request) {
         // --- End Validation ---
 
 
-        const directusUrl = process.env.NEXT_PUBLIC_SITE_BACKEND_URL;
+        // Habla directo con Directus en vez de auto-referenciarse por el dominio
+        // público (evita un round-trip innecesario a través de este mismo sitio).
+        const directusUrl = DIRECTUS_URL;
 
         const appUrl = process.env.NEXT_PUBLIC_APP_URL; // Read the app URL from env
         //const roleId = process.env.DIRECTUS_REGISTER_ROLE_ID; // Role ID is commented out, assuming default role or handled by Directus
         const supervisorToken = process.env.DIRECTUS_USER_SUPERVISOR_TOKEN; // Read supervisor token
 
-        if (!directusUrl || !appUrl || !supervisorToken) { // Check for all required URLs and token
-            console.error('Directus URL, App URL, or Supervisor Token missing in environment variables.');
+        if (!appUrl || !supervisorToken) { // Check for all required URLs and token
+            console.error('App URL or Supervisor Token missing in environment variables.');
             return NextResponse.json({ message: 'Server configuration error' }, { status: 500 });
         }
 

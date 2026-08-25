@@ -56,7 +56,10 @@ export default function RegistrationPage() {
         email: values.email, // From form
         password: values.password, // From form
         initialRole: "Patient", // Default role
-        verification_url: "https://recoverycaresolutions.com/user/verify", // Keep verification URL
+        // Nota: /api/register ignora este campo y arma su propia verification_url
+        // en el servidor con NEXT_PUBLIC_APP_URL; se corrige igual para no dejar
+        // el dominio viejo (sin www) dando vueltas como dead code confuso.
+        verification_url: `${process.env.NEXT_PUBLIC_APP_URL}/user/verify`,
         lang, // Para que Directus mande el email de verificación en el idioma correcto
       };
 
