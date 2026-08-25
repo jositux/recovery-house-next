@@ -39,7 +39,7 @@ export default function AboutUsClient() {
             <div className="my-8 overflow-hidden rounded-[14px] shadow-lg aspect-video w-full not-prose">
               <iframe
                 className="w-full h-full border-0"
-                src="https://www.youtube.com/embed/qqNjnkc7Vrs"
+                src="https://www.youtube.com/embed/dr7RcXp38Hk"
                 title="About Us Video"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 referrerPolicy="strict-origin-when-cross-origin"
