@@ -564,10 +564,10 @@ export default function TermsAndConditionsPage() {
               <div className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-primary" />
                 <a
-                  href="mailto:manager@recoverycaresolutions.com"
+                  href="mailto:admin@recoverycaresolutions.com"
                   className="text-primary hover:underline text-sm md:text-base"
                 >
-                  manager@recoverycaresolutions.com
+                  admin@recoverycaresolutions.com
                 </a>
               </div>
               <div className="flex items-center gap-3">
