@@ -15,7 +15,8 @@ import {
 } from "lucide-react"
 
 
-import { type Locale } from "@/lib/i18n" 
+import { type Locale } from "@/lib/i18n"
+import { RegisterServiceTrigger } from "@/components/RegisterServiceTrigger"
 
 interface SidebarContentProps {
   userName: string
@@ -74,6 +75,7 @@ export function SidebarContent({ userName, lang, onLogout, onNavigate }: Sidebar
       // Rutas corregidas para incluir el prefijo de idioma
       href: `/${lang}/mi-panel/registrar-servicio`,
       icon: PlusCircle,
+      isServiceTrigger: true,
     },
   ]
 
@@ -88,16 +90,21 @@ export function SidebarContent({ userName, lang, onLogout, onNavigate }: Sidebar
           // Para que el enlace activo funcione correctamente con las rutas localizadas
           const isActive = pathname === item.href
           const Icon = item.icon
+          const itemClassName = `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors w-full text-left ${
+            isActive ? "bg-[#39759E] text-white" : "text-gray-700 hover:bg-gray-100"
+          }`
+
+          if (item.isServiceTrigger) {
+            return (
+              <RegisterServiceTrigger key={item.href} lang={lang} className={itemClassName} onTriggerClick={onNavigate}>
+                <Icon className="w-5 h-5" />
+                <span className="font-medium">{item.name}</span>
+              </RegisterServiceTrigger>
+            )
+          }
 
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onNavigate}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                isActive ? "bg-[#39759E] text-white" : "text-gray-700 hover:bg-gray-100"
-              }`}
-            >
+            <Link key={item.href} href={item.href} onClick={onNavigate} className={itemClassName}>
               <Icon className="w-5 h-5" />
               <span className="font-medium">{item.name}</span>
             </Link>

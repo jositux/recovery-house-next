@@ -5,6 +5,7 @@ import { Plus, Building, HandHeart, Search } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { syncAuthCookies } from "@/utils/syncAuthCookies"
+import { RegisterServiceTrigger } from "@/components/RegisterServiceTrigger"
 
 
 export function MenuActions({ lang = "es" }: { lang?: string }) { // Usamos directamente la prop 'lang'
@@ -73,14 +74,10 @@ export function MenuActions({ lang = "es" }: { lang?: string }) { // Usamos dire
           </li>
 
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-            <button
-              // La ruta aquí no necesita el prefijo, lo añade navigateWithAuth
-              onClick={() => navigateWithAuth("/mi-panel/registrar-servicio")} 
-              className="flex items-center gap-2 w-full text-left"
-            >
+            <RegisterServiceTrigger lang={lang} className="flex items-center gap-2 w-full text-left" onTriggerClick={closeMenu}>
               <HandHeart className="w-4 h-4" />
               {isSpanish ? "Agregar Servicio" : "Add Service"}
-            </button>
+            </RegisterServiceTrigger>
           </li>
 
           <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
