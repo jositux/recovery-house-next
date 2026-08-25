@@ -123,7 +123,7 @@ function SubscriptionPlans() {
     // Plan Anual
     annualTitle: isSpanish ? "Plan Anual" : "Annual Plan",
     annualDescription: isSpanish ? "Máxima visibilidad y herramientas" : "Maximum visibility and tools",
-    annualDuration: isSpanish ? " / año" : " / year",
+    annualDuration: isSpanish ? " por año" : " per month",
     annualFeatures: [
       isSpanish ? "Aparición prioritaria en búsquedas" : "Priority appearance in searches",
       isSpanish ? "Visible en todas las habitaciones relacionadas" : "Visible in all related rooms",
