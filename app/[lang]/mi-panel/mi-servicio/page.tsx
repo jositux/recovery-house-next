@@ -21,6 +21,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { CollectionExtraTagsService } from "@/components/collectionExtraTagsService";
+import { getAssetUrl } from "@/lib/getAssetUrl";
 
 import {
   CheckCircle,
@@ -326,7 +327,7 @@ export default function ProviderDataPage() {
                         
                         {provider.RNTFile ? (
                             <a
-                                href={`/webapi/assets/${provider.RNTFile.id}`}
+                                href={getAssetUrl(provider.RNTFile.id)}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center text-sm font-semibold text-blue-700 bg-blue-100 py-1 px-2 rounded-md hover:bg-blue-200 transition duration-150 group"
@@ -355,7 +356,7 @@ export default function ProviderDataPage() {
                         </p>
                         {provider.taxIdEINFile ? (
                             <a
-                                href={`/webapi/assets/${provider.taxIdEINFile.id}`}
+                                href={getAssetUrl(provider.taxIdEINFile.id)}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center text-sm font-semibold text-blue-700 bg-blue-100 py-1 px-2 rounded-md hover:bg-blue-200 transition duration-150 group"

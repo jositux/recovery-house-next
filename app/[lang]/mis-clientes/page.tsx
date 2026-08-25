@@ -11,6 +11,7 @@ import Image from "next/image"
 import ReviewModal from "@/components/booking-list/ReviewModal"
 import { Calendar, Users, DollarSign, Home, Star, Loader2, Search } from "lucide-react"
 import Link from "next/link"
+import { getAssetUrl } from "@/lib/getAssetUrl";
 
 interface Photo {
   directus_files_id: {
@@ -290,7 +291,7 @@ const BookingList: React.FC = () => {
                                   <Image
                                     src={
                                       roomDetails?.photos[0]?.directus_files_id.id
-                                        ? `/webapi/assets/${roomDetails.photos[0]?.directus_files_id.id}?key=medium`
+                                        ? getAssetUrl(roomDetails.photos[0]?.directus_files_id.id, "medium")
                                         : "/placeholder.svg?height=400&width=600"
                                     }
                                     alt={roomDetails?.name || "Room image"}
@@ -416,7 +417,7 @@ const BookingList: React.FC = () => {
                                   <Image
                                     src={
                                       roomDetails?.photos[0]?.directus_files_id.id
-                                        ? `/webapi/assets/${roomDetails.photos[0]?.directus_files_id.id}?key=medium`
+                                        ? getAssetUrl(roomDetails.photos[0]?.directus_files_id.id, "medium")
                                         : "/placeholder.svg?height=400&width=600"
                                     }
                                     alt={roomDetails?.name || "Room image"}

@@ -11,6 +11,7 @@ import { es, enUS } from "date-fns/locale"; // Importamos 'enUS'
 import Link from 'next/link'
 import { useParams } from "next/navigation";
 import { type Locale } from "@/lib/i18n"
+import { getAssetUrl } from "@/lib/getAssetUrl";
 
 
 interface BookingData {
@@ -417,7 +418,7 @@ function BookingSummary({
   <Image
     src={
       bookingData.photo
-        ? `/webapi/assets/${bookingData.photo}?key=medium`
+        ? getAssetUrl(bookingData.photo, "medium")
         : "/assets/empty.jpg"
     }
     alt={bookingData.roomName || "Foto de habitación"}

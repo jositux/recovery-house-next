@@ -6,6 +6,7 @@ import { useState, useRef } from "react"
 import { X, Upload, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { getAssetUrl } from "@/lib/getAssetUrl";
 
 // --- Translation Interfaces and Data ---
 
@@ -125,7 +126,7 @@ export function SingleImageUploaderWithId({
       return URL.createObjectURL(newFile)
     }
     if (existingImageId) {
-      return `/webapi/assets/${existingImageId}?key=medium`
+      return getAssetUrl(existingImageId, "medium")
     }
     return null
   }

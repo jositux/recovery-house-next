@@ -18,6 +18,7 @@ import {
   Edit,
 } from "lucide-react";
 import { InfoItem } from "./info-item";
+import { getAssetUrl } from "@/lib/getAssetUrl";
 import { useRouter } from "next/navigation";
 import { type Locale } from "@/lib/i18n"; // Importación requerida
 
@@ -322,7 +323,7 @@ export const BookingCard = ({
           <Image
             src={
               roomDetails?.photos[0]?.directus_files_id.id
-                ? `/webapi/assets/${roomDetails.photos[0]?.directus_files_id.id}?key=medium`
+                ? getAssetUrl(roomDetails.photos[0]?.directus_files_id.id, "medium")
                 : "/placeholder.svg?height=400&width=600"
             }
             alt={roomDetails?.name || t.room}

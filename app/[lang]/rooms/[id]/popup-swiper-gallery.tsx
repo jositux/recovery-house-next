@@ -104,10 +104,10 @@ export function PopupSwiperGallery({
 
             {/* Botones de navegación personalizados */}
             <div className="swiper-button-prev !w-8 !h-8 !bg-white/80 hover:!bg-white !shadow-md !rounded-full !text-gray-800 !left-4">
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="!h-4 !w-4 !fill-none" />
             </div>
             <div className="swiper-button-next !w-8 !h-8 !bg-white/80 hover:!bg-white !shadow-md !rounded-full !text-gray-800 !right-4">
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="!h-4 !w-4 !fill-none" />
             </div>
           </Swiper>
 

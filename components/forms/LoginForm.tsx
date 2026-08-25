@@ -11,7 +11,6 @@ import { Input } from "@/components/ui/input"
 import axios from "axios"
 import { useRouter } from "next/navigation"
 import { loginService, type LoginCredentials } from "@/services/loginService"
-import { getCurrentUser, type User } from "@/services/userService"
 import Link from "next/link"
 
 // --- Translation Interfaces and Data ---
@@ -113,19 +112,17 @@ export function LoginForm({ lang }: LoginFormProps) {
     setIsLoading(true)
     setAuthError(null) // Limpiar mensajes de error previos
     try {
-      const response = await loginService.login(values as LoginCredentials)
+      const { user: currentUser, expires } = await loginService.login(values as LoginCredentials)
+      // Los tokens reales quedan en cookies httpOnly (los setea /api/auth/login).
+      // Acá solo guardamos un marcador no sensible para que el resto de la app
+      // (guards de "¿hay sesión?" y el middleware de páginas) sepan que hay sesión activa.
+      localStorage.setItem("expires", expires)
+      localStorage.setItem("refresh_token", "active")
+      localStorage.setItem("access_token", "active")
 
-      // Store in localStorage for client-side access
-      localStorage.setItem("expires", response.data.expires)
-      localStorage.setItem("refresh_token", response.data.refresh_token)
-      localStorage.setItem("access_token", response.data.access_token)
-      
-      // Store in cookies for middleware auth check
-      document.cookie = `access_token=${response.data.access_token}; path=/; max-age=${60*60*24*7}` // 7 days
-      document.cookie = `refresh_token=${response.data.refresh_token}; path=/; max-age=${60*60*24*30}` // 30 days
-      
-      const currentUser: User = await getCurrentUser(response.data.access_token);
-      console.log(currentUser)
+      document.cookie = `access_token=active; path=/; max-age=${60*60*24*7}` // 7 days
+      document.cookie = `refresh_token=active; path=/; max-age=${60*60*24*30}` // 30 days
+
       const nombre = `${currentUser?.first_name || ''} ${currentUser?.last_name || ''}`.trim();
 
       localStorage.setItem("nombre", nombre);

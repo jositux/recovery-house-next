@@ -14,6 +14,7 @@ import { MapPin, Plus, Loader2, BedDouble, Building2, CheckCircle, AlertCircle }
 import Image from "next/image"
 import Link from "next/link"
 import { Fraunces } from "next/font/google"
+import { getAssetUrl } from "@/lib/getAssetUrl";
 
 const fraunces = Fraunces({ subsets: ["latin"] })
 
@@ -186,7 +187,7 @@ const PropertiesPage: React.FC = () => {
                 <div className="relative w-full sm:w-2/5 h-48 sm:h-auto">
                   <Link href={`/${lang}/mi-panel/propiedades/${property.id}`}> {/* Aseguramos que el Link mantenga el idioma */}
                     <Image
-                      src={`/webapi/assets/${property.mainImage || "/placeholder.svg"}?key=medium`}
+                      src={getAssetUrl(property.mainImage || "/placeholder.svg", "medium")}
                       alt={property.name}
                       layout="fill"
                       objectFit="cover"

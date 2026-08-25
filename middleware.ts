@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 // Asegúrate de que este archivo defina 'defaultLocale', 'locales' y 'Locale'
-import { defaultLocale, locales, type Locale } from "./lib/i18n" 
+import { defaultLocale, locales, type Locale } from "./lib/i18n"
+import { AUTH_COOKIE_ACCESS } from "./lib/directus"
 
 // Nombre de la cookie para guardar la preferencia de idioma del usuario
 const LOCALE_COOKIE_NAME = 'NEXT_LOCALE'; 
@@ -109,7 +110,21 @@ function getLocaleFromPath(pathname: string): Locale | null {
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  
+
+  // --- Proxy de /webapi/*: inyecta el Authorization real desde la cookie httpOnly ---
+  // El token nunca vive en JS/localStorage; lo que el cliente mande en este header
+  // (si manda algo) se descarta y se reemplaza por el valor de la cookie httpOnly.
+  if (pathname.startsWith('/webapi/') && !pathname.startsWith('/webapi/assets/')) {
+    const realToken = request.cookies.get(AUTH_COOKIE_ACCESS)?.value;
+    const headers = new Headers(request.headers);
+    if (realToken) {
+      headers.set('Authorization', `Bearer ${realToken}`);
+    } else {
+      headers.delete('Authorization');
+    }
+    return NextResponse.next({ request: { headers } });
+  }
+
   // 1. Chequear si el pathname ya tiene un locale
   let currentLocale = getLocaleFromPath(pathname);
   const pathnameHasLocale = currentLocale !== null;
@@ -225,7 +240,7 @@ export function middleware(request: NextRequest) {
 // Configure which routes the middleware should run on
 export const config = {
   matcher: [
-    // Excluye API routes, estáticos, imágenes, etc.
-    '/((?!api|_next/static|_next/image|assets|webapi|webapi/assets|favicon.ico|placeholder.svg).*)',
+    // Excluye API routes, estáticos, imágenes, etc. webapi/assets (imágenes vía Directus) no necesita auth.
+    '/((?!api|_next/static|_next/image|assets|webapi/assets|favicon.ico|placeholder.svg).*)',
   ],
 };

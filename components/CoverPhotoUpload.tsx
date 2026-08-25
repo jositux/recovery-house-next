@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback } from "react"
 import Image from "next/image"
 import { uploadFile } from "@/services/fileUploadService"
 import { Camera, Loader2, XCircle } from "lucide-react"
+import { getAssetUrl } from "@/lib/getAssetUrl";
 
 interface CoverPhotoUploadProps {
   defaultImageId?: string
@@ -61,7 +62,7 @@ const CoverPhotoUpload: React.FC<CoverPhotoUploadProps> = ({ defaultImageId = ""
         <>
           <div className="absolute inset-0 w-full h-full">
             <Image
-              src={`/webapi/assets/${imageId}?key=medium`}
+              src={getAssetUrl(imageId, "medium")}
               alt="Cover Photo"
               layout="fill"
               objectFit="cover"

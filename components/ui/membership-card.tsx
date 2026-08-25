@@ -2,6 +2,7 @@
 
 import { Medal } from "lucide-react";
 import { cn } from "@/lib/utils";
+import DOMPurify from "dompurify";
 
 interface MembershipCardProps {
   id: string;
@@ -53,7 +54,7 @@ export function MembershipCard({
             "text-sm",
             isSelected ? "text-white/90" : "text-[#162F40]"
           )}
-          dangerouslySetInnerHTML={{ __html: description }}
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(description) }}
         />
       </div>
     </button>

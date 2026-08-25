@@ -10,6 +10,7 @@ import axios from "axios";
 import styles from "./RoomsPage.module.css"; 
 import { EyeOff, Eye } from "lucide-react";
 import { RoomCardShared } from "@/components/ui/room-card3";
+import { getAssetUrl } from "@/lib/getAssetUrl";
 
 // --- TIPOS MOVIDOS DEL ARCHIVO ORIGINAL ---
 
@@ -406,7 +407,7 @@ export function RoomsPageClient({ lang = "es" }: { lang?: string }) {
     () => (image: Image) => {
       return image.isModerated
         ? "/assets/empty.jpg"
-        : `/webapi/assets/${image.id}`;
+        : getAssetUrl(image.id);
     },
     []
   );

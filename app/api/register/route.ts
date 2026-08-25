@@ -1,6 +1,11 @@
 // app/api/register/route.ts
 import { NextResponse } from 'next/server';
 
+// Mensaje único para cualquier caso de "no se puede registrar con este email"
+// (ya activo, suspendido, o duplicado en Directus), para no revelar el estado
+// real de una cuenta a quien esté probando emails.
+const GENERIC_REGISTRATION_ERROR = 'No pudimos completar el registro con estos datos. Si ya tienes una cuenta, inicia sesión o contáctanos.';
+
 export async function POST(request: Request) {
     try {
         // Destructure new fields from the request body
@@ -61,18 +66,15 @@ export async function POST(request: Request) {
 
             if (statusData.data && statusData.data.length > 0) {
                 const userStatus = statusData.data[0].status;
-                if (userStatus === 'active') {
-                    // User exists and is active, prevent re-registration
-                    return NextResponse.json({ message: 'El usuario ya está registrado y verificado. Por favor, inicia sesión.' }, { status: 409 }); // 409 Conflict
-                }
+                // Mensaje y status genéricos independientemente del estado real (active/suspended/etc.)
+                // para no permitir enumerar qué emails existen o en qué estado están.
                 if (userStatus !== 'unverified') {
-                    // User exists and is active, prevent re-registration
-                    return NextResponse.json({ message: 'El usuario esta suspendido. Por favor, contacta con nosotros.' }, { status: 409 }); // 409 Conflict
-                }                
-                // If status is 'unverified' or any other status (like 'invited'), we allow the registration attempt to proceed
-                // This handles cases where the user started registration but didn't verify, or was invited
+                    return NextResponse.json({ message: GENERIC_REGISTRATION_ERROR }, { status: 409 });
+                }
+                // Si está 'unverified' (o invited), dejamos que el intento de registro siga
+                // (permite reintentar verificación sin bloquear al usuario legítimo)
             }
-            // If statusData.data is empty, the user does not exist, proceed with registration
+            // Si statusData.data está vacío, el usuario no existe, se procede con el registro
 
         } catch (statusError) {
             console.error('Error during user status check:', statusError);
@@ -117,7 +119,7 @@ export async function POST(request: Request) {
                     errorMessage = errorData.errors[0].message;
                     // Example: Check for specific error conditions if Directus provides codes/consistent messages
                     if (errorMessage.toLowerCase().includes('value has to be unique')) {
-                        errorMessage = 'Este correo electrónico ya está registrado.';
+                        errorMessage = GENERIC_REGISTRATION_ERROR;
                         statusCode = 409; // Conflict status code is appropriate
                     } else if (errorMessage.toLowerCase().includes('password does not meet')) {
                         errorMessage = 'La contraseña no cumple con los requisitos de seguridad.';

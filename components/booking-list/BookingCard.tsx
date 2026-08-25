@@ -9,6 +9,7 @@ import { es } from "date-fns/locale"
 import Image from "next/image"
 import { Calendar, Users, DollarSign, BedSingle, BedDouble, Star, MapPin, User, Info } from "lucide-react"
 import InfoItem from "./InfoItem"
+import { getAssetUrl } from "@/lib/getAssetUrl";
 
 interface Booking {
   id: string
@@ -126,7 +127,7 @@ const BookingCard: React.FC<BookingCardProps> = ({
           <Image
             src={
               roomDetails?.photos[0]?.directus_files_id.id
-                ? `/webapi/assets/${roomDetails.photos[0]?.directus_files_id.id}?key=medium`
+                ? getAssetUrl(roomDetails.photos[0]?.directus_files_id.id, "medium")
                 : "/placeholder.svg?height=400&width=600"
             }
             alt={roomDetails?.name || "Room image"}

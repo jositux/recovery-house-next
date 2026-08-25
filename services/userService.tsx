@@ -26,23 +26,18 @@ export const getCurrentUser = async (token: string): Promise<User> => {
     // Check if the error is due to an expired token (401 Unauthorized)
     if (axios.isAxiosError(error) && error.response?.status === 401) {
       try {
-        // Get refresh token from localStorage
-        const refreshToken = typeof window !== 'undefined' ? localStorage.getItem("refresh_token") : null;
-        
-        if (!refreshToken) {
-          throw new Error("No refresh token available. Please login again.");
-        }
-        
-        // Attempt to refresh the token
-        const refreshResponse = await loginService.refreshToken(refreshToken);
-        
-        // Retry the original request with the new token
+        // El refresh se hace server-side leyendo la cookie httpOnly; no necesitamos
+        // (ni tenemos) el refresh_token real en el cliente.
+        await loginService.refreshToken();
+
+        // Reintenta la request original: el middleware ya inyecta el Authorization
+        // real (actualizado) desde la cookie httpOnly.
         const newResponse = await axios.get<{ data: User }>("/webapi/users/me", {
           headers: {
-            Authorization: `Bearer ${refreshResponse.data.access_token}`,
+            Authorization: `Bearer ${token}`,
           },
         });
-        
+
         return newResponse.data.data;
       } catch (refreshError) {
         console.error("Error refreshing token:", refreshError instanceof Error ? refreshError.message : 'Unknown error');

@@ -9,6 +9,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getAssetUrl } from "@/lib/getAssetUrl";
 
 interface ProfileImageUploaderProps {
   onImageCropped: (croppedImage: string) => void;
@@ -27,7 +28,7 @@ export function ProfileImageUploader({
   // Use existing avatar if provided
   useEffect(() => {
     if (existingAvatarId) {
-      setAvatarSrc(`/webapi/assets/${existingAvatarId}`);
+      setAvatarSrc(getAssetUrl(existingAvatarId));
     }
   }, [existingAvatarId]);
 

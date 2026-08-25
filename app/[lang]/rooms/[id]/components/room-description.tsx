@@ -1,3 +1,7 @@
+"use client"
+
+import DOMPurify from "dompurify"
+
 interface RoomDescriptionProps {
   description: string
 }
@@ -7,7 +11,10 @@ export function RoomDescription({ description }: RoomDescriptionProps) {
 
   return (
     <div className="mb-8">
-      <div className="text-[#162F40] prose" dangerouslySetInnerHTML={{ __html: description }} />
+      <div
+        className="text-[#162F40] prose"
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(description) }}
+      />
     </div>
   )
 }

@@ -11,6 +11,7 @@ import useTags from "@/hooks/useExtraTags";
 import { fetchCurrentUser } from "@/services/BookingService";
 import { fetchUserById } from "@/services/UserById";
 import { fetchStayData, type Stay } from "@/services/stayService";
+import { getAssetUrl } from "@/lib/getAssetUrl";
 
 // Componentes internos
 import { RoomHero } from "./components/room-hero";
@@ -253,7 +254,7 @@ export function RoomDetailsClient({ lang }: RoomDetailsClientProps) {
     }
     return image.directus_files_id.isModerated
       ? "/assets/empty.jpg"
-      : `/webapi/assets/${image.directus_files_id.id}?key=full`;
+      : getAssetUrl(image.directus_files_id.id, "full");
   }, []);
 
   const imagesSwiper = useMemo(() => {

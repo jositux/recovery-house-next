@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { X, Upload, ImageIcon, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { getAssetUrl } from "@/lib/getAssetUrl";
 
 // --- Translation Interfaces and Data ---
 
@@ -249,7 +250,7 @@ export function MultiImageUploaderWithIds({
             >
               {/* NOTE: Assuming the base URL for existing images */}
               <Image
-                src={`/webapi/assets/${id}?key=medium`}
+                src={getAssetUrl(id, "medium")}
                 alt={`Existing image ${index + 1}`}
                 fill
                 className="object-cover"

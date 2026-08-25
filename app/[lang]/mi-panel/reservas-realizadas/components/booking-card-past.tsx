@@ -18,6 +18,7 @@ import {
   User,
   Info,
 } from "lucide-react";
+import { getAssetUrl } from "@/lib/getAssetUrl";
 import { InfoItem } from "./info-item";
 import { useState, useEffect } from "react";
 import { ReviewModal } from "./ReviewModal";
@@ -391,7 +392,7 @@ export const BookingCardPast = ({
             <Image
               src={
                 roomDetails?.photos[0]?.directus_files_id.id
-                  ? `/webapi/assets/${roomDetails.photos[0]?.directus_files_id.id}?key=medium`
+                  ? getAssetUrl(roomDetails.photos[0]?.directus_files_id.id, "medium")
                   : "/placeholder.svg?height=400&width=600"
               }
               alt={roomDetails?.name || t.room}

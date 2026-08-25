@@ -168,7 +168,7 @@ function SubscriptionPlans() {
             </CardHeader>
             <CardContent className="flex-grow pb-4">
               <p className="text-2xl font-bold mb-2">
-                $100.00 USD<span className="text-sm font-normal">{texts.annualDuration}</span>
+                ${process.env.NEXT_PUBLIC_STRIPE_PRICE_ANNUAL_AMOUNT} USD<span className="text-sm font-normal">{texts.annualDuration}</span>
               </p>
               <ul className="space-y-1 text-sm">
                 {texts.annualFeatures.map((feature, index) => (
@@ -183,10 +183,9 @@ function SubscriptionPlans() {
               <Button
                 onClick={() =>
                   handleSubscribe(
-                    //test
-                    "price_1R7cqLGDJ9gekygzcT6RrHD8",
+                    process.env.NEXT_PUBLIC_STRIPE_PRICE_ANNUAL as string,
                     "annual",
-                    "$100.00"
+                    `$${process.env.NEXT_PUBLIC_STRIPE_PRICE_ANNUAL_AMOUNT}`
                   )
                 }
                 className="bg-[#39759E] w-full text-sm"
@@ -208,7 +207,7 @@ function SubscriptionPlans() {
             </CardHeader>
             <CardContent className="flex-grow pb-4">
               <p className="text-2xl font-bold mb-2">
-                $40.00 USD
+                ${process.env.NEXT_PUBLIC_STRIPE_PRICE_QUARTERLY_AMOUNT} USD
                 <span className="text-sm font-normal">{texts.quarterlyDuration}</span>
               </p>
               <ul className="space-y-1 text-sm">
@@ -224,10 +223,9 @@ function SubscriptionPlans() {
               <Button
                 onClick={() =>
                   handleSubscribe(
-                    //test
-                    "price_1R7ctQGDJ9gekygzhq6qw9Eo",
+                    process.env.NEXT_PUBLIC_STRIPE_PRICE_QUARTERLY as string,
                     "quarterly",
-                    "$40.00"
+                    `$${process.env.NEXT_PUBLIC_STRIPE_PRICE_QUARTERLY_AMOUNT}`
                   )
                 }
                 className="w-full text-sm bg-[#39759E]"

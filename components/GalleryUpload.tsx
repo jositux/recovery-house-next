@@ -6,6 +6,7 @@ import { uploadFile } from "@/services/fileUploadService"
 import { Camera, Loader2, XCircle } from "lucide-react"
 import Image from "next/image"
 import styles from "./GalleryUpload.module.css"
+import { getAssetUrl } from "@/lib/getAssetUrl";
 
 interface UploadedImage {
   id: string
@@ -73,7 +74,7 @@ const GalleryUpload: React.FC<GalleryUploadProps> = ({ initialIds = [], onGaller
             <div className="absolute inset-0 overflow-hidden rounded-md shadow-sm">
               <div className="relative w-full h-full">
                 <Image
-                  src={`/webapi/assets/${image.id}?key=small`}
+                  src={getAssetUrl(image.id, "small")}
                   alt={image.filename_download}
                   layout="fill"
                   objectFit="cover"

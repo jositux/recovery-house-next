@@ -6,6 +6,7 @@ import { useState, useRef } from "react"
 import { X, Upload } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { getAssetUrl } from "@/lib/getAssetUrl";
 
 interface SingleImageUploaderWithIdProps {
   existingImageId?: string
@@ -73,7 +74,7 @@ export function SingleImageUploaderWithId({
       return URL.createObjectURL(newFile)
     }
     if (existingImageId) {
-      return `/webapi/assets/${existingImageId}?key=medium`
+      return getAssetUrl(existingImageId, "medium")
     }
     return null
   }

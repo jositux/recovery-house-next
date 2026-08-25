@@ -1,7 +1,5 @@
 import axios from "axios";
 
-const API_BASE_URL = "/webapi";
-
 /**
  * Limpia el localStorage y las cookies relacionadas con la sesión
  */
@@ -24,28 +22,18 @@ const clearSessionData = (): void => {
 };
 
 /**
- * Realiza el logout en Directus utilizando el refresh token.
- * @param refreshToken - El token de refresco almacenado en localStorage.
+ * Realiza el logout: /api/auth/logout invalida el refresh_token real (en cookie
+ * httpOnly) contra Directus y limpia esas cookies del lado del servidor.
+ * El parámetro se mantiene por compatibilidad con los llamadores existentes pero
+ * ya no se usa (el token real nunca está disponible en el cliente).
  */
-export const logoutUser = async (refreshToken: string): Promise<void> => {
+export const logoutUser = async (_refreshToken?: string): Promise<void> => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/auth/logout`, {
-      refresh_token: refreshToken,
-      mode: "json",
-    });
-    if (response.status === 204) {
-      console.log("Logout exitoso");
-      
-      clearSessionData();
-
-    } else {
-      console.warn("El logout no se completó correctamente:", response);
-    }
+    await axios.post("/api/auth/logout");
   } catch (error) {
     console.error("Error al realizar el logout:", error);
-    
-      clearSessionData();
-    
     throw error; // Propaga el error para manejarlo en el componente
+  } finally {
+    clearSessionData();
   }
 };

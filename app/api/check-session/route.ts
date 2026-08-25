@@ -7,11 +7,7 @@ const stripe = new Stripe(process.env.NEXT_STRIPE_KEY!, {
 
 export async function POST(request: Request) {
   try {
-
-    
     const { sessionId } = await request.json();
-
-    console.log("sessionId ", sessionId);
 
     if (!sessionId) {
       return NextResponse.json({ error: 'Session ID is required' }, { status: 400 });
@@ -19,15 +15,15 @@ export async function POST(request: Request) {
 
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
-    
-
-    if (session.payment_status === 'paid') {
-      // Update your database to mark the user as subscribed
-      // await updateUserSubscriptionStatus(session.client_reference_id, 'active');
-      console.log('Payment successful. Subscription status updated.');
-    }
-
-    return NextResponse.json({ session });
+    // Solo se expone lo que el cliente realmente necesita (el estado del pago).
+    // La sesión completa de Stripe trae PII (email, dirección, monto) que
+    // cualquiera con el sessionId podría leer si la devolviéramos entera.
+    return NextResponse.json({
+      session: {
+        status: session.status,
+        payment_status: session.payment_status,
+      },
+    });
   } catch (error) {
     // Narrow the type of error to properly access its properties
     if (error instanceof Error) {

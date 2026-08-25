@@ -28,6 +28,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { MagicBackButton } from "@/components/ui/magic-back-button";
 import { getCurrentUser } from "@/services/userService";
+import { getAssetUrl } from "@/lib/getAssetUrl";
 import {
   Dialog,
   DialogContent,
@@ -406,7 +407,7 @@ export default function RoomPage() {
   const getImageSrc = (image: ImageType) => {
     return image.isModerated && !isOwner
       ? "/assets/empty.jpg"
-      : `/webapi/assets/${image.id}?key=full`;
+      : getAssetUrl(image.id, "full");
   };
 
   if (isLoading) {

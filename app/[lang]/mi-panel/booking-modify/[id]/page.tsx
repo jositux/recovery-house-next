@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import axios from "axios";
+import DOMPurify from "dompurify";
 import {
   Bed,
   Users,
@@ -523,7 +524,7 @@ export default function BookingModifyPage() {
   const HtmlContent = ({ html }: HtmlContentProps) => {
     if (!html || html.trim() === "") return null;
 
-    return <div className="prose" dangerouslySetInnerHTML={{ __html: html }} />;
+    return <div className="prose" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }} />;
   };
 
   if (isLoading) {

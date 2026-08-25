@@ -13,6 +13,7 @@ import { toZonedTime } from "date-fns-tz";
 import Link from "next/link";
 import { type Locale } from "@/lib/i18n";
 import { useParams } from "next/navigation";
+import { getAssetUrl } from "@/lib/getAssetUrl";
 
 interface BookingData {
   checkIn: string;
@@ -500,7 +501,7 @@ function BookingSummary({
               <Image
                 src={
                   bookingData.photo
-                    ? `/webapi/assets/${bookingData.photo}?key=medium`
+                    ? getAssetUrl(bookingData.photo, "medium")
                     : "/assets/empty.jpg"
                 }
                 alt={bookingData.roomName || "Foto de habitación"}
