@@ -98,13 +98,13 @@ export function RegisterServiceTrigger({ lang, className, children, onTriggerCli
           </DialogHeader>
           <p className="text-sm text-gray-600">{t.description}</p>
           <DialogFooter className="sm:justify-center gap-2">
-            <Link href={`/${lang}/mi-panel/mi-servicio`} className="w-full">
+            <Link href={`/${lang}/mi-panel/mi-servicio`} className="w-full" onClick={() => setShowExisting(false)}>
               <Button variant="outline" className="w-full bg-transparent">
                 <Eye className="mr-2 h-4 w-4" />
                 {t.view}
               </Button>
             </Link>
-            <Link href={`/${lang}/mi-panel/editar-servicio`} className="w-full">
+            <Link href={`/${lang}/mi-panel/editar-servicio`} className="w-full" onClick={() => setShowExisting(false)}>
               <Button className="w-full bg-[#39759E] hover:bg-[#2c5a7a]">
                 <Edit className="mr-2 h-4 w-4" />
                 {t.edit}
