@@ -121,7 +121,7 @@ function SubscriptionPlans() {
       : "Offer your recovery services to more patients. Our subscriptions provide you with visibility and the necessary tools to connect with patients and expand your professional reach.",
     
     // Plan Anual
-    annualTitle: isSpanish ? "Plan Anual" : "Annual Plan",
+    annualTitle: isSpanish ? "Plan Anual (Piloto)" : "Annual Plan (Pilot)",
     annualDescription: isSpanish ? "Máxima visibilidad y herramientas" : "Maximum visibility and tools",
     annualDuration: isSpanish ? " por año" : " per month",
     annualFeatures: [
@@ -133,7 +133,7 @@ function SubscriptionPlans() {
     annualButton: isSpanish ? "Comenzar Plan Anual" : "Start Annual Plan",
 
     // Plan Trimestral
-    quarterlyTitle: isSpanish ? "Plan Trimestral" : "Quarterly Plan",
+    quarterlyTitle: isSpanish ? "Plan Trimestral (Piloto)" : "Quarterly Plan (Pilot)",
     quarterlyDescription: isSpanish ? "Ideal para comenzar" : "Ideal for starting out",
     quarterlyDuration: isSpanish ? " / cada 3 meses" : " / every 3 months",
     quarterlyFeatures: [
