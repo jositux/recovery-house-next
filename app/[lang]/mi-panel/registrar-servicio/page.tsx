@@ -104,8 +104,8 @@ const translations: Record<string, RegisterServiceTranslation> = {
     pageTitle: "Registra tu servicio",
     loadingServiceCheck: "Verificando servicios...",
 
-    cardTitle: "Servicio Cargado",
-    cardDescription: "Has completado exitosamente el registro de tu servicio. Ahora puedes editarlo según tus necesidades.",
+    cardTitle: "Ya tienes un servicio registrado",
+    cardDescription: "Ya cuentas con un servicio activo en la plataforma. Puedes revisarlo o editarlo según tus necesidades.",
     nextSteps: "Próximos pasos:",
     reviewInfo: "Revisa la información de tu servicio",
     updateDetails: "Actualiza tus detalles si es necesario",
@@ -154,8 +154,8 @@ const translations: Record<string, RegisterServiceTranslation> = {
     pageTitle: "Add your service",
     loadingServiceCheck: "Checking services...",
 
-    cardTitle: "Service Loaded",
-    cardDescription: "You have successfully completed the registration of your service. Now you can edit it according to your needs.",
+    cardTitle: "You already have a registered service",
+    cardDescription: "You already have an active service on the platform. You can review it or edit it as needed.",
     nextSteps: "Next steps:",
     reviewInfo: "Review your service information",
     updateDetails: "Update your details if necessary",
@@ -274,7 +274,6 @@ export default function RegisterServicePage() {
 
         if (data.length > 0) {
           setHasExistingService(true)
-          router.push(`/${lang}/mi-panel/mi-servicio`)
         }
       } catch (error) {
         console.error("Error al cargar los datos del proveedor:", error)

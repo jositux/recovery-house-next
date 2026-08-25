@@ -159,7 +159,7 @@ export function BookingWidgetBed({
   
 
   const isDateReserved = useMemo(() => {
-    const reservedDates: string[] = []
+    const reservedDates = new Set<string>()
 
     // Añadir todas las fechas reservadas
     bookings.forEach((booking) => {
@@ -167,7 +167,7 @@ export function BookingWidgetBed({
       const endDate = parseISO(booking.checkOut)
 
       while (currentDate <= endDate) {
-        reservedDates.push(format(currentDate, "yyyy-MM-dd"))
+        reservedDates.add(format(currentDate, "yyyy-MM-dd"))
         currentDate = addDays(currentDate, 1)
       }
     })
@@ -175,13 +175,13 @@ export function BookingWidgetBed({
     // Añadir las fechas deshabilitadas
     if (disableDates) {
       JSON.parse(disableDates).forEach((disabledDate: string) => {
-        reservedDates.push(disabledDate)
+        reservedDates.add(disabledDate)
       })
     }
 
     return (date: Date) => {
       const formattedDate = format(date, "yyyy-MM-dd")
-      return reservedDates.includes(formattedDate)
+      return reservedDates.has(formattedDate)
     }
   }, [bookings, disableDates])
 

@@ -314,7 +314,8 @@ export default function CalendarView({
 
   const [calendarDays, setCalendarDays] = useState<CalendarDay[]>([])
   const dayMapRef = useRef<DayMap>(new Map())
-  const [currentSelection, setCurrentSelection] = useState<Date[]>([])
+  const [currentSelection, setCurrentSelection] = useState<Set<string>>(new Set())
+  const dragStartRef = useRef<Date | null>(null)
   const [isSelecting, setIsSelecting] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
@@ -417,7 +418,7 @@ export default function CalendarView({
 
   const isDayInSelection = useCallback(
     (date: Date): boolean => {
-      return currentSelection.some((day) => isSameDay(day, date))
+      return currentSelection.has(format(date, "yyyy-MM-dd"))
     },
     [currentSelection],
   )
@@ -454,7 +455,8 @@ export default function CalendarView({
       if (isDayBooked(day) || isPastDay(day)) return
       toggleDayStatus(day)
       setIsSelecting(true)
-      setCurrentSelection([day])
+      dragStartRef.current = day
+      setCurrentSelection(new Set([format(day, "yyyy-MM-dd")]))
     },
     [isDayBooked, isPastDay, toggleDayStatus],
   )
@@ -463,55 +465,55 @@ export default function CalendarView({
     (day: Date) => {
       if (!isSelecting || isDayBooked(day) || isPastDay(day)) return
 
-      if (currentSelection.length > 0) {
-        const startDate = currentSelection[0]
-        const startTime = startDate.getTime()
-        const currentTime = day.getTime()
-        const isForward = startTime <= currentTime
+      const startDate = dragStartRef.current
+      if (!startDate) return
 
-        let current = new Date(startDate)
-        const dates = [new Date(current)]
+      const isForward = startDate.getTime() <= day.getTime()
 
-        while (!isSameDay(current, day)) {
-          current = addDays(current, isForward ? 1 : -1)
-          dates.push(new Date(current))
-        }
+      let current = new Date(startDate)
+      const keys = new Set<string>()
+      if (!isDayBooked(current) && !isPastDay(current)) keys.add(format(current, "yyyy-MM-dd"))
 
-        const validDates = dates.filter((date) => !isDayBooked(date) && !isPastDay(date))
-        setCurrentSelection(validDates)
+      while (!isSameDay(current, day)) {
+        current = addDays(current, isForward ? 1 : -1)
+        if (!isDayBooked(current) && !isPastDay(current)) keys.add(format(current, "yyyy-MM-dd"))
       }
+
+      setCurrentSelection(keys)
     },
-    [isSelecting, currentSelection, isDayBooked, isPastDay],
+    [isSelecting, isDayBooked, isPastDay],
   )
 
   const handleDayMouseUp = useCallback(() => {
     if (!isSelecting) return
 
-    if (currentSelection.length > 1) {
-      const firstDayKey = format(currentSelection[0], "yyyy-MM-dd")
-      const firstDayInfo = dayMapRef.current.get(firstDayKey)
+    if (currentSelection.size > 1) {
+      const startDate = dragStartRef.current
+      const firstDayKey = startDate ? format(startDate, "yyyy-MM-dd") : undefined
+      const firstDayInfo = firstDayKey ? dayMapRef.current.get(firstDayKey) : undefined
       const targetStatus = firstDayInfo?.status || "unavailable"
 
       setCalendarDays((prevDays) => {
         const newDays = [...prevDays]
 
-        for (let i = 1; i < currentSelection.length; i++) {
-          const dateKey = format(currentSelection[i], "yyyy-MM-dd")
+        currentSelection.forEach((dateKey) => {
+          if (dateKey === firstDayKey) return
           const dayInfo = dayMapRef.current.get(dateKey)
 
-          if (dayInfo && dayInfo.status !== "booked" && !isPastDay(currentSelection[i])) {
+          if (dayInfo && dayInfo.status !== "booked") {
             dayMapRef.current.set(dateKey, { ...dayInfo, status: targetStatus })
             newDays[dayInfo.index] = { ...newDays[dayInfo.index], status: targetStatus }
           }
-        }
+        })
 
         return newDays
       })
     }
 
     setIsSelecting(false)
-    setCurrentSelection([])
-  }, [isSelecting, currentSelection, isPastDay])
+    setCurrentSelection(new Set())
+    dragStartRef.current = null
+  }, [isSelecting, currentSelection])
 
   const handleExit = useCallback(() => {
     setShowConfirmDialog(false)
