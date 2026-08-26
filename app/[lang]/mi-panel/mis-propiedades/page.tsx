@@ -189,9 +189,9 @@ const PropertiesPage: React.FC = () => {
                     <Image
                       src={getAssetUrl(property.mainImage || "/placeholder.svg", "medium")}
                       alt={property.name}
-                      layout="fill"
-                      objectFit="cover"
-                      className="transition-transform duration-300 hover:scale-105"
+                      fill
+                      sizes="(min-width: 1024px) 20vw, (min-width: 640px) 40vw, 100vw"
+                      className="object-cover transition-transform duration-300 hover:scale-105"
                     />
                   </Link>
                 </div>

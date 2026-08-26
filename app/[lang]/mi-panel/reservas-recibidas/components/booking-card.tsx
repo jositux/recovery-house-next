@@ -327,9 +327,9 @@ export const BookingCard = ({
                 : "/placeholder.svg?height=400&width=600"
             }
             alt={roomDetails?.name || t.room}
-            layout="fill"
-            objectFit="cover"
-            className="rounded-t-lg md:rounded-l-lg md:rounded-t-none"
+            fill
+            sizes="(min-width: 768px) 33vw, 100vw"
+            className="object-cover rounded-t-lg md:rounded-l-lg md:rounded-t-none"
           />
 
           <div

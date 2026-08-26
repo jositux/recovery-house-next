@@ -22,9 +22,9 @@ export default function WelcomePage() {
           <Image
             src="/assets/welcome/visitante.jpg"
             alt="Imagen de bienvenida"
-            layout="fill"
-            objectFit="cover"
-            className="transition-transform duration-300 hover:scale-105"
+            fill
+            sizes="(min-width: 768px) 768px, 100vw"
+            className="object-cover transition-transform duration-300 hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           <div className="absolute bottom-0 left-0 p-6 text-white">

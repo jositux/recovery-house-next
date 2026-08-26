@@ -42,9 +42,9 @@ export function RoomCardShared({
           <Image
             src={image || "/placeholder.svg"}
             alt={name}
-            layout="fill"
-            objectFit="cover"
-            className="rounded-t-xl"
+            fill
+            sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+            className="object-cover rounded-t-xl"
           />
           {/* Icono y texto de habitación compartida */}
           <div className="absolute top-2 right-2 flex items-center space-x-1 bg-white py-1 px-2 rounded-full shadow-md">

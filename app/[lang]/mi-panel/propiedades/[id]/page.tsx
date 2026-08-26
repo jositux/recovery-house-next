@@ -465,8 +465,9 @@ export default function RoomPage() {
         <Image
           src={getImageSrc(property.mainImage) || "/assets/empty.jpg"}
           alt={property.name}
-          layout="fill"
-          objectFit="cover"
+          fill
+          sizes="100vw"
+          className="object-cover"
         />
 
         <div className="absolute inset-0 bg-black bg-opacity-50" />

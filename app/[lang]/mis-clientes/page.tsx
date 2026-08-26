@@ -295,9 +295,9 @@ const BookingList: React.FC = () => {
                                         : "/placeholder.svg?height=400&width=600"
                                     }
                                     alt={roomDetails?.name || "Room image"}
-                                    layout="fill"
-                                    objectFit="cover"
-                                    className="rounded-t-lg md:rounded-l-lg md:rounded-t-none"
+                                    fill
+                                    sizes="(min-width: 768px) 33vw, 100vw"
+                                    className="object-cover rounded-t-lg md:rounded-l-lg md:rounded-t-none"
                                   />
                                   <div
                                     className={`absolute top-4 left-4 px-3 py-1 rounded-full text-sm font-medium ${
@@ -421,9 +421,9 @@ const BookingList: React.FC = () => {
                                         : "/placeholder.svg?height=400&width=600"
                                     }
                                     alt={roomDetails?.name || "Room image"}
-                                    layout="fill"
-                                    objectFit="cover"
-                                    className="rounded-t-lg md:rounded-l-lg md:rounded-t-none grayscale-[20%]"
+                                    fill
+                                    sizes="(min-width: 768px) 33vw, 100vw"
+                                    className="object-cover rounded-t-lg md:rounded-l-lg md:rounded-t-none grayscale-[20%]"
                                   />
                                   <div
                                     className={`absolute top-4 left-4 px-3 py-1 rounded-full text-sm font-medium ${
