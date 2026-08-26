@@ -2,39 +2,46 @@
 
 import type React from "react"
 import { useState } from "react"
-import { X, Upload, ImageIcon, AlertTriangle } from "lucide-react"
+import { X, Upload, ImageIcon, AlertTriangle, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
+import { compressImages } from "@/lib/compressImage"
 
 // --- Translation Interfaces and Data ---
 
 interface ImageUploaderTranslation {
   uploadButton: string
+  processingButton: string
   imageCountLabel: string
   removeAria: string
-  noImagesTitle: string
   noImagesSubtitle: (max: number) => string
+  dragHint: string
   invalidFileError: (filename: string) => string
+  processingFileError: (filename: string, reason: string) => string
   errorTitle: string
 }
 
 const translations: Record<string, ImageUploaderTranslation> = {
   es: {
     uploadButton: "Subir Fotos",
+    processingButton: "Procesando...",
     imageCountLabel: "fotos",
     removeAria: "Eliminar foto",
-    noImagesTitle: "No hay fotos subidas",
     noImagesSubtitle: (max: number) => `Puedes subir hasta ${max} fotos`,
+    dragHint: "Arrastrá tus fotos acá, o hacé clic para elegirlas",
     invalidFileError: (filename: string) => `${filename} no es una imagen válida.`,
+    processingFileError: (filename: string, reason: string) => `${filename}: ${reason}`,
     errorTitle: "Error de Subida",
   },
   en: {
     uploadButton: "Upload Photos",
+    processingButton: "Processing...",
     imageCountLabel: "photos",
     removeAria: "Remove photo",
-    noImagesTitle: "No photos uploaded yet",
     noImagesSubtitle: (max: number) => `You can upload up to ${max} photos`,
+    dragHint: "Drag your photos here, or click to choose them",
     invalidFileError: (filename: string) => `${filename} is not a valid image.`,
+    processingFileError: (filename: string, reason: string) => `${filename}: ${reason}`,
     errorTitle: "Upload Error",
   },
 }
@@ -58,18 +65,18 @@ export function MultiImageUploader({
   const [images, setImages] = useState<File[]>([])
   const [previewUrls, setPreviewUrls] = useState<string[]>(defaultImages)
   const [uploadError, setUploadError] = useState<string | null>(null) // State for internal error message
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [isDraggingOver, setIsDraggingOver] = useState(false)
 
   // Select the current translation object
   const currentLangKey = lang.toLowerCase().startsWith("es") ? "es" : "en"
   const t = translations[currentLangKey]
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Clear previous errors
+  // Compartido entre el <input type="file"> y el drag-and-drop.
+  const processFiles = async (files: File[]) => {
     setUploadError(null)
 
-    const files = Array.from(e.target.files || [])
     const remainingSlots = maxImages - previewUrls.length
-
     const filesToProcess = files.slice(0, remainingSlots)
 
     // Validate and separate files
@@ -89,21 +96,33 @@ export function MultiImageUploader({
       }
     })
 
-    if (hasInvalidFile) {
-      setUploadError(t.invalidFileError(invalidFileName))
-    }
-
     if (validFiles.length === 0) {
-      // Reset input even if no valid files were processed
-      e.target.value = ""
+      if (hasInvalidFile) setUploadError(t.invalidFileError(invalidFileName))
       return
     }
 
+    // Redimensiona/recomprime cada foto en el navegador antes de subirla (evita
+    // chocar con el límite de tamaño de request al subir fotos de celular).
+    setIsProcessing(true)
+    const results = await compressImages(validFiles)
+    setIsProcessing(false)
+
+    const compressedFiles = results.filter((r) => r.file).map((r) => r.file as File)
+    const failed = results.find((r) => r.error)
+
+    if (failed) {
+      setUploadError(t.processingFileError(failed.original.name, failed.error!))
+    } else if (hasInvalidFile) {
+      setUploadError(t.invalidFileError(invalidFileName))
+    }
+
+    if (compressedFiles.length === 0) return
+
     // 1. Create preview URLs for the valid new files
-    const newPreviewUrls = validFiles.map((file) => URL.createObjectURL(file))
+    const newPreviewUrls = compressedFiles.map((file) => URL.createObjectURL(file))
 
     // 2. Update states
-    const updatedImages = [...images, ...validFiles]
+    const updatedImages = [...images, ...compressedFiles]
     const updatedPreviews = [...previewUrls, ...newPreviewUrls]
 
     setImages(updatedImages)
@@ -111,9 +130,30 @@ export function MultiImageUploader({
 
     // 3. Notify parent component
     onImagesChange?.(updatedImages)
+  }
 
-    // 4. Reset input
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
     e.target.value = ""
+    await processFiles(files)
+  }
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    if (previewUrls.length < maxImages && !isDraggingOver) setIsDraggingOver(true)
+  }
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    setIsDraggingOver(false)
+  }
+
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    setIsDraggingOver(false)
+    if (previewUrls.length >= maxImages) return
+    const files = Array.from(e.dataTransfer.files || [])
+    if (files.length > 0) await processFiles(files)
   }
 
   const handleRemoveImage = (index: number) => {
@@ -151,7 +191,12 @@ export function MultiImageUploader({
   const canUploadMore = totalImages < maxImages
 
   return (
-    <div className="space-y-4">
+    <div
+      className={`space-y-4 rounded-lg transition-colors ${isDraggingOver ? "ring-2 ring-primary ring-offset-2" : ""}`}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
       {/* Upload Button Section */}
       <div className="flex items-center gap-4">
         {canUploadMore && (
@@ -159,10 +204,15 @@ export function MultiImageUploader({
             type="button"
             variant="outline"
             className="relative bg-transparent"
+            disabled={isProcessing}
             onClick={() => document.getElementById("image-upload")?.click()}
           >
-            <Upload className="mr-2 h-4 w-4" />
-            {t.uploadButton}
+            {isProcessing ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Upload className="mr-2 h-4 w-4" />
+            )}
+            {isProcessing ? t.processingButton : t.uploadButton}
           </Button>
         )}
         <span className="text-sm text-muted-foreground">
@@ -212,7 +262,7 @@ export function MultiImageUploader({
           onClick={() => document.getElementById("image-upload")?.click()}
         >
           <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-          <p className="text-sm text-muted-foreground mb-2">{t.noImagesTitle}</p>
+          <p className="text-sm text-muted-foreground mb-2">{t.dragHint}</p>
           <p className="text-xs text-muted-foreground">{t.noImagesSubtitle(maxImages)}</p>
         </div>
       )}

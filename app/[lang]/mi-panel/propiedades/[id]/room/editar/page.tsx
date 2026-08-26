@@ -4,7 +4,7 @@ import { useState } from "react"
 import RoomForm from "./RoomForm"
 import { roomUpdateService, type RoomUpdateData } from "@/services/RoomUpdateService4"
 import { Fraunces } from "next/font/google"
-import { uploadFile } from "@/services/fileUploadService"
+import { uploadFiles } from "@/services/fileUploadService"
 import { deleteFile } from "@/services/deleteFileService"
 import { useToast } from "@/hooks/use-toast"
 // Definición simple de tipos de idioma para referencia 
@@ -64,8 +64,7 @@ export default function RoomPage() {
           description: `Subiendo ${newFiles.length} imagen(es) nueva(s)`,
         })
 
-        const uploadPromises = newFiles.map((file) => uploadFile(file))
-        const uploadResults = await Promise.all(uploadPromises)
+        const uploadResults = await uploadFiles(newFiles)
         const newImageIds = uploadResults.map((result) => result.id)
 
         finalPhotoIds = [...idsNotMarked, ...newImageIds]
@@ -101,7 +100,9 @@ export default function RoomPage() {
     }
   }
 
-  const storedRoomData = localStorage.getItem("selected_room")
+  // localStorage no existe durante el render en el servidor (Next.js
+  // server-renderiza los "use client" también); hay que chequear window antes.
+  const storedRoomData = typeof window !== "undefined" ? localStorage.getItem("selected_room") : null
 
   const initialValues: RoomUpdateData = storedRoomData
     ? (() => {

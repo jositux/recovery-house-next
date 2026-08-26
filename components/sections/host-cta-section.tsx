@@ -18,8 +18,8 @@ export function HostCTASection({ lang = "es" }: HostCTASectionProps) {
         src="/assets/cta/0.jpg"
         alt="Background"
         fill
-        className="object-cover"
-        priority
+        className="object-cover hidden md:block"
+        sizes="(min-width: 1536px) 1536px, (min-width: 1280px) 1280px, (min-width: 1024px) 1024px, (min-width: 768px) 768px, 100vw"
       />
 
       <Image
@@ -27,7 +27,7 @@ export function HostCTASection({ lang = "es" }: HostCTASectionProps) {
         alt="Background mobile"
         fill
         className="object-cover md:hidden"
-        priority
+        sizes="100vw"
       />
 
       {/* Content */}

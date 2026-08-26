@@ -29,10 +29,11 @@ export const fileService = {
       formData.append('description', data.description);*/
       formData.append('file', data.file);
 
+      // No fijar Content-Type a mano: con FormData el navegador tiene que
+      // generarlo (incluye el "boundary" que separa las partes del archivo).
       const response = await axios.post<FileUploadResponse>(`${API_URL}`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
         },
         onUploadProgress: (progressEvent) => {
           if (data.onProgress && progressEvent.total !== undefined) {

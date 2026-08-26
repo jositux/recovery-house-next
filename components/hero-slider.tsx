@@ -125,6 +125,7 @@ export function HeroSlider({ lang = "es" }: HeroSliderProps) {
                 fill
                 className="object-cover"
                 priority
+                sizes="(min-width: 1536px) 1536px, (min-width: 1280px) 1280px, (min-width: 1024px) 1024px, (min-width: 768px) 768px, (min-width: 640px) 640px, 100vw"
               />
             </div>
             <div className={styles.contentContainer}>
@@ -156,6 +157,7 @@ export function HeroSlider({ lang = "es" }: HeroSliderProps) {
                   className="object-contain"
                   priority
                   draggable={false}
+                  sizes="(min-width: 1536px) 768px, (min-width: 1280px) 640px, (min-width: 1024px) 512px, (min-width: 768px) 384px, (min-width: 640px) 320px, 50vw"
                 />
               </div>
             </div>

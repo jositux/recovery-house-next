@@ -28,6 +28,7 @@ export function BenefitsSection({ lang }: BenefitsSectionProps) {
               }
               fill
               className="object-cover"
+              sizes="(min-width: 1536px) 768px, (min-width: 1280px) 640px, (min-width: 1024px) 512px, (min-width: 768px) 384px, 100vw"
             />
           </div>
 

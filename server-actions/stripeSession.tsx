@@ -21,9 +21,10 @@ export const postStripeSession = async ({
   unit_amount,
   lang
 }: NewSessionOptions) => {
-  const returnUrl =
-  `https://recoverycaresolutions.com/${lang}/checkout-return?session_id={CHECKOUT_SESSION_ID}`;
-  //`http://localhost:3000/${lang}/checkout-return?session_id={CHECKOUT_SESSION_ID}`;
+  // NODE_ENV es server-only (no lo puede manipular el cliente), a diferencia de
+  // leer el header Origin de la request.
+  const baseUrl = process.env.NODE_ENV === "development" ? "http://localhost:3000" : process.env.NEXT_PUBLIC_APP_URL;
+  const returnUrl = `${baseUrl}/${lang}/checkout-return?session_id={CHECKOUT_SESSION_ID}`;
 
   const session = await stripe.checkout.sessions.create({
     ui_mode: "embedded",

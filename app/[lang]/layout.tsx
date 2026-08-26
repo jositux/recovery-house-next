@@ -58,7 +58,7 @@ export default async function LocaleLayout({
       </FadeWrapper>
 
       {/* MAIN con fade in */}
-      <FadeWrapper delay={1}>
+      <FadeWrapper delay={1} remountOnNavigate>
         <main className="max-auto relative z-0">
           <PageTracker />
           {children}

@@ -26,10 +26,11 @@ export const uploadBase64ToDirectus = async (
     formData.append("file", file)
 
     // Enviar la imagen a Directus con Axios
+    // No fijar Content-Type a mano: con FormData el navegador tiene que
+    // generarlo (incluye el "boundary" que separa las partes del archivo).
     const response = await axios.post(`${DIRECTUS_URL}/files`, formData, {
       headers: {
         Authorization: `Bearer ${accessToken}`, // Se usa el token de acceso
-        "Content-Type": "multipart/form-data",
       },
     })
 

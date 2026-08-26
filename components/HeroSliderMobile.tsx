@@ -1,6 +1,7 @@
 "use client"
 
 import { useRef, useState, useEffect, useCallback } from "react"
+import Image from "next/image"
 import { Card, CardContent } from "@/components/ui/card"
 import { Fraunces } from "next/font/google"
 
@@ -172,11 +173,14 @@ export function HeroSliderMobile({ lang = "es" }: HeroSliderMobileProps) {
             <Card className="w-full border-none shadow-none bg-transparent">
               <CardContent className="p-0 flex flex-col">
                 <div className="w-full aspect-[4/3] relative overflow-hidden rounded-2xl bg-[#E0EDF6]">
-                  <img
+                  <Image
                     src={card.imageSrc}
                     alt={card.title}
-                    className="w-full h-full object-cover rounded-2xl"
+                    fill
+                    className="object-cover rounded-2xl"
+                    sizes="82vw"
                     draggable={false}
+                    priority={index < baseCards.length}
                   />
                 </div>
                 <div className="mt-4">

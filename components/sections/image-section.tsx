@@ -10,7 +10,6 @@ export default function BannerImage() {
         height={1080}
         sizes="100vw"
         className="w-full h-auto object-cover"
-        priority
       />
     </div>
   );

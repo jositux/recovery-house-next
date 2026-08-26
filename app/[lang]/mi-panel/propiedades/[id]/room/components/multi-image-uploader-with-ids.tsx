@@ -2,53 +2,60 @@
 
 import type React from "react";
 import { useState, useEffect, useRef } from "react";
-import { X, Upload, ImageIcon, AlertTriangle } from "lucide-react";
+import { X, Upload, ImageIcon, AlertTriangle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { getAssetUrl } from "@/lib/getAssetUrl";
+import { compressImages } from "@/lib/compressImage";
 
 // --- Translation Interfaces and Data ---
 
 interface ImageUploaderTranslation {
   uploadButton: string;
+  processingButton: string;
   imageCountLabel: string;
   existingCount: string;
   newCount: string;
   removeAria: string;
-  noImagesTitle: string;
   noImagesSubtitle: (max: number) => string;
+  dragHint: string;
   maxReachedError: (max: number) => string;
   invalidFileError: (filename: string) => string;
+  processingFileError: (filename: string, reason: string) => string;
   errorTitle: string;
 }
 
 const translations: Record<string, ImageUploaderTranslation> = {
   es: {
     uploadButton: "Cargar Fotos",
+    processingButton: "Procesando...",
     imageCountLabel: "fotos",
     existingCount: "existentes",
     newCount: "nuevas",
     removeAria: "Eliminar foto",
-    noImagesTitle: "No hay fotos",
     noImagesSubtitle: (max: number) => `Puedes subir hasta ${max} fotos`,
+    dragHint: "Arrastrá tus fotos acá, o hacé clic para elegirlas",
     maxReachedError: (max: number) =>
       `Límite alcanzado. Solo puedes tener ${max} fotos en total.`,
     invalidFileError: (filename: string) =>
       `${filename} no es una imagen válida.`,
+    processingFileError: (filename: string, reason: string) => `${filename}: ${reason}`,
     errorTitle: "Error de Carga",
   },
   en: {
     uploadButton: "Upload Photos",
+    processingButton: "Processing...",
     imageCountLabel: "photos",
     existingCount: "existing",
     newCount: "new",
     removeAria: "Remove photo",
-    noImagesTitle: "No photos uploaded yet",
     noImagesSubtitle: (max: number) => `You can upload up to ${max} photos`,
+    dragHint: "Drag your photos here, or click to choose them",
     maxReachedError: (max: number) =>
       `Limit reached. You can only have ${max} photos in total.`,
     invalidFileError: (filename: string) =>
       `${filename} is not a valid image.`,
+    processingFileError: (filename: string, reason: string) => `${filename}: ${reason}`,
     errorTitle: "Upload Error",
   },
 };
@@ -97,6 +104,8 @@ export function MultiImageUploaderWithIds({
     new Set()
   );
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
 
   // Notificar al componente padre cada vez que cambien los archivos o los marcados para borrar
   useEffect(() => {
@@ -115,27 +124,24 @@ export function MultiImageUploaderWithIds({
     };
   }, [newFiles]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUploadError(null); // Clear previous errors
-
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
+  // Compartido entre el <input type="file"> y el drag-and-drop.
+  const processFiles = async (files: File[]) => {
+    setUploadError(null);
 
     const visibleExistingCount = existingIds.filter(
       (id) => !markedForDeletion.has(id)
     ).length;
     const totalCurrentImages = visibleExistingCount + newFiles.length;
     const remainingSlots = Math.max(0, maxImages - totalCurrentImages);
-    
+
     // Check if max capacity is reached before processing files
     if (remainingSlots === 0) {
       setUploadError(t.maxReachedError(maxImages));
-      e.target.value = "";
       return;
     }
 
     const filesToProcess = files.slice(0, remainingSlots);
-    
+
     const validFiles: File[] = [];
     let hasInvalidFile = false;
     let invalidFileName = "";
@@ -151,23 +157,59 @@ export function MultiImageUploaderWithIds({
       }
     });
 
-    if (hasInvalidFile) {
-        setUploadError(t.invalidFileError(invalidFileName));
-    }
-
     if (validFiles.length === 0) {
-      e.target.value = "";
+      if (hasInvalidFile) setUploadError(t.invalidFileError(invalidFileName));
       return;
     }
 
-    const mapped: NewFile[] = validFiles.map((file) => ({
+    // Redimensiona/recomprime cada foto en el navegador antes de subirla (evita
+    // chocar con el límite de tamaño de request al subir fotos de celular).
+    setIsProcessing(true);
+    const results = await compressImages(validFiles);
+    setIsProcessing(false);
+
+    const compressedFiles = results.filter((r) => r.file).map((r) => r.file as File);
+    const failed = results.find((r) => r.error);
+
+    if (failed) {
+      setUploadError(t.processingFileError(failed.original.name, failed.error!));
+    } else if (hasInvalidFile) {
+      setUploadError(t.invalidFileError(invalidFileName));
+    }
+
+    if (compressedFiles.length === 0) return;
+
+    const mapped: NewFile[] = compressedFiles.map((file) => ({
       id: genId(),
       file,
       url: URL.createObjectURL(file),
     }));
 
     setNewFiles((prev) => [...prev, ...mapped]);
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
     e.target.value = "";
+    if (files.length === 0) return;
+    await processFiles(files);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (!isDraggingOver) setIsDraggingOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDraggingOver(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDraggingOver(false);
+    const files = Array.from(e.dataTransfer.files || []);
+    if (files.length > 0) await processFiles(files);
   };
 
   const handleRemoveImage = (index: number) => {
@@ -199,7 +241,12 @@ export function MultiImageUploaderWithIds({
   const canUploadMore = totalImages < maxImages;
 
   return (
-    <div className="space-y-4">
+    <div
+      className={`space-y-4 rounded-lg transition-colors ${isDraggingOver ? "ring-2 ring-primary ring-offset-2" : ""}`}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
       {/* Upload Button Section */}
       <div className="flex items-center gap-4">
         {canUploadMore && (
@@ -207,10 +254,15 @@ export function MultiImageUploaderWithIds({
             type="button"
             variant="outline"
             className="relative bg-transparent"
+            disabled={isProcessing}
             onClick={() => document.getElementById("image-upload-ids")?.click()}
           >
-            <Upload className="mr-2 h-4 w-4" />
-            {t.uploadButton}
+            {isProcessing ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Upload className="mr-2 h-4 w-4" />
+            )}
+            {isProcessing ? t.processingButton : t.uploadButton}
           </Button>
         )}
         <span className="text-sm text-muted-foreground">
@@ -297,7 +349,7 @@ export function MultiImageUploaderWithIds({
           onClick={() => document.getElementById("image-upload-ids")?.click()}
         >
           <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-          <p className="text-sm text-muted-foreground mb-2">{t.noImagesTitle}</p>
+          <p className="text-sm text-muted-foreground mb-2">{t.dragHint}</p>
           <p className="text-xs text-muted-foreground">
             {t.noImagesSubtitle(maxImages)}
           </p>

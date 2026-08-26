@@ -3,7 +3,7 @@
 import { useState } from "react"
 import RoomForm from "./RoomForm"
 import { roomService } from "@/services/AddRoomImagesService"
-import { uploadFile } from "@/services/fileUploadService"
+import { uploadFiles } from "@/services/fileUploadService"
 import { Fraunces } from "next/font/google"
 import { usePathname, useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
@@ -82,8 +82,7 @@ export default function RoomPage() {
     if (data.imageFiles && data.imageFiles.length > 0) {
       setIsUploading(true)
       try {
-        const uploadPromises = data.imageFiles.map((file: File) => uploadFile(file))
-        const uploadResults = await Promise.all(uploadPromises)
+        const uploadResults = await uploadFiles(data.imageFiles)
         const imageIds = uploadResults.map((result) => result.id)
 
         data.photos = imageIds
