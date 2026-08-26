@@ -130,26 +130,26 @@ export function LoginForm({ lang }: LoginFormProps) {
 
       window.dispatchEvent(new Event("storage"))
 
+      // Redirect to complementary registration if first_name or last_name is missing
+      if (!currentUser.first_name || !currentUser.last_name) {
+        router.push(`/${lang}/perfil`)
+        return
+      }
+
       // Verificar el initialRole y redirigir
       const initialRole = localStorage.getItem("initialRole")
       switch (initialRole) {
         case "Patient":
-          router.push("/w-visitante")
+          router.push(`/${lang}/w-visitante`)
           break
         case "PropertyOwner":
-          router.push("/w-host")
+          router.push(`/${lang}/w-host`)
           break
         case "ServiceProvider":
-          router.push("/w-proveedor")
+          router.push(`/${lang}/w-proveedor`)
           break
         default:
-          router.push("/rooms")
-      }
-
-      // Redirect to complementary registration if first_name or last_name is missing
-      if (!currentUser.first_name || !currentUser.last_name) {
-        router.push("/perfil")
-        return
+          router.push(`/${lang}/rooms`)
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
