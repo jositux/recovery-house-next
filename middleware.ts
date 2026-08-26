@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server'
 // Asegúrate de que este archivo defina 'defaultLocale', 'locales' y 'Locale'
 import { defaultLocale, locales, type Locale } from "./lib/i18n"
 import { AUTH_COOKIE_ACCESS } from "./lib/directus"
+import { checkRateLimit, formatRetryMessage, getClientIp } from "./lib/rateLimit"
 
 // Nombre de la cookie para guardar la preferencia de idioma del usuario
 const LOCALE_COOKIE_NAME = 'NEXT_LOCALE'; 
@@ -110,6 +111,19 @@ function getLocaleFromPath(pathname: string): Locale | null {
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Freno básico contra spam de emails de reset de contraseña (este endpoint
+  // no pasa por ninguna ruta propia de /api, va directo al proxy de abajo).
+  if (pathname.startsWith('/webapi/auth/password/request')) {
+    const ip = getClientIp(request)
+    const rateLimit = checkRateLimit(`password-request:${ip}`, 3, 10 * 60 * 1000)
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { message: formatRetryMessage(rateLimit.retryAfterSeconds) },
+        { status: 429, headers: { 'Retry-After': String(rateLimit.retryAfterSeconds) } }
+      )
+    }
+  }
 
   // --- Proxy de /webapi/*: inyecta el Authorization real desde la cookie httpOnly ---
   // El token nunca vive en JS/localStorage; lo que el cliente mande en este header

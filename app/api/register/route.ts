@@ -1,6 +1,7 @@
 // app/api/register/route.ts
 import { NextResponse } from 'next/server';
 import { DIRECTUS_URL } from '@/lib/directus';
+import { checkRateLimit, formatRetryMessage, getClientIp } from '@/lib/rateLimit';
 
 // Mensaje único para cualquier caso de "no se puede registrar con este email"
 // (ya activo, suspendido, o duplicado en Directus), para no revelar el estado
@@ -8,6 +9,17 @@ import { DIRECTUS_URL } from '@/lib/directus';
 const GENERIC_REGISTRATION_ERROR = 'No pudimos completar el registro con estos datos. Si ya tienes una cuenta, inicia sesión o contáctanos.';
 
 export async function POST(request: Request) {
+    // Freno básico contra registros automatizados en masa (ver
+    // lib/rateLimit.ts para las limitaciones de este enfoque en serverless).
+    const ip = getClientIp(request);
+    const rateLimit = checkRateLimit(`register:${ip}`, 5, 10 * 60 * 1000);
+    if (!rateLimit.allowed) {
+        return NextResponse.json(
+            { message: formatRetryMessage(rateLimit.retryAfterSeconds) },
+            { status: 429, headers: { 'Retry-After': String(rateLimit.retryAfterSeconds) } }
+        );
+    }
+
     try {
         // Destructure new fields from the request body
         const {email, password, lang } = await request.json();

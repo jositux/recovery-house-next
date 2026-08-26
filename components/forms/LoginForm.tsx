@@ -155,6 +155,8 @@ export function LoginForm({ lang }: LoginFormProps) {
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 401) {
           setAuthError(t.authError401)
+        } else if (error.response?.status === 429 && error.response?.data?.message) {
+          setAuthError(error.response.data.message)
         } else {
           setAuthError(
             t.authErrorOther(

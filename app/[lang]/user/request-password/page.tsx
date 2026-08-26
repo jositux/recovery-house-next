@@ -46,6 +46,14 @@ export default function ForgotPassword() {
       
       if (response.ok) {
         router.push(isSpanish ? `/${lang}/login?message=reset` : `/${lang}/login?message=reset`); // Puedes usar query distinto si quieres
+      } else if (response.status === 429) {
+        const data = await response.json().catch(() => null);
+        setError(
+          data?.message ||
+            (isSpanish
+              ? 'Demasiados intentos. Probá de nuevo en unos minutos.'
+              : 'Too many attempts. Try again in a few minutes.')
+        );
       } else {
         setError(
           isSpanish
