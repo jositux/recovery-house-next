@@ -3,7 +3,7 @@
 import axios from 'axios'; 
 
 
-const API_URL = "https://us-east-1a.recoverycaresolutions.com/items/Available_Locations"
+const API_URL = `${process.env.DIRECTUS_URL}/items/Available_Locations`
 
 export interface LocationOption {
   id: string

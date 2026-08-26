@@ -1,5 +1,6 @@
-// Host real de Directus. Debe coincidir con el destino del rewrite '/webapi/:path*' en next.config.ts.
-export const DIRECTUS_URL = "https://us-east-1a.recoverycaresolutions.com";
+// Host real de Directus. Se define una sola vez en DIRECTUS_URL (.env) y de ahí
+// lo toman next.config.ts (rewrite + remotePatterns) y este archivo.
+export const DIRECTUS_URL = process.env.DIRECTUS_URL as string;
 
 export const AUTH_COOKIE_ACCESS = "access_token_secure";
 export const AUTH_COOKIE_REFRESH = "refresh_token_secure";
