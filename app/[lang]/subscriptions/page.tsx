@@ -135,7 +135,7 @@ function SubscriptionPlans() {
     // Plan Trimestral
     quarterlyTitle: isSpanish ? "Piloto" : "Pilot",
     quarterlyDescription: isSpanish ? "Ideal para comenzar" : "Ideal for starting out",
-    quarterlyDuration: isSpanish ? " / cada 3 meses" : " / every 3 months",
+    quarterlyDuration: isSpanish ? "" : "",
     quarterlyFeatures: [
       isSpanish ? "Aparición prioritaria en búsquedas" : "Priority appearance in searches",
       isSpanish ? "Visible en todas las habitaciones relacionadas" : "Visible in all related rooms",
