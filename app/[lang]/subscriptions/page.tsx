@@ -133,7 +133,7 @@ function SubscriptionPlans() {
     annualButton: isSpanish ? "Comenzar Plan Anual" : "Start Annual Plan",
 
     // Plan Trimestral
-    quarterlyTitle: isSpanish ? "Plan Trimestral (Piloto)" : "Quarterly Plan (Pilot)",
+    quarterlyTitle: isSpanish ? "Piloto" : "Pilot",
     quarterlyDescription: isSpanish ? "Ideal para comenzar" : "Ideal for starting out",
     quarterlyDuration: isSpanish ? " / cada 3 meses" : " / every 3 months",
     quarterlyFeatures: [

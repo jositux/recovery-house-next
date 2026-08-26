@@ -45,6 +45,7 @@ export async function POST(request: Request) {
       ],
       success_url: `${appUrl}/${lang}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/${lang}/subscriptions`,
+      allow_promotion_codes: true,
     });
 
     return NextResponse.json({ sessionId: session.id });
