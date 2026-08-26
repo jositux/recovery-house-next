@@ -43,6 +43,7 @@ export const postStripeSession = async ({
     ],
     mode: "payment",
     return_url: returnUrl,
+    allow_promotion_codes: true,
   });
 
   if (!session.client_secret) {
