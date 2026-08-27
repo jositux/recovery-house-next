@@ -131,18 +131,6 @@ function SubscriptionPlans() {
       isSpanish ? "Herramientas avanzadas de seguimiento" : "Advanced tracking tools",
     ],
     annualButton: isSpanish ? "Comenzar Plan Anual" : "Start Annual Plan",
-
-    // Plan Trimestral
-    quarterlyTitle: isSpanish ? "Piloto" : "Pilot",
-    quarterlyDescription: isSpanish ? "Ideal para comenzar" : "Ideal for starting out",
-    quarterlyDuration: isSpanish ? "" : "",
-    quarterlyFeatures: [
-      isSpanish ? "Aparición prioritaria en búsquedas" : "Priority appearance in searches",
-      isSpanish ? "Visible en todas las habitaciones relacionadas" : "Visible in all related rooms",
-      isSpanish ? "Pacientes ilimitados" : "Unlimited patients",
-      isSpanish ? "Herramientas avanzadas de seguimiento" : "Advanced tracking tools",
-    ],
-    quarterlyButton: isSpanish ? "Iniciar Plan" : "Start Plan",
   };
 
   return (
@@ -156,9 +144,8 @@ function SubscriptionPlans() {
             {texts.pageDescription}
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
-          {/* Plan Anual */}
-          <Card className="flex flex-col h-full transition-all duration-300 hover:shadow-lg">
+        <div className="flex justify-center max-w-md mx-auto">
+          <Card className="flex flex-col h-full w-full transition-all duration-300 hover:shadow-lg">
             <CardHeader className="pb-4">
               <CardTitle className="text-xl font-bold">{texts.annualTitle}</CardTitle>
               <CardDescription className="text-xs">
@@ -190,46 +177,6 @@ function SubscriptionPlans() {
                 className="bg-[#39759E] w-full text-sm"
               >
                 {texts.annualButton}
-              </Button>
-            </CardFooter>
-          </Card>
-
-          {/* Plan Trimestral */}
-          <Card className="flex flex-col h-full transition-all duration-300 hover:shadow-lg">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-xl font-bold">
-                {texts.quarterlyTitle}
-              </CardTitle>
-              <CardDescription className="text-xs">
-                {texts.quarterlyDescription}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex-grow pb-4">
-              <p className="text-2xl font-bold mb-2">
-                ${process.env.NEXT_PUBLIC_STRIPE_PRICE_QUARTERLY_AMOUNT} USD
-                <span className="text-sm font-normal">{texts.quarterlyDuration}</span>
-              </p>
-              <ul className="space-y-1 text-sm">
-                {texts.quarterlyFeatures.map((feature, index) => (
-                  <li key={index} className="flex items-center space-x-1">
-                    <Check className="text-green-500 flex-shrink-0 w-4 h-4" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-            <CardFooter>
-              <Button
-                onClick={() =>
-                  handleSubscribe(
-                    process.env.NEXT_PUBLIC_STRIPE_PRICE_QUARTERLY as string,
-                    "quarterly",
-                    `$${process.env.NEXT_PUBLIC_STRIPE_PRICE_QUARTERLY_AMOUNT}`
-                  )
-                }
-                className="w-full text-sm bg-[#39759E]"
-              >
-                {texts.quarterlyButton}
               </Button>
             </CardFooter>
           </Card>
