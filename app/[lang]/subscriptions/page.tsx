@@ -121,7 +121,7 @@ function SubscriptionPlans() {
       : "Offer your recovery services to more patients. Our subscriptions provide you with visibility and the necessary tools to connect with patients and expand your professional reach.",
     
     // Plan Anual
-    annualTitle: isSpanish ? "Plan Anual (Piloto)" : "Annual Plan (Pilot)",
+    annualTitle: isSpanish ? "Plan Anual" : "Annual Plan",
     annualDescription: isSpanish ? "Máxima visibilidad y herramientas" : "Maximum visibility and tools",
     annualDuration: isSpanish ? " por año" : " per month",
     annualFeatures: [
