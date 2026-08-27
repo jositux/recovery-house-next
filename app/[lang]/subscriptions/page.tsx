@@ -142,9 +142,8 @@ function SubscriptionPlans() {
       isSpanish ? "Pacientes ilimitados" : "Unlimited patients",
       isSpanish ? "Herramientas avanzadas de seguimiento" : "Advanced tracking tools",
     ],
-    quarterlyButton: isSpanish ? "Iniciar Plan Trimestral" : "Start Plan",
+    quarterlyButton: isSpanish ? "Iniciar Plan" : "Start Plan",
   };
-
 
   return (
     <div>
